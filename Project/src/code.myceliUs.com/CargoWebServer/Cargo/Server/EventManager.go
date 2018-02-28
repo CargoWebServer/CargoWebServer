@@ -413,7 +413,7 @@ func (this *EventChannel) broadcastEvent(evt *Event) {
 func (this *EventChannel) broadcastEventTo(evt *Event, account *CargoEntities.Account) {
 	for _, listener := range this.m_listeners {
 		for i := 0; i < len(account.M_sessions); i++ {
-			sessionId := account.M_sessions[i].M_id
+			sessionId := account.GetSessions()[i].GetId()
 			if sessionId == listener.m_id {
 				listener.onEvent(evt)
 			}

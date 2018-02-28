@@ -26,14 +26,10 @@ type Project struct{
 
 	/** members of Project **/
 	M_name string
-	m_filesRef []*File
-	/** If the ref is a string and not an object **/
 	M_filesRef []string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -102,138 +98,79 @@ func (this *Project) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Project) GetId() string{
+func (this *Project) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Project) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Project) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *Project) GetName() string{
+func (this *Project) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Project) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
+func (this *Project) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
+}
+
+
+func (this *Project) GetFilesRef()[]*File{
+	filesRef := make([]*File, 0)
+	for i := 0; i < len(this.M_filesRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_filesRef[i])
+		if err == nil {
+			filesRef = append(filesRef, entity.(*File))
+		}
+	}
+	return filesRef
+}
+
+func (this *Project) SetFilesRef(val []*File){
+	this.M_filesRef= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_filesRef=append(this.M_filesRef, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Name **/
-
-/** FilesRef **/
-func (this *Project) GetFilesRef() []*File{
-	if this.m_filesRef == nil {
-		this.m_filesRef = make([]*File, 0)
-		for i := 0; i < len(this.M_filesRef); i++ {
-			entity, err := this.getEntityByUuid(this.M_filesRef[i])
-			if err == nil {
-				this.m_filesRef = append(this.m_filesRef, entity.(*File))
-			}
+func (this *Project) AppendFilesRef(val *File){
+	for i:=0; i < len(this.M_filesRef); i++{
+		if this.M_filesRef[i] == val.GetUuid() {
+			return
 		}
 	}
-	return this.m_filesRef
-}
-func (this *Project) GetFilesRefStr() []string{
-	return this.M_filesRef
+	this.M_filesRef = append(this.M_filesRef, val.GetUuid())
 }
 
-/** Init reference FilesRef **/
-func (this *Project) SetFilesRef(ref interface{}){
-	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_filesRef); i++ {
-			if this.M_filesRef[i] == refStr {
-				return
-			}
-		}
-		this.M_filesRef = append(this.M_filesRef, ref.(string))
-		this.NeedSave = true
-	}else{
-		for i:=0; i < len(this.m_filesRef); i++ {
-			if this.m_filesRef[i].GetUuid() == ref.(*File).GetUuid() {
-				return
-			}
-		}
-		isExist := false
-		for i:=0; i < len(this.M_filesRef); i++ {
-			if this.M_filesRef[i] == ref.(*File).GetUuid() {
-				isExist = true
-			}
-		}
-		this.m_filesRef = append(this.m_filesRef, ref.(*File))
-	if !isExist {
-		this.M_filesRef = append(this.M_filesRef, ref.(Entity).GetUuid())
-		this.NeedSave = true
-	}
-	}
-}
-
-/** Remove reference FilesRef **/
-func (this *Project) RemoveFilesRef(ref interface{}){
-	toDelete := ref.(Entity)
-	filesRef_ := make([]*File, 0)
-	filesRefUuid := make([]string, 0)
-	for i := 0; i < len(this.m_filesRef); i++ {
-		if toDelete.GetUuid() != this.m_filesRef[i].GetUuid() {
-			filesRef_ = append(filesRef_, this.m_filesRef[i])
-			filesRefUuid = append(filesRefUuid, this.M_filesRef[i])
+func (this *Project) RemoveFilesRef(val *File){
+	filesRef := make([]string,0)
+	for i:=0; i < len(this.M_filesRef); i++{
+		if this.M_filesRef[i] != val.GetUuid() {
+			filesRef = append(filesRef, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.m_filesRef = filesRef_
-	this.M_filesRef = filesRefUuid
+	this.M_filesRef = filesRef
 }
 
-/** Entities **/
-func (this *Project) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+
+func (this *Project) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *Project) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *Project) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *Project) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *Project) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Project) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

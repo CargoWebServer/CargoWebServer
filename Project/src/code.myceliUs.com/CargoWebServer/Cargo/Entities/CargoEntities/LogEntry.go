@@ -26,17 +26,11 @@ type LogEntry struct{
 
 	/** members of LogEntry **/
 	M_creationTime int64
-	m_entityRef Entity
-	/** If the ref is a string and not an object **/
 	M_entityRef string
 
 
 	/** Associations **/
-	m_loggerPtr *Log
-	/** If the ref is a string and not an object **/
 	M_loggerPtr string
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -105,158 +99,69 @@ func (this *LogEntry) SetEntityGetter(fct func(uuid string)(interface{}, error))
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *LogEntry) GetId() string{
+func (this *LogEntry) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *LogEntry) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *LogEntry) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** CreationTime **/
-func (this *LogEntry) GetCreationTime() int64{
+func (this *LogEntry) GetCreationTime()int64{
 	return this.M_creationTime
 }
 
-/** Init reference CreationTime **/
-func (this *LogEntry) SetCreationTime(ref interface{}){
-	if this.M_creationTime != ref.(int64) {
-		this.M_creationTime = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *LogEntry) SetCreationTime(val int64){
+	this.NeedSave = this.M_creationTime== val
+	this.M_creationTime= val
 }
 
-/** Remove reference CreationTime **/
 
-/** EntityRef **/
-func (this *LogEntry) GetEntityRef() Entity{
-	if this.m_entityRef == nil {
-		entity, err := this.getEntityByUuid(this.M_entityRef)
-		if err == nil {
-			this.m_entityRef = entity.(Entity)
-		}
+func (this *LogEntry) GetEntityRef()Entity{
+	entity, err := this.getEntityByUuid(this.M_entityRef)
+	if err == nil {
+		return entity.(Entity)
 	}
-	return this.m_entityRef
-}
-func (this *LogEntry) GetEntityRefStr() string{
-	return this.M_entityRef
+	return nil
 }
 
-/** Init reference EntityRef **/
-func (this *LogEntry) SetEntityRef(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entityRef != ref.(string) {
-			this.M_entityRef = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entityRef != ref.(Entity).GetUuid() {
-			this.M_entityRef = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entityRef = ref.(Entity)
-	}
+func (this *LogEntry) SetEntityRef(val Entity){
+	this.M_entityRef= val.GetUuid()
 }
 
-/** Remove reference EntityRef **/
-func (this *LogEntry) RemoveEntityRef(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_entityRef!= nil {
-		if toDelete.GetUuid() == this.m_entityRef.(Entity).GetUuid() {
-			this.m_entityRef = nil
-			this.M_entityRef = ""
-			this.NeedSave = true
-		}
+
+func (this *LogEntry) GetLoggerPtr()*Log{
+	entity, err := this.getEntityByUuid(this.M_loggerPtr)
+	if err == nil {
+		return entity.(*Log)
 	}
+	return nil
 }
 
-/** Logger **/
-func (this *LogEntry) GetLoggerPtr() *Log{
-	if this.m_loggerPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_loggerPtr)
-		if err == nil {
-			this.m_loggerPtr = entity.(*Log)
-		}
-	}
-	return this.m_loggerPtr
-}
-func (this *LogEntry) GetLoggerPtrStr() string{
-	return this.M_loggerPtr
+func (this *LogEntry) SetLoggerPtr(val *Log){
+	this.M_loggerPtr= val.GetUuid()
 }
 
-/** Init reference Logger **/
-func (this *LogEntry) SetLoggerPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_loggerPtr != ref.(string) {
-			this.M_loggerPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_loggerPtr != ref.(Entity).GetUuid() {
-			this.M_loggerPtr = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_loggerPtr = ref.(*Log)
-	}
+func (this *LogEntry) ResetLoggerPtr(){
+	this.M_loggerPtr= ""
 }
 
-/** Remove reference Logger **/
-func (this *LogEntry) RemoveLoggerPtr(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_loggerPtr!= nil {
-		if toDelete.GetUuid() == this.m_loggerPtr.GetUuid() {
-			this.m_loggerPtr = nil
-			this.M_loggerPtr = ""
-			this.NeedSave = true
-		}
+
+func (this *LogEntry) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
+	return nil
 }
 
-/** Entities **/
-func (this *LogEntry) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
-	}
-	return this.m_entitiesPtr
-}
-func (this *LogEntry) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+func (this *LogEntry) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Init reference Entities **/
-func (this *LogEntry) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *LogEntry) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
 
-/** Remove reference Entities **/
-func (this *LogEntry) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
-}

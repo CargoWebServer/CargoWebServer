@@ -27,8 +27,6 @@ type OAuth2Expires struct{
 
 
 	/** Associations **/
-	m_parentPtr *OAuth2Configuration
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -93,74 +91,39 @@ func (this *OAuth2Expires) SetEntityGetter(fct func(uuid string)(interface{}, er
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *OAuth2Expires) GetId() string{
+func (this *OAuth2Expires) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *OAuth2Expires) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Expires) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** ExpiresAt **/
-func (this *OAuth2Expires) GetExpiresAt() int64{
+func (this *OAuth2Expires) GetExpiresAt()int64{
 	return this.M_expiresAt
 }
 
-/** Init reference ExpiresAt **/
-func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
-	if this.M_expiresAt != ref.(int64) {
-		this.M_expiresAt = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2Expires) SetExpiresAt(val int64){
+	this.NeedSave = this.M_expiresAt== val
+	this.M_expiresAt= val
 }
 
-/** Remove reference ExpiresAt **/
 
-/** Parent **/
-func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*OAuth2Configuration)
-		}
+func (this *OAuth2Expires) GetParentPtr()*OAuth2Configuration{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*OAuth2Configuration)
 	}
-	return this.m_parentPtr
-}
-func (this *OAuth2Expires) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *OAuth2Expires) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(Configuration).GetUuid() {
-			this.M_parentPtr = ref.(Configuration).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*OAuth2Configuration)
-	}
+func (this *OAuth2Expires) SetParentPtr(val *OAuth2Configuration){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *OAuth2Expires) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(Configuration)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *OAuth2Expires) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

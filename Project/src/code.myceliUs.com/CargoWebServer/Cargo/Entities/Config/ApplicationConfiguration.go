@@ -29,8 +29,6 @@ type ApplicationConfiguration struct{
 
 
 	/** Associations **/
-	m_parentPtr *Configurations
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -98,74 +96,39 @@ func (this *ApplicationConfiguration) SetEntityGetter(fct func(uuid string)(inte
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *ApplicationConfiguration) GetId() string{
+func (this *ApplicationConfiguration) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *ApplicationConfiguration) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ApplicationConfiguration) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** IndexPage **/
-func (this *ApplicationConfiguration) GetIndexPage() string{
+func (this *ApplicationConfiguration) GetIndexPage()string{
 	return this.M_indexPage
 }
 
-/** Init reference IndexPage **/
-func (this *ApplicationConfiguration) SetIndexPage(ref interface{}){
-	if this.M_indexPage != ref.(string) {
-		this.M_indexPage = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ApplicationConfiguration) SetIndexPage(val string){
+	this.NeedSave = this.M_indexPage== val
+	this.M_indexPage= val
 }
 
-/** Remove reference IndexPage **/
 
-/** Parent **/
-func (this *ApplicationConfiguration) GetParentPtr() *Configurations{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*Configurations)
-		}
+func (this *ApplicationConfiguration) GetParentPtr()*Configurations{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*Configurations)
 	}
-	return this.m_parentPtr
-}
-func (this *ApplicationConfiguration) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *ApplicationConfiguration) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
-			this.M_parentPtr = ref.(*Configurations).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*Configurations)
-	}
+func (this *ApplicationConfiguration) SetParentPtr(val *Configurations){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *ApplicationConfiguration) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(*Configurations)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *ApplicationConfiguration) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

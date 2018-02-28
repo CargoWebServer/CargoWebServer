@@ -2,12 +2,11 @@
 
 package Config
 
-import (
+import(
 	"encoding/xml"
-	"log"
 )
 
-type Configurations struct {
+type Configurations struct{
 
 	/** The entity UUID **/
 	UUID string
@@ -20,45 +19,46 @@ type Configurations struct {
 	/** If the entity value has change... **/
 	NeedSave bool
 	/** Get entity by uuid function **/
-	getEntityByUuid func(string) (interface{}, error)
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Configurations **/
-	M_id                  string
-	M_name                string
-	M_version             string
-	M_serverConfig        *ServerConfiguration
-	M_oauth2Configuration *OAuth2Configuration
-	M_serviceConfigs      []*ServiceConfiguration
-	M_dataStoreConfigs    []*DataStoreConfiguration
-	M_smtpConfigs         []*SmtpConfiguration
-	M_ldapConfigs         []*LdapConfiguration
-	M_applicationConfigs  []*ApplicationConfiguration
-	M_scheduledTasks      []*ScheduledTask
+	M_id string
+	M_name string
+	M_version string
+	M_serverConfig string
+	M_oauth2Configuration string
+	M_serviceConfigs []string
+	M_dataStoreConfigs []string
+	M_smtpConfigs []string
+	M_ldapConfigs []string
+	M_applicationConfigs []string
+	M_scheduledTasks []string
+
 }
 
 /** Xml parser for Configurations **/
 type XsdConfigurations struct {
-	XMLName               xml.Name                       `xml:"configurations"`
-	M_serverConfig        XsdServerConfiguration         `xml:"serverConfig"`
-	M_applicationConfigs  []*XsdApplicationConfiguration `xml:"applicationConfigs,omitempty"`
-	M_smtpConfigs         []*XsdSmtpConfiguration        `xml:"smtpConfigs,omitempty"`
-	M_ldapConfigs         []*XsdLdapConfiguration        `xml:"ldapConfigs,omitempty"`
-	M_dataStoreConfigs    []*XsdDataStoreConfiguration   `xml:"dataStoreConfigs,omitempty"`
-	M_serviceConfigs      []*XsdServiceConfiguration     `xml:"serviceConfigs,omitempty"`
-	M_oauth2Configuration *XsdOAuth2Configuration        `xml:"oauth2Configuration,omitempty"`
-	M_scheduledTasks      []*XsdScheduledTask            `xml:"scheduledTasks,omitempty"`
-	M_id                  string                         `xml:"id,attr"`
-	M_name                string                         `xml:"name,attr"`
-	M_version             string                         `xml:"version,attr"`
-}
+	XMLName xml.Name	`xml:"configurations"`
+	M_serverConfig	XsdServerConfiguration	`xml:"serverConfig"`
+	M_applicationConfigs	[]*XsdApplicationConfiguration	`xml:"applicationConfigs,omitempty"`
+	M_smtpConfigs	[]*XsdSmtpConfiguration	`xml:"smtpConfigs,omitempty"`
+	M_ldapConfigs	[]*XsdLdapConfiguration	`xml:"ldapConfigs,omitempty"`
+	M_dataStoreConfigs	[]*XsdDataStoreConfiguration	`xml:"dataStoreConfigs,omitempty"`
+	M_serviceConfigs	[]*XsdServiceConfiguration	`xml:"serviceConfigs,omitempty"`
+	M_oauth2Configuration	*XsdOAuth2Configuration	`xml:"oauth2Configuration,omitempty"`
+	M_scheduledTasks	[]*XsdScheduledTask	`xml:"scheduledTasks,omitempty"`
+	M_id	string	`xml:"id,attr"`
+	M_name	string	`xml:"name,attr"`
+	M_version	string	`xml:"version,attr"`
 
+}
 /***************** Entity **************************/
 
 /** UUID **/
-func (this *Configurations) GetUuid() string {
+func (this *Configurations) GetUuid() string{
 	return this.UUID
 }
-func (this *Configurations) SetUuid(uuid string) {
+func (this *Configurations) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
@@ -70,356 +70,342 @@ func (this *Configurations) Ids() []interface{} {
 }
 
 /** The type name **/
-func (this *Configurations) GetTypeName() string {
+func (this *Configurations) GetTypeName() string{
 	this.TYPENAME = "Config.Configurations"
 	return this.TYPENAME
 }
 
 /** Return the entity parent UUID **/
-func (this *Configurations) GetParentUuid() string {
+func (this *Configurations) GetParentUuid() string{
 	return this.ParentUuid
 }
 
 /** Set it parent UUID **/
-func (this *Configurations) SetParentUuid(parentUuid string) {
+func (this *Configurations) SetParentUuid(parentUuid string){
 	this.ParentUuid = parentUuid
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *Configurations) GetParentLnk() string {
+func (this *Configurations) GetParentLnk() string{
 	return this.ParentLnk
 }
-func (this *Configurations) SetParentLnk(parentLnk string) {
+func (this *Configurations) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
 /** Evaluate if an entity needs to be saved. **/
-func (this *Configurations) IsNeedSave() bool {
+func (this *Configurations) IsNeedSave() bool{
 	return this.NeedSave
 }
-func (this *Configurations) ResetNeedSave() {
-	this.NeedSave = false
+func (this *Configurations) ResetNeedSave(){
+	this.NeedSave=false
 }
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
-func (this *Configurations) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
+func (this *Configurations) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Configurations) GetId() string {
+func (this *Configurations) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Configurations) SetId(ref interface{}) {
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Configurations) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *Configurations) GetName() string {
+func (this *Configurations) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Configurations) SetName(ref interface{}) {
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Configurations) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** Version **/
-func (this *Configurations) GetVersion() string {
+func (this *Configurations) GetVersion()string{
 	return this.M_version
 }
 
-/** Init reference Version **/
-func (this *Configurations) SetVersion(ref interface{}) {
-	if this.M_version != ref.(string) {
-		this.M_version = ref.(string)
-		this.NeedSave = true
+func (this *Configurations) SetVersion(val string){
+	this.NeedSave = this.M_version== val
+	this.M_version= val
+}
+
+
+func (this *Configurations) GetServerConfig()*ServerConfiguration{
+	entity, err := this.getEntityByUuid(this.M_serverConfig)
+	if err == nil {
+		return entity.(*ServerConfiguration)
 	}
+	return nil
 }
 
-/** Remove reference Version **/
-
-/** ServerConfig **/
-func (this *Configurations) GetServerConfig() *ServerConfiguration {
-	return this.M_serverConfig
+func (this *Configurations) SetServerConfig(val *ServerConfiguration){
+	this.M_serverConfig= val.GetUuid()
 }
 
-/** Init reference ServerConfig **/
-func (this *Configurations) SetServerConfig(ref interface{}) {
-	if this.M_serverConfig != ref.(*ServerConfiguration) {
-		this.M_serverConfig = ref.(*ServerConfiguration)
-		this.NeedSave = true
+func (this *Configurations) ResetServerConfig(){
+	this.M_serverConfig= ""
+}
+
+
+func (this *Configurations) GetOauth2Configuration()*OAuth2Configuration{
+	entity, err := this.getEntityByUuid(this.M_oauth2Configuration)
+	if err == nil {
+		return entity.(*OAuth2Configuration)
 	}
+	return nil
 }
 
-/** Remove reference ServerConfig **/
-func (this *Configurations) RemoveServerConfig(ref interface{}) {
-	toDelete := ref.(Configuration)
-	if toDelete.GetUuid() == this.M_serverConfig.GetUuid() {
-		this.M_serverConfig = nil
-		this.NeedSave = true
-	}
+func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
+	this.M_oauth2Configuration= val.GetUuid()
 }
 
-/** Oauth2Configuration **/
-func (this *Configurations) GetOauth2Configuration() *OAuth2Configuration {
-	return this.M_oauth2Configuration
+func (this *Configurations) ResetOauth2Configuration(){
+	this.M_oauth2Configuration= ""
 }
 
-/** Init reference Oauth2Configuration **/
-func (this *Configurations) SetOauth2Configuration(ref interface{}) {
-	if this.M_oauth2Configuration != ref.(*OAuth2Configuration) {
-		this.M_oauth2Configuration = ref.(*OAuth2Configuration)
-		this.NeedSave = true
-	}
-}
 
-/** Remove reference Oauth2Configuration **/
-func (this *Configurations) RemoveOauth2Configuration(ref interface{}) {
-	toDelete := ref.(Configuration)
-	if toDelete.GetUuid() == this.M_oauth2Configuration.GetUuid() {
-		this.M_oauth2Configuration = nil
-		this.NeedSave = true
-	}
-}
-
-/** ServiceConfigs **/
-func (this *Configurations) GetServiceConfigs() []*ServiceConfiguration {
-	return this.M_serviceConfigs
-}
-
-/** Init reference ServiceConfigs **/
-func (this *Configurations) SetServiceConfigs(ref interface{}) {
-	isExist := false
-	var serviceConfigss []*ServiceConfiguration
+func (this *Configurations) GetServiceConfigs()[]*ServiceConfiguration{
+	serviceConfigs := make([]*ServiceConfiguration, 0)
 	for i := 0; i < len(this.M_serviceConfigs); i++ {
-		if this.M_serviceConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
-			serviceConfigss = append(serviceConfigss, this.M_serviceConfigs[i])
-		} else {
-			isExist = true
-			serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
+		entity, err := this.getEntityByUuid(this.M_serviceConfigs[i])
+		if err == nil {
+			serviceConfigs = append(serviceConfigs, entity.(*ServiceConfiguration))
 		}
 	}
-	if !isExist {
-		serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
-		this.NeedSave = true
-		this.M_serviceConfigs = serviceConfigss
+	return serviceConfigs
+}
+
+func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
+	this.M_serviceConfigs= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
 	}
 }
 
-/** Remove reference ServiceConfigs **/
-func (this *Configurations) RemoveServiceConfigs(ref interface{}) {
-	toDelete := ref.(Configuration)
-	serviceConfigs_ := make([]*ServiceConfiguration, 0)
-	for i := 0; i < len(this.M_serviceConfigs); i++ {
-		if toDelete.GetUuid() != this.M_serviceConfigs[i].GetUuid() {
-			serviceConfigs_ = append(serviceConfigs_, this.M_serviceConfigs[i])
-		} else {
+func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
+	for i:=0; i < len(this.M_serviceConfigs); i++{
+		if this.M_serviceConfigs[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
+}
+
+func (this *Configurations) RemoveServiceConfigs(val *ServiceConfiguration){
+	serviceConfigs := make([]string,0)
+	for i:=0; i < len(this.M_serviceConfigs); i++{
+		if this.M_serviceConfigs[i] != val.GetUuid() {
+			serviceConfigs = append(serviceConfigs, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_serviceConfigs = serviceConfigs_
+	this.M_serviceConfigs = serviceConfigs
 }
 
-/** DataStoreConfigs **/
-func (this *Configurations) GetDataStoreConfigs() []*DataStoreConfiguration {
-	return this.M_dataStoreConfigs
-}
 
-/** Init reference DataStoreConfigs **/
-func (this *Configurations) SetDataStoreConfigs(ref interface{}) {
-	isExist := false
-	var dataStoreConfigss []*DataStoreConfiguration
+func (this *Configurations) GetDataStoreConfigs()[]*DataStoreConfiguration{
+	dataStoreConfigs := make([]*DataStoreConfiguration, 0)
 	for i := 0; i < len(this.M_dataStoreConfigs); i++ {
-		if this.M_dataStoreConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
-			dataStoreConfigss = append(dataStoreConfigss, this.M_dataStoreConfigs[i])
-		} else {
-			isExist = true
-			dataStoreConfigss = append(dataStoreConfigss, ref.(*DataStoreConfiguration))
+		entity, err := this.getEntityByUuid(this.M_dataStoreConfigs[i])
+		if err == nil {
+			dataStoreConfigs = append(dataStoreConfigs, entity.(*DataStoreConfiguration))
 		}
 	}
-	if !isExist {
-		dataStoreConfigss = append(dataStoreConfigss, ref.(*DataStoreConfiguration))
-		this.NeedSave = true
-		this.M_dataStoreConfigs = dataStoreConfigss
+	return dataStoreConfigs
+}
+
+func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
+	this.M_dataStoreConfigs= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
 	}
 }
 
-/** Remove reference DataStoreConfigs **/
-func (this *Configurations) RemoveDataStoreConfigs(ref interface{}) {
-	toDelete := ref.(Configuration)
-	dataStoreConfigs_ := make([]*DataStoreConfiguration, 0)
-	for i := 0; i < len(this.M_dataStoreConfigs); i++ {
-		if toDelete.GetUuid() != this.M_dataStoreConfigs[i].GetUuid() {
-			dataStoreConfigs_ = append(dataStoreConfigs_, this.M_dataStoreConfigs[i])
-		} else {
-			log.Println("---> configuration: ", toDelete.GetUuid(), "was remove!")
+func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
+	for i:=0; i < len(this.M_dataStoreConfigs); i++{
+		if this.M_dataStoreConfigs[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
+}
+
+func (this *Configurations) RemoveDataStoreConfigs(val *DataStoreConfiguration){
+	dataStoreConfigs := make([]string,0)
+	for i:=0; i < len(this.M_dataStoreConfigs); i++{
+		if this.M_dataStoreConfigs[i] != val.GetUuid() {
+			dataStoreConfigs = append(dataStoreConfigs, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_dataStoreConfigs = dataStoreConfigs_
+	this.M_dataStoreConfigs = dataStoreConfigs
 }
 
-/** SmtpConfigs **/
-func (this *Configurations) GetSmtpConfigs() []*SmtpConfiguration {
-	return this.M_smtpConfigs
-}
 
-/** Init reference SmtpConfigs **/
-func (this *Configurations) SetSmtpConfigs(ref interface{}) {
-	isExist := false
-	var smtpConfigss []*SmtpConfiguration
+func (this *Configurations) GetSmtpConfigs()[]*SmtpConfiguration{
+	smtpConfigs := make([]*SmtpConfiguration, 0)
 	for i := 0; i < len(this.M_smtpConfigs); i++ {
-		if this.M_smtpConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
-			smtpConfigss = append(smtpConfigss, this.M_smtpConfigs[i])
-		} else {
-			isExist = true
-			smtpConfigss = append(smtpConfigss, ref.(*SmtpConfiguration))
+		entity, err := this.getEntityByUuid(this.M_smtpConfigs[i])
+		if err == nil {
+			smtpConfigs = append(smtpConfigs, entity.(*SmtpConfiguration))
 		}
 	}
-	if !isExist {
-		smtpConfigss = append(smtpConfigss, ref.(*SmtpConfiguration))
-		this.NeedSave = true
-		this.M_smtpConfigs = smtpConfigss
+	return smtpConfigs
+}
+
+func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
+	this.M_smtpConfigs= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
 	}
 }
 
-/** Remove reference SmtpConfigs **/
-func (this *Configurations) RemoveSmtpConfigs(ref interface{}) {
-	toDelete := ref.(Configuration)
-	smtpConfigs_ := make([]*SmtpConfiguration, 0)
-	for i := 0; i < len(this.M_smtpConfigs); i++ {
-		if toDelete.GetUuid() != this.M_smtpConfigs[i].GetUuid() {
-			smtpConfigs_ = append(smtpConfigs_, this.M_smtpConfigs[i])
-		} else {
+func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
+	for i:=0; i < len(this.M_smtpConfigs); i++{
+		if this.M_smtpConfigs[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
+}
+
+func (this *Configurations) RemoveSmtpConfigs(val *SmtpConfiguration){
+	smtpConfigs := make([]string,0)
+	for i:=0; i < len(this.M_smtpConfigs); i++{
+		if this.M_smtpConfigs[i] != val.GetUuid() {
+			smtpConfigs = append(smtpConfigs, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_smtpConfigs = smtpConfigs_
+	this.M_smtpConfigs = smtpConfigs
 }
 
-/** LdapConfigs **/
-func (this *Configurations) GetLdapConfigs() []*LdapConfiguration {
-	return this.M_ldapConfigs
-}
 
-/** Init reference LdapConfigs **/
-func (this *Configurations) SetLdapConfigs(ref interface{}) {
-	isExist := false
-	var ldapConfigss []*LdapConfiguration
+func (this *Configurations) GetLdapConfigs()[]*LdapConfiguration{
+	ldapConfigs := make([]*LdapConfiguration, 0)
 	for i := 0; i < len(this.M_ldapConfigs); i++ {
-		if this.M_ldapConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
-			ldapConfigss = append(ldapConfigss, this.M_ldapConfigs[i])
-		} else {
-			isExist = true
-			ldapConfigss = append(ldapConfigss, ref.(*LdapConfiguration))
+		entity, err := this.getEntityByUuid(this.M_ldapConfigs[i])
+		if err == nil {
+			ldapConfigs = append(ldapConfigs, entity.(*LdapConfiguration))
 		}
 	}
-	if !isExist {
-		ldapConfigss = append(ldapConfigss, ref.(*LdapConfiguration))
-		this.NeedSave = true
-		this.M_ldapConfigs = ldapConfigss
+	return ldapConfigs
+}
+
+func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
+	this.M_ldapConfigs= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
 	}
 }
 
-/** Remove reference LdapConfigs **/
-func (this *Configurations) RemoveLdapConfigs(ref interface{}) {
-	toDelete := ref.(Configuration)
-	ldapConfigs_ := make([]*LdapConfiguration, 0)
-	for i := 0; i < len(this.M_ldapConfigs); i++ {
-		if toDelete.GetUuid() != this.M_ldapConfigs[i].GetUuid() {
-			ldapConfigs_ = append(ldapConfigs_, this.M_ldapConfigs[i])
-		} else {
+func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
+	for i:=0; i < len(this.M_ldapConfigs); i++{
+		if this.M_ldapConfigs[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
+}
+
+func (this *Configurations) RemoveLdapConfigs(val *LdapConfiguration){
+	ldapConfigs := make([]string,0)
+	for i:=0; i < len(this.M_ldapConfigs); i++{
+		if this.M_ldapConfigs[i] != val.GetUuid() {
+			ldapConfigs = append(ldapConfigs, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_ldapConfigs = ldapConfigs_
+	this.M_ldapConfigs = ldapConfigs
 }
 
-/** ApplicationConfigs **/
-func (this *Configurations) GetApplicationConfigs() []*ApplicationConfiguration {
-	return this.M_applicationConfigs
-}
 
-/** Init reference ApplicationConfigs **/
-func (this *Configurations) SetApplicationConfigs(ref interface{}) {
-	isExist := false
-	var applicationConfigss []*ApplicationConfiguration
+func (this *Configurations) GetApplicationConfigs()[]*ApplicationConfiguration{
+	applicationConfigs := make([]*ApplicationConfiguration, 0)
 	for i := 0; i < len(this.M_applicationConfigs); i++ {
-		if this.M_applicationConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
-			applicationConfigss = append(applicationConfigss, this.M_applicationConfigs[i])
-		} else {
-			isExist = true
-			applicationConfigss = append(applicationConfigss, ref.(*ApplicationConfiguration))
+		entity, err := this.getEntityByUuid(this.M_applicationConfigs[i])
+		if err == nil {
+			applicationConfigs = append(applicationConfigs, entity.(*ApplicationConfiguration))
 		}
 	}
-	if !isExist {
-		applicationConfigss = append(applicationConfigss, ref.(*ApplicationConfiguration))
-		this.NeedSave = true
-		this.M_applicationConfigs = applicationConfigss
+	return applicationConfigs
+}
+
+func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguration){
+	this.M_applicationConfigs= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
 	}
 }
 
-/** Remove reference ApplicationConfigs **/
-func (this *Configurations) RemoveApplicationConfigs(ref interface{}) {
-	toDelete := ref.(Configuration)
-	applicationConfigs_ := make([]*ApplicationConfiguration, 0)
-	for i := 0; i < len(this.M_applicationConfigs); i++ {
-		if toDelete.GetUuid() != this.M_applicationConfigs[i].GetUuid() {
-			applicationConfigs_ = append(applicationConfigs_, this.M_applicationConfigs[i])
-		} else {
+func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfiguration){
+	for i:=0; i < len(this.M_applicationConfigs); i++{
+		if this.M_applicationConfigs[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
+}
+
+func (this *Configurations) RemoveApplicationConfigs(val *ApplicationConfiguration){
+	applicationConfigs := make([]string,0)
+	for i:=0; i < len(this.M_applicationConfigs); i++{
+		if this.M_applicationConfigs[i] != val.GetUuid() {
+			applicationConfigs = append(applicationConfigs, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_applicationConfigs = applicationConfigs_
+	this.M_applicationConfigs = applicationConfigs
 }
 
-/** ScheduledTasks **/
-func (this *Configurations) GetScheduledTasks() []*ScheduledTask {
-	return this.M_scheduledTasks
-}
 
-/** Init reference ScheduledTasks **/
-func (this *Configurations) SetScheduledTasks(ref interface{}) {
-	isExist := false
-	var scheduledTaskss []*ScheduledTask
+func (this *Configurations) GetScheduledTasks()[]*ScheduledTask{
+	scheduledTasks := make([]*ScheduledTask, 0)
 	for i := 0; i < len(this.M_scheduledTasks); i++ {
-		if this.M_scheduledTasks[i].GetUuid() != ref.(Configuration).GetUuid() {
-			scheduledTaskss = append(scheduledTaskss, this.M_scheduledTasks[i])
-		} else {
-			isExist = true
-			scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
+		entity, err := this.getEntityByUuid(this.M_scheduledTasks[i])
+		if err == nil {
+			scheduledTasks = append(scheduledTasks, entity.(*ScheduledTask))
 		}
 	}
-	if !isExist {
-		scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
-		this.NeedSave = true
-		this.M_scheduledTasks = scheduledTaskss
+	return scheduledTasks
+}
+
+func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
+	this.M_scheduledTasks= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
 	}
 }
 
-/** Remove reference ScheduledTasks **/
-func (this *Configurations) RemoveScheduledTasks(ref interface{}) {
-	toDelete := ref.(Configuration)
-	scheduledTasks_ := make([]*ScheduledTask, 0)
-	for i := 0; i < len(this.M_scheduledTasks); i++ {
-		if toDelete.GetUuid() != this.M_scheduledTasks[i].GetUuid() {
-			scheduledTasks_ = append(scheduledTasks_, this.M_scheduledTasks[i])
-		} else {
+func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
+	for i:=0; i < len(this.M_scheduledTasks); i++{
+		if this.M_scheduledTasks[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())
+}
+
+func (this *Configurations) RemoveScheduledTasks(val *ScheduledTask){
+	scheduledTasks := make([]string,0)
+	for i:=0; i < len(this.M_scheduledTasks); i++{
+		if this.M_scheduledTasks[i] != val.GetUuid() {
+			scheduledTasks = append(scheduledTasks, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_scheduledTasks = scheduledTasks_
+	this.M_scheduledTasks = scheduledTasks
 }
+

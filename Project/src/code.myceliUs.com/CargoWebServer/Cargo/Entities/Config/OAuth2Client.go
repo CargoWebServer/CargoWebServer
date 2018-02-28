@@ -30,8 +30,6 @@ type OAuth2Client struct {
 	M_extra            []uint8
 
 	/** Associations **/
-	m_parentPtr *OAuth2Configuration
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -98,134 +96,72 @@ func (this *OAuth2Client) SetEntityGetter(fct func(uuid string) (interface{}, er
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
 func (this *OAuth2Client) GetId() string {
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *OAuth2Client) SetId(ref interface{}) {
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Client) SetId(val string) {
+	this.NeedSave = this.M_id == val
+	this.M_id = val
 }
 
-/** Remove reference Id **/
-
-/** Secret **/
 func (this *OAuth2Client) GetSecret() string {
 	return this.M_secret
 }
 
-/** Init reference Secret **/
-func (this *OAuth2Client) SetSecret(ref interface{}) {
-	if this.M_secret != ref.(string) {
-		this.M_secret = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Client) SetSecret(val string) {
+	this.NeedSave = this.M_secret == val
+	this.M_secret = val
 }
 
-/** Remove reference Secret **/
-
-/** RedirectUri **/
 func (this *OAuth2Client) GetRedirectUri() string {
 	return this.M_redirectUri
 }
 
-/** Init reference RedirectUri **/
-func (this *OAuth2Client) SetRedirectUri(ref interface{}) {
-	if this.M_redirectUri != ref.(string) {
-		this.M_redirectUri = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Client) SetRedirectUri(val string) {
+	this.NeedSave = this.M_redirectUri == val
+	this.M_redirectUri = val
 }
 
-/** Remove reference RedirectUri **/
-
-/** TokenUri **/
 func (this *OAuth2Client) GetTokenUri() string {
 	return this.M_tokenUri
 }
 
-/** Init reference TokenUri **/
-func (this *OAuth2Client) SetTokenUri(ref interface{}) {
-	if this.M_tokenUri != ref.(string) {
-		this.M_tokenUri = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Client) SetTokenUri(val string) {
+	this.NeedSave = this.M_tokenUri == val
+	this.M_tokenUri = val
 }
 
-/** Remove reference TokenUri **/
-
-/** AuthorizationUri **/
 func (this *OAuth2Client) GetAuthorizationUri() string {
 	return this.M_authorizationUri
 }
 
-/** Init reference AuthorizationUri **/
-func (this *OAuth2Client) SetAuthorizationUri(ref interface{}) {
-	if this.M_authorizationUri != ref.(string) {
-		this.M_authorizationUri = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Client) SetAuthorizationUri(val string) {
+	this.NeedSave = this.M_authorizationUri == val
+	this.M_authorizationUri = val
 }
 
-/** Remove reference AuthorizationUri **/
-
-/** Extra **/
 func (this *OAuth2Client) GetExtra() []uint8 {
 	return this.M_extra
 }
 
-/** Init reference Extra **/
-func (this *OAuth2Client) SetExtra(ref interface{}) {
-	/*if this.M_extra != ref.([]uint8) {
-		this.M_extra = ref.([]uint8)
-		this.NeedSave = true
-	}*/
+func (this *OAuth2Client) SetExtra(val []uint8) {
+	//	this.NeedSave = this.M_extra== val
+	this.M_extra = val
 }
 
-/** Remove reference Extra **/
-
-/** Parent **/
 func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration {
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*OAuth2Configuration)
-		}
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*OAuth2Configuration)
 	}
-	return this.m_parentPtr
-}
-func (this *OAuth2Client) GetParentPtrStr() string {
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *OAuth2Client) SetParentPtr(ref interface{}) {
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	} else {
-		if this.M_parentPtr != ref.(Configuration).GetUuid() {
-			this.M_parentPtr = ref.(Configuration).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*OAuth2Configuration)
-	}
+func (this *OAuth2Client) SetParentPtr(val *OAuth2Configuration) {
+	this.M_parentPtr = val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *OAuth2Client) RemoveParentPtr(ref interface{}) {
-	toDelete := ref.(Configuration)
-	if this.m_parentPtr != nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *OAuth2Client) ResetParentPtr() {
+	this.M_parentPtr = ""
 }

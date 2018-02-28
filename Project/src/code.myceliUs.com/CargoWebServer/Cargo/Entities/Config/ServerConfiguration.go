@@ -39,8 +39,6 @@ type ServerConfiguration struct{
 
 
 	/** Associations **/
-	m_parentPtr *Configurations
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -118,224 +116,139 @@ func (this *ServerConfiguration) SetEntityGetter(fct func(uuid string)(interface
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *ServerConfiguration) GetId() string{
+func (this *ServerConfiguration) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *ServerConfiguration) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** HostName **/
-func (this *ServerConfiguration) GetHostName() string{
+func (this *ServerConfiguration) GetHostName()string{
 	return this.M_hostName
 }
 
-/** Init reference HostName **/
-func (this *ServerConfiguration) SetHostName(ref interface{}){
-	if this.M_hostName != ref.(string) {
-		this.M_hostName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetHostName(val string){
+	this.NeedSave = this.M_hostName== val
+	this.M_hostName= val
 }
 
-/** Remove reference HostName **/
 
-/** Ipv4 **/
-func (this *ServerConfiguration) GetIpv4() string{
+func (this *ServerConfiguration) GetIpv4()string{
 	return this.M_ipv4
 }
 
-/** Init reference Ipv4 **/
-func (this *ServerConfiguration) SetIpv4(ref interface{}){
-	if this.M_ipv4 != ref.(string) {
-		this.M_ipv4 = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetIpv4(val string){
+	this.NeedSave = this.M_ipv4== val
+	this.M_ipv4= val
 }
 
-/** Remove reference Ipv4 **/
 
-/** ServerPort **/
-func (this *ServerConfiguration) GetServerPort() int{
+func (this *ServerConfiguration) GetServerPort()int{
 	return this.M_serverPort
 }
 
-/** Init reference ServerPort **/
-func (this *ServerConfiguration) SetServerPort(ref interface{}){
-	if this.M_serverPort != ref.(int) {
-		this.M_serverPort = ref.(int)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetServerPort(val int){
+	this.NeedSave = this.M_serverPort== val
+	this.M_serverPort= val
 }
 
-/** Remove reference ServerPort **/
 
-/** ServiceContainerPort **/
-func (this *ServerConfiguration) GetServiceContainerPort() int{
+func (this *ServerConfiguration) GetServiceContainerPort()int{
 	return this.M_serviceContainerPort
 }
 
-/** Init reference ServiceContainerPort **/
-func (this *ServerConfiguration) SetServiceContainerPort(ref interface{}){
-	if this.M_serviceContainerPort != ref.(int) {
-		this.M_serviceContainerPort = ref.(int)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetServiceContainerPort(val int){
+	this.NeedSave = this.M_serviceContainerPort== val
+	this.M_serviceContainerPort= val
 }
 
-/** Remove reference ServiceContainerPort **/
 
-/** ApplicationsPath **/
-func (this *ServerConfiguration) GetApplicationsPath() string{
+func (this *ServerConfiguration) GetApplicationsPath()string{
 	return this.M_applicationsPath
 }
 
-/** Init reference ApplicationsPath **/
-func (this *ServerConfiguration) SetApplicationsPath(ref interface{}){
-	if this.M_applicationsPath != ref.(string) {
-		this.M_applicationsPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetApplicationsPath(val string){
+	this.NeedSave = this.M_applicationsPath== val
+	this.M_applicationsPath= val
 }
 
-/** Remove reference ApplicationsPath **/
 
-/** DataPath **/
-func (this *ServerConfiguration) GetDataPath() string{
+func (this *ServerConfiguration) GetDataPath()string{
 	return this.M_dataPath
 }
 
-/** Init reference DataPath **/
-func (this *ServerConfiguration) SetDataPath(ref interface{}){
-	if this.M_dataPath != ref.(string) {
-		this.M_dataPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetDataPath(val string){
+	this.NeedSave = this.M_dataPath== val
+	this.M_dataPath= val
 }
 
-/** Remove reference DataPath **/
 
-/** ScriptsPath **/
-func (this *ServerConfiguration) GetScriptsPath() string{
+func (this *ServerConfiguration) GetScriptsPath()string{
 	return this.M_scriptsPath
 }
 
-/** Init reference ScriptsPath **/
-func (this *ServerConfiguration) SetScriptsPath(ref interface{}){
-	if this.M_scriptsPath != ref.(string) {
-		this.M_scriptsPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetScriptsPath(val string){
+	this.NeedSave = this.M_scriptsPath== val
+	this.M_scriptsPath= val
 }
 
-/** Remove reference ScriptsPath **/
 
-/** DefinitionsPath **/
-func (this *ServerConfiguration) GetDefinitionsPath() string{
+func (this *ServerConfiguration) GetDefinitionsPath()string{
 	return this.M_definitionsPath
 }
 
-/** Init reference DefinitionsPath **/
-func (this *ServerConfiguration) SetDefinitionsPath(ref interface{}){
-	if this.M_definitionsPath != ref.(string) {
-		this.M_definitionsPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetDefinitionsPath(val string){
+	this.NeedSave = this.M_definitionsPath== val
+	this.M_definitionsPath= val
 }
 
-/** Remove reference DefinitionsPath **/
 
-/** SchemasPath **/
-func (this *ServerConfiguration) GetSchemasPath() string{
+func (this *ServerConfiguration) GetSchemasPath()string{
 	return this.M_schemasPath
 }
 
-/** Init reference SchemasPath **/
-func (this *ServerConfiguration) SetSchemasPath(ref interface{}){
-	if this.M_schemasPath != ref.(string) {
-		this.M_schemasPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetSchemasPath(val string){
+	this.NeedSave = this.M_schemasPath== val
+	this.M_schemasPath= val
 }
 
-/** Remove reference SchemasPath **/
 
-/** TmpPath **/
-func (this *ServerConfiguration) GetTmpPath() string{
+func (this *ServerConfiguration) GetTmpPath()string{
 	return this.M_tmpPath
 }
 
-/** Init reference TmpPath **/
-func (this *ServerConfiguration) SetTmpPath(ref interface{}){
-	if this.M_tmpPath != ref.(string) {
-		this.M_tmpPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetTmpPath(val string){
+	this.NeedSave = this.M_tmpPath== val
+	this.M_tmpPath= val
 }
 
-/** Remove reference TmpPath **/
 
-/** BinPath **/
-func (this *ServerConfiguration) GetBinPath() string{
+func (this *ServerConfiguration) GetBinPath()string{
 	return this.M_binPath
 }
 
-/** Init reference BinPath **/
-func (this *ServerConfiguration) SetBinPath(ref interface{}){
-	if this.M_binPath != ref.(string) {
-		this.M_binPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *ServerConfiguration) SetBinPath(val string){
+	this.NeedSave = this.M_binPath== val
+	this.M_binPath= val
 }
 
-/** Remove reference BinPath **/
 
-/** Parent **/
-func (this *ServerConfiguration) GetParentPtr() *Configurations{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*Configurations)
-		}
+func (this *ServerConfiguration) GetParentPtr()*Configurations{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*Configurations)
 	}
-	return this.m_parentPtr
-}
-func (this *ServerConfiguration) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *ServerConfiguration) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
-			this.M_parentPtr = ref.(*Configurations).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*Configurations)
-	}
+func (this *ServerConfiguration) SetParentPtr(val *Configurations){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *ServerConfiguration) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(*Configurations)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *ServerConfiguration) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

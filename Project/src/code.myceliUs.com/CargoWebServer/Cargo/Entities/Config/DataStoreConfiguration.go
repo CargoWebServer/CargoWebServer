@@ -37,8 +37,6 @@ type DataStoreConfiguration struct{
 
 
 	/** Associations **/
-	m_parentPtr *Configurations
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -114,194 +112,131 @@ func (this *DataStoreConfiguration) SetEntityGetter(fct func(uuid string)(interf
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *DataStoreConfiguration) GetId() string{
+func (this *DataStoreConfiguration) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *DataStoreConfiguration) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** DataStoreType **/
-func (this *DataStoreConfiguration) GetDataStoreType() DataStoreType{
+func (this *DataStoreConfiguration) GetDataStoreType()DataStoreType{
 	return this.M_dataStoreType
 }
 
-/** Init reference DataStoreType **/
-func (this *DataStoreConfiguration) SetDataStoreType(ref interface{}){
-	if this.M_dataStoreType != ref.(DataStoreType) {
-		this.M_dataStoreType = ref.(DataStoreType)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetDataStoreType(val DataStoreType){
+	this.NeedSave = this.M_dataStoreType== val
+	this.M_dataStoreType= val
 }
 
-/** Remove reference DataStoreType **/
+func (this *DataStoreConfiguration) ResetDataStoreType(){
+	this.M_dataStoreType= 0
+}
 
-/** DataStoreVendor **/
-func (this *DataStoreConfiguration) GetDataStoreVendor() DataStoreVendor{
+
+func (this *DataStoreConfiguration) GetDataStoreVendor()DataStoreVendor{
 	return this.M_dataStoreVendor
 }
 
-/** Init reference DataStoreVendor **/
-func (this *DataStoreConfiguration) SetDataStoreVendor(ref interface{}){
-	if this.M_dataStoreVendor != ref.(DataStoreVendor) {
-		this.M_dataStoreVendor = ref.(DataStoreVendor)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetDataStoreVendor(val DataStoreVendor){
+	this.NeedSave = this.M_dataStoreVendor== val
+	this.M_dataStoreVendor= val
 }
 
-/** Remove reference DataStoreVendor **/
+func (this *DataStoreConfiguration) ResetDataStoreVendor(){
+	this.M_dataStoreVendor= 0
+}
 
-/** TextEncoding **/
-func (this *DataStoreConfiguration) GetTextEncoding() Encoding{
+
+func (this *DataStoreConfiguration) GetTextEncoding()Encoding{
 	return this.M_textEncoding
 }
 
-/** Init reference TextEncoding **/
-func (this *DataStoreConfiguration) SetTextEncoding(ref interface{}){
-	if this.M_textEncoding != ref.(Encoding) {
-		this.M_textEncoding = ref.(Encoding)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetTextEncoding(val Encoding){
+	this.NeedSave = this.M_textEncoding== val
+	this.M_textEncoding= val
 }
 
-/** Remove reference TextEncoding **/
+func (this *DataStoreConfiguration) ResetTextEncoding(){
+	this.M_textEncoding= 0
+}
 
-/** StoreName **/
-func (this *DataStoreConfiguration) GetStoreName() string{
+
+func (this *DataStoreConfiguration) GetStoreName()string{
 	return this.M_storeName
 }
 
-/** Init reference StoreName **/
-func (this *DataStoreConfiguration) SetStoreName(ref interface{}){
-	if this.M_storeName != ref.(string) {
-		this.M_storeName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetStoreName(val string){
+	this.NeedSave = this.M_storeName== val
+	this.M_storeName= val
 }
 
-/** Remove reference StoreName **/
 
-/** HostName **/
-func (this *DataStoreConfiguration) GetHostName() string{
+func (this *DataStoreConfiguration) GetHostName()string{
 	return this.M_hostName
 }
 
-/** Init reference HostName **/
-func (this *DataStoreConfiguration) SetHostName(ref interface{}){
-	if this.M_hostName != ref.(string) {
-		this.M_hostName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetHostName(val string){
+	this.NeedSave = this.M_hostName== val
+	this.M_hostName= val
 }
 
-/** Remove reference HostName **/
 
-/** Ipv4 **/
-func (this *DataStoreConfiguration) GetIpv4() string{
+func (this *DataStoreConfiguration) GetIpv4()string{
 	return this.M_ipv4
 }
 
-/** Init reference Ipv4 **/
-func (this *DataStoreConfiguration) SetIpv4(ref interface{}){
-	if this.M_ipv4 != ref.(string) {
-		this.M_ipv4 = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetIpv4(val string){
+	this.NeedSave = this.M_ipv4== val
+	this.M_ipv4= val
 }
 
-/** Remove reference Ipv4 **/
 
-/** User **/
-func (this *DataStoreConfiguration) GetUser() string{
+func (this *DataStoreConfiguration) GetUser()string{
 	return this.M_user
 }
 
-/** Init reference User **/
-func (this *DataStoreConfiguration) SetUser(ref interface{}){
-	if this.M_user != ref.(string) {
-		this.M_user = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetUser(val string){
+	this.NeedSave = this.M_user== val
+	this.M_user= val
 }
 
-/** Remove reference User **/
 
-/** Pwd **/
-func (this *DataStoreConfiguration) GetPwd() string{
+func (this *DataStoreConfiguration) GetPwd()string{
 	return this.M_pwd
 }
 
-/** Init reference Pwd **/
-func (this *DataStoreConfiguration) SetPwd(ref interface{}){
-	if this.M_pwd != ref.(string) {
-		this.M_pwd = ref.(string)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetPwd(val string){
+	this.NeedSave = this.M_pwd== val
+	this.M_pwd= val
 }
 
-/** Remove reference Pwd **/
 
-/** Port **/
-func (this *DataStoreConfiguration) GetPort() int{
+func (this *DataStoreConfiguration) GetPort()int{
 	return this.M_port
 }
 
-/** Init reference Port **/
-func (this *DataStoreConfiguration) SetPort(ref interface{}){
-	if this.M_port != ref.(int) {
-		this.M_port = ref.(int)
-		this.NeedSave = true
-	}
+func (this *DataStoreConfiguration) SetPort(val int){
+	this.NeedSave = this.M_port== val
+	this.M_port= val
 }
 
-/** Remove reference Port **/
 
-/** Parent **/
-func (this *DataStoreConfiguration) GetParentPtr() *Configurations{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*Configurations)
-		}
+func (this *DataStoreConfiguration) GetParentPtr()*Configurations{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*Configurations)
 	}
-	return this.m_parentPtr
-}
-func (this *DataStoreConfiguration) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *DataStoreConfiguration) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
-			this.M_parentPtr = ref.(*Configurations).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*Configurations)
-	}
+func (this *DataStoreConfiguration) SetParentPtr(val *Configurations){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *DataStoreConfiguration) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(*Configurations)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *DataStoreConfiguration) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

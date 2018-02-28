@@ -8,7 +8,6 @@ type Configuration interface{
 	/** UUID **/
 	GetUuid() string
 
-	/** Id **/
-	GetId() string
+
 
 }

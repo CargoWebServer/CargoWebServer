@@ -34,8 +34,6 @@ type SmtpConfiguration struct{
 
 
 	/** Associations **/
-	m_parentPtr *Configurations
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -108,149 +106,93 @@ func (this *SmtpConfiguration) SetEntityGetter(fct func(uuid string)(interface{}
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *SmtpConfiguration) GetId() string{
+func (this *SmtpConfiguration) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *SmtpConfiguration) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** TextEncoding **/
-func (this *SmtpConfiguration) GetTextEncoding() Encoding{
+func (this *SmtpConfiguration) GetTextEncoding()Encoding{
 	return this.M_textEncoding
 }
 
-/** Init reference TextEncoding **/
-func (this *SmtpConfiguration) SetTextEncoding(ref interface{}){
-	if this.M_textEncoding != ref.(Encoding) {
-		this.M_textEncoding = ref.(Encoding)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetTextEncoding(val Encoding){
+	this.NeedSave = this.M_textEncoding== val
+	this.M_textEncoding= val
 }
 
-/** Remove reference TextEncoding **/
+func (this *SmtpConfiguration) ResetTextEncoding(){
+	this.M_textEncoding= 0
+}
 
-/** HostName **/
-func (this *SmtpConfiguration) GetHostName() string{
+
+func (this *SmtpConfiguration) GetHostName()string{
 	return this.M_hostName
 }
 
-/** Init reference HostName **/
-func (this *SmtpConfiguration) SetHostName(ref interface{}){
-	if this.M_hostName != ref.(string) {
-		this.M_hostName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetHostName(val string){
+	this.NeedSave = this.M_hostName== val
+	this.M_hostName= val
 }
 
-/** Remove reference HostName **/
 
-/** Ipv4 **/
-func (this *SmtpConfiguration) GetIpv4() string{
+func (this *SmtpConfiguration) GetIpv4()string{
 	return this.M_ipv4
 }
 
-/** Init reference Ipv4 **/
-func (this *SmtpConfiguration) SetIpv4(ref interface{}){
-	if this.M_ipv4 != ref.(string) {
-		this.M_ipv4 = ref.(string)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetIpv4(val string){
+	this.NeedSave = this.M_ipv4== val
+	this.M_ipv4= val
 }
 
-/** Remove reference Ipv4 **/
 
-/** Port **/
-func (this *SmtpConfiguration) GetPort() int{
+func (this *SmtpConfiguration) GetPort()int{
 	return this.M_port
 }
 
-/** Init reference Port **/
-func (this *SmtpConfiguration) SetPort(ref interface{}){
-	if this.M_port != ref.(int) {
-		this.M_port = ref.(int)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetPort(val int){
+	this.NeedSave = this.M_port== val
+	this.M_port= val
 }
 
-/** Remove reference Port **/
 
-/** User **/
-func (this *SmtpConfiguration) GetUser() string{
+func (this *SmtpConfiguration) GetUser()string{
 	return this.M_user
 }
 
-/** Init reference User **/
-func (this *SmtpConfiguration) SetUser(ref interface{}){
-	if this.M_user != ref.(string) {
-		this.M_user = ref.(string)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetUser(val string){
+	this.NeedSave = this.M_user== val
+	this.M_user= val
 }
 
-/** Remove reference User **/
 
-/** Pwd **/
-func (this *SmtpConfiguration) GetPwd() string{
+func (this *SmtpConfiguration) GetPwd()string{
 	return this.M_pwd
 }
 
-/** Init reference Pwd **/
-func (this *SmtpConfiguration) SetPwd(ref interface{}){
-	if this.M_pwd != ref.(string) {
-		this.M_pwd = ref.(string)
-		this.NeedSave = true
-	}
+func (this *SmtpConfiguration) SetPwd(val string){
+	this.NeedSave = this.M_pwd== val
+	this.M_pwd= val
 }
 
-/** Remove reference Pwd **/
 
-/** Parent **/
-func (this *SmtpConfiguration) GetParentPtr() *Configurations{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*Configurations)
-		}
+func (this *SmtpConfiguration) GetParentPtr()*Configurations{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*Configurations)
 	}
-	return this.m_parentPtr
-}
-func (this *SmtpConfiguration) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *SmtpConfiguration) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
-			this.M_parentPtr = ref.(*Configurations).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*Configurations)
-	}
+func (this *SmtpConfiguration) SetParentPtr(val *Configurations){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *SmtpConfiguration) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(*Configurations)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *SmtpConfiguration) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

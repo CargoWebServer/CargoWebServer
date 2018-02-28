@@ -30,14 +30,10 @@ type Error struct{
 	/** members of Error **/
 	M_errorPath string
 	M_code int
-	m_accountRef *Account
-	/** If the ref is a string and not an object **/
 	M_accountRef string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -110,146 +106,76 @@ func (this *Error) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Error) GetId() string{
+func (this *Error) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Error) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Error) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Body **/
-func (this *Error) GetBody() string{
+func (this *Error) GetBody()string{
 	return this.M_body
 }
 
-/** Init reference Body **/
-func (this *Error) SetBody(ref interface{}){
-	if this.M_body != ref.(string) {
-		this.M_body = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Error) SetBody(val string){
+	this.NeedSave = this.M_body== val
+	this.M_body= val
 }
 
-/** Remove reference Body **/
 
-/** ErrorPath **/
-func (this *Error) GetErrorPath() string{
+func (this *Error) GetErrorPath()string{
 	return this.M_errorPath
 }
 
-/** Init reference ErrorPath **/
-func (this *Error) SetErrorPath(ref interface{}){
-	if this.M_errorPath != ref.(string) {
-		this.M_errorPath = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Error) SetErrorPath(val string){
+	this.NeedSave = this.M_errorPath== val
+	this.M_errorPath= val
 }
 
-/** Remove reference ErrorPath **/
 
-/** Code **/
-func (this *Error) GetCode() int{
+func (this *Error) GetCode()int{
 	return this.M_code
 }
 
-/** Init reference Code **/
-func (this *Error) SetCode(ref interface{}){
-	if this.M_code != ref.(int) {
-		this.M_code = ref.(int)
-		this.NeedSave = true
-	}
+func (this *Error) SetCode(val int){
+	this.NeedSave = this.M_code== val
+	this.M_code= val
 }
 
-/** Remove reference Code **/
 
-/** AccountRef **/
-func (this *Error) GetAccountRef() *Account{
-	if this.m_accountRef == nil {
-		entity, err := this.getEntityByUuid(this.M_accountRef)
-		if err == nil {
-			this.m_accountRef = entity.(*Account)
-		}
+func (this *Error) GetAccountRef()*Account{
+	entity, err := this.getEntityByUuid(this.M_accountRef)
+	if err == nil {
+		return entity.(*Account)
 	}
-	return this.m_accountRef
-}
-func (this *Error) GetAccountRefStr() string{
-	return this.M_accountRef
+	return nil
 }
 
-/** Init reference AccountRef **/
-func (this *Error) SetAccountRef(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_accountRef != ref.(string) {
-			this.M_accountRef = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_accountRef != ref.(Entity).GetUuid() {
-			this.M_accountRef = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_accountRef = ref.(*Account)
-	}
+func (this *Error) SetAccountRef(val *Account){
+	this.M_accountRef= val.GetUuid()
 }
 
-/** Remove reference AccountRef **/
-func (this *Error) RemoveAccountRef(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_accountRef!= nil {
-		if toDelete.GetUuid() == this.m_accountRef.GetUuid() {
-			this.m_accountRef = nil
-			this.M_accountRef = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Error) ResetAccountRef(){
+	this.M_accountRef= ""
 }
 
-/** Entities **/
-func (this *Error) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+
+func (this *Error) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *Error) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *Error) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *Error) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *Error) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Error) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

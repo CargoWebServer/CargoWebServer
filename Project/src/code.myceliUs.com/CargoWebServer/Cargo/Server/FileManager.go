@@ -182,7 +182,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					file, err := this.createFile(dirEntity, f.Name(), filePath_, filedata, "", 128, 128, false)
 					if err == nil {
-						dirEntity.SetFiles(file)
+						dirEntity.AppendFiles(file)
 					} else {
 						log.Panicln("--------------> fail to create file ", filePath__)
 					}
@@ -192,7 +192,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					subDir := this.synchronize(this.root + filePath__)
 					if subDir != nil {
-						dirEntity.SetFiles(subDir)
+						dirEntity.AppendFiles(subDir)
 					}
 				}
 			}
@@ -203,14 +203,14 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					filedata, _ := ioutil.ReadFile(this.root + filePath__)
 					this.saveFile(fileEntity.UUID, filedata, "", 128, 128, false)
-					dirEntity.SetFiles(fileEntity)
+					dirEntity.AppendFiles(fileEntity)
 				}
 			} else {
 				// make a recursion...
 				if !strings.HasPrefix(f.Name(), ".") {
 					subDir := this.synchronize(this.root + filePath__)
 					if subDir != nil {
-						dirEntity.SetFiles(subDir)
+						dirEntity.AppendFiles(subDir)
 					}
 				}
 			}
@@ -315,7 +315,7 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 		// That will set the uuid
 		dirEntity, _ := GetServer().GetEntityManager().createEntity(parentDir.GetUuid(), "M_files", "CargoEntities.File", dir.GetId(), dir)
 		dir = dirEntity.(*CargoEntities.File)
-		dir.SetParentDirPtr(parentDir)
+		dir.SetParentDirPtr(parentDir.(*CargoEntities.File))
 		dir.SetEntitiesPtr(entities)
 	}
 
@@ -368,7 +368,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		// Here I will get the parent put the file in it and save it.
 		parentDir := parentDirEntity.(*CargoEntities.File)
 		file.SetParentDirPtr(parentDir)
-		parentDir.SetFiles(file)
+		parentDir.AppendFiles(file)
 
 		// Write the file data. Try to decode it if it is encoded, and decode it if it is not.
 		if _, err := os.Stat(this.root + filepath + "/" + filename); err != nil {
@@ -577,7 +577,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 			}
 		} else {
 			// Set the new data...
-			file.SetData(filedata)
+			file.SetData(string(filedata))
 		}
 
 		file.SetChecksum(checksum)

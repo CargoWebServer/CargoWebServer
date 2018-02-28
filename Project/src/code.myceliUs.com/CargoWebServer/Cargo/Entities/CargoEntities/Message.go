@@ -8,7 +8,6 @@ type Message interface{
 	/** UUID **/
 	GetUuid() string
 
-	/** Body **/
-	GetBody() string
+
 
 }

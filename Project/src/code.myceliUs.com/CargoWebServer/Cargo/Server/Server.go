@@ -1027,8 +1027,8 @@ func (this *Server) Start() {
 		}
 
 		// Now I will run the scheduled task
-		for i := 0; i < len(activeConfigurations.M_scheduledTasks); i++ {
-			task := activeConfigurations.M_scheduledTasks[i]
+		for i := 0; i < len(activeConfigurations.GetScheduledTasks()); i++ {
+			task := activeConfigurations.GetScheduledTasks()[i]
 			GetTaskManager().scheduleTask(task)
 		}
 

@@ -50,8 +50,8 @@ func (this *SecurityManager) createAdminRole() {
 
 		// Create adminRole
 		adminRole, _ := this.createRole("adminRole")
-		adminRole.SetAccounts(adminAccount)
-		adminAccount.SetRolesRef(adminRole)
+		adminRole.AppendAccounts(adminAccount)
+		adminAccount.AppendRolesRef(adminRole)
 
 		GetServer().GetEntityManager().saveEntity(adminRole)
 		GetServer().GetEntityManager().saveEntity(adminAccount)
@@ -72,10 +72,10 @@ func (this *SecurityManager) createGuestRole() {
 
 		// Create guestRole
 		guestRole, _ := this.createRole("guestRole")
-		guestRole.SetAccounts(guestAccount)
+		guestRole.AppendAccounts(guestAccount)
 
 		// Setting guestRole to guest account
-		guestAccount.SetRolesRef(guestRole)
+		guestAccount.AppendRolesRef(guestRole)
 
 		GetServer().GetEntityManager().saveEntity(guestRole)
 		GetServer().GetEntityManager().saveEntity(guestAccount)
@@ -196,8 +196,8 @@ func (this *SecurityManager) appendAccount(roleId string, accountId string) *Car
 		account := accountEntity.(*CargoEntities.Account)
 
 		// Set the account to the role
-		role.SetAccounts(account)
-		account.SetRolesRef(role)
+		role.AppendAccounts(account)
+		account.AppendRolesRef(role)
 
 		GetServer().GetEntityManager().saveEntity(roleEntity)
 		GetServer().GetEntityManager().saveEntity(accountEntity)
@@ -298,7 +298,7 @@ func (this *SecurityManager) appendAction(roleId string, actionName string) *Car
 		// Get the account entity
 		action := actionEntity.(*CargoEntities.Action)
 		// Set the account to the role
-		role.SetActions(action)
+		role.AppendActions(action)
 
 		// Save the entities.
 		GetServer().GetEntityManager().saveEntity(roleEntity)
@@ -544,8 +544,8 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType i
 		}
 
 		// Append the account ref to the
-		permission.SetAccountsRef(accountEntity.(*CargoEntities.Account))
-		accountEntity.(*CargoEntities.Account).SetPermissionsRef(permission)
+		permission.AppendAccountsRef(accountEntity.(*CargoEntities.Account))
+		accountEntity.(*CargoEntities.Account).AppendPermissionsRef(permission)
 
 		GetServer().GetEntityManager().saveEntity(permission)
 		GetServer().GetEntityManager().saveEntity(accountEntity)

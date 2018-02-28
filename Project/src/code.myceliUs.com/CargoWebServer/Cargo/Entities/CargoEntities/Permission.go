@@ -24,14 +24,10 @@ type Permission struct{
 	/** members of Permission **/
 	M_id string
 	M_types int
-	m_accountsRef []*Account
-	/** If the ref is a string and not an object **/
 	M_accountsRef []string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -96,138 +92,79 @@ func (this *Permission) SetEntityGetter(fct func(uuid string)(interface{}, error
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Permission) GetId() string{
+func (this *Permission) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Permission) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Permission) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Types **/
-func (this *Permission) GetTypes() int{
+func (this *Permission) GetTypes()int{
 	return this.M_types
 }
 
-/** Init reference Types **/
-func (this *Permission) SetTypes(ref interface{}){
-	if this.M_types != ref.(int) {
-		this.M_types = ref.(int)
-		this.NeedSave = true
+func (this *Permission) SetTypes(val int){
+	this.NeedSave = this.M_types== val
+	this.M_types= val
+}
+
+
+func (this *Permission) GetAccountsRef()[]*Account{
+	accountsRef := make([]*Account, 0)
+	for i := 0; i < len(this.M_accountsRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_accountsRef[i])
+		if err == nil {
+			accountsRef = append(accountsRef, entity.(*Account))
+		}
+	}
+	return accountsRef
+}
+
+func (this *Permission) SetAccountsRef(val []*Account){
+	this.M_accountsRef= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Types **/
-
-/** AccountsRef **/
-func (this *Permission) GetAccountsRef() []*Account{
-	if this.m_accountsRef == nil {
-		this.m_accountsRef = make([]*Account, 0)
-		for i := 0; i < len(this.M_accountsRef); i++ {
-			entity, err := this.getEntityByUuid(this.M_accountsRef[i])
-			if err == nil {
-				this.m_accountsRef = append(this.m_accountsRef, entity.(*Account))
-			}
+func (this *Permission) AppendAccountsRef(val *Account){
+	for i:=0; i < len(this.M_accountsRef); i++{
+		if this.M_accountsRef[i] == val.GetUuid() {
+			return
 		}
 	}
-	return this.m_accountsRef
-}
-func (this *Permission) GetAccountsRefStr() []string{
-	return this.M_accountsRef
+	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
 }
 
-/** Init reference AccountsRef **/
-func (this *Permission) SetAccountsRef(ref interface{}){
-	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_accountsRef); i++ {
-			if this.M_accountsRef[i] == refStr {
-				return
-			}
-		}
-		this.M_accountsRef = append(this.M_accountsRef, ref.(string))
-		this.NeedSave = true
-	}else{
-		for i:=0; i < len(this.m_accountsRef); i++ {
-			if this.m_accountsRef[i].GetUuid() == ref.(*Account).GetUuid() {
-				return
-			}
-		}
-		isExist := false
-		for i:=0; i < len(this.M_accountsRef); i++ {
-			if this.M_accountsRef[i] == ref.(*Account).GetUuid() {
-				isExist = true
-			}
-		}
-		this.m_accountsRef = append(this.m_accountsRef, ref.(*Account))
-	if !isExist {
-		this.M_accountsRef = append(this.M_accountsRef, ref.(Entity).GetUuid())
-		this.NeedSave = true
-	}
-	}
-}
-
-/** Remove reference AccountsRef **/
-func (this *Permission) RemoveAccountsRef(ref interface{}){
-	toDelete := ref.(Entity)
-	accountsRef_ := make([]*Account, 0)
-	accountsRefUuid := make([]string, 0)
-	for i := 0; i < len(this.m_accountsRef); i++ {
-		if toDelete.GetUuid() != this.m_accountsRef[i].GetUuid() {
-			accountsRef_ = append(accountsRef_, this.m_accountsRef[i])
-			accountsRefUuid = append(accountsRefUuid, this.M_accountsRef[i])
+func (this *Permission) RemoveAccountsRef(val *Account){
+	accountsRef := make([]string,0)
+	for i:=0; i < len(this.M_accountsRef); i++{
+		if this.M_accountsRef[i] != val.GetUuid() {
+			accountsRef = append(accountsRef, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.m_accountsRef = accountsRef_
-	this.M_accountsRef = accountsRefUuid
+	this.M_accountsRef = accountsRef
 }
 
-/** Entities **/
-func (this *Permission) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+
+func (this *Permission) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *Permission) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *Permission) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *Permission) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *Permission) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Permission) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

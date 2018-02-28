@@ -26,14 +26,10 @@ type Group struct{
 
 	/** members of Group **/
 	M_name string
-	m_membersRef []*User
-	/** If the ref is a string and not an object **/
 	M_membersRef []string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -102,138 +98,79 @@ func (this *Group) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Group) GetId() string{
+func (this *Group) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Group) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Group) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *Group) GetName() string{
+func (this *Group) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Group) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
+func (this *Group) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
+}
+
+
+func (this *Group) GetMembersRef()[]*User{
+	membersRef := make([]*User, 0)
+	for i := 0; i < len(this.M_membersRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_membersRef[i])
+		if err == nil {
+			membersRef = append(membersRef, entity.(*User))
+		}
+	}
+	return membersRef
+}
+
+func (this *Group) SetMembersRef(val []*User){
+	this.M_membersRef= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_membersRef=append(this.M_membersRef, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Name **/
-
-/** MembersRef **/
-func (this *Group) GetMembersRef() []*User{
-	if this.m_membersRef == nil {
-		this.m_membersRef = make([]*User, 0)
-		for i := 0; i < len(this.M_membersRef); i++ {
-			entity, err := this.getEntityByUuid(this.M_membersRef[i])
-			if err == nil {
-				this.m_membersRef = append(this.m_membersRef, entity.(*User))
-			}
+func (this *Group) AppendMembersRef(val *User){
+	for i:=0; i < len(this.M_membersRef); i++{
+		if this.M_membersRef[i] == val.GetUuid() {
+			return
 		}
 	}
-	return this.m_membersRef
-}
-func (this *Group) GetMembersRefStr() []string{
-	return this.M_membersRef
+	this.M_membersRef = append(this.M_membersRef, val.GetUuid())
 }
 
-/** Init reference MembersRef **/
-func (this *Group) SetMembersRef(ref interface{}){
-	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_membersRef); i++ {
-			if this.M_membersRef[i] == refStr {
-				return
-			}
-		}
-		this.M_membersRef = append(this.M_membersRef, ref.(string))
-		this.NeedSave = true
-	}else{
-		for i:=0; i < len(this.m_membersRef); i++ {
-			if this.m_membersRef[i].GetUuid() == ref.(*User).GetUuid() {
-				return
-			}
-		}
-		isExist := false
-		for i:=0; i < len(this.M_membersRef); i++ {
-			if this.M_membersRef[i] == ref.(*User).GetUuid() {
-				isExist = true
-			}
-		}
-		this.m_membersRef = append(this.m_membersRef, ref.(*User))
-	if !isExist {
-		this.M_membersRef = append(this.M_membersRef, ref.(Entity).GetUuid())
-		this.NeedSave = true
-	}
-	}
-}
-
-/** Remove reference MembersRef **/
-func (this *Group) RemoveMembersRef(ref interface{}){
-	toDelete := ref.(Entity)
-	membersRef_ := make([]*User, 0)
-	membersRefUuid := make([]string, 0)
-	for i := 0; i < len(this.m_membersRef); i++ {
-		if toDelete.GetUuid() != this.m_membersRef[i].GetUuid() {
-			membersRef_ = append(membersRef_, this.m_membersRef[i])
-			membersRefUuid = append(membersRefUuid, this.M_membersRef[i])
+func (this *Group) RemoveMembersRef(val *User){
+	membersRef := make([]string,0)
+	for i:=0; i < len(this.M_membersRef); i++{
+		if this.M_membersRef[i] != val.GetUuid() {
+			membersRef = append(membersRef, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.m_membersRef = membersRef_
-	this.M_membersRef = membersRefUuid
+	this.M_membersRef = membersRef
 }
 
-/** Entities **/
-func (this *Group) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+
+func (this *Group) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *Group) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *Group) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *Group) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *Group) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Group) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

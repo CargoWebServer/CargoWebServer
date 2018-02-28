@@ -350,7 +350,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 							if err == nil {
 								log.Println("--> Create user: ", user.GetId())
 								account.SetUserRef(user)
-								user.SetAccounts(account)
+								user.AppendAccounts(account)
 								// Save both entity...
 								GetServer().GetEntityManager().saveEntity(account)
 								GetServer().GetEntityManager().saveEntity(user)
@@ -424,8 +424,8 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 							ids := []interface{}{strings.TrimSpace(strings.ToLower(membersRef[k]))}
 							member, err := GetServer().GetEntityManager().getEntityById("CargoEntities.User", "CargoEntities", ids)
 							if err == nil {
-								group.SetMembersRef(member.(*CargoEntities.User))
-								member.(*CargoEntities.User).SetMemberOfRef(group)
+								group.AppendMembersRef(member.(*CargoEntities.User))
+								member.(*CargoEntities.User).AppendMemberOfRef(group)
 								GetServer().GetEntityManager().saveEntity(member)
 							}
 						}

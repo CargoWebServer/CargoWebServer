@@ -242,7 +242,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 								parameter.SetIsArray(isArray)
 								parameter.SetType(parameterInfo.(map[string]interface{})["type"].(string))
 								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_parameters", "CargoEntities.Parameter", "", parameter)
-								action.SetParameters(parameter)
+								action.AppendParameters(parameter)
 							}
 
 							// Now the return values.
@@ -256,7 +256,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 								result.SetIsArray(isArray)
 								result.SetType(resultInfo.(map[string]interface{})["type"].(string))
 								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_results", "CargoEntities.Parameter", "", result)
-								action.SetResults(result)
+								action.AppendResults(result)
 							}
 
 							GetServer().GetEntityManager().saveEntity(actionEntity)
@@ -387,7 +387,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 								parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 								parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
 								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_parameters", "CargoEntities.Parameter", "", parameter)
-								action.SetParameters(parameter)
+								action.AppendParameters(parameter)
 
 							}
 						}
@@ -409,7 +409,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 							parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 							parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
 							GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_results", "CargoEntities.Parameter", "", parameter)
-							action.SetResults(parameter)
+							action.AppendResults(parameter)
 						}
 
 						action.SetAccessType(CargoEntities.AccessType_Public)
@@ -431,7 +431,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						adminRoleEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"adminRole"})
 						if adminRoleEntity != nil {
 							if action.GetAccessType() != CargoEntities.AccessType_Hidden {
-								adminRoleEntity.(*CargoEntities.Role).SetActions(action)
+								adminRoleEntity.(*CargoEntities.Role).AppendActions(action)
 								GetServer().GetEntityManager().saveEntity(adminRoleEntity)
 							}
 						}
@@ -439,7 +439,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						guestRoleEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"guestRole"})
 						if guestRoleEntity != nil {
 							if action.GetAccessType() == CargoEntities.AccessType_Public {
-								guestRoleEntity.(*CargoEntities.Role).SetActions(action)
+								guestRoleEntity.(*CargoEntities.Role).AppendActions(action)
 								GetServer().GetEntityManager().saveEntity(guestRoleEntity)
 							}
 						}
@@ -508,7 +508,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 				if action.M_parameters != nil {
 					// The last tow parameters are sessionId and message Id
 					for j := 0; j < len(action.M_parameters)-2; j++ {
-						clientSrc += action.M_parameters[j].GetName()
+						clientSrc += action.GetParameters()[j].GetName()
 						if j < len(action.M_parameters)-2 {
 							clientSrc += ", "
 						}
@@ -544,8 +544,8 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 				// Here I will generate the content of the function.
 				if action.M_parameters != nil {
 					clientSrc += "	var params = []\n"
-					for j := 0; j < len(action.M_parameters)-2; j++ {
-						param := action.M_parameters[j]
+					for j := 0; j < len(action.GetParameters())-2; j++ {
+						param := action.GetParameters()[j]
 						paramTypeName := param.GetType()
 						if paramTypeName == "string" {
 							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"STRING\", \"" + param.GetName() + "\"))\n"
@@ -586,8 +586,8 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 				if Utility.Contains(callbacks, "successCallback") {
 					// Set the progress callback.
 					clientSrc += "	function (results, caller) { // Success callback\n"
-					if len(action.M_results) > 0 {
-						typeName := action.M_results[0].M_type
+					if len(action.GetResults()) > 0 {
+						typeName := action.GetResults()[0].GetType()
 						isArray := strings.HasPrefix(typeName, "[]")
 						typeName = strings.Replace(typeName, "[]", "", -1)
 						typeName = strings.Replace(typeName, "*", "", -1)
@@ -713,9 +713,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 		params_ := ""
 		if action.M_parameters != nil {
 			// The last tow parameters are sessionId and message Id
-			for j := 0; j < len(action.M_parameters)-2; j++ {
-				params_ += action.M_parameters[j].GetName()
-				if j < len(action.M_parameters)-3 {
+			for j := 0; j < len(action.GetParameters())-2; j++ {
+				params_ += action.GetParameters()[j].GetName()
+				if j < len(action.GetParameters())-3 {
 					params_ += ", "
 				}
 			}
@@ -730,15 +730,15 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 		params_ += "messageId, sessionId"
 
 		// The content of the action code will depend of the parameter output.
-		if len(action.M_results) > 0 {
+		if len(action.GetResults()) > 0 {
 			// It can be an array or not...
-			if action.M_results[0].IsArray() {
-				serverSrc += "	var " + action.M_results[0].M_name + " = []\n"
+			if action.GetResults()[0].IsArray() {
+				serverSrc += "	var " + action.GetResults()[0].M_name + " = []\n"
 			} else {
-				serverSrc += "	var " + action.M_results[0].M_name + " = null\n"
+				serverSrc += "	var " + action.GetResults()[0].M_name + " = null\n"
 			}
-			serverSrc += "	" + action.M_results[0].M_name + " = GetServer().Get" + serviceId + "()." + name + "(" + params_ + ")\n"
-			serverSrc += "	return " + action.M_results[0].M_name + "\n"
+			serverSrc += "	" + action.GetResults()[0].M_name + " = GetServer().Get" + serviceId + "()." + name + "(" + params_ + ")\n"
+			serverSrc += "	return " + action.GetResults()[0].M_name + "\n"
 		} else {
 			// Here I will simply call the method on the service object..
 			serverSrc += "	GetServer().Get" + serviceId + "()." + name + "(" + params_ + ")\n"
@@ -790,12 +790,12 @@ func (this *ServiceManager) registerAction(methodName string, parameters []inter
 
 	// The input
 	for j := 0; j < len(parameters_); j++ {
-		action.SetParameters(parameters_[j])
+		action.AppendParameters(parameters_[j])
 	}
 
 	// The output
 	for j := 0; j < len(results_); j++ {
-		action.SetResults(results_[j])
+		action.AppendResults(results_[j])
 	}
 
 	// Restricted by default.
@@ -804,7 +804,7 @@ func (this *ServiceManager) registerAction(methodName string, parameters []inter
 	// apend it to the entities action.
 	entities := GetServer().GetEntityManager().getCargoEntities()
 	action.SetEntitiesPtr(entities)
-	GetServer().GetEntityManager().getCargoEntities().SetActions(action)
+	GetServer().GetEntityManager().getCargoEntities().AppendActions(action)
 	GetServer().GetEntityManager().saveEntity(entities)
 
 	return action, nil

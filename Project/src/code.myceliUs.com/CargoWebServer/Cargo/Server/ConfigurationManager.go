@@ -165,7 +165,7 @@ func (this *ConfigurationManager) initialize() {
 		// Create the configuration entity from the configuration and save it.
 		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
 
-		this.m_activeConfigurations.M_serviceConfigs = this.m_servicesConfiguration
+		this.m_activeConfigurations.SetServiceConfigs(this.m_servicesConfiguration)
 
 		// Now the default server configuration...
 		// Sever default values...
@@ -177,7 +177,7 @@ func (this *ConfigurationManager) initialize() {
 		serverConfig.M_serviceContainerPort = 9494
 		serverConfig.M_hostName = "localhost"
 		serverConfig.M_ipv4 = "127.0.0.1"
-		this.m_activeConfigurations.M_serverConfig = serverConfig
+		this.m_activeConfigurations.SetServerConfig(serverConfig)
 
 		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
 		os.MkdirAll(this.GetDataPath(), 0777)
@@ -201,7 +201,7 @@ func (this *ConfigurationManager) initialize() {
 	}
 
 	// Set the service container configuration
-	this.setServiceConfiguration("CargoServiceContainer", this.m_activeConfigurations.M_serverConfig.M_serviceContainerPort)
+	this.setServiceConfiguration("CargoServiceContainer", this.m_activeConfigurations.GetServerConfig().GetServiceContainerPort())
 }
 
 func (this *ConfigurationManager) getId() string {
@@ -254,49 +254,49 @@ func (this *ConfigurationManager) GetApplicationDirectoryPath() string {
 		return this.m_filePath + "/Apps"
 	}
 
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_applicationsPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetApplicationsPath()
 }
 
 func (this *ConfigurationManager) GetDataPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Data"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_dataPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetDataPath()
 }
 
 func (this *ConfigurationManager) GetScriptPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Script"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_scriptsPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetScriptsPath()
 }
 
 func (this *ConfigurationManager) GetDefinitionsPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Definitions"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_definitionsPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetDefinitionsPath()
 }
 
 func (this *ConfigurationManager) GetSchemasPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Schemas"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_schemasPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetSchemasPath()
 }
 
 func (this *ConfigurationManager) GetTmpPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/tmp"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_tmpPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetTmpPath()
 }
 
 func (this *ConfigurationManager) GetBinPath() string {
 	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/bin"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_binPath
+	return this.m_filePath + this.m_activeConfigurations.GetServerConfig().GetBinPath()
 }
 
 func (this *ConfigurationManager) GetHostName() string {
@@ -304,7 +304,7 @@ func (this *ConfigurationManager) GetHostName() string {
 		return "localhost"
 	}
 	// Default port...
-	return this.m_activeConfigurations.M_serverConfig.M_hostName
+	return this.m_activeConfigurations.GetServerConfig().GetHostName()
 }
 
 func (this *ConfigurationManager) GetIpv4() string {
@@ -312,7 +312,7 @@ func (this *ConfigurationManager) GetIpv4() string {
 		return "127.0.0.1"
 	}
 	// Default port...
-	return this.m_activeConfigurations.M_serverConfig.M_ipv4
+	return this.m_activeConfigurations.GetServerConfig().GetIpv4()
 }
 
 /**
@@ -322,7 +322,7 @@ func (this *ConfigurationManager) GetServerPort() int {
 	if this.m_activeConfigurations == nil {
 		return 9393
 	}
-	return this.m_activeConfigurations.M_serverConfig.M_serverPort
+	return this.m_activeConfigurations.GetServerConfig().GetServerPort()
 }
 
 /**
@@ -332,7 +332,7 @@ func (this *ConfigurationManager) GetConfigurationServicePort() int {
 	if this.m_activeConfigurations == nil {
 		return 9494
 	}
-	return this.m_activeConfigurations.M_serverConfig.M_serviceContainerPort
+	return this.m_activeConfigurations.GetServerConfig().GetServiceContainerPort()
 }
 
 /**
@@ -371,7 +371,7 @@ func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Co
 func (this *ConfigurationManager) appendDataStoreConfiguration(config *Config.DataStoreConfiguration) {
 	// Save the data store.
 	if this.m_activeConfigurations != nil {
-		this.m_activeConfigurations.SetDataStoreConfigs(config)
+		this.m_activeConfigurations.AppendDataStoreConfigs(config)
 		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
 	} else {
 		// append in the list of configuration store and save it latter...

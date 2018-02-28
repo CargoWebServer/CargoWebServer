@@ -25,10 +25,10 @@ type Entities struct{
 	M_id string
 	M_name string
 	M_version string
-	M_entities []Entity
-	M_roles []*Role
-	M_permissions []*Permission
-	M_actions []*Action
+	M_entities []string
+	M_roles []string
+	M_permissions []string
+	M_actions []string
 
 }
 
@@ -106,199 +106,192 @@ func (this *Entities) SetEntityGetter(fct func(uuid string)(interface{}, error))
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Entities) GetId() string{
+func (this *Entities) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Entities) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Entities) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *Entities) GetName() string{
+func (this *Entities) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Entities) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Entities) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** Version **/
-func (this *Entities) GetVersion() string{
+func (this *Entities) GetVersion()string{
 	return this.M_version
 }
 
-/** Init reference Version **/
-func (this *Entities) SetVersion(ref interface{}){
-	if this.M_version != ref.(string) {
-		this.M_version = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Entities) SetVersion(val string){
+	this.NeedSave = this.M_version== val
+	this.M_version= val
 }
 
-/** Remove reference Version **/
 
-/** Entities **/
-func (this *Entities) GetEntities() []Entity{
-	return this.M_entities
-}
-
-/** Init reference Entities **/
-func (this *Entities) SetEntities(ref interface{}){
-	isExist := false
-	var entitiess []Entity
-	for i:=0; i<len(this.M_entities); i++ {
-		if this.M_entities[i].(Entity).GetUuid() != ref.(Entity).GetUuid() {
-			entitiess = append(entitiess, this.M_entities[i])
-		} else {
-			isExist = true
-			entitiess = append(entitiess, ref.(Entity))
-		}
-	}
-	if !isExist {
-		entitiess = append(entitiess, ref.(Entity))
-		this.NeedSave = true
-		this.M_entities = entitiess
-	}
-}
-
-/** Remove reference Entities **/
-func (this *Entities) RemoveEntities(ref interface{}){
-	toDelete := ref.(Entity)
-	entities_ := make([]Entity, 0)
+func (this *Entities) GetEntities()[]Entity{
+	entities := make([]Entity, 0)
 	for i := 0; i < len(this.M_entities); i++ {
-		if toDelete.GetUuid() != this.M_entities[i].(Entity).GetUuid() {
-			entities_ = append(entities_, this.M_entities[i])
+		entity, err := this.getEntityByUuid(this.M_entities[i])
+		if err == nil {
+			entities = append(entities, entity.(Entity))
+		}
+	}
+	return entities
+}
+
+func (this *Entities) SetEntities(val []Entity){
+	this.M_entities= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_entities=append(this.M_entities, val[i].GetUuid())
+	}
+}
+
+func (this *Entities) AppendEntities(val Entity){
+	for i:=0; i < len(this.M_entities); i++{
+		if this.M_entities[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_entities = append(this.M_entities, val.GetUuid())
+}
+
+func (this *Entities) RemoveEntities(val Entity){
+	entities := make([]string,0)
+	for i:=0; i < len(this.M_entities); i++{
+		if this.M_entities[i] != val.GetUuid() {
+			entities = append(entities, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_entities = entities_
+	this.M_entities = entities
 }
 
-/** Roles **/
-func (this *Entities) GetRoles() []*Role{
-	return this.M_roles
-}
 
-/** Init reference Roles **/
-func (this *Entities) SetRoles(ref interface{}){
-	isExist := false
-	var roless []*Role
-	for i:=0; i<len(this.M_roles); i++ {
-		if this.M_roles[i].GetUuid() != ref.(*Role).GetUuid() {
-			roless = append(roless, this.M_roles[i])
-		} else {
-			isExist = true
-			roless = append(roless, ref.(*Role))
-		}
-	}
-	if !isExist {
-		roless = append(roless, ref.(*Role))
-		this.NeedSave = true
-		this.M_roles = roless
-	}
-}
-
-/** Remove reference Roles **/
-func (this *Entities) RemoveRoles(ref interface{}){
-	toDelete := ref.(*Role)
-	roles_ := make([]*Role, 0)
+func (this *Entities) GetRoles()[]*Role{
+	roles := make([]*Role, 0)
 	for i := 0; i < len(this.M_roles); i++ {
-		if toDelete.GetUuid() != this.M_roles[i].GetUuid() {
-			roles_ = append(roles_, this.M_roles[i])
+		entity, err := this.getEntityByUuid(this.M_roles[i])
+		if err == nil {
+			roles = append(roles, entity.(*Role))
+		}
+	}
+	return roles
+}
+
+func (this *Entities) SetRoles(val []*Role){
+	this.M_roles= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_roles=append(this.M_roles, val[i].GetUuid())
+	}
+}
+
+func (this *Entities) AppendRoles(val *Role){
+	for i:=0; i < len(this.M_roles); i++{
+		if this.M_roles[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_roles = append(this.M_roles, val.GetUuid())
+}
+
+func (this *Entities) RemoveRoles(val *Role){
+	roles := make([]string,0)
+	for i:=0; i < len(this.M_roles); i++{
+		if this.M_roles[i] != val.GetUuid() {
+			roles = append(roles, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_roles = roles_
+	this.M_roles = roles
 }
 
-/** Permissions **/
-func (this *Entities) GetPermissions() []*Permission{
-	return this.M_permissions
-}
 
-/** Init reference Permissions **/
-func (this *Entities) SetPermissions(ref interface{}){
-	isExist := false
-	var permissionss []*Permission
-	for i:=0; i<len(this.M_permissions); i++ {
-		if this.M_permissions[i].GetUuid() != ref.(*Permission).GetUuid() {
-			permissionss = append(permissionss, this.M_permissions[i])
-		} else {
-			isExist = true
-			permissionss = append(permissionss, ref.(*Permission))
-		}
-	}
-	if !isExist {
-		permissionss = append(permissionss, ref.(*Permission))
-		this.NeedSave = true
-		this.M_permissions = permissionss
-	}
-}
-
-/** Remove reference Permissions **/
-func (this *Entities) RemovePermissions(ref interface{}){
-	toDelete := ref.(*Permission)
-	permissions_ := make([]*Permission, 0)
+func (this *Entities) GetPermissions()[]*Permission{
+	permissions := make([]*Permission, 0)
 	for i := 0; i < len(this.M_permissions); i++ {
-		if toDelete.GetUuid() != this.M_permissions[i].GetUuid() {
-			permissions_ = append(permissions_, this.M_permissions[i])
+		entity, err := this.getEntityByUuid(this.M_permissions[i])
+		if err == nil {
+			permissions = append(permissions, entity.(*Permission))
+		}
+	}
+	return permissions
+}
+
+func (this *Entities) SetPermissions(val []*Permission){
+	this.M_permissions= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
+	}
+}
+
+func (this *Entities) AppendPermissions(val *Permission){
+	for i:=0; i < len(this.M_permissions); i++{
+		if this.M_permissions[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_permissions = append(this.M_permissions, val.GetUuid())
+}
+
+func (this *Entities) RemovePermissions(val *Permission){
+	permissions := make([]string,0)
+	for i:=0; i < len(this.M_permissions); i++{
+		if this.M_permissions[i] != val.GetUuid() {
+			permissions = append(permissions, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_permissions = permissions_
+	this.M_permissions = permissions
 }
 
-/** Actions **/
-func (this *Entities) GetActions() []*Action{
-	return this.M_actions
-}
 
-/** Init reference Actions **/
-func (this *Entities) SetActions(ref interface{}){
-	isExist := false
-	var actionss []*Action
-	for i:=0; i<len(this.M_actions); i++ {
-		if this.M_actions[i].GetUuid() != ref.(*Action).GetUuid() {
-			actionss = append(actionss, this.M_actions[i])
-		} else {
-			isExist = true
-			actionss = append(actionss, ref.(*Action))
-		}
-	}
-	if !isExist {
-		actionss = append(actionss, ref.(*Action))
-		this.NeedSave = true
-		this.M_actions = actionss
-	}
-}
-
-/** Remove reference Actions **/
-func (this *Entities) RemoveActions(ref interface{}){
-	toDelete := ref.(*Action)
-	actions_ := make([]*Action, 0)
+func (this *Entities) GetActions()[]*Action{
+	actions := make([]*Action, 0)
 	for i := 0; i < len(this.M_actions); i++ {
-		if toDelete.GetUuid() != this.M_actions[i].GetUuid() {
-			actions_ = append(actions_, this.M_actions[i])
+		entity, err := this.getEntityByUuid(this.M_actions[i])
+		if err == nil {
+			actions = append(actions, entity.(*Action))
+		}
+	}
+	return actions
+}
+
+func (this *Entities) SetActions(val []*Action){
+	this.M_actions= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_actions=append(this.M_actions, val[i].GetUuid())
+	}
+}
+
+func (this *Entities) AppendActions(val *Action){
+	for i:=0; i < len(this.M_actions); i++{
+		if this.M_actions[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_actions = append(this.M_actions, val.GetUuid())
+}
+
+func (this *Entities) RemoveActions(val *Action){
+	actions := make([]string,0)
+	for i:=0; i < len(this.M_actions); i++{
+		if this.M_actions[i] != val.GetUuid() {
+			actions = append(actions, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_actions = actions_
+	this.M_actions = actions
 }
+

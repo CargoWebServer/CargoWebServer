@@ -428,23 +428,15 @@ func generateGoMemberCode(attribute *XML_Schemas.CMOF_OwnedAttribute, isAssociat
 		ref = "Ptr"
 	}
 
-	isRef := IsRef(attribute)
-	// The reference pointer here
-
-	if isRef {
-		// The initialyse memory reference...
-		memberStr += "	m_" + memberName + ref + " " + typeName + "\n"
-
-		// The string key to that reference...
-		memberStr += "	/** If the ref is a string and not an object **/\n"
+	// The string key to that reference...
+	if isPrimitive || enumMap[typeName] != nil {
+		memberStr += "	M_" + memberName + ref + " " + typeName + "\n"
+	} else {
 		if attribute.Upper == "*" {
 			memberStr += "	M_" + memberName + ref + " []string\n"
 		} else {
 			memberStr += "	M_" + memberName + ref + " string\n"
 		}
-
-	} else {
-		memberStr += "	M_" + memberName + ref + " " + typeName + "\n"
 	}
 
 	return memberStr
@@ -473,46 +465,6 @@ func generateGoClassMembersCode(class *XML_Schemas.CMOF_OwnedMember, packageId s
  * like GetResolution()float32
  */
 func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML_Schemas.CMOF_OwnedMember, isAssociation bool, packName string) string {
-	var methodStr string
-	var getter string
-	var setter string
-
-	// Here I will print the property...
-	// is abstract or not...
-	var typeName, isPrimitive, isPointer = getAttributeTypeName(attribute)
-	typeName_ := typeName
-	if !isPrimitive {
-		typeName = getClassPackName(typeName, packName) + typeName
-	}
-
-	//log.Println(attribute.Name)
-	var methodName = strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:]
-	isInterface := Utility.Contains(superClassesLst, typeName) || Utility.Contains(abstractClassLst, typeName)
-
-	if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
-		typeName = "*" + typeName
-	}
-
-	ref := ""
-	if isAssociation == true {
-		ref = "Ptr"
-	}
-
-	// If the method is a boolean and is name beging with is...
-	if strings.HasPrefix(methodName, "Is") && (typeName == "bool" || typeName == "boolean") {
-		getter += methodName + "() "
-		if attribute.Upper == "*" {
-			getter += "[]"
-		}
-		getter += typeName
-	} else {
-		getter += "Get" + methodName + ref + "() "
-		if attribute.Upper == "*" {
-			getter += "[]"
-		}
-		getter += typeName
-	}
-
 	if owner != nil {
 		ownerName := owner.Name
 		if Utility.Contains(superClassesLst, ownerName) == true {
@@ -520,300 +472,182 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		}
 
 		// Here we are in a struct...
-		getter = "func (this *" + ownerName + ") " + getter + "{\n"
-		isRef := IsRef(attribute)
+		typeName, isPrimitive, isPointer := getAttributeTypeName(attribute)
+		var methodName = strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:]
+		var attributeName = attribute.Name
+		if isAssociation {
+			attributeName += "Ptr"
+			methodName += "Ptr"
+		}
 
-		if isRef && attribute.Name != "other" {
-			// Here the reference are not initialyse at first...
-			if attribute.Upper == "*" {
-				getter += "	if this.m_" + attribute.Name + ref + " == nil {\n"
-				getter += "		this.m_" + attribute.Name + ref + " = make([]" + typeName + ", 0)\n"
-				getter += "		for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-				getter += "			entity, err := this.getEntityByUuid(this.M_" + attribute.Name + ref + "[i])\n"
-				getter += "			if err == nil {\n"
-				getter += "				this.m_" + attribute.Name + ref + " = append(this.m_" + attribute.Name + ref + ", entity.(" + typeName + "))\n"
-				getter += "			}\n"
-				getter += "		}\n"
-				getter += "	}\n"
-			} else {
-				getter += "	if this.m_" + attribute.Name + ref + " == nil {\n"
-				getter += "		entity, err := this.getEntityByUuid(this.M_" + attribute.Name + ref + ")\n"
-				getter += "		if err == nil {\n"
-				getter += "			this.m_" + attribute.Name + ref + " = entity.(" + typeName + ")\n"
-				getter += "		}\n"
-				getter += "	}\n"
+		// The getter function...
+		getterStr := "func (this *" + ownerName + ") "
+		if typeName == "bool" || typeName == "boolean" {
+			if !strings.HasPrefix(methodName, "Is") {
+
+				getterStr += "Is"
 			}
-			getter += "	return this.m_" + attribute.Name + ref + "\n"
 		} else {
-			getter += "	return this.M_" + attribute.Name + ref + "\n"
+			getterStr += "Get"
 		}
-
-		getter += "}\n"
-		if isRef && attribute.Name != "other" {
-			if attribute.Upper == "*" {
-				getter += "func (this *" + ownerName + ") Get" + methodName + ref + "Str() []string{\n"
-			} else {
-				getter += "func (this *" + ownerName + ") Get" + methodName + ref + "Str() string{\n"
-			}
-			getter += "	return this.M_" + attribute.Name + ref + "\n"
-			getter += "}\n"
-		}
-
-		methodStr = "\n/** " + methodName + " **/\n" + getter
-
-		/** Here I will create the function to initialyse a reference... **/
-		methodStr += "\n/** Init reference " + methodName + " **/\n"
-		setter = "Set" + methodName + ref + "(ref interface{})\n"
-
-		refSetter := ""
-		refSetter += "func (this *" + ownerName + ") Set" + methodName + ref + "(ref interface{}){\n"
-
-		cast := typeName_
-		elementPackName := ""
-
-		if classesMap[cast] != nil {
-			_, owner_ := getOwnedAttributeByName("id", classesMap[cast])
-			cast = getClassPackName(owner_.Name, packName) + owner_.Name
-			elementPackName = membersPackage[owner_.Name]
-		}
-
+		getterStr += methodName + "()"
 		if attribute.Upper == "*" {
-			if isRef {
-				refSetter += "	if refStr, ok := ref.(string); ok {\n"
-				refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-				refSetter += "			if this.M_" + attribute.Name + ref + "[i] == refStr {\n"
-				refSetter += "				return\n"
-				refSetter += "			}\n"
-				refSetter += "		}\n"
-				refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(string))\n"
-				refSetter += "		this.NeedSave = true\n"
-				refSetter += "	}else{\n"
-				if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
-					refSetter += "		for i:=0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.m_" + attribute.Name + ref + "[i].GetUuid() == ref.(" + typeName + ").GetUuid() {\n"
-					refSetter += "				return\n"
-					refSetter += "			}\n"
-					refSetter += "		}\n"
-					refSetter += "		isExist := false\n"
-					refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").GetUuid() {\n"
-					refSetter += "				isExist = true\n"
-					refSetter += "			}\n"
-					refSetter += "		}\n"
-				}
-				refSetter += "		this.m_" + attribute.Name + ref + " = append(this.m_" + attribute.Name + ref + ", ref.(" + typeName + "))\n"
-				if classesMap[cast] != nil {
-					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-
-					if elementPackName != packName {
-						cast = elementPackName + "." + cast
-					}
-					if isPointer && !isInterfaceCast {
-						cast = "*" + cast
-					}
-					refSetter += "	if !isExist {\n"
-					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUuid())\n"
-					refSetter += "		this.NeedSave = true\n"
-					refSetter += "	}\n"
-				}
-				refSetter += "	}\n"
-			} else {
-				refSetter += "	isExist := false\n"
-				refSetter += "	var " + attribute.Name + "s []" + typeName + "\n"
-				refSetter += "	for i:=0; i<len(this.M_" + attribute.Name + "); i++ {\n"
-
-				if typeName == "string" {
-					refSetter += "		if this.M_" + attribute.Name + "[i] != ref.(" + typeName + ") {\n"
-				} else if typeName == "int" {
-					refSetter += "		if this.M_" + attribute.Name + "[i] != ref.(" + typeName + ") {\n"
-				} else {
-					cast := cast[strings.Index(cast, ".")+1:]
-
-					if classesMap[cast] != nil {
-						isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-
-						if elementPackName != packName {
-							cast = elementPackName + "." + cast
-						}
-						if isPointer && !isInterfaceCast {
-							cast = "*" + cast
-						}
-						if isInterface {
-							refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUuid() != ref.(" + cast + ").GetUuid() {\n"
-						} else {
-							refSetter += "		if this.M_" + attribute.Name + "[i].GetUuid() != ref.(" + cast + ").GetUuid() {\n"
-						}
-
-					} else {
-						log.Println("------------> class not found! ", cast)
-					}
-
-				}
-
-				refSetter += "			" + attribute.Name + "s = append(" + attribute.Name + "s, this.M_" + attribute.Name + "[i])\n"
-				refSetter += "		} else {\n"
-				refSetter += "			isExist = true\n"
-				refSetter += "			" + attribute.Name + "s = append(" + attribute.Name + "s, ref.(" + typeName + "))\n"
-				refSetter += "		}\n"
-				refSetter += "	}\n"
-
-				refSetter += "	if !isExist {\n"
-				refSetter += "		" + attribute.Name + "s = append(" + attribute.Name + "s, ref.(" + typeName + "))\n"
-				refSetter += "		this.NeedSave = true\n"
-				refSetter += "		this.M_" + attribute.Name + " = " + attribute.Name + "s\n"
-				refSetter += "	}\n"
-			}
-		} else {
-			if isRef {
-				refSetter += "	if _, ok := ref.(string); ok {\n"
-				refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(string) {\n"
-				refSetter += "			this.M_" + attribute.Name + ref + " = ref.(string)\n"
-				refSetter += "			this.NeedSave = true\n"
-				refSetter += "		}\n"
-				refSetter += "	}else{\n"
-
-				if classesMap[cast] != nil {
-					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-					if elementPackName != packName {
-						cast = elementPackName + "." + cast
-					}
-					if isPointer && !isInterfaceCast {
-						cast = "*" + cast
-					}
-					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(" + cast + ").GetUuid() {\n"
-					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUuid()\n"
-					refSetter += "			this.NeedSave = true\n"
-					refSetter += "		}\n"
-				} else {
-					hasUtility[packName+"."+ownerName] = true
-					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(Utility.Referenceable).GetUuid() {\n"
-					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(Utility.Referenceable).GetUuid()\n"
-					refSetter += "			this.NeedSave = true\n"
-					refSetter += "		}\n"
-				}
-
-				refSetter += "		this.m_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
-
-				refSetter += "	}\n"
-			} else {
-				refSetter += "	if this.M_" + attribute.Name + ref + " != ref.(" + typeName + ") {\n"
-				refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
-				refSetter += "		this.NeedSave = true\n"
-				refSetter += "	}\n"
-			}
+			getterStr += "[]"
 		}
-		refSetter += "}\n"
-		methodStr += refSetter
+		isInterface := Utility.Contains(superClassesLst, typeName) || Utility.Contains(abstractClassLst, typeName)
+		if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+			getterStr += "*"
+		}
 
-		// Now the ref remover..
-		/** Here I will create the function to initialyse a reference... **/
-		methodStr += "\n/** Remove reference " + methodName + " **/\n"
-		refRemover := ""
-		if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
+		getterStr += typeName
+		getterStr += "{\n"
 
-			refRemover += "func (this *" + ownerName + ") Remove" + methodName + ref + "(ref interface{}){\n"
-			// Here the reference is an array...
-			var isInterfaceCast bool
-			if strings.Contains(cast, ".") {
-				isInterfaceCast = Utility.Contains(abstractClassLst, strings.Split(cast, ".")[1]) || Utility.Contains(superClassesLst, strings.Split(cast, ".")[1])
-			} else {
-				isInterfaceCast = Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-			}
-
-			if isPointer && !isInterfaceCast && !strings.HasPrefix(cast, "*") {
-				cast = "*" + cast
-			}
-
-			refRemover += "	toDelete := ref.(" + cast + ")\n"
-
+		// The getter function body here.
+		if isPrimitive || enumMap[typeName] != nil {
+			getterStr += "	return this.M_" + attribute.Name + "\n"
+		} else {
 			if attribute.Upper == "*" {
-
-				if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-					refRemover += "	" + attribute.Name + ref + "_ := make([]" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
-				} else {
-					refRemover += "	" + attribute.Name + ref + "_ := make([]*" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
+				getterStr += "	" + attribute.Name + " := make([]"
+				if isPointer {
+					getterStr += "*"
 				}
+				getterStr += typeName
+				getterStr += ", 0)\n"
+				getterStr += "	for i := 0; i < len(this.M_" + attributeName + "); i++ {\n"
+				getterStr += "		entity, err := this.getEntityByUuid(this.M_" + attributeName + "[i])\n"
+				getterStr += "		if err == nil {\n"
 
-				if len(attribute.IsComposite) > 0 {
-					refRemover += "	for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-
-					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUuid() != this.M_" + attribute.Name + ref + "[i].(" + cast + ").GetUuid() {\n"
-					} else {
-						refRemover += "		if toDelete.GetUuid() != this.M_" + attribute.Name + ref + "[i].GetUuid() {\n"
-					}
-					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
-					refRemover += "		}else{\n"
-					refRemover += "			this.NeedSave = true\n"
-					refRemover += "		}\n"
-					refRemover += "	}\n"
-
-					refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
-				} else {
-					refRemover += "	" + attribute.Name + ref + "Uuid := make([]string, 0)\n"
-
-					refRemover += "	for i := 0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
-					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUuid() != this.m_" + attribute.Name + ref + "[i].(" + cast + ").GetUuid() {\n"
-					} else {
-						refRemover += "		if toDelete.GetUuid() != this.m_" + attribute.Name + ref + "[i].GetUuid() {\n"
-					}
-
-					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
-					refRemover += "			" + attribute.Name + ref + "Uuid = append(" + attribute.Name + ref + "Uuid, this.M_" + attribute.Name + ref + "[i])\n"
-					refRemover += "		}else{\n"
-					refRemover += "			this.NeedSave = true\n"
-					refRemover += "		}\n"
-					refRemover += "	}\n"
-
-					refRemover += "	this.m_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
-					refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "Uuid\n"
+				getterStr += "			" + attributeName + " = append(" + attributeName + ", entity.("
+				if isPointer {
+					getterStr += "*"
 				}
-
+				getterStr += typeName
+				getterStr += "))\n"
+				getterStr += "		}\n"
+				getterStr += "	}\n"
+				getterStr += "	return " + attributeName + "\n"
 			} else {
-
-				if len(attribute.IsComposite) > 0 {
-					// The attribute is not an array...
-					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "	if toDelete.GetUuid() == this.M_" + attribute.Name + ref + ".(" + cast + ").GetUuid() {\n"
-					} else {
-						refRemover += "	if toDelete.GetUuid() == this.M_" + attribute.Name + ref + ".GetUuid() {\n"
-					}
-					refRemover += "		this.M_" + attribute.Name + ref + " = nil\n"
-					refRemover += "		this.NeedSave = true\n"
-				} else {
-					// The attribute is not an array...
-					refRemover += "	if this.m_" + attribute.Name + ref + "!= nil {\n"
-					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUuid() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUuid() {\n"
-					} else {
-						refRemover += "		if toDelete.GetUuid() == this.m_" + attribute.Name + ref + ".GetUuid() {\n"
-					}
-					refRemover += "			this.m_" + attribute.Name + ref + " = nil\n"
-					refRemover += "			this.M_" + attribute.Name + ref + " = \"\"\n"
-					refRemover += "			this.NeedSave = true\n"
-					refRemover += "		}\n"
+				getterStr += "	entity, err := this.getEntityByUuid(this.M_" + attributeName + ")\n"
+				getterStr += "	if err == nil {\n"
+				getterStr += "		return entity.("
+				if isPointer {
+					getterStr += "*"
 				}
-				refRemover += "	}\n"
+				getterStr += typeName
+				getterStr += ")\n"
+				getterStr += "	}\n"
+				getterStr += "	return nil\n"
 			}
-			refRemover += "}\n"
-			methodStr += refRemover
+		}
+		getterStr += "}\n"
 
+		// The setter function...
+		setterStr := "func (this *" + ownerName + ") Set"
+		setterStr += methodName
+		setterStr += "(val "
+		if attribute.Upper == "*" {
+			setterStr += "[]"
+		}
+		if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+			setterStr += "*"
+		}
+		setterStr += typeName + ")"
+		setterStr += "{\n"
+		// The setter function body here.
+		if isPrimitive || enumMap[typeName] != nil {
+			if attribute.Upper != "*" {
+				setterStr += "	this.NeedSave = this.M_" + attributeName + "== val\n"
+			}
+			setterStr += "	this.M_" + attributeName + "= val\n"
 		} else {
-			//log.Println("-----------> no remover for ", attribute.Name)
+			if attribute.Upper == "*" {
+				setterStr += "	this.M_" + attributeName + "= make([]string,0)\n"
+				setterStr += "	for i:=0; i < len(val); i++{\n"
+				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
+				setterStr += "	}\n"
+			} else {
+				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
+			}
 		}
-	} else {
+		setterStr += "}\n"
 
-		methodStr = "	/** " + methodName + " **/\n	" + getter + "\n"
-
-		// Now if the property is public i will also generate it's setter.
-		if attribute.Visibility == "public" {
-			setter += "Set" + methodName + ref + "(interface{}) "
-			methodStr += "	" + setter + "\n"
+		// In case of array I will also create append method...
+		if attribute.Upper == "*" {
+			setterStr += "\nfunc (this *" + ownerName + ") Append"
+			setterStr += methodName
+			setterStr += "(val "
+			if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+				setterStr += "*"
+			}
+			setterStr += typeName + ")"
+			setterStr += "{\n"
+			// The append function body here.
+			if isPrimitive {
+				setterStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + ", val)\n"
+			} else {
+				setterStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
+				setterStr += "		if this.M_" + attributeName + "[i] == val.GetUuid() {\n"
+				setterStr += "			return\n"
+				setterStr += "		}\n"
+				setterStr += "	}\n"
+				setterStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
+			}
+			setterStr += "}\n"
 		}
+
+		var removerStr string
+		if (isPointer || attribute.Upper == "*") && !isPrimitive {
+			// The remover function...
+			removerStr = "func (this *" + ownerName + ") "
+			if attribute.Upper == "*" {
+				removerStr += "Remove"
+				removerStr += methodName + "("
+				if !isPrimitive {
+					removerStr += "val "
+					if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+						removerStr += "*"
+					}
+					removerStr += typeName
+				} else {
+					removerStr += "index int"
+				}
+				removerStr += ")"
+			} else {
+				removerStr += "Reset" + methodName + "()"
+			}
+			removerStr += "{\n"
+			// The delete function body here.
+			if attribute.Upper == "*" {
+				if isPrimitive {
+					removerStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + "[0:index], [index+1:], ...)\n"
+				} else {
+					removerStr += "	" + attributeName + " := make([]string,0)\n"
+					removerStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
+					removerStr += "		if this.M_" + attributeName + "[i] != val.GetUuid() {\n"
+					removerStr += "			" + attributeName + " = append(" + attributeName + ", val.GetUuid())\n"
+					removerStr += "		}else{\n"
+					removerStr += "			this.NeedSave = true\n"
+					removerStr += "		}\n"
+					removerStr += "	}\n"
+					removerStr += "	this.M_" + attributeName + " = " + attributeName + "\n"
+				}
+			} else {
+				if enumMap[typeName] != nil {
+					removerStr += "	this.M_" + attributeName + "= 0\n"
+				} else {
+					removerStr += "	this.M_" + attributeName + "= \"\"\n"
+				}
+			}
+
+			removerStr += "}\n"
+
+			return getterStr + "\n" + setterStr + "\n" + removerStr + "\n"
+		}
+
+		return getterStr + "\n" + setterStr + "\n"
 	}
 
-	return methodStr
+	return ""
 }
 
 // Interface
@@ -861,7 +695,7 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	for j := 0; j < len(class.Attributes); j++ {
 		attribute := class.Attributes[j]
 		if attribute.Type == "cmof:Property" {
-			classStr += generateGoMethodCode(&attribute, nil, false, membersPackage[class.Name])
+			classStr += "\n" + generateGoMethodCode(&attribute, nil, false, membersPackage[class.Name])
 			classStr += "\n"
 		}
 	}
@@ -1017,20 +851,20 @@ func generateGoClassCode(packageId string) {
 				for j := 0; j < len(superClasses); j++ {
 					superClass := classesMap[superClasses[j]]
 					for k := 0; k < len(superClass.Attributes); k++ {
-						classStr += generateGoMethodCode(&superClass.Attributes[k], class, false, membersPackage[class.Name])
+						classStr += "\n" + generateGoMethodCode(&superClass.Attributes[k], class, false, membersPackage[class.Name])
 					}
 				}
 
 				// The class methode
 				for j := 0; j < len(class.Attributes); j++ {
-					classStr += generateGoMethodCode(&class.Attributes[j], class, false, membersPackage[class.Name])
+					classStr += "\n" + generateGoMethodCode(&class.Attributes[j], class, false, membersPackage[class.Name])
 				}
 
 				// The associations getter / setter
 				for _, att := range associations {
 					associationsStr := generateGoMethodCode(att, class, true, membersPackage[class.Name])
 					if strings.Index(classStr, associationsStr) == -1 {
-						classStr += associationsStr
+						classStr += "\n" + associationsStr
 					}
 				}
 

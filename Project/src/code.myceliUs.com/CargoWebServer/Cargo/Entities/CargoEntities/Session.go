@@ -27,14 +27,10 @@ type Session struct{
 	M_endTime int64
 	M_statusTime int64
 	M_sessionState SessionState
-	m_computerRef *Computer
-	/** If the ref is a string and not an object **/
 	M_computerRef string
 
 
 	/** Associations **/
-	m_accountPtr *Account
-	/** If the ref is a string and not an object **/
 	M_accountPtr string
 }
 
@@ -103,161 +99,90 @@ func (this *Session) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Session) GetId() string{
+func (this *Session) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Session) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Session) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** StartTime **/
-func (this *Session) GetStartTime() int64{
+func (this *Session) GetStartTime()int64{
 	return this.M_startTime
 }
 
-/** Init reference StartTime **/
-func (this *Session) SetStartTime(ref interface{}){
-	if this.M_startTime != ref.(int64) {
-		this.M_startTime = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *Session) SetStartTime(val int64){
+	this.NeedSave = this.M_startTime== val
+	this.M_startTime= val
 }
 
-/** Remove reference StartTime **/
 
-/** EndTime **/
-func (this *Session) GetEndTime() int64{
+func (this *Session) GetEndTime()int64{
 	return this.M_endTime
 }
 
-/** Init reference EndTime **/
-func (this *Session) SetEndTime(ref interface{}){
-	if this.M_endTime != ref.(int64) {
-		this.M_endTime = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *Session) SetEndTime(val int64){
+	this.NeedSave = this.M_endTime== val
+	this.M_endTime= val
 }
 
-/** Remove reference EndTime **/
 
-/** StatusTime **/
-func (this *Session) GetStatusTime() int64{
+func (this *Session) GetStatusTime()int64{
 	return this.M_statusTime
 }
 
-/** Init reference StatusTime **/
-func (this *Session) SetStatusTime(ref interface{}){
-	if this.M_statusTime != ref.(int64) {
-		this.M_statusTime = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *Session) SetStatusTime(val int64){
+	this.NeedSave = this.M_statusTime== val
+	this.M_statusTime= val
 }
 
-/** Remove reference StatusTime **/
 
-/** SessionState **/
-func (this *Session) GetSessionState() SessionState{
+func (this *Session) GetSessionState()SessionState{
 	return this.M_sessionState
 }
 
-/** Init reference SessionState **/
-func (this *Session) SetSessionState(ref interface{}){
-	if this.M_sessionState != ref.(SessionState) {
-		this.M_sessionState = ref.(SessionState)
-		this.NeedSave = true
-	}
+func (this *Session) SetSessionState(val SessionState){
+	this.NeedSave = this.M_sessionState== val
+	this.M_sessionState= val
 }
 
-/** Remove reference SessionState **/
-
-/** ComputerRef **/
-func (this *Session) GetComputerRef() *Computer{
-	if this.m_computerRef == nil {
-		entity, err := this.getEntityByUuid(this.M_computerRef)
-		if err == nil {
-			this.m_computerRef = entity.(*Computer)
-		}
-	}
-	return this.m_computerRef
-}
-func (this *Session) GetComputerRefStr() string{
-	return this.M_computerRef
+func (this *Session) ResetSessionState(){
+	this.M_sessionState= 0
 }
 
-/** Init reference ComputerRef **/
-func (this *Session) SetComputerRef(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_computerRef != ref.(string) {
-			this.M_computerRef = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_computerRef != ref.(Entity).GetUuid() {
-			this.M_computerRef = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_computerRef = ref.(*Computer)
+
+func (this *Session) GetComputerRef()*Computer{
+	entity, err := this.getEntityByUuid(this.M_computerRef)
+	if err == nil {
+		return entity.(*Computer)
 	}
+	return nil
 }
 
-/** Remove reference ComputerRef **/
-func (this *Session) RemoveComputerRef(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_computerRef!= nil {
-		if toDelete.GetUuid() == this.m_computerRef.GetUuid() {
-			this.m_computerRef = nil
-			this.M_computerRef = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Session) SetComputerRef(val *Computer){
+	this.M_computerRef= val.GetUuid()
 }
 
-/** Account **/
-func (this *Session) GetAccountPtr() *Account{
-	if this.m_accountPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_accountPtr)
-		if err == nil {
-			this.m_accountPtr = entity.(*Account)
-		}
-	}
-	return this.m_accountPtr
-}
-func (this *Session) GetAccountPtrStr() string{
-	return this.M_accountPtr
+func (this *Session) ResetComputerRef(){
+	this.M_computerRef= ""
 }
 
-/** Init reference Account **/
-func (this *Session) SetAccountPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_accountPtr != ref.(string) {
-			this.M_accountPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_accountPtr != ref.(Entity).GetUuid() {
-			this.M_accountPtr = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_accountPtr = ref.(*Account)
+
+func (this *Session) GetAccountPtr()*Account{
+	entity, err := this.getEntityByUuid(this.M_accountPtr)
+	if err == nil {
+		return entity.(*Account)
 	}
+	return nil
 }
 
-/** Remove reference Account **/
-func (this *Session) RemoveAccountPtr(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_accountPtr!= nil {
-		if toDelete.GetUuid() == this.m_accountPtr.GetUuid() {
-			this.m_accountPtr = nil
-			this.M_accountPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Session) SetAccountPtr(val *Account){
+	this.M_accountPtr= val.GetUuid()
 }
+
+func (this *Session) ResetAccountPtr(){
+	this.M_accountPtr= ""
+}
+

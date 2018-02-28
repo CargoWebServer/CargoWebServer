@@ -23,15 +23,11 @@ type OAuth2Authorize struct{
 
 	/** members of OAuth2Authorize **/
 	M_id string
-	m_client *OAuth2Client
-	/** If the ref is a string and not an object **/
 	M_client string
 	M_expiresIn int64
 	M_scope string
 	M_redirectUri string
 	M_state string
-	m_userData *OAuth2IdToken
-	/** If the ref is a string and not an object **/
 	M_userData string
 	M_createdAt int64
 
@@ -102,176 +98,96 @@ func (this *OAuth2Authorize) SetEntityGetter(fct func(uuid string)(interface{}, 
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *OAuth2Authorize) GetId() string{
+func (this *OAuth2Authorize) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *OAuth2Authorize) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2Authorize) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
+}
+
+
+func (this *OAuth2Authorize) GetClient()*OAuth2Client{
+	entity, err := this.getEntityByUuid(this.M_client)
+	if err == nil {
+		return entity.(*OAuth2Client)
 	}
+	return nil
 }
 
-/** Remove reference Id **/
-
-/** Client **/
-func (this *OAuth2Authorize) GetClient() *OAuth2Client{
-	if this.m_client == nil {
-		entity, err := this.getEntityByUuid(this.M_client)
-		if err == nil {
-			this.m_client = entity.(*OAuth2Client)
-		}
-	}
-	return this.m_client
-}
-func (this *OAuth2Authorize) GetClientStr() string{
-	return this.M_client
+func (this *OAuth2Authorize) SetClient(val *OAuth2Client){
+	this.M_client= val.GetUuid()
 }
 
-/** Init reference Client **/
-func (this *OAuth2Authorize) SetClient(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_client != ref.(string) {
-			this.M_client = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_client != ref.(*OAuth2Client).GetUuid() {
-			this.M_client = ref.(*OAuth2Client).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_client = ref.(*OAuth2Client)
-	}
+func (this *OAuth2Authorize) ResetClient(){
+	this.M_client= ""
 }
 
-/** Remove reference Client **/
-func (this *OAuth2Authorize) RemoveClient(ref interface{}){
-	toDelete := ref.(*OAuth2Client)
-	if this.m_client!= nil {
-		if toDelete.GetUuid() == this.m_client.GetUuid() {
-			this.m_client = nil
-			this.M_client = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** ExpiresIn **/
-func (this *OAuth2Authorize) GetExpiresIn() int64{
+func (this *OAuth2Authorize) GetExpiresIn()int64{
 	return this.M_expiresIn
 }
 
-/** Init reference ExpiresIn **/
-func (this *OAuth2Authorize) SetExpiresIn(ref interface{}){
-	if this.M_expiresIn != ref.(int64) {
-		this.M_expiresIn = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2Authorize) SetExpiresIn(val int64){
+	this.NeedSave = this.M_expiresIn== val
+	this.M_expiresIn= val
 }
 
-/** Remove reference ExpiresIn **/
 
-/** Scope **/
-func (this *OAuth2Authorize) GetScope() string{
+func (this *OAuth2Authorize) GetScope()string{
 	return this.M_scope
 }
 
-/** Init reference Scope **/
-func (this *OAuth2Authorize) SetScope(ref interface{}){
-	if this.M_scope != ref.(string) {
-		this.M_scope = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Authorize) SetScope(val string){
+	this.NeedSave = this.M_scope== val
+	this.M_scope= val
 }
 
-/** Remove reference Scope **/
 
-/** RedirectUri **/
-func (this *OAuth2Authorize) GetRedirectUri() string{
+func (this *OAuth2Authorize) GetRedirectUri()string{
 	return this.M_redirectUri
 }
 
-/** Init reference RedirectUri **/
-func (this *OAuth2Authorize) SetRedirectUri(ref interface{}){
-	if this.M_redirectUri != ref.(string) {
-		this.M_redirectUri = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Authorize) SetRedirectUri(val string){
+	this.NeedSave = this.M_redirectUri== val
+	this.M_redirectUri= val
 }
 
-/** Remove reference RedirectUri **/
 
-/** State **/
-func (this *OAuth2Authorize) GetState() string{
+func (this *OAuth2Authorize) GetState()string{
 	return this.M_state
 }
 
-/** Init reference State **/
-func (this *OAuth2Authorize) SetState(ref interface{}){
-	if this.M_state != ref.(string) {
-		this.M_state = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2Authorize) SetState(val string){
+	this.NeedSave = this.M_state== val
+	this.M_state= val
+}
+
+
+func (this *OAuth2Authorize) GetUserData()*OAuth2IdToken{
+	entity, err := this.getEntityByUuid(this.M_userData)
+	if err == nil {
+		return entity.(*OAuth2IdToken)
 	}
+	return nil
 }
 
-/** Remove reference State **/
-
-/** UserData **/
-func (this *OAuth2Authorize) GetUserData() *OAuth2IdToken{
-	if this.m_userData == nil {
-		entity, err := this.getEntityByUuid(this.M_userData)
-		if err == nil {
-			this.m_userData = entity.(*OAuth2IdToken)
-		}
-	}
-	return this.m_userData
-}
-func (this *OAuth2Authorize) GetUserDataStr() string{
-	return this.M_userData
+func (this *OAuth2Authorize) SetUserData(val *OAuth2IdToken){
+	this.M_userData= val.GetUuid()
 }
 
-/** Init reference UserData **/
-func (this *OAuth2Authorize) SetUserData(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_userData != ref.(string) {
-			this.M_userData = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_userData != ref.(*OAuth2IdToken).GetUuid() {
-			this.M_userData = ref.(*OAuth2IdToken).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_userData = ref.(*OAuth2IdToken)
-	}
+func (this *OAuth2Authorize) ResetUserData(){
+	this.M_userData= ""
 }
 
-/** Remove reference UserData **/
-func (this *OAuth2Authorize) RemoveUserData(ref interface{}){
-	toDelete := ref.(*OAuth2IdToken)
-	if this.m_userData!= nil {
-		if toDelete.GetUuid() == this.m_userData.GetUuid() {
-			this.m_userData = nil
-			this.M_userData = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** CreatedAt **/
-func (this *OAuth2Authorize) GetCreatedAt() int64{
+func (this *OAuth2Authorize) GetCreatedAt()int64{
 	return this.M_createdAt
 }
 
-/** Init reference CreatedAt **/
-func (this *OAuth2Authorize) SetCreatedAt(ref interface{}){
-	if this.M_createdAt != ref.(int64) {
-		this.M_createdAt = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2Authorize) SetCreatedAt(val int64){
+	this.NeedSave = this.M_createdAt== val
+	this.M_createdAt= val
 }
 
-/** Remove reference CreatedAt **/

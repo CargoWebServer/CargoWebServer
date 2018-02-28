@@ -8,7 +8,6 @@ type Entity interface{
 	/** UUID **/
 	GetUuid() string
 
-	/** Id **/
-	GetId() string
+
 
 }

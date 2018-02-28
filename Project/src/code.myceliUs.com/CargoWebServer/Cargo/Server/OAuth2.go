@@ -180,25 +180,25 @@ func (this *OAuth2Manager) start() {
 
 		for i := 0; i < len(sconfig.AllowedAuthorizeTypes); i++ {
 			if sconfig.AllowedAuthorizeTypes[i] == osin.CODE {
-				cfg.SetAllowedAuthorizeTypes("code")
+				cfg.AppendAllowedAuthorizeTypes("code")
 			} else if sconfig.AllowedAuthorizeTypes[i] == osin.TOKEN {
-				cfg.SetAllowedAuthorizeTypes("token")
+				cfg.AppendAllowedAuthorizeTypes("token")
 			}
 		}
 
 		for i := 0; i < len(sconfig.AllowedAccessTypes); i++ {
 			if sconfig.AllowedAccessTypes[i] == osin.AUTHORIZATION_CODE {
-				cfg.SetAllowedAccessTypes("authorization_code")
+				cfg.AppendAllowedAccessTypes("authorization_code")
 			} else if sconfig.AllowedAccessTypes[i] == osin.REFRESH_TOKEN {
-				cfg.SetAllowedAccessTypes("refresh_token")
+				cfg.AppendAllowedAccessTypes("refresh_token")
 			} else if sconfig.AllowedAccessTypes[i] == osin.PASSWORD {
-				cfg.SetAllowedAccessTypes("password")
+				cfg.AppendAllowedAccessTypes("password")
 			} else if sconfig.AllowedAccessTypes[i] == osin.CLIENT_CREDENTIALS {
-				cfg.SetAllowedAccessTypes("client_credentials")
+				cfg.AppendAllowedAccessTypes("client_credentials")
 			} else if sconfig.AllowedAccessTypes[i] == osin.ASSERTION {
-				cfg.SetAllowedAccessTypes("assertion")
+				cfg.AppendAllowedAccessTypes("assertion")
 			} else if sconfig.AllowedAccessTypes[i] == osin.IMPLICIT {
-				cfg.SetAllowedAccessTypes("__implicit")
+				cfg.AppendAllowedAccessTypes("__implicit")
 			}
 		}
 
@@ -229,8 +229,8 @@ func (this *OAuth2Manager) start() {
 		sconfig = osin.NewServerConfig()
 		// Set the access expiration time.
 		sconfig.AccessExpiration = int32(cfg.GetAccessExpiration())
-		sconfig.AllowClientSecretInParams = cfg.GetAllowClientSecretInParams()
-		sconfig.AllowGetAccessRequest = cfg.GetAllowGetAccessRequest()
+		sconfig.AllowClientSecretInParams = cfg.IsAllowClientSecretInParams()
+		sconfig.AllowGetAccessRequest = cfg.IsAllowGetAccessRequest()
 
 		for i := 0; i < len(cfg.GetAllowedAuthorizeTypes()); i++ {
 			if cfg.GetAllowedAuthorizeTypes()[i] == "code" {
@@ -1822,7 +1822,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	}
 
 	// Set the client.
-	a.SetClient(c)
+	a.SetClient(c.(*Config.OAuth2Client))
 
 	// Set the value from the data.
 	a.SetId(data.Code)
@@ -1919,7 +1919,7 @@ func loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 	it := new(IDToken)
 	it.ClientID = idToken.GetClient().GetId()
 	it.Email = idToken.GetEmail()
-	emailVerified := idToken.GetEmailVerified()
+	emailVerified := idToken.IsEmailVerified()
 	it.EmailVerified = &emailVerified
 	it.Expiration = idToken.GetExpiration()
 	it.FamilyName = idToken.GetFamilyName()

@@ -24,8 +24,6 @@ type OAuth2IdToken struct{
 	/** members of OAuth2IdToken **/
 	M_issuer string
 	M_id string
-	m_client *OAuth2Client
-	/** If the ref is a string and not an object **/
 	M_client string
 	M_expiration int64
 	M_issuedAt int64
@@ -39,8 +37,6 @@ type OAuth2IdToken struct{
 
 
 	/** Associations **/
-	m_parentPtr *OAuth2Configuration
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -114,251 +110,146 @@ func (this *OAuth2IdToken) SetEntityGetter(fct func(uuid string)(interface{}, er
 	this.getEntityByUuid = fct
 }
 
-/** Issuer **/
-func (this *OAuth2IdToken) GetIssuer() string{
+func (this *OAuth2IdToken) GetIssuer()string{
 	return this.M_issuer
 }
 
-/** Init reference Issuer **/
-func (this *OAuth2IdToken) SetIssuer(ref interface{}){
-	if this.M_issuer != ref.(string) {
-		this.M_issuer = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetIssuer(val string){
+	this.NeedSave = this.M_issuer== val
+	this.M_issuer= val
 }
 
-/** Remove reference Issuer **/
 
-/** Id **/
-func (this *OAuth2IdToken) GetId() string{
+func (this *OAuth2IdToken) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *OAuth2IdToken) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2IdToken) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
+}
+
+
+func (this *OAuth2IdToken) GetClient()*OAuth2Client{
+	entity, err := this.getEntityByUuid(this.M_client)
+	if err == nil {
+		return entity.(*OAuth2Client)
 	}
+	return nil
 }
 
-/** Remove reference Id **/
-
-/** Client **/
-func (this *OAuth2IdToken) GetClient() *OAuth2Client{
-	if this.m_client == nil {
-		entity, err := this.getEntityByUuid(this.M_client)
-		if err == nil {
-			this.m_client = entity.(*OAuth2Client)
-		}
-	}
-	return this.m_client
-}
-func (this *OAuth2IdToken) GetClientStr() string{
-	return this.M_client
+func (this *OAuth2IdToken) SetClient(val *OAuth2Client){
+	this.M_client= val.GetUuid()
 }
 
-/** Init reference Client **/
-func (this *OAuth2IdToken) SetClient(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_client != ref.(string) {
-			this.M_client = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_client != ref.(*OAuth2Client).GetUuid() {
-			this.M_client = ref.(*OAuth2Client).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_client = ref.(*OAuth2Client)
-	}
+func (this *OAuth2IdToken) ResetClient(){
+	this.M_client= ""
 }
 
-/** Remove reference Client **/
-func (this *OAuth2IdToken) RemoveClient(ref interface{}){
-	toDelete := ref.(*OAuth2Client)
-	if this.m_client!= nil {
-		if toDelete.GetUuid() == this.m_client.GetUuid() {
-			this.m_client = nil
-			this.M_client = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** Expiration **/
-func (this *OAuth2IdToken) GetExpiration() int64{
+func (this *OAuth2IdToken) GetExpiration()int64{
 	return this.M_expiration
 }
 
-/** Init reference Expiration **/
-func (this *OAuth2IdToken) SetExpiration(ref interface{}){
-	if this.M_expiration != ref.(int64) {
-		this.M_expiration = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetExpiration(val int64){
+	this.NeedSave = this.M_expiration== val
+	this.M_expiration= val
 }
 
-/** Remove reference Expiration **/
 
-/** IssuedAt **/
-func (this *OAuth2IdToken) GetIssuedAt() int64{
+func (this *OAuth2IdToken) GetIssuedAt()int64{
 	return this.M_issuedAt
 }
 
-/** Init reference IssuedAt **/
-func (this *OAuth2IdToken) SetIssuedAt(ref interface{}){
-	if this.M_issuedAt != ref.(int64) {
-		this.M_issuedAt = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetIssuedAt(val int64){
+	this.NeedSave = this.M_issuedAt== val
+	this.M_issuedAt= val
 }
 
-/** Remove reference IssuedAt **/
 
-/** Nonce **/
-func (this *OAuth2IdToken) GetNonce() string{
+func (this *OAuth2IdToken) GetNonce()string{
 	return this.M_nonce
 }
 
-/** Init reference Nonce **/
-func (this *OAuth2IdToken) SetNonce(ref interface{}){
-	if this.M_nonce != ref.(string) {
-		this.M_nonce = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetNonce(val string){
+	this.NeedSave = this.M_nonce== val
+	this.M_nonce= val
 }
 
-/** Remove reference Nonce **/
 
-/** Email **/
-func (this *OAuth2IdToken) GetEmail() string{
+func (this *OAuth2IdToken) GetEmail()string{
 	return this.M_email
 }
 
-/** Init reference Email **/
-func (this *OAuth2IdToken) SetEmail(ref interface{}){
-	if this.M_email != ref.(string) {
-		this.M_email = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetEmail(val string){
+	this.NeedSave = this.M_email== val
+	this.M_email= val
 }
 
-/** Remove reference Email **/
 
-/** EmailVerified **/
-func (this *OAuth2IdToken) GetEmailVerified() bool{
+func (this *OAuth2IdToken) IsEmailVerified()bool{
 	return this.M_emailVerified
 }
 
-/** Init reference EmailVerified **/
-func (this *OAuth2IdToken) SetEmailVerified(ref interface{}){
-	if this.M_emailVerified != ref.(bool) {
-		this.M_emailVerified = ref.(bool)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetEmailVerified(val bool){
+	this.NeedSave = this.M_emailVerified== val
+	this.M_emailVerified= val
 }
 
-/** Remove reference EmailVerified **/
 
-/** Name **/
-func (this *OAuth2IdToken) GetName() string{
+func (this *OAuth2IdToken) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *OAuth2IdToken) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** FamilyName **/
-func (this *OAuth2IdToken) GetFamilyName() string{
+func (this *OAuth2IdToken) GetFamilyName()string{
 	return this.M_familyName
 }
 
-/** Init reference FamilyName **/
-func (this *OAuth2IdToken) SetFamilyName(ref interface{}){
-	if this.M_familyName != ref.(string) {
-		this.M_familyName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetFamilyName(val string){
+	this.NeedSave = this.M_familyName== val
+	this.M_familyName= val
 }
 
-/** Remove reference FamilyName **/
 
-/** GivenName **/
-func (this *OAuth2IdToken) GetGivenName() string{
+func (this *OAuth2IdToken) GetGivenName()string{
 	return this.M_givenName
 }
 
-/** Init reference GivenName **/
-func (this *OAuth2IdToken) SetGivenName(ref interface{}){
-	if this.M_givenName != ref.(string) {
-		this.M_givenName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetGivenName(val string){
+	this.NeedSave = this.M_givenName== val
+	this.M_givenName= val
 }
 
-/** Remove reference GivenName **/
 
-/** Local **/
-func (this *OAuth2IdToken) GetLocal() string{
+func (this *OAuth2IdToken) GetLocal()string{
 	return this.M_local
 }
 
-/** Init reference Local **/
-func (this *OAuth2IdToken) SetLocal(ref interface{}){
-	if this.M_local != ref.(string) {
-		this.M_local = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2IdToken) SetLocal(val string){
+	this.NeedSave = this.M_local== val
+	this.M_local= val
 }
 
-/** Remove reference Local **/
 
-/** Parent **/
-func (this *OAuth2IdToken) GetParentPtr() *OAuth2Configuration{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*OAuth2Configuration)
-		}
+func (this *OAuth2IdToken) GetParentPtr()*OAuth2Configuration{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*OAuth2Configuration)
 	}
-	return this.m_parentPtr
-}
-func (this *OAuth2IdToken) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *OAuth2IdToken) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(Configuration).GetUuid() {
-			this.M_parentPtr = ref.(Configuration).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*OAuth2Configuration)
-	}
+func (this *OAuth2IdToken) SetParentPtr(val *OAuth2Configuration){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *OAuth2IdToken) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(Configuration)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *OAuth2IdToken) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

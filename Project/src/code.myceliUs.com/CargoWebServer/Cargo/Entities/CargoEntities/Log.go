@@ -25,12 +25,10 @@ type Log struct{
 	M_id string
 
 	/** members of Log **/
-	M_entries []*LogEntry
+	M_entries []string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -99,97 +97,69 @@ func (this *Log) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Log) GetId() string{
+func (this *Log) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Log) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Log) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Entries **/
-func (this *Log) GetEntries() []*LogEntry{
-	return this.M_entries
-}
-
-/** Init reference Entries **/
-func (this *Log) SetEntries(ref interface{}){
-	isExist := false
-	var entriess []*LogEntry
-	for i:=0; i<len(this.M_entries); i++ {
-		if this.M_entries[i].GetUuid() != ref.(Entity).GetUuid() {
-			entriess = append(entriess, this.M_entries[i])
-		} else {
-			isExist = true
-			entriess = append(entriess, ref.(*LogEntry))
+func (this *Log) GetEntries()[]*LogEntry{
+	entries := make([]*LogEntry, 0)
+	for i := 0; i < len(this.M_entries); i++ {
+		entity, err := this.getEntityByUuid(this.M_entries[i])
+		if err == nil {
+			entries = append(entries, entity.(*LogEntry))
 		}
 	}
-	if !isExist {
-		entriess = append(entriess, ref.(*LogEntry))
-		this.NeedSave = true
-		this.M_entries = entriess
+	return entries
+}
+
+func (this *Log) SetEntries(val []*LogEntry){
+	this.M_entries= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_entries=append(this.M_entries, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Entries **/
-func (this *Log) RemoveEntries(ref interface{}){
-	toDelete := ref.(Entity)
-	entries_ := make([]*LogEntry, 0)
-	for i := 0; i < len(this.M_entries); i++ {
-		if toDelete.GetUuid() != this.M_entries[i].GetUuid() {
-			entries_ = append(entries_, this.M_entries[i])
+func (this *Log) AppendEntries(val *LogEntry){
+	for i:=0; i < len(this.M_entries); i++{
+		if this.M_entries[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_entries = append(this.M_entries, val.GetUuid())
+}
+
+func (this *Log) RemoveEntries(val *LogEntry){
+	entries := make([]string,0)
+	for i:=0; i < len(this.M_entries); i++{
+		if this.M_entries[i] != val.GetUuid() {
+			entries = append(entries, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_entries = entries_
+	this.M_entries = entries
 }
 
-/** Entities **/
-func (this *Log) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+
+func (this *Log) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *Log) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *Log) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *Log) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *Log) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Log) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

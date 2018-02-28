@@ -32,8 +32,6 @@ type Computer struct{
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -104,119 +102,77 @@ func (this *Computer) SetEntityGetter(fct func(uuid string)(interface{}, error))
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *Computer) GetId() string{
+func (this *Computer) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *Computer) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Computer) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *Computer) GetName() string{
+func (this *Computer) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Computer) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Computer) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** Ipv4 **/
-func (this *Computer) GetIpv4() string{
+func (this *Computer) GetIpv4()string{
 	return this.M_ipv4
 }
 
-/** Init reference Ipv4 **/
-func (this *Computer) SetIpv4(ref interface{}){
-	if this.M_ipv4 != ref.(string) {
-		this.M_ipv4 = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Computer) SetIpv4(val string){
+	this.NeedSave = this.M_ipv4== val
+	this.M_ipv4= val
 }
 
-/** Remove reference Ipv4 **/
 
-/** OsType **/
-func (this *Computer) GetOsType() OsType{
+func (this *Computer) GetOsType()OsType{
 	return this.M_osType
 }
 
-/** Init reference OsType **/
-func (this *Computer) SetOsType(ref interface{}){
-	if this.M_osType != ref.(OsType) {
-		this.M_osType = ref.(OsType)
-		this.NeedSave = true
-	}
+func (this *Computer) SetOsType(val OsType){
+	this.NeedSave = this.M_osType== val
+	this.M_osType= val
 }
 
-/** Remove reference OsType **/
+func (this *Computer) ResetOsType(){
+	this.M_osType= 0
+}
 
-/** PlatformType **/
-func (this *Computer) GetPlatformType() PlatformType{
+
+func (this *Computer) GetPlatformType()PlatformType{
 	return this.M_platformType
 }
 
-/** Init reference PlatformType **/
-func (this *Computer) SetPlatformType(ref interface{}){
-	if this.M_platformType != ref.(PlatformType) {
-		this.M_platformType = ref.(PlatformType)
-		this.NeedSave = true
-	}
+func (this *Computer) SetPlatformType(val PlatformType){
+	this.NeedSave = this.M_platformType== val
+	this.M_platformType= val
 }
 
-/** Remove reference PlatformType **/
-
-/** Entities **/
-func (this *Computer) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
-	}
-	return this.m_entitiesPtr
-}
-func (this *Computer) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+func (this *Computer) ResetPlatformType(){
+	this.M_platformType= 0
 }
 
-/** Init reference Entities **/
-func (this *Computer) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
+
+func (this *Computer) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
+	return nil
 }
 
-/** Remove reference Entities **/
-func (this *Computer) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Computer) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
+
+func (this *Computer) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
+}
+

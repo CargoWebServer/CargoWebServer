@@ -29,18 +29,12 @@ type TextMessage struct{
 
 	/** members of TextMessage **/
 	M_creationTime int64
-	m_fromRef *Account
-	/** If the ref is a string and not an object **/
 	M_fromRef string
-	m_toRef *Account
-	/** If the ref is a string and not an object **/
 	M_toRef string
 	M_title string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -115,188 +109,93 @@ func (this *TextMessage) SetEntityGetter(fct func(uuid string)(interface{}, erro
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *TextMessage) GetId() string{
+func (this *TextMessage) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *TextMessage) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *TextMessage) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Body **/
-func (this *TextMessage) GetBody() string{
+func (this *TextMessage) GetBody()string{
 	return this.M_body
 }
 
-/** Init reference Body **/
-func (this *TextMessage) SetBody(ref interface{}){
-	if this.M_body != ref.(string) {
-		this.M_body = ref.(string)
-		this.NeedSave = true
-	}
+func (this *TextMessage) SetBody(val string){
+	this.NeedSave = this.M_body== val
+	this.M_body= val
 }
 
-/** Remove reference Body **/
 
-/** CreationTime **/
-func (this *TextMessage) GetCreationTime() int64{
+func (this *TextMessage) GetCreationTime()int64{
 	return this.M_creationTime
 }
 
-/** Init reference CreationTime **/
-func (this *TextMessage) SetCreationTime(ref interface{}){
-	if this.M_creationTime != ref.(int64) {
-		this.M_creationTime = ref.(int64)
-		this.NeedSave = true
+func (this *TextMessage) SetCreationTime(val int64){
+	this.NeedSave = this.M_creationTime== val
+	this.M_creationTime= val
+}
+
+
+func (this *TextMessage) GetFromRef()*Account{
+	entity, err := this.getEntityByUuid(this.M_fromRef)
+	if err == nil {
+		return entity.(*Account)
 	}
+	return nil
 }
 
-/** Remove reference CreationTime **/
+func (this *TextMessage) SetFromRef(val *Account){
+	this.M_fromRef= val.GetUuid()
+}
 
-/** FromRef **/
-func (this *TextMessage) GetFromRef() *Account{
-	if this.m_fromRef == nil {
-		entity, err := this.getEntityByUuid(this.M_fromRef)
-		if err == nil {
-			this.m_fromRef = entity.(*Account)
-		}
+func (this *TextMessage) ResetFromRef(){
+	this.M_fromRef= ""
+}
+
+
+func (this *TextMessage) GetToRef()*Account{
+	entity, err := this.getEntityByUuid(this.M_toRef)
+	if err == nil {
+		return entity.(*Account)
 	}
-	return this.m_fromRef
-}
-func (this *TextMessage) GetFromRefStr() string{
-	return this.M_fromRef
+	return nil
 }
 
-/** Init reference FromRef **/
-func (this *TextMessage) SetFromRef(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_fromRef != ref.(string) {
-			this.M_fromRef = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_fromRef != ref.(Entity).GetUuid() {
-			this.M_fromRef = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_fromRef = ref.(*Account)
-	}
+func (this *TextMessage) SetToRef(val *Account){
+	this.M_toRef= val.GetUuid()
 }
 
-/** Remove reference FromRef **/
-func (this *TextMessage) RemoveFromRef(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_fromRef!= nil {
-		if toDelete.GetUuid() == this.m_fromRef.GetUuid() {
-			this.m_fromRef = nil
-			this.M_fromRef = ""
-			this.NeedSave = true
-		}
-	}
+func (this *TextMessage) ResetToRef(){
+	this.M_toRef= ""
 }
 
-/** ToRef **/
-func (this *TextMessage) GetToRef() *Account{
-	if this.m_toRef == nil {
-		entity, err := this.getEntityByUuid(this.M_toRef)
-		if err == nil {
-			this.m_toRef = entity.(*Account)
-		}
-	}
-	return this.m_toRef
-}
-func (this *TextMessage) GetToRefStr() string{
-	return this.M_toRef
-}
 
-/** Init reference ToRef **/
-func (this *TextMessage) SetToRef(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_toRef != ref.(string) {
-			this.M_toRef = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_toRef != ref.(Entity).GetUuid() {
-			this.M_toRef = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_toRef = ref.(*Account)
-	}
-}
-
-/** Remove reference ToRef **/
-func (this *TextMessage) RemoveToRef(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_toRef!= nil {
-		if toDelete.GetUuid() == this.m_toRef.GetUuid() {
-			this.m_toRef = nil
-			this.M_toRef = ""
-			this.NeedSave = true
-		}
-	}
-}
-
-/** Title **/
-func (this *TextMessage) GetTitle() string{
+func (this *TextMessage) GetTitle()string{
 	return this.M_title
 }
 
-/** Init reference Title **/
-func (this *TextMessage) SetTitle(ref interface{}){
-	if this.M_title != ref.(string) {
-		this.M_title = ref.(string)
-		this.NeedSave = true
-	}
+func (this *TextMessage) SetTitle(val string){
+	this.NeedSave = this.M_title== val
+	this.M_title= val
 }
 
-/** Remove reference Title **/
 
-/** Entities **/
-func (this *TextMessage) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
+func (this *TextMessage) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
-	return this.m_entitiesPtr
-}
-func (this *TextMessage) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return nil
 }
 
-/** Init reference Entities **/
-func (this *TextMessage) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
-	}
+func (this *TextMessage) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
 
-/** Remove reference Entities **/
-func (this *TextMessage) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *TextMessage) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
 }
+

@@ -2,11 +2,12 @@
 
 package CargoEntities
 
-import(
+import (
 	"encoding/xml"
+	"log"
 )
 
-type Action struct{
+type Action struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -19,36 +20,33 @@ type Action struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 	/** Get entity by uuid function **/
-	getEntityByUuid func(string)(interface{}, error)
+	getEntityByUuid func(string) (interface{}, error)
 
 	/** members of Action **/
-	M_name string
-	M_doc string
-	M_parameters []*Parameter
-	M_results []*Parameter
+	M_name       string
+	M_doc        string
+	M_parameters []string
+	M_results    []string
 	M_accessType AccessType
 
-
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
 /** Xml parser for Action **/
 type XsdAction struct {
-	XMLName xml.Name	`xml:"action"`
-	M_name	string	`xml:"name,attr"`
-	M_doc	string	`xml:"doc,attr"`
-
+	XMLName xml.Name `xml:"action"`
+	M_name  string   `xml:"name,attr"`
+	M_doc   string   `xml:"doc,attr"`
 }
+
 /***************** Entity **************************/
 
 /** UUID **/
-func (this *Action) GetUuid() string{
+func (this *Action) GetUuid() string {
 	return this.UUID
 }
-func (this *Action) SetUuid(uuid string){
+func (this *Action) SetUuid(uuid string) {
 	this.UUID = uuid
 }
 
@@ -60,201 +58,164 @@ func (this *Action) Ids() []interface{} {
 }
 
 /** The type name **/
-func (this *Action) GetTypeName() string{
+func (this *Action) GetTypeName() string {
 	this.TYPENAME = "CargoEntities.Action"
 	return this.TYPENAME
 }
 
 /** Return the entity parent UUID **/
-func (this *Action) GetParentUuid() string{
+func (this *Action) GetParentUuid() string {
 	return this.ParentUuid
 }
 
 /** Set it parent UUID **/
-func (this *Action) SetParentUuid(parentUuid string){
+func (this *Action) SetParentUuid(parentUuid string) {
 	this.ParentUuid = parentUuid
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *Action) GetParentLnk() string{
+func (this *Action) GetParentLnk() string {
 	return this.ParentLnk
 }
-func (this *Action) SetParentLnk(parentLnk string){
+func (this *Action) SetParentLnk(parentLnk string) {
 	this.ParentLnk = parentLnk
 }
 
 /** Evaluate if an entity needs to be saved. **/
-func (this *Action) IsNeedSave() bool{
+func (this *Action) IsNeedSave() bool {
 	return this.NeedSave
 }
-func (this *Action) ResetNeedSave(){
-	this.NeedSave=false
+func (this *Action) ResetNeedSave() {
+	this.NeedSave = false
 }
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
-func (this *Action) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+func (this *Action) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
 	this.getEntityByUuid = fct
 }
 
-/** Name **/
-func (this *Action) GetName() string{
+func (this *Action) GetName() string {
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Action) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Action) SetName(val string) {
+	this.NeedSave = this.M_name == val
+	this.M_name = val
 }
 
-/** Remove reference Name **/
-
-/** Doc **/
-func (this *Action) GetDoc() string{
+func (this *Action) GetDoc() string {
 	return this.M_doc
 }
 
-/** Init reference Doc **/
-func (this *Action) SetDoc(ref interface{}){
-	if this.M_doc != ref.(string) {
-		this.M_doc = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Action) SetDoc(val string) {
+	this.NeedSave = this.M_doc == val
+	this.M_doc = val
 }
 
-/** Remove reference Doc **/
-
-/** Parameters **/
-func (this *Action) GetParameters() []*Parameter{
-	return this.M_parameters
-}
-
-/** Init reference Parameters **/
-func (this *Action) SetParameters(ref interface{}){
-	isExist := false
-	var parameterss []*Parameter
-	for i:=0; i<len(this.M_parameters); i++ {
-		if this.M_parameters[i].GetUuid() != ref.(*Parameter).GetUuid() {
-			parameterss = append(parameterss, this.M_parameters[i])
-		} else {
-			isExist = true
-			parameterss = append(parameterss, ref.(*Parameter))
-		}
-	}
-	if !isExist {
-		parameterss = append(parameterss, ref.(*Parameter))
-		this.NeedSave = true
-		this.M_parameters = parameterss
-	}
-}
-
-/** Remove reference Parameters **/
-func (this *Action) RemoveParameters(ref interface{}){
-	toDelete := ref.(*Parameter)
-	parameters_ := make([]*Parameter, 0)
+func (this *Action) GetParameters() []*Parameter {
+	parameters := make([]*Parameter, 0)
 	for i := 0; i < len(this.M_parameters); i++ {
-		if toDelete.GetUuid() != this.M_parameters[i].GetUuid() {
-			parameters_ = append(parameters_, this.M_parameters[i])
-		}else{
-			this.NeedSave = true
+		entity, err := this.getEntityByUuid(this.M_parameters[i])
+		if err == nil {
+			parameters = append(parameters, entity.(*Parameter))
 		}
 	}
-	this.M_parameters = parameters_
+	return parameters
 }
 
-/** Results **/
-func (this *Action) GetResults() []*Parameter{
-	return this.M_results
+func (this *Action) SetParameters(val []*Parameter) {
+	this.M_parameters = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_parameters = append(this.M_parameters, val[i].GetUuid())
+	}
 }
 
-/** Init reference Results **/
-func (this *Action) SetResults(ref interface{}){
-	isExist := false
-	var resultss []*Parameter
-	for i:=0; i<len(this.M_results); i++ {
-		if this.M_results[i].GetUuid() != ref.(*Parameter).GetUuid() {
-			resultss = append(resultss, this.M_results[i])
+func (this *Action) AppendParameters(val *Parameter) {
+	for i := 0; i < len(this.M_parameters); i++ {
+		if this.M_parameters[i] == val.GetUuid() {
+			return
+		}
+	}
+	log.Println("---> append parameter: ", this.GetName(), val.GetName())
+	this.M_parameters = append(this.M_parameters, val.GetUuid())
+}
+
+func (this *Action) RemoveParameters(val *Parameter) {
+	parameters := make([]string, 0)
+	for i := 0; i < len(this.M_parameters); i++ {
+		if this.M_parameters[i] != val.GetUuid() {
+			parameters = append(parameters, val.GetUuid())
 		} else {
-			isExist = true
-			resultss = append(resultss, ref.(*Parameter))
-		}
-	}
-	if !isExist {
-		resultss = append(resultss, ref.(*Parameter))
-		this.NeedSave = true
-		this.M_results = resultss
-	}
-}
-
-/** Remove reference Results **/
-func (this *Action) RemoveResults(ref interface{}){
-	toDelete := ref.(*Parameter)
-	results_ := make([]*Parameter, 0)
-	for i := 0; i < len(this.M_results); i++ {
-		if toDelete.GetUuid() != this.M_results[i].GetUuid() {
-			results_ = append(results_, this.M_results[i])
-		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_results = results_
+	this.M_parameters = parameters
 }
 
-/** AccessType **/
-func (this *Action) GetAccessType() AccessType{
+func (this *Action) GetResults() []*Parameter {
+	results := make([]*Parameter, 0)
+	for i := 0; i < len(this.M_results); i++ {
+		entity, err := this.getEntityByUuid(this.M_results[i])
+		if err == nil {
+			results = append(results, entity.(*Parameter))
+		}
+	}
+	return results
+}
+
+func (this *Action) SetResults(val []*Parameter) {
+	this.M_results = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_results = append(this.M_results, val[i].GetUuid())
+	}
+}
+
+func (this *Action) AppendResults(val *Parameter) {
+	for i := 0; i < len(this.M_results); i++ {
+		if this.M_results[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_results = append(this.M_results, val.GetUuid())
+}
+
+func (this *Action) RemoveResults(val *Parameter) {
+	results := make([]string, 0)
+	for i := 0; i < len(this.M_results); i++ {
+		if this.M_results[i] != val.GetUuid() {
+			results = append(results, val.GetUuid())
+		} else {
+			this.NeedSave = true
+		}
+	}
+	this.M_results = results
+}
+
+func (this *Action) GetAccessType() AccessType {
 	return this.M_accessType
 }
 
-/** Init reference AccessType **/
-func (this *Action) SetAccessType(ref interface{}){
-	if this.M_accessType != ref.(AccessType) {
-		this.M_accessType = ref.(AccessType)
-		this.NeedSave = true
-	}
+func (this *Action) SetAccessType(val AccessType) {
+	this.NeedSave = this.M_accessType == val
+	this.M_accessType = val
 }
 
-/** Remove reference AccessType **/
-
-/** Entities **/
-func (this *Action) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
-	}
-	return this.m_entitiesPtr
-}
-func (this *Action) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+func (this *Action) ResetAccessType() {
+	this.M_accessType = 0
 }
 
-/** Init reference Entities **/
-func (this *Action) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
+func (this *Action) GetEntitiesPtr() *Entities {
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
+	return nil
 }
 
-/** Remove reference Entities **/
-func (this *Action) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Action) SetEntitiesPtr(val *Entities) {
+	this.M_entitiesPtr = val.GetUuid()
+}
+
+func (this *Action) ResetEntitiesPtr() {
+	this.M_entitiesPtr = ""
 }

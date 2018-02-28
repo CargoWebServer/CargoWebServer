@@ -23,26 +23,18 @@ type OAuth2Access struct{
 
 	/** members of OAuth2Access **/
 	M_id string
-	m_client *OAuth2Client
-	/** If the ref is a string and not an object **/
 	M_client string
 	M_authorize string
 	M_previous string
-	m_refreshToken *OAuth2Refresh
-	/** If the ref is a string and not an object **/
 	M_refreshToken string
 	M_expiresIn int64
 	M_scope string
 	M_redirectUri string
-	m_userData *OAuth2IdToken
-	/** If the ref is a string and not an object **/
 	M_userData string
 	M_createdAt int64
 
 
 	/** Associations **/
-	m_parentPtr *OAuth2Configuration
-	/** If the ref is a string and not an object **/
 	M_parentPtr string
 }
 
@@ -114,275 +106,140 @@ func (this *OAuth2Access) SetEntityGetter(fct func(uuid string)(interface{}, err
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *OAuth2Access) GetId() string{
+func (this *OAuth2Access) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *OAuth2Access) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2Access) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
+}
+
+
+func (this *OAuth2Access) GetClient()*OAuth2Client{
+	entity, err := this.getEntityByUuid(this.M_client)
+	if err == nil {
+		return entity.(*OAuth2Client)
 	}
+	return nil
 }
 
-/** Remove reference Id **/
-
-/** Client **/
-func (this *OAuth2Access) GetClient() *OAuth2Client{
-	if this.m_client == nil {
-		entity, err := this.getEntityByUuid(this.M_client)
-		if err == nil {
-			this.m_client = entity.(*OAuth2Client)
-		}
-	}
-	return this.m_client
-}
-func (this *OAuth2Access) GetClientStr() string{
-	return this.M_client
+func (this *OAuth2Access) SetClient(val *OAuth2Client){
+	this.M_client= val.GetUuid()
 }
 
-/** Init reference Client **/
-func (this *OAuth2Access) SetClient(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_client != ref.(string) {
-			this.M_client = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_client != ref.(*OAuth2Client).GetUuid() {
-			this.M_client = ref.(*OAuth2Client).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_client = ref.(*OAuth2Client)
-	}
+func (this *OAuth2Access) ResetClient(){
+	this.M_client= ""
 }
 
-/** Remove reference Client **/
-func (this *OAuth2Access) RemoveClient(ref interface{}){
-	toDelete := ref.(*OAuth2Client)
-	if this.m_client!= nil {
-		if toDelete.GetUuid() == this.m_client.GetUuid() {
-			this.m_client = nil
-			this.M_client = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** Authorize **/
-func (this *OAuth2Access) GetAuthorize() string{
+func (this *OAuth2Access) GetAuthorize()string{
 	return this.M_authorize
 }
 
-/** Init reference Authorize **/
-func (this *OAuth2Access) SetAuthorize(ref interface{}){
-	if this.M_authorize != ref.(string) {
-		this.M_authorize = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Access) SetAuthorize(val string){
+	this.NeedSave = this.M_authorize== val
+	this.M_authorize= val
 }
 
-/** Remove reference Authorize **/
 
-/** Previous **/
-func (this *OAuth2Access) GetPrevious() string{
+func (this *OAuth2Access) GetPrevious()string{
 	return this.M_previous
 }
 
-/** Init reference Previous **/
-func (this *OAuth2Access) SetPrevious(ref interface{}){
-	if this.M_previous != ref.(string) {
-		this.M_previous = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2Access) SetPrevious(val string){
+	this.NeedSave = this.M_previous== val
+	this.M_previous= val
+}
+
+
+func (this *OAuth2Access) GetRefreshToken()*OAuth2Refresh{
+	entity, err := this.getEntityByUuid(this.M_refreshToken)
+	if err == nil {
+		return entity.(*OAuth2Refresh)
 	}
+	return nil
 }
 
-/** Remove reference Previous **/
-
-/** RefreshToken **/
-func (this *OAuth2Access) GetRefreshToken() *OAuth2Refresh{
-	if this.m_refreshToken == nil {
-		entity, err := this.getEntityByUuid(this.M_refreshToken)
-		if err == nil {
-			this.m_refreshToken = entity.(*OAuth2Refresh)
-		}
-	}
-	return this.m_refreshToken
-}
-func (this *OAuth2Access) GetRefreshTokenStr() string{
-	return this.M_refreshToken
+func (this *OAuth2Access) SetRefreshToken(val *OAuth2Refresh){
+	this.M_refreshToken= val.GetUuid()
 }
 
-/** Init reference RefreshToken **/
-func (this *OAuth2Access) SetRefreshToken(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_refreshToken != ref.(string) {
-			this.M_refreshToken = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_refreshToken != ref.(*OAuth2Refresh).GetUuid() {
-			this.M_refreshToken = ref.(*OAuth2Refresh).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_refreshToken = ref.(*OAuth2Refresh)
-	}
+func (this *OAuth2Access) ResetRefreshToken(){
+	this.M_refreshToken= ""
 }
 
-/** Remove reference RefreshToken **/
-func (this *OAuth2Access) RemoveRefreshToken(ref interface{}){
-	toDelete := ref.(*OAuth2Refresh)
-	if this.m_refreshToken!= nil {
-		if toDelete.GetUuid() == this.m_refreshToken.GetUuid() {
-			this.m_refreshToken = nil
-			this.M_refreshToken = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** ExpiresIn **/
-func (this *OAuth2Access) GetExpiresIn() int64{
+func (this *OAuth2Access) GetExpiresIn()int64{
 	return this.M_expiresIn
 }
 
-/** Init reference ExpiresIn **/
-func (this *OAuth2Access) SetExpiresIn(ref interface{}){
-	if this.M_expiresIn != ref.(int64) {
-		this.M_expiresIn = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2Access) SetExpiresIn(val int64){
+	this.NeedSave = this.M_expiresIn== val
+	this.M_expiresIn= val
 }
 
-/** Remove reference ExpiresIn **/
 
-/** Scope **/
-func (this *OAuth2Access) GetScope() string{
+func (this *OAuth2Access) GetScope()string{
 	return this.M_scope
 }
 
-/** Init reference Scope **/
-func (this *OAuth2Access) SetScope(ref interface{}){
-	if this.M_scope != ref.(string) {
-		this.M_scope = ref.(string)
-		this.NeedSave = true
-	}
+func (this *OAuth2Access) SetScope(val string){
+	this.NeedSave = this.M_scope== val
+	this.M_scope= val
 }
 
-/** Remove reference Scope **/
 
-/** RedirectUri **/
-func (this *OAuth2Access) GetRedirectUri() string{
+func (this *OAuth2Access) GetRedirectUri()string{
 	return this.M_redirectUri
 }
 
-/** Init reference RedirectUri **/
-func (this *OAuth2Access) SetRedirectUri(ref interface{}){
-	if this.M_redirectUri != ref.(string) {
-		this.M_redirectUri = ref.(string)
-		this.NeedSave = true
+func (this *OAuth2Access) SetRedirectUri(val string){
+	this.NeedSave = this.M_redirectUri== val
+	this.M_redirectUri= val
+}
+
+
+func (this *OAuth2Access) GetUserData()*OAuth2IdToken{
+	entity, err := this.getEntityByUuid(this.M_userData)
+	if err == nil {
+		return entity.(*OAuth2IdToken)
 	}
+	return nil
 }
 
-/** Remove reference RedirectUri **/
-
-/** UserData **/
-func (this *OAuth2Access) GetUserData() *OAuth2IdToken{
-	if this.m_userData == nil {
-		entity, err := this.getEntityByUuid(this.M_userData)
-		if err == nil {
-			this.m_userData = entity.(*OAuth2IdToken)
-		}
-	}
-	return this.m_userData
-}
-func (this *OAuth2Access) GetUserDataStr() string{
-	return this.M_userData
+func (this *OAuth2Access) SetUserData(val *OAuth2IdToken){
+	this.M_userData= val.GetUuid()
 }
 
-/** Init reference UserData **/
-func (this *OAuth2Access) SetUserData(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_userData != ref.(string) {
-			this.M_userData = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_userData != ref.(*OAuth2IdToken).GetUuid() {
-			this.M_userData = ref.(*OAuth2IdToken).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_userData = ref.(*OAuth2IdToken)
-	}
+func (this *OAuth2Access) ResetUserData(){
+	this.M_userData= ""
 }
 
-/** Remove reference UserData **/
-func (this *OAuth2Access) RemoveUserData(ref interface{}){
-	toDelete := ref.(*OAuth2IdToken)
-	if this.m_userData!= nil {
-		if toDelete.GetUuid() == this.m_userData.GetUuid() {
-			this.m_userData = nil
-			this.M_userData = ""
-			this.NeedSave = true
-		}
-	}
-}
 
-/** CreatedAt **/
-func (this *OAuth2Access) GetCreatedAt() int64{
+func (this *OAuth2Access) GetCreatedAt()int64{
 	return this.M_createdAt
 }
 
-/** Init reference CreatedAt **/
-func (this *OAuth2Access) SetCreatedAt(ref interface{}){
-	if this.M_createdAt != ref.(int64) {
-		this.M_createdAt = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *OAuth2Access) SetCreatedAt(val int64){
+	this.NeedSave = this.M_createdAt== val
+	this.M_createdAt= val
 }
 
-/** Remove reference CreatedAt **/
 
-/** Parent **/
-func (this *OAuth2Access) GetParentPtr() *OAuth2Configuration{
-	if this.m_parentPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentPtr)
-		if err == nil {
-			this.m_parentPtr = entity.(*OAuth2Configuration)
-		}
+func (this *OAuth2Access) GetParentPtr()*OAuth2Configuration{
+	entity, err := this.getEntityByUuid(this.M_parentPtr)
+	if err == nil {
+		return entity.(*OAuth2Configuration)
 	}
-	return this.m_parentPtr
-}
-func (this *OAuth2Access) GetParentPtrStr() string{
-	return this.M_parentPtr
+	return nil
 }
 
-/** Init reference Parent **/
-func (this *OAuth2Access) SetParentPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentPtr != ref.(string) {
-			this.M_parentPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentPtr != ref.(Configuration).GetUuid() {
-			this.M_parentPtr = ref.(Configuration).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentPtr = ref.(*OAuth2Configuration)
-	}
+func (this *OAuth2Access) SetParentPtr(val *OAuth2Configuration){
+	this.M_parentPtr= val.GetUuid()
 }
 
-/** Remove reference Parent **/
-func (this *OAuth2Access) RemoveParentPtr(ref interface{}){
-	toDelete := ref.(Configuration)
-	if this.m_parentPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
-			this.m_parentPtr = nil
-			this.M_parentPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *OAuth2Access) ResetParentPtr(){
+	this.M_parentPtr= ""
 }
+

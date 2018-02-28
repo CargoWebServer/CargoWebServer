@@ -105,7 +105,7 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	// I will keep reference to the project directory only...
 	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", ids) // get the first file level only...
 	if err == nil {
-		project.SetFilesRef(file)
+		project.AppendFilesRef(file.(*CargoEntities.File))
 	}
 }
 

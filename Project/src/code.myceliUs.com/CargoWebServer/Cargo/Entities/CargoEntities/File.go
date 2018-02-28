@@ -34,16 +34,12 @@ type File struct{
 	M_data string
 	M_thumbnail string
 	M_mime string
-	M_files []*File
+	M_files []string
 	M_fileType FileType
 
 
 	/** Associations **/
-	m_parentDirPtr *File
-	/** If the ref is a string and not an object **/
 	M_parentDirPtr string
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -121,289 +117,190 @@ func (this *File) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *File) GetId() string{
+func (this *File) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *File) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** Name **/
-func (this *File) GetName() string{
+func (this *File) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *File) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** Path **/
-func (this *File) GetPath() string{
+func (this *File) GetPath()string{
 	return this.M_path
 }
 
-/** Init reference Path **/
-func (this *File) SetPath(ref interface{}){
-	if this.M_path != ref.(string) {
-		this.M_path = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetPath(val string){
+	this.NeedSave = this.M_path== val
+	this.M_path= val
 }
 
-/** Remove reference Path **/
 
-/** Size **/
-func (this *File) GetSize() int{
+func (this *File) GetSize()int{
 	return this.M_size
 }
 
-/** Init reference Size **/
-func (this *File) SetSize(ref interface{}){
-	if this.M_size != ref.(int) {
-		this.M_size = ref.(int)
-		this.NeedSave = true
-	}
+func (this *File) SetSize(val int){
+	this.NeedSave = this.M_size== val
+	this.M_size= val
 }
 
-/** Remove reference Size **/
 
-/** ModeTime **/
-func (this *File) GetModeTime() int64{
+func (this *File) GetModeTime()int64{
 	return this.M_modeTime
 }
 
-/** Init reference ModeTime **/
-func (this *File) SetModeTime(ref interface{}){
-	if this.M_modeTime != ref.(int64) {
-		this.M_modeTime = ref.(int64)
-		this.NeedSave = true
-	}
+func (this *File) SetModeTime(val int64){
+	this.NeedSave = this.M_modeTime== val
+	this.M_modeTime= val
 }
 
-/** Remove reference ModeTime **/
 
-/** IsDir **/
-func (this *File) IsDir() bool{
+func (this *File) IsDir()bool{
 	return this.M_isDir
 }
 
-/** Init reference IsDir **/
-func (this *File) SetIsDir(ref interface{}){
-	if this.M_isDir != ref.(bool) {
-		this.M_isDir = ref.(bool)
-		this.NeedSave = true
-	}
+func (this *File) SetIsDir(val bool){
+	this.NeedSave = this.M_isDir== val
+	this.M_isDir= val
 }
 
-/** Remove reference IsDir **/
 
-/** Checksum **/
-func (this *File) GetChecksum() string{
+func (this *File) GetChecksum()string{
 	return this.M_checksum
 }
 
-/** Init reference Checksum **/
-func (this *File) SetChecksum(ref interface{}){
-	if this.M_checksum != ref.(string) {
-		this.M_checksum = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetChecksum(val string){
+	this.NeedSave = this.M_checksum== val
+	this.M_checksum= val
 }
 
-/** Remove reference Checksum **/
 
-/** Data **/
-func (this *File) GetData() string{
+func (this *File) GetData()string{
 	return this.M_data
 }
 
-/** Init reference Data **/
-func (this *File) SetData(ref interface{}){
-	if this.M_data != ref.(string) {
-		this.M_data = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetData(val string){
+	this.NeedSave = this.M_data== val
+	this.M_data= val
 }
 
-/** Remove reference Data **/
 
-/** Thumbnail **/
-func (this *File) GetThumbnail() string{
+func (this *File) GetThumbnail()string{
 	return this.M_thumbnail
 }
 
-/** Init reference Thumbnail **/
-func (this *File) SetThumbnail(ref interface{}){
-	if this.M_thumbnail != ref.(string) {
-		this.M_thumbnail = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetThumbnail(val string){
+	this.NeedSave = this.M_thumbnail== val
+	this.M_thumbnail= val
 }
 
-/** Remove reference Thumbnail **/
 
-/** Mime **/
-func (this *File) GetMime() string{
+func (this *File) GetMime()string{
 	return this.M_mime
 }
 
-/** Init reference Mime **/
-func (this *File) SetMime(ref interface{}){
-	if this.M_mime != ref.(string) {
-		this.M_mime = ref.(string)
-		this.NeedSave = true
-	}
+func (this *File) SetMime(val string){
+	this.NeedSave = this.M_mime== val
+	this.M_mime= val
 }
 
-/** Remove reference Mime **/
 
-/** Files **/
-func (this *File) GetFiles() []*File{
-	return this.M_files
-}
-
-/** Init reference Files **/
-func (this *File) SetFiles(ref interface{}){
-	isExist := false
-	var filess []*File
-	for i:=0; i<len(this.M_files); i++ {
-		if this.M_files[i].GetUuid() != ref.(Entity).GetUuid() {
-			filess = append(filess, this.M_files[i])
-		} else {
-			isExist = true
-			filess = append(filess, ref.(*File))
+func (this *File) GetFiles()[]*File{
+	files := make([]*File, 0)
+	for i := 0; i < len(this.M_files); i++ {
+		entity, err := this.getEntityByUuid(this.M_files[i])
+		if err == nil {
+			files = append(files, entity.(*File))
 		}
 	}
-	if !isExist {
-		filess = append(filess, ref.(*File))
-		this.NeedSave = true
-		this.M_files = filess
+	return files
+}
+
+func (this *File) SetFiles(val []*File){
+	this.M_files= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_files=append(this.M_files, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Files **/
-func (this *File) RemoveFiles(ref interface{}){
-	toDelete := ref.(Entity)
-	files_ := make([]*File, 0)
-	for i := 0; i < len(this.M_files); i++ {
-		if toDelete.GetUuid() != this.M_files[i].GetUuid() {
-			files_ = append(files_, this.M_files[i])
+func (this *File) AppendFiles(val *File){
+	for i:=0; i < len(this.M_files); i++{
+		if this.M_files[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_files = append(this.M_files, val.GetUuid())
+}
+
+func (this *File) RemoveFiles(val *File){
+	files := make([]string,0)
+	for i:=0; i < len(this.M_files); i++{
+		if this.M_files[i] != val.GetUuid() {
+			files = append(files, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_files = files_
+	this.M_files = files
 }
 
-/** FileType **/
-func (this *File) GetFileType() FileType{
+
+func (this *File) GetFileType()FileType{
 	return this.M_fileType
 }
 
-/** Init reference FileType **/
-func (this *File) SetFileType(ref interface{}){
-	if this.M_fileType != ref.(FileType) {
-		this.M_fileType = ref.(FileType)
-		this.NeedSave = true
-	}
+func (this *File) SetFileType(val FileType){
+	this.NeedSave = this.M_fileType== val
+	this.M_fileType= val
 }
 
-/** Remove reference FileType **/
-
-/** ParentDir **/
-func (this *File) GetParentDirPtr() *File{
-	if this.m_parentDirPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parentDirPtr)
-		if err == nil {
-			this.m_parentDirPtr = entity.(*File)
-		}
-	}
-	return this.m_parentDirPtr
-}
-func (this *File) GetParentDirPtrStr() string{
-	return this.M_parentDirPtr
+func (this *File) ResetFileType(){
+	this.M_fileType= 0
 }
 
-/** Init reference ParentDir **/
-func (this *File) SetParentDirPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parentDirPtr != ref.(string) {
-			this.M_parentDirPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parentDirPtr != ref.(Entity).GetUuid() {
-			this.M_parentDirPtr = ref.(Entity).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parentDirPtr = ref.(*File)
+
+func (this *File) GetParentDirPtr()*File{
+	entity, err := this.getEntityByUuid(this.M_parentDirPtr)
+	if err == nil {
+		return entity.(*File)
 	}
+	return nil
 }
 
-/** Remove reference ParentDir **/
-func (this *File) RemoveParentDirPtr(ref interface{}){
-	toDelete := ref.(Entity)
-	if this.m_parentDirPtr!= nil {
-		if toDelete.GetUuid() == this.m_parentDirPtr.GetUuid() {
-			this.m_parentDirPtr = nil
-			this.M_parentDirPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *File) SetParentDirPtr(val *File){
+	this.M_parentDirPtr= val.GetUuid()
 }
 
-/** Entities **/
-func (this *File) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
-		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
-		}
-	}
-	return this.m_entitiesPtr
-}
-func (this *File) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+func (this *File) ResetParentDirPtr(){
+	this.M_parentDirPtr= ""
 }
 
-/** Init reference Entities **/
-func (this *File) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
+
+func (this *File) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
 	}
+	return nil
 }
 
-/** Remove reference Entities **/
-func (this *File) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *File) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
 }
+
+func (this *File) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
+}
+

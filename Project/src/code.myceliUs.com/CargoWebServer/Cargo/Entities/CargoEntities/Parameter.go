@@ -28,8 +28,6 @@ type Parameter struct{
 
 
 	/** Associations **/
-	m_parametersPtr *Parameter
-	/** If the ref is a string and not an object **/
 	M_parametersPtr string
 }
 
@@ -94,89 +92,49 @@ func (this *Parameter) SetEntityGetter(fct func(uuid string)(interface{}, error)
 	this.getEntityByUuid = fct
 }
 
-/** Name **/
-func (this *Parameter) GetName() string{
+func (this *Parameter) GetName()string{
 	return this.M_name
 }
 
-/** Init reference Name **/
-func (this *Parameter) SetName(ref interface{}){
-	if this.M_name != ref.(string) {
-		this.M_name = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Parameter) SetName(val string){
+	this.NeedSave = this.M_name== val
+	this.M_name= val
 }
 
-/** Remove reference Name **/
 
-/** Type **/
-func (this *Parameter) GetType() string{
+func (this *Parameter) GetType()string{
 	return this.M_type
 }
 
-/** Init reference Type **/
-func (this *Parameter) SetType(ref interface{}){
-	if this.M_type != ref.(string) {
-		this.M_type = ref.(string)
-		this.NeedSave = true
-	}
+func (this *Parameter) SetType(val string){
+	this.NeedSave = this.M_type== val
+	this.M_type= val
 }
 
-/** Remove reference Type **/
 
-/** IsArray **/
-func (this *Parameter) IsArray() bool{
+func (this *Parameter) IsArray()bool{
 	return this.M_isArray
 }
 
-/** Init reference IsArray **/
-func (this *Parameter) SetIsArray(ref interface{}){
-	if this.M_isArray != ref.(bool) {
-		this.M_isArray = ref.(bool)
-		this.NeedSave = true
-	}
+func (this *Parameter) SetIsArray(val bool){
+	this.NeedSave = this.M_isArray== val
+	this.M_isArray= val
 }
 
-/** Remove reference IsArray **/
 
-/** Parameters **/
-func (this *Parameter) GetParametersPtr() *Parameter{
-	if this.m_parametersPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_parametersPtr)
-		if err == nil {
-			this.m_parametersPtr = entity.(*Parameter)
-		}
+func (this *Parameter) GetParametersPtr()*Parameter{
+	entity, err := this.getEntityByUuid(this.M_parametersPtr)
+	if err == nil {
+		return entity.(*Parameter)
 	}
-	return this.m_parametersPtr
-}
-func (this *Parameter) GetParametersPtrStr() string{
-	return this.M_parametersPtr
+	return nil
 }
 
-/** Init reference Parameters **/
-func (this *Parameter) SetParametersPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_parametersPtr != ref.(string) {
-			this.M_parametersPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_parametersPtr != ref.(*Parameter).GetUuid() {
-			this.M_parametersPtr = ref.(*Parameter).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_parametersPtr = ref.(*Parameter)
-	}
+func (this *Parameter) SetParametersPtr(val *Parameter){
+	this.M_parametersPtr= val.GetUuid()
 }
 
-/** Remove reference Parameters **/
-func (this *Parameter) RemoveParametersPtr(ref interface{}){
-	toDelete := ref.(*Parameter)
-	if this.m_parametersPtr!= nil {
-		if toDelete.GetUuid() == this.m_parametersPtr.GetUuid() {
-			this.m_parametersPtr = nil
-			this.M_parametersPtr = ""
-			this.NeedSave = true
-		}
-	}
+func (this *Parameter) ResetParametersPtr(){
+	this.M_parametersPtr= ""
 }
+

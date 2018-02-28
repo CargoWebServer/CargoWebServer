@@ -30,17 +30,11 @@ type User struct{
 	M_middle string
 	M_phone string
 	M_email string
-	m_memberOfRef []*Group
-	/** If the ref is a string and not an object **/
 	M_memberOfRef []string
-	m_accounts []*Account
-	/** If the ref is a string and not an object **/
 	M_accounts []string
 
 
 	/** Associations **/
-	m_entitiesPtr *Entities
-	/** If the ref is a string and not an object **/
 	M_entitiesPtr string
 }
 
@@ -113,262 +107,159 @@ func (this *User) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
 }
 
-/** Id **/
-func (this *User) GetId() string{
+func (this *User) GetId()string{
 	return this.M_id
 }
 
-/** Init reference Id **/
-func (this *User) SetId(ref interface{}){
-	if this.M_id != ref.(string) {
-		this.M_id = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetId(val string){
+	this.NeedSave = this.M_id== val
+	this.M_id= val
 }
 
-/** Remove reference Id **/
 
-/** FirstName **/
-func (this *User) GetFirstName() string{
+func (this *User) GetFirstName()string{
 	return this.M_firstName
 }
 
-/** Init reference FirstName **/
-func (this *User) SetFirstName(ref interface{}){
-	if this.M_firstName != ref.(string) {
-		this.M_firstName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetFirstName(val string){
+	this.NeedSave = this.M_firstName== val
+	this.M_firstName= val
 }
 
-/** Remove reference FirstName **/
 
-/** LastName **/
-func (this *User) GetLastName() string{
+func (this *User) GetLastName()string{
 	return this.M_lastName
 }
 
-/** Init reference LastName **/
-func (this *User) SetLastName(ref interface{}){
-	if this.M_lastName != ref.(string) {
-		this.M_lastName = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetLastName(val string){
+	this.NeedSave = this.M_lastName== val
+	this.M_lastName= val
 }
 
-/** Remove reference LastName **/
 
-/** Middle **/
-func (this *User) GetMiddle() string{
+func (this *User) GetMiddle()string{
 	return this.M_middle
 }
 
-/** Init reference Middle **/
-func (this *User) SetMiddle(ref interface{}){
-	if this.M_middle != ref.(string) {
-		this.M_middle = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetMiddle(val string){
+	this.NeedSave = this.M_middle== val
+	this.M_middle= val
 }
 
-/** Remove reference Middle **/
 
-/** Phone **/
-func (this *User) GetPhone() string{
+func (this *User) GetPhone()string{
 	return this.M_phone
 }
 
-/** Init reference Phone **/
-func (this *User) SetPhone(ref interface{}){
-	if this.M_phone != ref.(string) {
-		this.M_phone = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetPhone(val string){
+	this.NeedSave = this.M_phone== val
+	this.M_phone= val
 }
 
-/** Remove reference Phone **/
 
-/** Email **/
-func (this *User) GetEmail() string{
+func (this *User) GetEmail()string{
 	return this.M_email
 }
 
-/** Init reference Email **/
-func (this *User) SetEmail(ref interface{}){
-	if this.M_email != ref.(string) {
-		this.M_email = ref.(string)
-		this.NeedSave = true
-	}
+func (this *User) SetEmail(val string){
+	this.NeedSave = this.M_email== val
+	this.M_email= val
 }
 
-/** Remove reference Email **/
 
-/** MemberOfRef **/
-func (this *User) GetMemberOfRef() []*Group{
-	if this.m_memberOfRef == nil {
-		this.m_memberOfRef = make([]*Group, 0)
-		for i := 0; i < len(this.M_memberOfRef); i++ {
-			entity, err := this.getEntityByUuid(this.M_memberOfRef[i])
-			if err == nil {
-				this.m_memberOfRef = append(this.m_memberOfRef, entity.(*Group))
-			}
-		}
-	}
-	return this.m_memberOfRef
-}
-func (this *User) GetMemberOfRefStr() []string{
-	return this.M_memberOfRef
-}
-
-/** Init reference MemberOfRef **/
-func (this *User) SetMemberOfRef(ref interface{}){
-	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_memberOfRef); i++ {
-			if this.M_memberOfRef[i] == refStr {
-				return
-			}
-		}
-		this.M_memberOfRef = append(this.M_memberOfRef, ref.(string))
-		this.NeedSave = true
-	}else{
-		for i:=0; i < len(this.m_memberOfRef); i++ {
-			if this.m_memberOfRef[i].GetUuid() == ref.(*Group).GetUuid() {
-				return
-			}
-		}
-		isExist := false
-		for i:=0; i < len(this.M_memberOfRef); i++ {
-			if this.M_memberOfRef[i] == ref.(*Group).GetUuid() {
-				isExist = true
-			}
-		}
-		this.m_memberOfRef = append(this.m_memberOfRef, ref.(*Group))
-	if !isExist {
-		this.M_memberOfRef = append(this.M_memberOfRef, ref.(Entity).GetUuid())
-		this.NeedSave = true
-	}
-	}
-}
-
-/** Remove reference MemberOfRef **/
-func (this *User) RemoveMemberOfRef(ref interface{}){
-	toDelete := ref.(Entity)
-	memberOfRef_ := make([]*Group, 0)
-	memberOfRefUuid := make([]string, 0)
-	for i := 0; i < len(this.m_memberOfRef); i++ {
-		if toDelete.GetUuid() != this.m_memberOfRef[i].GetUuid() {
-			memberOfRef_ = append(memberOfRef_, this.m_memberOfRef[i])
-			memberOfRefUuid = append(memberOfRefUuid, this.M_memberOfRef[i])
-		}else{
-			this.NeedSave = true
-		}
-	}
-	this.m_memberOfRef = memberOfRef_
-	this.M_memberOfRef = memberOfRefUuid
-}
-
-/** Accounts **/
-func (this *User) GetAccounts() []*Account{
-	if this.m_accounts == nil {
-		this.m_accounts = make([]*Account, 0)
-		for i := 0; i < len(this.M_accounts); i++ {
-			entity, err := this.getEntityByUuid(this.M_accounts[i])
-			if err == nil {
-				this.m_accounts = append(this.m_accounts, entity.(*Account))
-			}
-		}
-	}
-	return this.m_accounts
-}
-func (this *User) GetAccountsStr() []string{
-	return this.M_accounts
-}
-
-/** Init reference Accounts **/
-func (this *User) SetAccounts(ref interface{}){
-	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_accounts); i++ {
-			if this.M_accounts[i] == refStr {
-				return
-			}
-		}
-		this.M_accounts = append(this.M_accounts, ref.(string))
-		this.NeedSave = true
-	}else{
-		for i:=0; i < len(this.m_accounts); i++ {
-			if this.m_accounts[i].GetUuid() == ref.(*Account).GetUuid() {
-				return
-			}
-		}
-		isExist := false
-		for i:=0; i < len(this.M_accounts); i++ {
-			if this.M_accounts[i] == ref.(*Account).GetUuid() {
-				isExist = true
-			}
-		}
-		this.m_accounts = append(this.m_accounts, ref.(*Account))
-	if !isExist {
-		this.M_accounts = append(this.M_accounts, ref.(Entity).GetUuid())
-		this.NeedSave = true
-	}
-	}
-}
-
-/** Remove reference Accounts **/
-func (this *User) RemoveAccounts(ref interface{}){
-	toDelete := ref.(Entity)
-	accounts_ := make([]*Account, 0)
-	accountsUuid := make([]string, 0)
-	for i := 0; i < len(this.m_accounts); i++ {
-		if toDelete.GetUuid() != this.m_accounts[i].GetUuid() {
-			accounts_ = append(accounts_, this.m_accounts[i])
-			accountsUuid = append(accountsUuid, this.M_accounts[i])
-		}else{
-			this.NeedSave = true
-		}
-	}
-	this.m_accounts = accounts_
-	this.M_accounts = accountsUuid
-}
-
-/** Entities **/
-func (this *User) GetEntitiesPtr() *Entities{
-	if this.m_entitiesPtr == nil {
-		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+func (this *User) GetMemberOfRef()[]*Group{
+	memberOfRef := make([]*Group, 0)
+	for i := 0; i < len(this.M_memberOfRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_memberOfRef[i])
 		if err == nil {
-			this.m_entitiesPtr = entity.(*Entities)
+			memberOfRef = append(memberOfRef, entity.(*Group))
 		}
 	}
-	return this.m_entitiesPtr
-}
-func (this *User) GetEntitiesPtrStr() string{
-	return this.M_entitiesPtr
+	return memberOfRef
 }
 
-/** Init reference Entities **/
-func (this *User) SetEntitiesPtr(ref interface{}){
-	if _, ok := ref.(string); ok {
-		if this.M_entitiesPtr != ref.(string) {
-			this.M_entitiesPtr = ref.(string)
-			this.NeedSave = true
-		}
-	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
-			this.M_entitiesPtr = ref.(*Entities).GetUuid()
-			this.NeedSave = true
-		}
-		this.m_entitiesPtr = ref.(*Entities)
+func (this *User) SetMemberOfRef(val []*Group){
+	this.M_memberOfRef= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_memberOfRef=append(this.M_memberOfRef, val[i].GetUuid())
 	}
 }
 
-/** Remove reference Entities **/
-func (this *User) RemoveEntitiesPtr(ref interface{}){
-	toDelete := ref.(*Entities)
-	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
-			this.m_entitiesPtr = nil
-			this.M_entitiesPtr = ""
+func (this *User) AppendMemberOfRef(val *Group){
+	for i:=0; i < len(this.M_memberOfRef); i++{
+		if this.M_memberOfRef[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_memberOfRef = append(this.M_memberOfRef, val.GetUuid())
+}
+
+func (this *User) RemoveMemberOfRef(val *Group){
+	memberOfRef := make([]string,0)
+	for i:=0; i < len(this.M_memberOfRef); i++{
+		if this.M_memberOfRef[i] != val.GetUuid() {
+			memberOfRef = append(memberOfRef, val.GetUuid())
+		}else{
 			this.NeedSave = true
 		}
 	}
+	this.M_memberOfRef = memberOfRef
 }
+
+
+func (this *User) GetAccounts()[]*Account{
+	accounts := make([]*Account, 0)
+	for i := 0; i < len(this.M_accounts); i++ {
+		entity, err := this.getEntityByUuid(this.M_accounts[i])
+		if err == nil {
+			accounts = append(accounts, entity.(*Account))
+		}
+	}
+	return accounts
+}
+
+func (this *User) SetAccounts(val []*Account){
+	this.M_accounts= make([]string,0)
+	for i:=0; i < len(val); i++{
+		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
+	}
+}
+
+func (this *User) AppendAccounts(val *Account){
+	for i:=0; i < len(this.M_accounts); i++{
+		if this.M_accounts[i] == val.GetUuid() {
+			return
+		}
+	}
+	this.M_accounts = append(this.M_accounts, val.GetUuid())
+}
+
+func (this *User) RemoveAccounts(val *Account){
+	accounts := make([]string,0)
+	for i:=0; i < len(this.M_accounts); i++{
+		if this.M_accounts[i] != val.GetUuid() {
+			accounts = append(accounts, val.GetUuid())
+		}else{
+			this.NeedSave = true
+		}
+	}
+	this.M_accounts = accounts
+}
+
+
+func (this *User) GetEntitiesPtr()*Entities{
+	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+	if err == nil {
+		return entity.(*Entities)
+	}
+	return nil
+}
+
+func (this *User) SetEntitiesPtr(val *Entities){
+	this.M_entitiesPtr= val.GetUuid()
+}
+
+func (this *User) ResetEntitiesPtr(){
+	this.M_entitiesPtr= ""
+}
+
