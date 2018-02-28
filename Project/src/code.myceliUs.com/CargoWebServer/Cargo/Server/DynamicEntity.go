@@ -25,16 +25,18 @@ type DynamicEntity struct {
 	sync.RWMutex
 }
 
+func NewDynamicEntity() *DynamicEntity {
+	entity := new(DynamicEntity)
+	entity.object = make(map[string]interface{}, 0)
+	return entity
+}
+
 /**
  * Thread safe function
  */
 func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	this.Lock()
 	defer this.Unlock()
-
-	if this.object == nil {
-		this.object = make(map[string]interface{}, 0)
-	}
 
 	// Here the value is in the map.
 	this.object[field] = value
@@ -49,6 +51,46 @@ func (this *DynamicEntity) getValue(field string) interface{} {
 	this.Lock()
 	defer this.Unlock()
 	return this.object[field]
+}
+
+/**
+ * That function return a detach copy of the values contain in the object map.
+ * Only the uuid of all child values are keep. That map can be use to save the content
+ * of an entity in the cache.
+ */
+func (this *DynamicEntity) getValues() interface{} {
+	this.Lock()
+	defer this.Unlock()
+	values := make(map[string]interface{})
+	// return the values without all sub-entity values
+	for k, v := range this.object {
+		if reflect.TypeOf(v).String() == "[]interface {}" {
+			if len(v.([]interface{})) > 0 {
+				if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
+					if v.([]interface{})[0].(map[string]interface{})["UUID"] != nil {
+						childs := make([]string, 0)
+						for i := 0; i < len(v.([]interface{})); i++ {
+							childs = append(childs, v.([]interface{})[0].(map[string]interface{})["UUID"].(string))
+						}
+						values[k] = childs
+					} else {
+						values[k] = v
+					}
+				} else {
+					values[k] = v
+				}
+			}
+		} else if reflect.TypeOf(v).String() == "map[string]interface {}" {
+			if v.(map[string]interface{})["UUID"] != nil {
+				values[k] = v.(map[string]interface{})["UUID"]
+			} else {
+				values[k] = v
+			}
+		} else {
+			values[k] = v
+		}
+	}
+	return values
 }
 
 /**
@@ -112,8 +154,7 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
  * To remove other field type simply call 'setValue' with the new array values.
  */
 func (this *DynamicEntity) removeValue(field string, uuid interface{}) {
-	this.Lock()
-	defer this.Unlock()
+
 	values_ := this.getValue(field)
 
 	// Here no value aready exist.

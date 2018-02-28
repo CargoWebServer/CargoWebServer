@@ -994,17 +994,17 @@ func (this *Server) Start() {
 	// Services intialisation.
 	////////////////////////////////////////////////////////////////////////////
 	defer func() {
-		// Now after all initialisation are done I will open connection with
-		// other servers.
-		this.GetDataManager().openConnections() // That will also append entities scripts.
-
-		// Javacript initialisation here.
-		JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
 
 		// Append services scripts.
 		for id, src := range GetServer().GetServiceManager().m_serviceClientSrc {
 			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src, false)
 		}
+
+		this.GetDataManager().openConnections() // That will also append entities scripts.
+
+		// Javacript initialisation here, must be create before openConnections
+		// because prototypes are created in anonymous session.
+		JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
 
 		// Initialyse the script for the default session.
 		JS.GetJsRuntimeManager().InitScripts("") // Initialyse the base session.

@@ -1,6 +1,7 @@
 package Utility
 
 import (
+	"bytes"
 	b64 "encoding/base64"
 	"encoding/gob"
 	"errors"
@@ -368,6 +369,34 @@ func InitializeStructures(data []interface{}, typeName string) (reflect.Value, e
 		}
 	}
 	return values, nil
+}
+
+/**
+ * Serialyse the entity to a byte array.
+ */
+func ToBytes(val interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(val)
+	return buf.Bytes(), err
+}
+
+/**
+ * Read entity from byte array.
+ */
+func FromBytes(data []byte, typeName string) (interface{}, error) {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+	if t, ok := typeRegistry[typeName]; ok {
+		v := reflect.New(t).Interface()
+		err := dec.Decode(v)
+		return v, err
+	} else {
+		v := make(map[string]interface{})
+		err := dec.Decode(&v)
+		return v, err
+	}
+	return nil, errors.New("Fail to instantiate value!")
 }
 
 /**

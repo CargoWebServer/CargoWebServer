@@ -1416,7 +1416,7 @@ func createEntityFromInfo(key string, info map[string]interface{}, infos map[str
 		}
 	}
 
-	entity := new(DynamicEntity)
+	entity := NewDynamicEntity()
 	entity.SetParentUuid(parentUuid)
 	entity.setObject(info)
 

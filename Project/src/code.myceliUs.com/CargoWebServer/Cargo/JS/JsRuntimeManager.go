@@ -656,12 +656,6 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			this.initScript(path, sessionId)
 		}
 	}
-
-	// Other module must be loaded with help of require function...
-	/*for path, _ := range this.m_scripts {
-		// Start initalyse the scripts.
-		this.initScript(path, sessionId)
-	}*/
 }
 
 /**

@@ -98,6 +98,15 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 		log.Fatal(err)
 	}
 
+	// Here I will register all class in the vm.
+	prototypes, err := store.GetEntityPrototypes()
+	if err == nil {
+		for i := 0; i < len(prototypes); i++ {
+			// The script will be put in global context (CargoWebServer)
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), false)
+		}
+	}
+
 	return
 }
 
@@ -981,14 +990,6 @@ func (this *GraphStore) Connect() error {
 		}
 	}
 
-	// Here I will register all class in the vm.
-	prototypes, err := this.GetEntityPrototypes()
-	if err == nil {
-		for i := 0; i < len(prototypes); i++ {
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), true)
-		}
-	}
-
 	return nil
 }
 
@@ -1599,7 +1600,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		// log.Println("remove triple: ", triples[i])
+		log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {

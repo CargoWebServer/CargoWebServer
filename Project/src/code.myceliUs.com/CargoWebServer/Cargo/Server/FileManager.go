@@ -1282,9 +1282,11 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 func (this *FileManager) IsFileExist(filename string, filepath string, messageId string, sessionId string) bool {
 
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
-	_, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
-
-	return err == nil
+	uuid, err := GetServer().GetEntityManager().getEntityUuidById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
+	if err != nil {
+		return false
+	}
+	return len(uuid) > 0
 }
 
 // @api 1.0

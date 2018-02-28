@@ -6,22 +6,18 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	//	"runtime/debug"
 	"strconv"
 	"strings"
-	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
-
 	"code.myceliUs.com/Utility"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
 //						Entity Manager
 ////////////////////////////////////////////////////////////////////////////////
-
-// The entity are keep in memory for ten minutes.
-var timeOutDuration = time.Duration(1)
 
 // Struct use to tranfer internal informations about entity
 type EntityInfo struct {
@@ -37,14 +33,7 @@ type EntityManager struct {
 	// Cache the entitie in memory...
 	m_entities map[string]Entity
 
-	// That map will contain the list of timer. Object are keep in map
-	// for a certain delay and remove after to save memory usage...
-	m_timeout map[string]*time.Timer
-
-	// Map of entity (reverse) references in cache
-	m_entitiesRefs map[string]map[string][]string
-
-	// Access the tow map via those channel...
+	// Access map via those channel...
 	m_setEntityChan    chan Entity
 	m_getEntityChan    chan EntityInfo
 	m_removeEntityChan chan Entity
@@ -93,10 +82,7 @@ func newEntityManager() *EntityManager {
 
 	// The Cache...
 	entityManager.m_entities = make(map[string]Entity, 0)
-	entityManager.m_entitiesRefs = make(map[string]map[string][]string)
-
-	// The timeout function
-	entityManager.m_timeout = make(map[string]*time.Timer, 0)
+	//debug.SetGCPercent(20)
 
 	// Cache accessor.
 	entityManager.m_getEntityChan = make(chan EntityInfo, 0)
@@ -107,6 +93,7 @@ func newEntityManager() *EntityManager {
 	go func() {
 		entityManager := GetServer().GetEntityManager()
 		for {
+
 			select {
 			case entityInfo := <-entityManager.m_getEntityChan:
 				if len(entityInfo.uuid) > 0 {
@@ -133,7 +120,6 @@ func newEntityManager() *EntityManager {
 					for _, entity := range entityManager.m_entities {
 						if entity.GetTypeName() == entityInfo.typeName {
 							// Reset the time of the timer.
-							entityManager.m_timeout[entity.GetUuid()].Reset(timeOutDuration * time.Minute)
 							entities = append(entities, entity)
 						}
 					}
@@ -142,138 +128,52 @@ func newEntityManager() *EntityManager {
 					entityInfo.entities <- nil
 				}
 			case entity := <-entityManager.m_removeEntityChan:
-
-				// If the entity was referenced by entity in the cache
-				// I will remove it from this entity
-				ref := entityManager.m_entitiesRefs[entity.GetUuid()]
-				if ref != nil {
-					for field, uuids := range ref {
-						for i := 0; i < len(uuids); i++ {
-							// Only entities in the case must be updates.
-							if entityManager.m_entities[uuids[i]] != nil {
-								// In that case the entity referenced is in the
-								// cache map so I need to update it.
-								entity_ := entityManager.m_entities[uuids[i]]
-								prototype, _ := entityManager.getEntityPrototype(entity_.GetTypeName(), strings.Split(entity_.GetTypeName(), ".")[0])
-								if reflect.TypeOf(entity_).String() == "*Server.DynamicEntity" {
-									refs_ := entity_.(*DynamicEntity).getValue(field)
-									if refs_ != nil {
-										refs := make([]string, 0)
-										for j := 0; j < len(refs_.([]string)); j++ {
-											if refs_.([]string)[j] != entity.GetUuid() {
-												refs = append(refs, refs_.([]string)[j])
-											}
-										}
-										entity_.(*DynamicEntity).setValue(field, refs)
-									}
-								} else {
-									removeName := strings.Replace(field, "M_", "", -1)
-									removeName = "Remove" + strings.ToUpper(removeName[0:1]) + removeName[1:] + "Ref"
-									params := make([]interface{}, 1)
-									params[0] = entity
-									_, err := Utility.CallMethod(entity_, removeName, params)
-									if err == nil {
-										// Here I will send update entity event...
-										log.Println("--> remove ref ", entity_.GetUuid(), field, entity.GetUuid())
-									}
-								}
-
-								// Sent the update event.
-								eventData := make([]*MessageData, 2)
-								msgData0 := new(MessageData)
-								msgData0.Name = "entity"
-								if reflect.TypeOf(entity_).String() == "*Server.DynamicEntity" {
-									msgData0.Value = entity_.(*DynamicEntity).getObject()
-								} else {
-									msgData0.Value = entity_
-								}
-								eventData[0] = msgData0
-
-								msgData1 := new(MessageData)
-								msgData1.Name = "prototype"
-								msgData1.Value = prototype
-								eventData[1] = msgData1
-
-								evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
-								GetServer().GetEventManager().BroadcastEvent(evt)
-							}
-						}
-					}
-
-					// Remove it from the map.
-					if len(entity.Ids()) > 0 {
-						id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
-						delete(entityManager.m_entities, id)
-					}
-					delete(entityManager.m_entities, entity.GetUuid())
-
-					// Remove it timer...
-					delete(entityManager.m_timeout, entity.GetUuid())
-
+				// Remove it from the map.
+				if len(entity.Ids()) > 0 {
+					id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+					delete(entityManager.m_entities, id)
 				}
+				// Remove from the cache.
+				delete(entityManager.m_entities, entity.GetUuid())
 
 			case entity := <-entityManager.m_setEntityChan:
-				// Keep track of reverse references releationship. (referenced by)
-				prototype, err := entityManager.getEntityPrototype(entity.GetTypeName(), strings.Split(entity.GetTypeName(), ".")[0])
-				if err == nil {
-					// Append in the map:
-					// Set it entity getter.
-					entity.SetEntityGetter(getEntityFct)
-					// By id
-					if len(entity.Ids()) > 0 {
-						id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
-						entityManager.m_entities[id] = entity
-					}
-					// By uuid
-					entityManager.m_entities[entity.GetUuid()] = entity
+				// Append in the map:
+				// Set it entity getter.
+				entity.SetEntityGetter(getEntityFct)
 
-					for i := 0; i < len(prototype.Fields); i++ {
-						if strings.HasSuffix(prototype.FieldsType[i], ":Ref") {
-							refs := make([]string, 0)
-							var refs_ interface{}
-							var err interface{}
-							if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-								refs_ = entity.(*DynamicEntity).getValue(prototype.Fields[i])
-							} else {
-								getterName := strings.Replace(prototype.Fields[i], "M_", "", -1)
-								getterName = "Get" + strings.ToUpper(getterName[0:1]) + getterName[1:] + "Str"
-								refs_, err = Utility.CallMethod(entity, getterName, []interface{}{})
-							}
-							if err == nil && refs_ != nil {
-								if reflect.TypeOf(refs_).Kind() == reflect.String {
-									refs = append(refs, refs_.(string))
-								} else if reflect.TypeOf(refs_).String() == "[]string" {
-									refs = refs_.([]string)
-								} else if reflect.TypeOf(refs_).String() == "[]interface {}" {
-									for j := 0; j < len(refs_.([]interface{})); j++ {
-										refs = append(refs, refs_.([]interface{})[j].(string))
-									}
-								}
+				// By id
+				if len(entity.Ids()) > 0 {
+					id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+					entityManager.m_entities[id] = entity
+				}
 
-								// Now I go the reference i will keep it in the map.
-								for j := 0; j < len(refs); j++ {
-									if entityManager.m_entitiesRefs[refs[j]] == nil {
-										entityManager.m_entitiesRefs[refs[j]] = make(map[string][]string, 0)
-									}
-									if entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] == nil {
-										entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] = make([]string, 0)
-									}
-									if !Utility.Contains(entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]], entity.GetUuid()) {
-										entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] = append(entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]], entity.GetUuid())
-									}
-								}
-							}
+				// By uuid
+				entityManager.m_entities[entity.GetUuid()] = entity
+
+				if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
+					var bytes, err = Utility.ToBytes(entity)
+					if err == nil {
+						log.Println("---> value write ", len(bytes))
+						val, err := Utility.FromBytes(bytes, entity.GetTypeName())
+						if err == nil {
+							log.Println("---> value read success", val.(Entity).GetUuid())
+						} else {
+							log.Panicln("---> ", err)
 						}
 					}
-
-					// Set the entity timeout function...
-					timer := time.NewTimer(timeOutDuration * time.Minute)
-					entityManager.m_timeout[entity.GetUuid()] = timer
-					go func(timer *time.Timer, entity Entity) {
-						<-timer.C
-						// Remove the entity from the map.
-						entityManager.m_removeEntityChan <- entity
-					}(timer, entity)
+				} else {
+					// In that case I got an a dynamic entity...
+					obj := entity.(*DynamicEntity).getValues()
+					var bytes, err = Utility.ToBytes(obj)
+					if err == nil {
+						log.Println("---> value write ", len(bytes))
+						val, err := Utility.FromBytes(bytes, entity.GetTypeName())
+						if err == nil {
+							log.Println("---> value read success", val.(map[string]interface{})["UUID"])
+						} else {
+							log.Panicln("---> ", err)
+						}
+					}
 				}
 
 			}
@@ -448,7 +348,17 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								}
 							}
 						} else {
-							*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(string), isIndex})
+							if reflect.TypeOf(v).String() == "map[string]interface {}" {
+								if v.(map[string]interface{})["TYPENAME"] == nil {
+									ToTriples(v.(map[string]interface{}), triples)
+								} else if v.(map[string]interface{})["UUID"] != nil {
+									fieldType_ := v.(map[string]interface{})["TYPENAME"].(string)
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
+								}
+							} else {
+								// Here I will append attribute...
+								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+							}
 						}
 
 					} else {
@@ -459,7 +369,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 										for i := 0; i < len(v.([]map[string]interface{})); i++ {
 											ToTriples(v.([]map[string]interface{})[i], triples)
 										}
-									} else {
+									} else if v.(map[string]interface{})["UUID"] != nil {
 										fieldType_ := v.([]map[string]interface{})[0]["TYPENAME"].(string)
 										for i := 0; i < len(v.([]map[string]interface{})); i++ {
 											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
@@ -473,7 +383,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 											for i := 0; i < len(v.([]interface{})); i++ {
 												ToTriples(v.([]interface{})[i].(map[string]interface{}), triples)
 											}
-										} else {
+										} else if v.(map[string]interface{})["UUID"] != nil {
 											fieldType_ := v.([]interface{})[0].(map[string]interface{})["TYPENAME"].(string)
 											for i := 0; i < len(v.([]interface{})); i++ {
 												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(map[string]interface{})["UUID"].(string), isIndex})
@@ -497,7 +407,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 							if reflect.TypeOf(v).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["TYPENAME"] == nil {
 									ToTriples(v.(map[string]interface{}), triples)
-								} else {
+								} else if v.(map[string]interface{})["UUID"] != nil {
 									fieldType_ := v.(map[string]interface{})["TYPENAME"].(string)
 									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
 								}
@@ -583,7 +493,7 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 	return entities, nil
 }
 
-func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntity(uuid string) Entity {
 	var info EntityInfo
 	typeName := strings.Split(uuid, "%")[0]
 	info.typeName = typeName
@@ -594,10 +504,20 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	// wait to answer...
 	entities := <-info.entities
 	if len(entities) == 1 {
-		return entities[0], nil
+		return entities[0]
+	}
+	return nil
+}
+
+func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+	// Get it from cache if is there.
+	entity := this.getEntity(uuid)
+	if entity != nil {
+		return entity, nil
 	}
 
 	// Todo get the entity from the datastore.
+	typeName := strings.Split(uuid, "%")[0]
 	storeId := typeName[0:strings.Index(typeName, ".")]
 
 	// So now I will retreive the list of values associated with that uuid.
@@ -615,7 +535,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 	// So here I will retreive the entity uuid from the entity id.
 	// prototype, _ := this.getEntityPrototype(typeName, storeId)
-	var entity Entity
 
 	if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
 		entity = obj.Interface().(Entity)
@@ -663,7 +582,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 	} else {
 		// Dynamic entity here.
-		entity = new(DynamicEntity)
+		entity = NewDynamicEntity()
 		entity.SetEntityGetter(getEntityFct)
 		entity.(*DynamicEntity).setObject(values)
 		for k, v := range values {
@@ -680,9 +599,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 							if values[k[0:len(k)-5]] == nil {
 								values[k[0:len(k)-5]] = make([]interface{}, 0)
 							}
-
 							values[k[0:len(k)-5]] = append(values[k[0:len(k)-5]].([]interface{}), subEntity.(*DynamicEntity).getObject())
-
 						}
 					}
 				}
@@ -707,6 +624,16 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 		return nil, errObj
 	}
 
+	uuid, errObj := this.getEntityUuidById(typeName, storeId, ids)
+	if errObj == nil {
+		return this.getEntityByUuid(uuid)
+	}
+
+	return nil, errObj
+}
+
+func (this *EntityManager) getEntityUuidById(typeName string, storeId string, ids []interface{}) (string, *CargoEntities.Error) {
+
 	// First I will get a look in the cash to see if the entity is already initialyse...
 	var info EntityInfo
 	info.typeName = typeName
@@ -717,7 +644,7 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 	// wait to answer...
 	entities := <-info.entities
 	if len(entities) == 1 {
-		return entities[0], nil
+		return entities[0].GetUuid(), nil
 	}
 
 	// So here I will retreive the entity uuid from the entity id.
@@ -728,7 +655,7 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 	fieldType = strings.Replace(fieldType, "[]", "", -1)
 	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 	query := "( ?, " + typeName + ":" + fieldType + ":" + prototype.Ids[1] + ", " + ids[0].(string) + ")"
-	//log.Println("---->  ", query)
+
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
@@ -741,12 +668,13 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 			}
 		}
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
-		log.Println(errObj.GetBody())
-		return nil, errObj
+		//log.Println(errObj.GetBody())
+		return "", errObj
 	}
 
 	uuid := results[0][0].(string)
-	return this.getEntityByUuid(uuid)
+
+	return uuid, nil
 }
 
 func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *CargoEntities.Error {
@@ -1088,6 +1016,77 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
+	}
+
+	// Now I will clear other references...
+	query := "( ? ,?, " + entity.GetUuid() + ")"
+	// Now entity are quadify I will save it in the graph store.
+	references, err_ := store.Read(query, []interface{}{}, []interface{}{})
+	if err_ == nil {
+		toDelete := make([]interface{}, 0)
+		for i := 0; i < len(references); i++ {
+			// Remove the reference from the entity loaded in the cache.
+			ref := this.getEntity(references[i][0].(string))
+			if ref != nil {
+				field := references[i][1].(string)
+				typeName := references[i][0].(string)
+				prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
+				fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
+				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
+					refs_ := ref.(*DynamicEntity).getValue(field)
+					if refs_ != nil {
+						if reflect.TypeOf(refs_).String() == "[]string" { // Array of references.
+							refs := make([]string, 0)
+							for j := 0; j < len(refs_.([]string)); j++ {
+								if refs_.([]string)[j] != entity.GetUuid() {
+									refs = append(refs, refs_.([]string)[j])
+								}
+							}
+							ref.(*DynamicEntity).setValue(field, refs)
+						} else if reflect.TypeOf(refs_).Kind() == reflect.String {
+							ref.(*DynamicEntity).setValue(field, refs_) // single ref.
+						} else {
+							ref.(*DynamicEntity).removeValue(field, refs_) // childs
+						}
+					}
+				} else {
+					removeName := strings.Replace(field, "M_", "", -1)
+					removeName = "Remove" + strings.ToUpper(removeName[0:1]) + removeName[1:]
+					if strings.HasSuffix(fieldType, ":Ref") {
+						removeName += "Ref"
+					}
+					params := make([]interface{}, 1)
+					params[0] = entity
+					_, err := Utility.CallMethod(ref, removeName, params)
+					if err == nil {
+						// Here I will send update entity event...
+						log.Println("--> remove ref fail", ref.GetUuid(), field, entity.GetUuid())
+					}
+				}
+
+				// Update the reference here.
+				var eventDatas []*MessageData
+				evtData := new(MessageData)
+				evtData.TYPENAME = "Server.MessageData"
+				evtData.Name = "entity"
+				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
+					evtData.Value = ref.(*DynamicEntity).getObject()
+				} else {
+					evtData.Value = ref
+				}
+				eventDatas = append(eventDatas, evtData)
+				evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventDatas)
+				GetServer().GetEventManager().BroadcastEvent(evt)
+			}
+
+			// Remove obsolete triples...
+			toDelete = append(toDelete, Triple{references[i][0].(string), references[i][1].(string), references[i][2], false})
+		}
+		err = store.Delete("", toDelete)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}
 	}
 
 	// Send event message...
@@ -1802,7 +1801,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 				}
 				return obj.Interface().(Entity)
 			} else {
-				entity := new(DynamicEntity)
+				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
 				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, entity)
 				if errObj != nil {
@@ -1904,7 +1903,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 				}
 				return obj.Interface().(Entity)
 			} else {
-				entity := new(DynamicEntity)
+				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
 				errObj = this.saveEntity(entity)
 				if errObj != nil {
@@ -2327,10 +2326,39 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 	}
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		return entity.(*DynamicEntity).getObject()
+		obj := entity.(*DynamicEntity).getObject()
+		return obj
 	}
 
 	return entity
+}
+
+// @api 1.0
+// Test if an entity with a given id(s) exist in the db.
+// @param {string} typeName The object type name.
+// @param {string} storeId The object type name.
+// @param {string} ids The id's (not uuid) of the object to look for.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @result{bool} Return true if the entity exist.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *EntityManager) IsEntityExist(typeName string, storeId string, ids []interface{}, messageId string, sessionId string) bool {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return false
+	}
+
+	var uuid string
+	uuid, errObj = this.getEntityUuidById(typeName, storeId, ids)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return false
+	}
+
+	return len(uuid) > 0
 }
 
 // @api 1.0

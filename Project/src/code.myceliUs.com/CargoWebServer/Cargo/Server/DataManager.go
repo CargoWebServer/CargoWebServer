@@ -69,6 +69,7 @@ func newDataManager() *DataManager {
 				} else if op["op"] == "setDataStore" {
 					store := op["store"].(DataStore)
 					dataManager.m_dataStores[store.GetId()] = store
+
 				} else if op["op"] == "removeDataStore" {
 					storeId := op["storeId"].(string)
 					delete(dataManager.m_dataStores, storeId)
@@ -131,11 +132,7 @@ func (this *DataManager) stop() {
 
 func (this *DataManager) openConnections() {
 	for i := 0; i < len(this.getDataStores()); i++ {
-		err := this.getDataStores()[i].Connect()
-		// Call get entity prototype once to initialyse entity prototypes.
-		if err == nil {
-			this.getDataStores()[i].GetEntityPrototypes()
-		}
+		this.getDataStores()[i].Connect()
 	}
 }
 
@@ -1078,7 +1075,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 		if err == nil {
 			if reflect.TypeOf(obj).String() == "map[string]interface {}" {
-				entity := new(DynamicEntity)
+				entity := NewDynamicEntity()
 				entity.setObject(obj.(map[string]interface{}))
 				entity.setValue("NeedSave", true)
 				entities = append(entities, entity)

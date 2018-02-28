@@ -1691,7 +1691,7 @@ func (this *XmlDocumentHandler) EndDocument() {
 		object := this.globalObjects[i]
 		compactObject(object)
 		object["NeedSave"] = true
-		entity := new(DynamicEntity)
+		entity := NewDynamicEntity()
 		entity.setObject(object)
 		GetServer().GetEntityManager().saveEntity(entity)
 	}
