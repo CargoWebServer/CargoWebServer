@@ -125,6 +125,7 @@ func (this *OAuth2Access) GetClient()*OAuth2Client{
 }
 
 func (this *OAuth2Access) SetClient(val *OAuth2Client){
+	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
 
@@ -162,6 +163,7 @@ func (this *OAuth2Access) GetRefreshToken()*OAuth2Refresh{
 }
 
 func (this *OAuth2Access) SetRefreshToken(val *OAuth2Refresh){
+	this.NeedSave = this.M_refreshToken != val.GetUuid()
 	this.M_refreshToken= val.GetUuid()
 }
 
@@ -209,6 +211,7 @@ func (this *OAuth2Access) GetUserData()*OAuth2IdToken{
 }
 
 func (this *OAuth2Access) SetUserData(val *OAuth2IdToken){
+	this.NeedSave = this.M_userData != val.GetUuid()
 	this.M_userData= val.GetUuid()
 }
 
@@ -236,6 +239,7 @@ func (this *OAuth2Access) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2Access) SetParentPtr(val *OAuth2Configuration){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

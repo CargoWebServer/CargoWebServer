@@ -58,7 +58,7 @@ func (this *DynamicEntity) getValue(field string) interface{} {
  * Only the uuid of all child values are keep. That map can be use to save the content
  * of an entity in the cache.
  */
-func (this *DynamicEntity) getValues() interface{} {
+func (this *DynamicEntity) getValues() map[string]interface{} {
 	this.Lock()
 	defer this.Unlock()
 	values := make(map[string]interface{})

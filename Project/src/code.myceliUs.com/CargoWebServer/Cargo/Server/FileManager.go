@@ -184,7 +184,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 					if err == nil {
 						dirEntity.AppendFiles(file)
 					} else {
-						log.Panicln("--------------> fail to create file ", filePath__)
+						log.Panicln("--------------> fail to create file ", filePath__, err)
 					}
 				}
 			} else {
@@ -244,7 +244,6 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 
 	// Return the dir entity if it already exist.
 	dirId := Utility.CreateSha1Key([]byte(dirPath + "/" + dirName))
-
 	dirEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{dirId})
 	if errObj == nil {
 		return dirEntity.(*CargoEntities.File), nil
@@ -306,6 +305,7 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	dir.SetName(dirName)
 	dir.SetPath(dirPath)
 	dir.SetFileType(CargoEntities.FileType_DiskFile)
+	dir.NeedSave = true
 
 	// Set the cargo entities object.
 	entities := GetServer().GetEntityManager().getCargoEntities()
@@ -317,10 +317,12 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 		dir = dirEntity.(*CargoEntities.File)
 		dir.SetParentDirPtr(parentDir.(*CargoEntities.File))
 		dir.SetEntitiesPtr(entities)
+		parentDir.(*CargoEntities.File).AppendFiles(dir)
+		GetServer().GetEntityManager().saveEntity(dir)
+	} else {
+		// Save the dir.
+		GetServer().GetEntityManager().saveEntity(dir)
 	}
-
-	// Save the dir.
-	GetServer().GetEntityManager().saveEntity(dir)
 
 	return dir, nil
 
@@ -360,6 +362,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	} else {
 		log.Println("Create entity for file: ", filepath+"/"+filename)
 		file = new(CargoEntities.File)
+		file.NeedSave = true
 		file.SetId(fileId)
 	}
 
@@ -522,9 +525,6 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		GetServer().GetEventManager().BroadcastEvent(evt)
 
 	}
-
-	// Save the file.
-	GetServer().GetEntityManager().saveEntity(parentDirEntity)
 
 	return file, nil
 }
@@ -825,7 +825,7 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	dbFile.M_id = id
 	dbFile.M_name = name
 	dbFile.M_mime = mimeType
-
+	dbFile.NeedSave = true
 	// Create the file.
 	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.File", id, dbFile)
 

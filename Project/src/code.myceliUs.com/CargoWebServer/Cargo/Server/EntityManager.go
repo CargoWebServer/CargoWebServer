@@ -124,10 +124,12 @@ func newEntityManager() *EntityManager {
 						val, err := Utility.FromBytes(entry, entityInfo.typeName)
 						if err == nil {
 							if reflect.TypeOf(val).String() != "map[string]interface {}" {
+								val.(Entity).SetEntityGetter(getEntityFct)
 								entities = append(entities, val.(Entity))
 							} else {
 								entity := NewDynamicEntity()
 								entity.setObject(val.(map[string]interface{}))
+								entity.SetEntityGetter(getEntityFct)
 								entities = append(entities, entity)
 							}
 						}
@@ -137,16 +139,21 @@ func newEntityManager() *EntityManager {
 					// The uuid generated here is local and not the entity uuid because the
 					// parentUuid is not know... clash can append if entity with same ids and typeName exist at same time.
 					id := entityManager.GenerateEntityUUID(entityInfo.typeName, "", entityInfo.ids, "", "")
+
+					// From the id I will get the uuid...
+					uuid, err := entityManager.m_cache.Get(id)
 					entities := make([]Entity, 0)
-					if entry, err := entityManager.m_cache.Get(id); err == nil {
-						val, err := Utility.FromBytes(entry, entityInfo.typeName)
-						if err == nil {
-							if reflect.TypeOf(val).String() != "map[string]interface {}" {
-								entities = append(entities, val.(Entity))
-							} else {
-								entity := NewDynamicEntity()
-								entity.setObject(val.(map[string]interface{}))
-								entities = append(entities, entity)
+					if err == nil {
+						if entry, err := entityManager.m_cache.Get(string(uuid)); err == nil {
+							val, err := Utility.FromBytes(entry, entityInfo.typeName)
+							if err == nil {
+								if reflect.TypeOf(val).String() != "map[string]interface {}" {
+									entities = append(entities, val.(Entity))
+								} else {
+									entity := NewDynamicEntity()
+									entity.setObject(val.(map[string]interface{}))
+									entities = append(entities, entity)
+								}
 							}
 						}
 					}
@@ -170,7 +177,7 @@ func newEntityManager() *EntityManager {
 						// By id
 						if len(entity.Ids()) > 0 {
 							id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
-							entityManager.m_cache.Set(id, bytes)
+							entityManager.m_cache.Set(id, []byte(entity.GetUuid()))
 						}
 						// By uuid
 						entityManager.m_cache.Set(entity.GetUuid(), bytes)
@@ -182,7 +189,7 @@ func newEntityManager() *EntityManager {
 						// By id
 						if len(entity.Ids()) > 0 {
 							id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
-							entityManager.m_cache.Set(id, bytes)
+							entityManager.m_cache.Set(id, []byte(entity.GetUuid()))
 						}
 						// By uuid
 						entityManager.m_cache.Set(entity.GetUuid(), bytes)
@@ -272,6 +279,8 @@ func FromTriples(values [][]interface{}) map[string]interface{} {
 					} else {
 						if strings.HasPrefix(fieldType, "[]xs.") {
 							// simple type the values are contain inside
+							//array := make([]interface{}, 0)
+							//json.Unmarshal([]byte(value), &array)
 						} else {
 							if Utility.IsValidEntityReferenceName(value.(string)) {
 								// So here I will get the value from the store.
@@ -357,9 +366,6 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 							if reflect.TypeOf(v).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["TYPENAME"] == nil {
 									ToTriples(v.(map[string]interface{}), triples)
-								} else if v.(map[string]interface{})["UUID"] != nil {
-									fieldType_ := v.(map[string]interface{})["TYPENAME"].(string)
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
 								}
 							} else {
 								// Here I will append attribute...
@@ -369,34 +375,44 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 
 					} else {
 						if strings.HasPrefix(fieldType, "[]") {
-							if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
-								if len(v.([]map[string]interface{})) > 0 {
-									if v.([]map[string]interface{})[0]["TYPENAME"] == nil {
-										for i := 0; i < len(v.([]map[string]interface{})); i++ {
-											ToTriples(v.([]map[string]interface{})[i], triples)
-										}
-									} else if v.(map[string]interface{})["UUID"] != nil {
-										fieldType_ := v.([]map[string]interface{})[0]["TYPENAME"].(string)
-										for i := 0; i < len(v.([]map[string]interface{})); i++ {
-											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
-										}
-									}
-								}
-							} else if reflect.TypeOf(v).String() == "[]interface {}" {
+							if reflect.TypeOf(v).String() == "[]interface {}" {
 								if len(v.([]interface{})) > 0 {
 									if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
 										if v.([]interface{})[0].(map[string]interface{})["TYPENAME"] == nil {
 											for i := 0; i < len(v.([]interface{})); i++ {
 												ToTriples(v.([]interface{})[i].(map[string]interface{}), triples)
 											}
-										} else if v.(map[string]interface{})["UUID"] != nil {
-											fieldType_ := v.([]interface{})[0].(map[string]interface{})["TYPENAME"].(string)
-											for i := 0; i < len(v.([]interface{})); i++ {
-												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(map[string]interface{})["UUID"].(string), isIndex})
-											}
 										}
 									} else {
 										// a regular array here.
+										if reflect.TypeOf(v.([]interface{})[0]).Kind() == reflect.String {
+											if Utility.IsValidEntityReferenceName(v.([]interface{})[0].(string)) {
+												for i := 0; i < len(v.([]interface{})); i++ {
+													uuid_ := v.([]interface{})[i].(string)
+													*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+												}
+											} else {
+												str, err := json.Marshal(v)
+												if err == nil {
+													*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+												}
+											}
+										} else {
+											str, err := json.Marshal(v)
+											if err == nil {
+												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+											}
+										}
+									}
+								}
+							} else if reflect.TypeOf(v).String() == "[]string" {
+								if len(v.([]string)) > 0 {
+									if Utility.IsValidEntityReferenceName(v.([]string)[0]) {
+										for i := 0; i < len(v.([]string)); i++ {
+											uuid_ := v.([]string)[i]
+											*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+										}
+									} else {
 										str, err := json.Marshal(v)
 										if err == nil {
 											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
@@ -413,9 +429,6 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 							if reflect.TypeOf(v).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["TYPENAME"] == nil {
 									ToTriples(v.(map[string]interface{}), triples)
-								} else if v.(map[string]interface{})["UUID"] != nil {
-									fieldType_ := v.(map[string]interface{})["TYPENAME"].(string)
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
 								}
 							} else {
 								// Dont save the file disk data into the entity...
@@ -425,7 +438,16 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 									}
 								}
 								// Here I will append attribute...
-								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+								if reflect.TypeOf(v).Kind() == reflect.String {
+									if Utility.IsValidEntityReferenceName(v.(string)) && k != "ParentUuid" && k != "UUID" {
+										uuid_ := v.(string)
+										*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+									} else {
+										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+									}
+								} else {
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+								}
 							}
 						}
 					}
@@ -449,6 +471,7 @@ func (this *EntityManager) getCargoEntities() *CargoEntities.Entities {
 		cargoEntities.SetId("CARGO_ENTITIES")
 		cargoEntities.SetName("Cargo entities")
 		cargoEntities.SetVersion("1.0")
+		cargoEntities.NeedSave = true
 		this.saveEntity(cargoEntities)
 	}
 	return cargoEntities
@@ -516,11 +539,15 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+	if len(uuid) == 0 {
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No uuid given!"))
+		return nil, errObj
+	}
+
 	// Get it from cache if is there.
 	entity := this.getEntity(uuid)
 	if entity != nil {
 		// that function must be set back.
-		entity.SetEntityGetter(getEntityFct)
 		return entity, nil
 	}
 
@@ -533,7 +560,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
 	if err != nil {
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
 		return nil, errObj
 	}
 
@@ -790,6 +817,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		uuid := this.GenerateEntityUUID(typeName, entity.GetParentUuid(), entity.Ids(), "", "")
 		entity.SetUuid(uuid)
 	}
+	entity.SetEntityGetter(getEntityFct)
 
 	var values map[string]interface{}
 
@@ -2291,6 +2319,7 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 	}
 
 	return entity
+
 }
 
 // @api 1.0

@@ -138,6 +138,7 @@ func (this *Notification) GetFromRef()*Account{
 }
 
 func (this *Notification) SetFromRef(val *Account){
+	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
 }
 
@@ -155,6 +156,7 @@ func (this *Notification) GetToRef()*Account{
 }
 
 func (this *Notification) SetToRef(val *Account){
+	this.NeedSave = this.M_toRef != val.GetUuid()
 	this.M_toRef= val.GetUuid()
 }
 
@@ -192,6 +194,7 @@ func (this *Notification) GetEntitiesPtr()*Entities{
 }
 
 func (this *Notification) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

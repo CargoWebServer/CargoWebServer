@@ -159,6 +159,7 @@ func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration {
 }
 
 func (this *OAuth2Client) SetParentPtr(val *OAuth2Configuration) {
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr = val.GetUuid()
 }
 

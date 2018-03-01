@@ -45,7 +45,6 @@ func (this *SecurityManager) createAdminRole() {
 		if errObj != nil {
 			return
 		}
-
 		adminAccount := adminAccountEntity.(*CargoEntities.Account)
 
 		// Create adminRole
@@ -178,7 +177,6 @@ func (this *SecurityManager) deleteRole(id string) *CargoEntities.Error {
  * Append a new account to a given role. Do nothing if the account is already in the role
  */
 func (this *SecurityManager) appendAccount(roleId string, accountId string) *CargoEntities.Error {
-
 	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
 	if err != nil {
 		return err
@@ -280,7 +278,6 @@ func (this *SecurityManager) removeAccount(roleId string, accountId string) *Car
  * Append a new action to a given role. Do nothing if the action is already in the role
  */
 func (this *SecurityManager) appendAction(roleId string, actionName string) *CargoEntities.Error {
-
 	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
 	if err != nil {
 		return err

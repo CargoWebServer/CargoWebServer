@@ -169,6 +169,7 @@ func (this *Computer) GetEntitiesPtr()*Entities{
 }
 
 func (this *Computer) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

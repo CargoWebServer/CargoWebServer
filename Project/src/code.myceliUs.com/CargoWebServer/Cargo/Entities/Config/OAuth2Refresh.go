@@ -109,6 +109,7 @@ func (this *OAuth2Refresh) GetAccess()*OAuth2Access{
 }
 
 func (this *OAuth2Refresh) SetAccess(val *OAuth2Access){
+	this.NeedSave = this.M_access != val.GetUuid()
 	this.M_access= val.GetUuid()
 }
 
@@ -126,6 +127,7 @@ func (this *OAuth2Refresh) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2Refresh) SetParentPtr(val *OAuth2Configuration){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

@@ -183,6 +183,7 @@ func (this *User) SetMemberOfRef(val []*Group){
 	for i:=0; i < len(val); i++{
 		this.M_memberOfRef=append(this.M_memberOfRef, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *User) AppendMemberOfRef(val *Group){
@@ -191,6 +192,7 @@ func (this *User) AppendMemberOfRef(val *Group){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_memberOfRef = append(this.M_memberOfRef, val.GetUuid())
 }
 
@@ -223,6 +225,7 @@ func (this *User) SetAccounts(val []*Account){
 	for i:=0; i < len(val); i++{
 		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *User) AppendAccounts(val *Account){
@@ -231,6 +234,7 @@ func (this *User) AppendAccounts(val *Account){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_accounts = append(this.M_accounts, val.GetUuid())
 }
 
@@ -256,6 +260,7 @@ func (this *User) GetEntitiesPtr()*Entities{
 }
 
 func (this *User) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

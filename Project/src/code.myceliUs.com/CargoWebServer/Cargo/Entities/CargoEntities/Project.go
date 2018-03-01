@@ -134,6 +134,7 @@ func (this *Project) SetFilesRef(val []*File){
 	for i:=0; i < len(val); i++{
 		this.M_filesRef=append(this.M_filesRef, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Project) AppendFilesRef(val *File){
@@ -142,6 +143,7 @@ func (this *Project) AppendFilesRef(val *File){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_filesRef = append(this.M_filesRef, val.GetUuid())
 }
 
@@ -167,6 +169,7 @@ func (this *Project) GetEntitiesPtr()*Entities{
 }
 
 func (this *Project) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

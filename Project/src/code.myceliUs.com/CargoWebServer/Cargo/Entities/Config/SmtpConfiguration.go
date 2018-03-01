@@ -189,6 +189,7 @@ func (this *SmtpConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *SmtpConfiguration) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

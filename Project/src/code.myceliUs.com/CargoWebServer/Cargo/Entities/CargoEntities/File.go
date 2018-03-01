@@ -233,6 +233,7 @@ func (this *File) SetFiles(val []*File){
 	for i:=0; i < len(val); i++{
 		this.M_files=append(this.M_files, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *File) AppendFiles(val *File){
@@ -241,6 +242,7 @@ func (this *File) AppendFiles(val *File){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_files = append(this.M_files, val.GetUuid())
 }
 
@@ -280,6 +282,7 @@ func (this *File) GetParentDirPtr()*File{
 }
 
 func (this *File) SetParentDirPtr(val *File){
+	this.NeedSave = this.M_parentDirPtr != val.GetUuid()
 	this.M_parentDirPtr= val.GetUuid()
 }
 
@@ -297,6 +300,7 @@ func (this *File) GetEntitiesPtr()*Entities{
 }
 
 func (this *File) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

@@ -500,7 +500,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         return function () {
                             var entity = entityPanel.entity
                             if (entity.UUID != undefined) {
-                                server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [entity.M_id],
+                                server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [entity.M_id], false,
                                     function (file, caller) {
                                         caller.entity.M_script = file.M_id
                                         server.entityManager.saveEntity(caller.entity) // Save the entity...

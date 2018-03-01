@@ -154,6 +154,15 @@ func (this *ConfigurationManager) initialize() {
 	if cargoError == nil {
 		this.m_activeConfigurations = entity.(*Config.Configurations)
 	} else {
+		// Create directory if there are not already there.
+		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
+		os.MkdirAll(this.GetDataPath(), 0777)
+		os.MkdirAll(this.GetDefinitionsPath(), 0777)
+		os.MkdirAll(this.GetScriptPath(), 0777)
+		os.MkdirAll(this.GetSchemasPath(), 0777)
+		os.MkdirAll(this.GetTmpPath(), 0777)
+		os.MkdirAll(this.GetBinPath(), 0777)
+
 		this.m_activeConfigurations = new(Config.Configurations)
 		this.m_activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Cargo Default Configurations"
@@ -177,15 +186,6 @@ func (this *ConfigurationManager) initialize() {
 		serverConfig.M_serviceContainerPort = 9494
 		serverConfig.M_hostName = "localhost"
 		serverConfig.M_ipv4 = "127.0.0.1"
-		this.m_activeConfigurations.SetServerConfig(serverConfig)
-
-		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
-		os.MkdirAll(this.GetDataPath(), 0777)
-		os.MkdirAll(this.GetDefinitionsPath(), 0777)
-		os.MkdirAll(this.GetScriptPath(), 0777)
-		os.MkdirAll(this.GetSchemasPath(), 0777)
-		os.MkdirAll(this.GetTmpPath(), 0777)
-		os.MkdirAll(this.GetBinPath(), 0777)
 
 		// Server folders...
 		serverConfig.M_applicationsPath = "/Apps"
@@ -197,7 +197,9 @@ func (this *ConfigurationManager) initialize() {
 		serverConfig.M_binPath = "/bin"
 
 		GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serverConfig", "Config.ServerConfiguration", serverConfig.GetId(), serverConfig)
+		this.m_activeConfigurations.SetServerConfig(serverConfig)
 
+		GetServer().GetEntityManager().saveEntity(serverConfig)
 	}
 
 	// Set the service container configuration

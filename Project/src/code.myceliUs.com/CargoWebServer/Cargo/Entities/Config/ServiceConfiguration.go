@@ -185,6 +185,7 @@ func (this *ServiceConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *ServiceConfiguration) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

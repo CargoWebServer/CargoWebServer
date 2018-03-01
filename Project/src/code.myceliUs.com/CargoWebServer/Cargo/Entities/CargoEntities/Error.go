@@ -155,6 +155,7 @@ func (this *Error) GetAccountRef()*Account{
 }
 
 func (this *Error) SetAccountRef(val *Account){
+	this.NeedSave = this.M_accountRef != val.GetUuid()
 	this.M_accountRef= val.GetUuid()
 }
 
@@ -172,6 +173,7 @@ func (this *Error) GetEntitiesPtr()*Entities{
 }
 
 func (this *Error) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

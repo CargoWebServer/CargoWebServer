@@ -139,6 +139,7 @@ func (this *OAuth2IdToken) GetClient()*OAuth2Client{
 }
 
 func (this *OAuth2IdToken) SetClient(val *OAuth2Client){
+	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
 
@@ -246,6 +247,7 @@ func (this *OAuth2IdToken) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2IdToken) SetParentPtr(val *OAuth2Configuration){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

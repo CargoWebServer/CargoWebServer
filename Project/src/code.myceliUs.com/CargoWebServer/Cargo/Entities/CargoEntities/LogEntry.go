@@ -128,6 +128,7 @@ func (this *LogEntry) GetEntityRef()Entity{
 }
 
 func (this *LogEntry) SetEntityRef(val Entity){
+	this.NeedSave = this.M_entityRef != val.GetUuid()
 	this.M_entityRef= val.GetUuid()
 }
 
@@ -141,6 +142,7 @@ func (this *LogEntry) GetLoggerPtr()*Log{
 }
 
 func (this *LogEntry) SetLoggerPtr(val *Log){
+	this.NeedSave = this.M_loggerPtr != val.GetUuid()
 	this.M_loggerPtr= val.GetUuid()
 }
 
@@ -158,6 +160,7 @@ func (this *LogEntry) GetEntitiesPtr()*Entities{
 }
 
 func (this *LogEntry) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

@@ -117,6 +117,7 @@ func (this *OAuth2Authorize) GetClient()*OAuth2Client{
 }
 
 func (this *OAuth2Authorize) SetClient(val *OAuth2Client){
+	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
 
@@ -174,6 +175,7 @@ func (this *OAuth2Authorize) GetUserData()*OAuth2IdToken{
 }
 
 func (this *OAuth2Authorize) SetUserData(val *OAuth2IdToken){
+	this.NeedSave = this.M_userData != val.GetUuid()
 	this.M_userData= val.GetUuid()
 }
 

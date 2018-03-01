@@ -47,6 +47,7 @@ func (this *AccountManager) initialize() {
 	// Create the admin account if it doesn't exist
 	admin, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{"admin"})
 	if admin == nil {
+
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
 		account.M_id = "admin"
@@ -54,7 +55,10 @@ func (this *AccountManager) initialize() {
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
-		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "admin", account, "", "")
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "admin", account)
+		if err != nil {
+			log.Panicln("--> create account admin: ", err)
+		}
 	}
 
 	// Create the guest account if it doesn't exist
@@ -67,7 +71,10 @@ func (this *AccountManager) initialize() {
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
-		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "guest", account, "", "")
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "guest", account)
+		if err != nil {
+			log.Panicln("--> create account admin: ", err)
+		}
 	}
 
 }

@@ -162,6 +162,7 @@ func (this *Session) GetComputerRef()*Computer{
 }
 
 func (this *Session) SetComputerRef(val *Computer){
+	this.NeedSave = this.M_computerRef != val.GetUuid()
 	this.M_computerRef= val.GetUuid()
 }
 
@@ -179,6 +180,7 @@ func (this *Session) GetAccountPtr()*Account{
 }
 
 func (this *Session) SetAccountPtr(val *Account){
+	this.NeedSave = this.M_accountPtr != val.GetUuid()
 	this.M_accountPtr= val.GetUuid()
 }
 

@@ -128,6 +128,7 @@ func (this *Permission) SetAccountsRef(val []*Account){
 	for i:=0; i < len(val); i++{
 		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Permission) AppendAccountsRef(val *Account){
@@ -136,6 +137,7 @@ func (this *Permission) AppendAccountsRef(val *Account){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
 }
 
@@ -161,6 +163,7 @@ func (this *Permission) GetEntitiesPtr()*Entities{
 }
 
 func (this *Permission) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

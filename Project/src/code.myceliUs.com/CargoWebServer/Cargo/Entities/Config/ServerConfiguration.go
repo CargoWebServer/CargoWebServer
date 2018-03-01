@@ -245,6 +245,7 @@ func (this *ServerConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *ServerConfiguration) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

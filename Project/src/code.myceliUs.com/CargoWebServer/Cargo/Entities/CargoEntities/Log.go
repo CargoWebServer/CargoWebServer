@@ -123,6 +123,7 @@ func (this *Log) SetEntries(val []*LogEntry){
 	for i:=0; i < len(val); i++{
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Log) AppendEntries(val *LogEntry){
@@ -131,6 +132,7 @@ func (this *Log) AppendEntries(val *LogEntry){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_entries = append(this.M_entries, val.GetUuid())
 }
 
@@ -156,6 +158,7 @@ func (this *Log) GetEntitiesPtr()*Entities{
 }
 
 func (this *Log) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

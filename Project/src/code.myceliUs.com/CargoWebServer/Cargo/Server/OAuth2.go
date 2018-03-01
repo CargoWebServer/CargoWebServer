@@ -157,6 +157,7 @@ func (this *OAuth2Manager) getId() string {
 func (this *OAuth2Manager) start() {
 	log.Println("--> Start OAuth2Manager")
 	activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+
 	cfg := activeConfigurations.GetOauth2Configuration()
 
 	var sconfig *osin.ServerConfig

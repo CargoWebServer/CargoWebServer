@@ -219,6 +219,7 @@ func (this *OAuth2Configuration) SetAllowedAuthorizeTypes(val []string){
 
 func (this *OAuth2Configuration) AppendAllowedAuthorizeTypes(val string){
 	this.M_allowedAuthorizeTypes=append(this.M_allowedAuthorizeTypes, val)
+	this.NeedSave= true
 }
 
 
@@ -232,6 +233,7 @@ func (this *OAuth2Configuration) SetAllowedAccessTypes(val []string){
 
 func (this *OAuth2Configuration) AppendAllowedAccessTypes(val string){
 	this.M_allowedAccessTypes=append(this.M_allowedAccessTypes, val)
+	this.NeedSave= true
 }
 
 
@@ -251,6 +253,7 @@ func (this *OAuth2Configuration) SetClients(val []*OAuth2Client){
 	for i:=0; i < len(val); i++{
 		this.M_clients=append(this.M_clients, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
@@ -259,6 +262,7 @@ func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_clients = append(this.M_clients, val.GetUuid())
 }
 
@@ -291,6 +295,7 @@ func (this *OAuth2Configuration) SetAuthorize(val []*OAuth2Authorize){
 	for i:=0; i < len(val); i++{
 		this.M_authorize=append(this.M_authorize, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
@@ -299,6 +304,7 @@ func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_authorize = append(this.M_authorize, val.GetUuid())
 }
 
@@ -331,6 +337,7 @@ func (this *OAuth2Configuration) SetAccess(val []*OAuth2Access){
 	for i:=0; i < len(val); i++{
 		this.M_access=append(this.M_access, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
@@ -339,6 +346,7 @@ func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_access = append(this.M_access, val.GetUuid())
 }
 
@@ -371,6 +379,7 @@ func (this *OAuth2Configuration) SetIds(val []*OAuth2IdToken){
 	for i:=0; i < len(val); i++{
 		this.M_ids=append(this.M_ids, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
@@ -379,6 +388,7 @@ func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_ids = append(this.M_ids, val.GetUuid())
 }
 
@@ -411,6 +421,7 @@ func (this *OAuth2Configuration) SetRefresh(val []*OAuth2Refresh){
 	for i:=0; i < len(val); i++{
 		this.M_refresh=append(this.M_refresh, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
@@ -419,6 +430,7 @@ func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_refresh = append(this.M_refresh, val.GetUuid())
 }
 
@@ -451,6 +463,7 @@ func (this *OAuth2Configuration) SetExpire(val []*OAuth2Expires){
 	for i:=0; i < len(val); i++{
 		this.M_expire=append(this.M_expire, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
@@ -459,6 +472,7 @@ func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_expire = append(this.M_expire, val.GetUuid())
 }
 
@@ -484,6 +498,7 @@ func (this *OAuth2Configuration) GetParentPtr()*Configurations{
 }
 
 func (this *OAuth2Configuration) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

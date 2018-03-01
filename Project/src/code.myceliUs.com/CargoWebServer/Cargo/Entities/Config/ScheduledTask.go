@@ -192,6 +192,7 @@ func (this *ScheduledTask) SetOffsets(val []int){
 
 func (this *ScheduledTask) AppendOffsets(val int){
 	this.M_offsets=append(this.M_offsets, val)
+	this.NeedSave= true
 }
 
 
@@ -204,6 +205,7 @@ func (this *ScheduledTask) GetParentPtr()*Configurations{
 }
 
 func (this *ScheduledTask) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

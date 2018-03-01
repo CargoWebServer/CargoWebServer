@@ -1,0 +1,85 @@
+/** The file navigator **/
+ #workingFilesDiv{
+	position: absolute; 
+    top: 0px; left: 0px; right: 0px; 
+    height: 30px;
+    z-index: 1;
+ }
+
+ #workingFilesDiv.scrolling{
+
+ }
+
+.fileNavigator{
+    height: 100%;
+    border-spacing:2px 0px;
+    overflow: hidden;
+    display: none;
+}
+
+.fileNavigationBtn{
+    display: inline;
+    text-align: center;
+}
+
+.fileNavigationBtn {
+    display: inline;
+    vertical-align: middle;
+    font-size: 12pt;
+}
+
+.fileNavigationBtn.active{
+    color:  #657383;
+}
+
+.fileNavigationBtn.active:hover{
+    cursor: pointer;
+    color:  #428bca;
+}
+
+.file_tab{
+    display: table-cell;
+    min-width: 50px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 4px 4px 4px 4px;
+    background-color: white;
+    color:  lightgrey;
+    min-width: 75px;
+    max-height: 30px;
+    transition: all .1s ease;
+}
+
+.file_tab:hover{
+    cursor: pointer;
+}
+
+.file_tab.active{
+    border-top: 2px solid  #428bca;;
+}
+
+.file_tab_close_btn{
+    font-size: 10pt;
+    display: table-cell; 
+    color: transparent;
+    padding-left: 2px;
+}
+
+.file_tab_close_btn:hover{
+    color: lightgray;
+    cursor: pointer;
+}
+
+.fa-save-all:before{
+    content: "\f0c7";
+    position:relative;
+    top: -4px;
+    left: -4px;
+}
+.fa-save-all:after {
+    content: "\f0c7";
+    position:absolute;
+    left: 10px;
+    top: 10px;
+    background-color:white;
+}

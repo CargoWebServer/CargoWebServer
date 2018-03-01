@@ -422,61 +422,18 @@ function setRef(owner, property, refValue, isArray) {
 /**
  * Set object, that function call setObjectValues in this path so it's recursive.
  */
-function setSubObject(parent, property, values, isArray) {
-    if (values.TYPENAME == undefined || values.UUID == undefined) {
-        return
+function setSubObject(parent, property, uuid, isArray, index) {
+    if(isArray){
+        server.entityManager.getEntityByUuid(uuid, function(entity, caller){
+            parent[caller.property][caller.index] = entity
+        }, 
+        function(){
+
+        }, {"parent":parent, "property":property, "index":index})
+    }else{
+
     }
 
-    server.entityManager.getEntityPrototype(values.TYPENAME, values.TYPENAME.split(".")[0],
-        function (result, caller) {
-            var parent = caller.parent
-            var property = caller.property
-            var values = caller.values
-            var isArray = caller.isArray
-
-            // Get the parent from the global map.
-            if (entities[parent.UUID] != undefined) {
-                parent = entities[parent.UUID]
-            }
-
-            if (values.TYPENAME == "BPMN20.StartEvent") {
-                i = 0;
-            }
-
-            var object = entities[values.UUID]
-            if (object == undefined) {
-                object = eval("new " + values.TYPENAME + "(values)")
-                setObjectValues(object, values)
-            }
-
-            // Keep track of the child uuid inside the parent.
-            if (parent.childsUuid == undefined) {
-                parent.childsUuid = []
-            }
-
-            if (parent.childsUuid.indexOf(object.UUID)) {
-                parent.childsUuid.push(object.UUID)
-            }
-
-            if (isArray) {
-                if (parent[property] == undefined) {
-                    parent[property] = []
-                }
-                object.init(values)
-                parent[property].push(object)
-
-            } else {
-                object.init(values)
-                parent[property] = object
-            }
-
-            object.ParentUuid = parent.UUID
-            object.ParentLnk = property
-            server.entityManager.setEntity(object)
-        },
-        function () {
-
-        }, { "parent": parent, "property": property, "values": values, "isArray": isArray })
 }
 
 /**
@@ -578,6 +535,8 @@ function setObjectValues(object, values) {
 
     ////////////////////////////////////////////////////////////////////////////////
     // Generate sub-object and reference set and reset function
+    var hasChilds = false
+
     for (var property in values) {
 
         var propertyType = prototype.FieldsType[prototype.getFieldIndex(property)]
@@ -645,13 +604,15 @@ function setObjectValues(object, values) {
                                 if (isRef) {
                                     setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    setSubObject(object, property, values[property][i], isArray_)
+                                    hasChilds = true
+                                    setSubObject(object, property, values[property][i], isArray_, i)
                                 }
                             }
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
+                                hasChilds = true
                                 setSubObject(object, property, values[property], isArray_)
                             }
                         }
@@ -662,10 +623,11 @@ function setObjectValues(object, values) {
     }
 
     // Call the init callback.
-    if (object.initCallback != undefined) {
+    if (object.initCallback != undefined && !hasChilds) {
         object.initCallback(object)
         object.initCallback == undefined
     }
+
     // Set the initialyse object.
     server.entityManager.setEntity(object)
 }

@@ -565,7 +565,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				setterStr += "	for i:=0; i < len(val); i++{\n"
 				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
 				setterStr += "	}\n"
+				setterStr += "	this.NeedSave= true\n"
 			} else {
+				setterStr += "	this.NeedSave = this.M_" + attributeName + " != val.GetUuid()\n"
 				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
 			}
 		}
@@ -584,12 +586,14 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			// The append function body here.
 			if isPrimitive {
 				setterStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + ", val)\n"
+				setterStr += "	this.NeedSave= true\n"
 			} else {
 				setterStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
 				setterStr += "		if this.M_" + attributeName + "[i] == val.GetUuid() {\n"
 				setterStr += "			return\n"
 				setterStr += "		}\n"
 				setterStr += "	}\n"
+				setterStr += "	this.NeedSave= true\n"
 				setterStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
 			}
 			setterStr += "}\n"

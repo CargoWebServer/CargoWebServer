@@ -197,6 +197,7 @@ func (this *LdapConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *LdapConfiguration) SetParentPtr(val *Configurations){
+	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
 

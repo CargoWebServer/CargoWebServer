@@ -117,6 +117,7 @@ func (this *Role) SetAccounts(val []*Account){
 	for i:=0; i < len(val); i++{
 		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Role) AppendAccounts(val *Account){
@@ -125,6 +126,7 @@ func (this *Role) AppendAccounts(val *Account){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_accounts = append(this.M_accounts, val.GetUuid())
 }
 
@@ -157,6 +159,7 @@ func (this *Role) SetActions(val []*Action){
 	for i:=0; i < len(val); i++{
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Role) AppendActions(val *Action){
@@ -165,6 +168,7 @@ func (this *Role) AppendActions(val *Action){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_actions = append(this.M_actions, val.GetUuid())
 }
 
@@ -190,6 +194,7 @@ func (this *Role) GetEntitiesPtr()*Entities{
 }
 
 func (this *Role) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

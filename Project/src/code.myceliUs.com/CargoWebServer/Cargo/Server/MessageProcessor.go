@@ -337,7 +337,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 				}
 				a.Params = append(a.Params, val)
 			} else if param.GetType() == Data_BOOLEAN {
-
 				val, err := strconv.ParseBool(string(param.GetDataBytes()))
 				if err != nil {
 					panic(err)

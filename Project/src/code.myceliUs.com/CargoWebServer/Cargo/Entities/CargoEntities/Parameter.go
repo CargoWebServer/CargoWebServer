@@ -131,6 +131,7 @@ func (this *Parameter) GetParametersPtr()*Parameter{
 }
 
 func (this *Parameter) SetParametersPtr(val *Parameter){
+	this.NeedSave = this.M_parametersPtr != val.GetUuid()
 	this.M_parametersPtr= val.GetUuid()
 }
 

@@ -148,6 +148,7 @@ func (this *TextMessage) GetFromRef()*Account{
 }
 
 func (this *TextMessage) SetFromRef(val *Account){
+	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
 }
 
@@ -165,6 +166,7 @@ func (this *TextMessage) GetToRef()*Account{
 }
 
 func (this *TextMessage) SetToRef(val *Account){
+	this.NeedSave = this.M_toRef != val.GetUuid()
 	this.M_toRef= val.GetUuid()
 }
 
@@ -192,6 +194,7 @@ func (this *TextMessage) GetEntitiesPtr()*Entities{
 }
 
 func (this *TextMessage) SetEntitiesPtr(val *Entities){
+	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
 

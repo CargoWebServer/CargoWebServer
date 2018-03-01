@@ -145,6 +145,7 @@ func (this *Configurations) GetServerConfig()*ServerConfiguration{
 }
 
 func (this *Configurations) SetServerConfig(val *ServerConfiguration){
+	this.NeedSave = this.M_serverConfig != val.GetUuid()
 	this.M_serverConfig= val.GetUuid()
 }
 
@@ -162,6 +163,7 @@ func (this *Configurations) GetOauth2Configuration()*OAuth2Configuration{
 }
 
 func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
+	this.NeedSave = this.M_oauth2Configuration != val.GetUuid()
 	this.M_oauth2Configuration= val.GetUuid()
 }
 
@@ -186,6 +188,7 @@ func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
 	for i:=0; i < len(val); i++{
 		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
@@ -194,6 +197,7 @@ func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
 }
 
@@ -226,6 +230,7 @@ func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
 	for i:=0; i < len(val); i++{
 		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
@@ -234,6 +239,7 @@ func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
 }
 
@@ -266,6 +272,7 @@ func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
 	for i:=0; i < len(val); i++{
 		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
@@ -274,6 +281,7 @@ func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
 }
 
@@ -306,6 +314,7 @@ func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
 	for i:=0; i < len(val); i++{
 		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
@@ -314,6 +323,7 @@ func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
 }
 
@@ -346,6 +356,7 @@ func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguratio
 	for i:=0; i < len(val); i++{
 		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfiguration){
@@ -354,6 +365,7 @@ func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfigurati
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
 }
 
@@ -386,6 +398,7 @@ func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
 	for i:=0; i < len(val); i++{
 		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
@@ -394,6 +407,7 @@ func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())
 }
 

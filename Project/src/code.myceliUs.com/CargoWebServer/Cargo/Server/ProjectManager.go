@@ -107,6 +107,7 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	if err == nil {
 		project.AppendFilesRef(file.(*CargoEntities.File))
 	}
+	GetServer().GetEntityManager().saveEntity(project)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

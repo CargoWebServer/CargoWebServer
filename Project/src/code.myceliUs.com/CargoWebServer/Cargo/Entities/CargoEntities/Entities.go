@@ -152,6 +152,7 @@ func (this *Entities) SetEntities(val []Entity){
 	for i:=0; i < len(val); i++{
 		this.M_entities=append(this.M_entities, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Entities) AppendEntities(val Entity){
@@ -160,6 +161,7 @@ func (this *Entities) AppendEntities(val Entity){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_entities = append(this.M_entities, val.GetUuid())
 }
 
@@ -192,6 +194,7 @@ func (this *Entities) SetRoles(val []*Role){
 	for i:=0; i < len(val); i++{
 		this.M_roles=append(this.M_roles, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Entities) AppendRoles(val *Role){
@@ -200,6 +203,7 @@ func (this *Entities) AppendRoles(val *Role){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_roles = append(this.M_roles, val.GetUuid())
 }
 
@@ -232,6 +236,7 @@ func (this *Entities) SetPermissions(val []*Permission){
 	for i:=0; i < len(val); i++{
 		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Entities) AppendPermissions(val *Permission){
@@ -240,6 +245,7 @@ func (this *Entities) AppendPermissions(val *Permission){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_permissions = append(this.M_permissions, val.GetUuid())
 }
 
@@ -272,6 +278,7 @@ func (this *Entities) SetActions(val []*Action){
 	for i:=0; i < len(val); i++{
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
 	}
+	this.NeedSave= true
 }
 
 func (this *Entities) AppendActions(val *Action){
@@ -280,6 +287,7 @@ func (this *Entities) AppendActions(val *Action){
 			return
 		}
 	}
+	this.NeedSave= true
 	this.M_actions = append(this.M_actions, val.GetUuid())
 }
 
