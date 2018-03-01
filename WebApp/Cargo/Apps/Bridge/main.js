@@ -7,13 +7,13 @@ var applicationName = document.getElementsByTagName("title")[0].text;
 var ChangeFileEvent = 100;
 var ChangeThemeEvent = 101;
 
-// Set the address here
+// Set the address here.
 var mainPage = null;
 var catalog = null;
 var homePage = null;
 
 function init() {
-
+    // console.log("welcome to bridge!")
     // Set style informations.
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"));
     if (cargoThemeInfos !== undefined) {
@@ -30,7 +30,7 @@ function init() {
     // The body element....
     var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
 
-    // The page to display when the user is logged in
+    // The page to display when the user is logged in.
     homePage = new HomePage()
 
     // The login page...

@@ -198,8 +198,6 @@ func (this *ConfigurationManager) initialize() {
 
 		GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serverConfig", "Config.ServerConfiguration", serverConfig.GetId(), serverConfig)
 		this.m_activeConfigurations.SetServerConfig(serverConfig)
-
-		GetServer().GetEntityManager().saveEntity(serverConfig)
 	}
 
 	// Set the service container configuration

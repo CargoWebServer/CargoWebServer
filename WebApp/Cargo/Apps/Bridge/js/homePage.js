@@ -1005,7 +1005,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.taskInstancesExplorer = new TaskInstancesExplorer(this.scheduledTasksDiv)
 
     // I will set the configuration of the panel...
-    server.entityManager.getEntities("Config.Configurations", "Config", null, 0, -1, [], true, false,
+    server.entityManager.getEntities("Config.Configurations", "Config", null, 0, -1, [], true,
         /** Progress callback */
         function () {
 

@@ -20,28 +20,28 @@
  * @version 1.0
  */
 
- /**
- * The query is use to specifying the basic information it's like
- * the select, insert or update of sql...
- */
-var EntityQuery = function(typeName) {
-	// Must be Server.EntityQuery
-	this.TYPENAME = "Server.EntityQuery"
+/**
+* The query is use to specifying the basic information it's like
+* the select, insert or update of sql...
+*/
+var EntityQuery = function (typeName) {
+    // Must be Server.EntityQuery
+    this.TYPENAME = "Server.EntityQuery"
 
-	// The name of the entity
+    // The name of the entity
     this.TypeName = typeName
-    
-	// The list of field to retreive, delete or modify
+
+    // The list of field to retreive, delete or modify
     this.Fields = []
-    
-	// The base index, this must be of form indexFieldName=indexFieldValue
+
+    // The base index, this must be of form indexFieldName=indexFieldValue
     this.Indexs = []
-    
-	// The query to execute by the search engine.
+
+    // The query to execute by the search engine.
     this.Query = []
-    
+
     // Stringnify method.
-    this.stringify = function(){
+    this.stringify = function () {
         return JSON.stringify(this)
     }
 }
@@ -419,22 +419,6 @@ function setRef(owner, property, refValue, isArray) {
     return owner
 }
 
-/**
- * Set object, that function call setObjectValues in this path so it's recursive.
- */
-function setSubObject(parent, property, uuid, isArray, index) {
-    if(isArray){
-        server.entityManager.getEntityByUuid(uuid, function(entity, caller){
-            parent[caller.property][caller.index] = entity
-        }, 
-        function(){
-
-        }, {"parent":parent, "property":property, "index":index})
-    }else{
-
-    }
-
-}
 
 /**
  * That function initialyse an object created from a given prototype constructor with the values from a plain JSON object.
@@ -535,7 +519,7 @@ function setObjectValues(object, values) {
 
     ////////////////////////////////////////////////////////////////////////////////
     // Generate sub-object and reference set and reset function
-    var hasChilds = false
+    var subObjects = []
 
     for (var property in values) {
 
@@ -604,16 +588,14 @@ function setObjectValues(object, values) {
                                 if (isRef) {
                                     setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    hasChilds = true
-                                    setSubObject(object, property, values[property][i], isArray_, i)
+                                    subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
                                 }
                             }
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
-                                hasChilds = true
-                                setSubObject(object, property, values[property], isArray_)
+                                subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
                             }
                         }
                     }
@@ -622,10 +604,45 @@ function setObjectValues(object, values) {
         }
     }
 
+    /**
+     * Set object, that function call setObjectValues in this path so it's recursive.
+     */
+    function setSubObject(parent, subObjects, callback) {
+        if (subObjects.length > 0) {
+            subObject = subObjects.shift()
+            server.entityManager.getEntityByUuid(subObject.uuid,
+                function (entity, caller) {
+                    if(caller.subObject.isArray == true){
+                        caller.parent[caller.subObject.property][caller.subObject.index] = entity
+                    }else{
+                        caller.parent[caller.subObject.property] = entity
+                    }
+                    if (subObjects.length == 0) {
+                        caller.callback(caller.parent)
+                    } else {
+                        setSubObject(caller.parent, caller.subObjects, caller.callback)
+                    }
+                },
+                function (err, caller) {
+
+                },
+                { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
+        }
+    }
+
+    setSubObject(object, subObjects, function (object) {
+        if (object.initCallback != undefined) {
+            object.initCallback(object)
+            object.initCallback == undefined
+        }
+    })
+
     // Call the init callback.
-    if (object.initCallback != undefined && !hasChilds) {
-        object.initCallback(object)
-        object.initCallback == undefined
+    if (subObjects.length == 0) {
+        if (object.initCallback != undefined) {
+            object.initCallback(object)
+            object.initCallback == undefined
+        }
     }
 
     // Set the initialyse object.

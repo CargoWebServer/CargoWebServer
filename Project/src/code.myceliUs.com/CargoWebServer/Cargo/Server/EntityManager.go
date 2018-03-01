@@ -695,6 +695,9 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 		}
 	}
 
+	// Set the parent value in the cache.
+	this.m_setEntityChan <- parent
+
 	// I will also append the parent relationship...
 	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
 	*triples = append(*triples, parentLnkTriple)

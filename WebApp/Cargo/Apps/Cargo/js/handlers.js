@@ -133,7 +133,6 @@ function initConnection(adress, onOpenCallback, onCloseCallback) {
         };
 
         connection.onmessage = function (evt) {
-            console.log("ws message received!")
             var arrayBuffer;
             var fileReader = new FileReader();
             var self = this;
