@@ -962,6 +962,9 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 			}
 		}
 
+		// Set the parent value in the cache.
+		this.m_setEntityChan <- parent
+
 		// Update the parent here.
 		var eventDatas []*MessageData
 		evtData := new(MessageData)
@@ -1003,24 +1006,19 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
-	err = store.Delete("", triples)
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-		return cargoError
-	}
-
 	// Now I will clear other references...
-	query := "( ? ,?, " + entity.GetUuid() + ")"
+	query := "(?,?, " + entity.GetUuid() + ")"
 	// Now entity are quadify I will save it in the graph store.
 	references, err_ := store.Read(query, []interface{}{}, []interface{}{})
+
 	if err_ == nil {
-		toDelete := make([]interface{}, 0)
+
 		for i := 0; i < len(references); i++ {
 			// Remove the reference from the entity loaded in the cache.
 			ref := this.getEntity(references[i][0].(string))
 			if ref != nil {
-				field := references[i][1].(string)
-				typeName := references[i][0].(string)
+				field := strings.Split(references[i][1].(string), ":")[2]
+				typeName := strings.Split(references[i][0].(string), "%")[0]
 				prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
 				fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
 				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
@@ -1035,7 +1033,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 							}
 							ref.(*DynamicEntity).setValue(field, refs)
 						} else if reflect.TypeOf(refs_).Kind() == reflect.String {
-							ref.(*DynamicEntity).setValue(field, refs_) // single ref.
+							ref.(*DynamicEntity).setValue(field, "") // single ref.
 						} else {
 							ref.(*DynamicEntity).removeValue(field, refs_) // childs
 						}
@@ -1048,12 +1046,11 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 					}
 					params := make([]interface{}, 1)
 					params[0] = entity
-					_, err := Utility.CallMethod(ref, removeName, params)
-					if err == nil {
-						// Here I will send update entity event...
-						log.Println("--> remove ref fail", ref.GetUuid(), field, entity.GetUuid())
-					}
+					Utility.CallMethod(ref, removeName, params)
 				}
+
+				// Set back the ref without the deleted entity in the cache.
+				this.m_setEntityChan <- ref
 
 				// Update the reference here.
 				var eventDatas []*MessageData
@@ -1071,13 +1068,14 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 			}
 
 			// Remove obsolete triples...
-			toDelete = append(toDelete, Triple{references[i][0].(string), references[i][1].(string), references[i][2], false})
+			triples = append(triples, Triple{references[i][0].(string), references[i][1].(string), references[i][2], false})
 		}
-		err = store.Delete("", toDelete)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-			return cargoError
-		}
+	}
+
+	err = store.Delete("", triples)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+		return cargoError
 	}
 
 	// Send event message...

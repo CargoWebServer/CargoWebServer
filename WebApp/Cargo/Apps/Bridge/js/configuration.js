@@ -500,7 +500,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         return function () {
                             var entity = entityPanel.entity
                             if (entity.UUID != undefined) {
-                                server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [entity.M_id], false,
+                                server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [entity.M_id],
                                     function (file, caller) {
                                         caller.entity.M_script = file.M_id
                                         server.entityManager.saveEntity(caller.entity) // Save the entity...
@@ -532,6 +532,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
                                     function (entity, caller) {
                                         // Set the entity.
+                                        console.log("Task entity:", entity)
                                         entityPanel.setEntity(entity)
                                         caller.editBtn.click()
                                     },

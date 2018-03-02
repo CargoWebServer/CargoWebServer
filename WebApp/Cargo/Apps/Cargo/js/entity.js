@@ -624,7 +624,7 @@ function setObjectValues(object, values) {
                     }
                 },
                 function (err, caller) {
-
+                    console.log("err ", err)
                 },
                 { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
         }

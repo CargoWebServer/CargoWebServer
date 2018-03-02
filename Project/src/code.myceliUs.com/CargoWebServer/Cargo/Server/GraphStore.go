@@ -1155,7 +1155,7 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 					// ?, P, ?
 					err = this.index(triple.Predicate, uuid, "P")
 					if err == nil {
-						if triple.IsIndex {
+						if triple.IsIndex || Utility.IsValidEntityReferenceName(Utility.ToString(triple.Object)) {
 							// ?, ?, O
 							this.index(Utility.ToString(triple.Object), uuid, "O")
 						}
