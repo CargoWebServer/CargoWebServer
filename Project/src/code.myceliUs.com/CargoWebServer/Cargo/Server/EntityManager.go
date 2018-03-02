@@ -665,9 +665,9 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 		fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
 		if strings.HasPrefix(fieldType, "[]") {
-			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).getObject())
+			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		} else {
-			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).getObject())
+			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		}
 	} else {
 
