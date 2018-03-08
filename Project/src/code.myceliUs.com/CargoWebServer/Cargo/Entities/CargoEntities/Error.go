@@ -20,6 +20,10 @@ type Error struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entity **/
 	M_id string
@@ -93,6 +97,11 @@ func (this *Error) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Error) GetChilds() []interface{}{
+	var childs []interface{}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Error) IsNeedSave() bool{
 	return this.NeedSave
@@ -104,6 +113,14 @@ func (this *Error) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Error) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Error) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Error) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Error) GetId()string{

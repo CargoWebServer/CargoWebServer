@@ -114,7 +114,7 @@ BpmnDataView.prototype.generateEntityPrototype = function (data, typeName, callb
         // I will retreive it item definition...
         if (isObjectReference(data[i].M_itemSubjectRef)) {
             // Here I will get the item definition...
-            server.entityManager.getEntityByUuid(data[i].M_itemSubjectRef,
+            server.entityManager.getEntityByUuid(data[i].M_itemSubjectRef, false,
                 function (result, caller) {
                     var done = caller.done
                     var callback = caller.callback

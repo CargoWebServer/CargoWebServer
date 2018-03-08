@@ -20,6 +20,10 @@ type Log struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entity **/
 	M_id string
@@ -84,6 +88,19 @@ func (this *Log) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Log) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_entries); i++ {
+		child, err = this.getEntityByUuid( this.M_entries[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Log) IsNeedSave() bool{
 	return this.NeedSave
@@ -95,6 +112,14 @@ func (this *Log) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Log) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Log) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Log) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Log) GetId()string{
@@ -121,6 +146,13 @@ func (this *Log) GetEntries()[]*LogEntry{
 func (this *Log) SetEntries(val []*LogEntry){
 	this.M_entries= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_entries")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -133,6 +165,13 @@ func (this *Log) AppendEntries(val *LogEntry){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_entries")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_entries = append(this.M_entries, val.GetUuid())
 }
 

@@ -20,6 +20,10 @@ type OAuth2Configuration struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Configuration **/
 	M_id string
@@ -106,6 +110,49 @@ func (this *OAuth2Configuration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *OAuth2Configuration) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_clients); i++ {
+		child, err = this.getEntityByUuid( this.M_clients[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_authorize); i++ {
+		child, err = this.getEntityByUuid( this.M_authorize[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_access); i++ {
+		child, err = this.getEntityByUuid( this.M_access[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_ids); i++ {
+		child, err = this.getEntityByUuid( this.M_ids[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_refresh); i++ {
+		child, err = this.getEntityByUuid( this.M_refresh[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_expire); i++ {
+		child, err = this.getEntityByUuid( this.M_expire[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *OAuth2Configuration) IsNeedSave() bool{
 	return this.NeedSave
@@ -117,6 +164,14 @@ func (this *OAuth2Configuration) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Configuration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *OAuth2Configuration) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *OAuth2Configuration) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *OAuth2Configuration) GetId()string{
@@ -251,6 +306,13 @@ func (this *OAuth2Configuration) GetClients()[]*OAuth2Client{
 func (this *OAuth2Configuration) SetClients(val []*OAuth2Client){
 	this.M_clients= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_clients")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_clients=append(this.M_clients, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -263,6 +325,13 @@ func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_clients")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_clients = append(this.M_clients, val.GetUuid())
 }
 
@@ -293,6 +362,13 @@ func (this *OAuth2Configuration) GetAuthorize()[]*OAuth2Authorize{
 func (this *OAuth2Configuration) SetAuthorize(val []*OAuth2Authorize){
 	this.M_authorize= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_authorize")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_authorize=append(this.M_authorize, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -305,6 +381,13 @@ func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_authorize")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_authorize = append(this.M_authorize, val.GetUuid())
 }
 
@@ -335,6 +418,13 @@ func (this *OAuth2Configuration) GetAccess()[]*OAuth2Access{
 func (this *OAuth2Configuration) SetAccess(val []*OAuth2Access){
 	this.M_access= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_access")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_access=append(this.M_access, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -347,6 +437,13 @@ func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_access")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_access = append(this.M_access, val.GetUuid())
 }
 
@@ -377,6 +474,13 @@ func (this *OAuth2Configuration) GetIds()[]*OAuth2IdToken{
 func (this *OAuth2Configuration) SetIds(val []*OAuth2IdToken){
 	this.M_ids= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_ids")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_ids=append(this.M_ids, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -389,6 +493,13 @@ func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_ids")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_ids = append(this.M_ids, val.GetUuid())
 }
 
@@ -419,6 +530,13 @@ func (this *OAuth2Configuration) GetRefresh()[]*OAuth2Refresh{
 func (this *OAuth2Configuration) SetRefresh(val []*OAuth2Refresh){
 	this.M_refresh= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_refresh")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_refresh=append(this.M_refresh, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -431,6 +549,13 @@ func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_refresh")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_refresh = append(this.M_refresh, val.GetUuid())
 }
 
@@ -461,6 +586,13 @@ func (this *OAuth2Configuration) GetExpire()[]*OAuth2Expires{
 func (this *OAuth2Configuration) SetExpire(val []*OAuth2Expires){
 	this.M_expire= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_expire")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_expire=append(this.M_expire, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -473,6 +605,13 @@ func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_expire")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_expire = append(this.M_expire, val.GetUuid())
 }
 

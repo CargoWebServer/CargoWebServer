@@ -20,6 +20,10 @@ type File struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entity **/
 	M_id string
@@ -104,6 +108,19 @@ func (this *File) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *File) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_files); i++ {
+		child, err = this.getEntityByUuid( this.M_files[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *File) IsNeedSave() bool{
 	return this.NeedSave
@@ -115,6 +132,14 @@ func (this *File) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *File) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *File) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *File) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *File) GetId()string{
@@ -231,6 +256,13 @@ func (this *File) GetFiles()[]*File{
 func (this *File) SetFiles(val []*File){
 	this.M_files= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_files")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_files=append(this.M_files, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -243,6 +275,13 @@ func (this *File) AppendFiles(val *File){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_files")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_files = append(this.M_files, val.GetUuid())
 }
 

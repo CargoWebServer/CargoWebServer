@@ -216,7 +216,7 @@ EntityTableModel.prototype.constructor = EntityTableModel;
 EntityTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
 
     if (this.query != null) {
-        server.entityManager.getEntities(this.proto.TypeName, this.proto.TypeName.split(".")[0], this.query, 0, -1, [], true,
+        server.entityManager.getEntities(this.proto.TypeName, this.proto.TypeName.split(".")[0], this.query, 0, -1, [], true, false,
             // Progress callback
             function (index, total, caller) {
                 // nothing to do here

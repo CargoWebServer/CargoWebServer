@@ -347,9 +347,6 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " return this\n"
 	constructorSrc += "}\n"
 
-	log.Println("----> generate constructor: ", this.TypeName)
-
-
 	return constructorSrc
 }
 

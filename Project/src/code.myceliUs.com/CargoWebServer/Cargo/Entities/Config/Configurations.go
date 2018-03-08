@@ -20,6 +20,10 @@ type Configurations struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Configurations **/
 	M_id string
@@ -93,6 +97,57 @@ func (this *Configurations) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Configurations) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	child, err = this.getEntityByUuid( this.M_serverConfig)
+	if err == nil {
+		childs = append( childs, child)
+	}
+	child, err = this.getEntityByUuid( this.M_oauth2Configuration)
+	if err == nil {
+		childs = append( childs, child)
+	}
+	for i:=0; i < len(this.M_serviceConfigs); i++ {
+		child, err = this.getEntityByUuid( this.M_serviceConfigs[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_dataStoreConfigs); i++ {
+		child, err = this.getEntityByUuid( this.M_dataStoreConfigs[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_smtpConfigs); i++ {
+		child, err = this.getEntityByUuid( this.M_smtpConfigs[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_ldapConfigs); i++ {
+		child, err = this.getEntityByUuid( this.M_ldapConfigs[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_applicationConfigs); i++ {
+		child, err = this.getEntityByUuid( this.M_applicationConfigs[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_scheduledTasks); i++ {
+		child, err = this.getEntityByUuid( this.M_scheduledTasks[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Configurations) IsNeedSave() bool{
 	return this.NeedSave
@@ -104,6 +159,14 @@ func (this *Configurations) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Configurations) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Configurations) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Configurations) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Configurations) GetId()string{
@@ -146,6 +209,13 @@ func (this *Configurations) GetServerConfig()*ServerConfiguration{
 
 func (this *Configurations) SetServerConfig(val *ServerConfiguration){
 	this.NeedSave = this.M_serverConfig != val.GetUuid()
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_serverConfig")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_serverConfig= val.GetUuid()
 }
 
@@ -164,6 +234,13 @@ func (this *Configurations) GetOauth2Configuration()*OAuth2Configuration{
 
 func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
 	this.NeedSave = this.M_oauth2Configuration != val.GetUuid()
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_oauth2Configuration")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_oauth2Configuration= val.GetUuid()
 }
 
@@ -186,6 +263,13 @@ func (this *Configurations) GetServiceConfigs()[]*ServiceConfiguration{
 func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
 	this.M_serviceConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_serviceConfigs")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -198,6 +282,13 @@ func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_serviceConfigs")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
 }
 
@@ -228,6 +319,13 @@ func (this *Configurations) GetDataStoreConfigs()[]*DataStoreConfiguration{
 func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
 	this.M_dataStoreConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_dataStoreConfigs")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -240,6 +338,13 @@ func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_dataStoreConfigs")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
 }
 
@@ -270,6 +375,13 @@ func (this *Configurations) GetSmtpConfigs()[]*SmtpConfiguration{
 func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
 	this.M_smtpConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_smtpConfigs")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -282,6 +394,13 @@ func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_smtpConfigs")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
 }
 
@@ -312,6 +431,13 @@ func (this *Configurations) GetLdapConfigs()[]*LdapConfiguration{
 func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
 	this.M_ldapConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_ldapConfigs")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -324,6 +450,13 @@ func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_ldapConfigs")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
 }
 
@@ -354,6 +487,13 @@ func (this *Configurations) GetApplicationConfigs()[]*ApplicationConfiguration{
 func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguration){
 	this.M_applicationConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_applicationConfigs")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -366,6 +506,13 @@ func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfigurati
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_applicationConfigs")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
 }
 
@@ -396,6 +543,13 @@ func (this *Configurations) GetScheduledTasks()[]*ScheduledTask{
 func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
 	this.M_scheduledTasks= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_scheduledTasks")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -408,6 +562,13 @@ func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_scheduledTasks")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())
 }
 

@@ -354,23 +354,7 @@ EntityPrototype.prototype.generateConstructor = function () {
                 } else if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " this." + fieldName + " = 1\n"
                 } else {
-                    if (!this.FieldsType[i].endsWith(":Ref")) {
-                        constructorSrc += " if( values != undefined ){\n"
-                        constructorSrc += "     this." + fieldName + " = eval(\"new " + this.FieldsType[i] + "(values." + fieldName + ")\")\n"
-                        constructorSrc += " }else{\n"
-                        constructorSrc += "     this." + fieldName + " = eval(\"new " + this.FieldsType[i] + "()\")\n"
-                        constructorSrc += "     this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                        constructorSrc += "     this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                        if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
-                            constructorSrc += "     var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                            constructorSrc += "     obj.ParentUuid = this.UUID\n"
-                            constructorSrc += "     obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                            constructorSrc += "     this." + this.Fields[i] + ".init(obj)\n"
-                        }
-                        constructorSrc += " }\n"
-                    } else {
-                        constructorSrc += " this." + fieldName + " = null\n"
-                    }
+                    constructorSrc += " this." + fieldName + " = null\n"
                 }
             }
         } else if (this.FieldsType[i].startsWith("[]")) {
@@ -390,17 +374,7 @@ EntityPrototype.prototype.generateConstructor = function () {
                 constructorSrc += " this." + fieldName + " = 1\n"
             } else {
                 // Object here.
-                if (!this.FieldsType[i].endsWith(":Ref")) {
-                    constructorSrc += " this." + fieldName + " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
-                    constructorSrc += " this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                    constructorSrc += " this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                    if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
-                        constructorSrc += " var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                        constructorSrc += " obj.ParentUuid = this.UUID\n"
-                        constructorSrc += " obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                        constructorSrc += " this." + this.Fields[i] + ".init(obj)\n"
-                    }
-                } else if (this.FieldsType[i].startsWith("enum:")) {
+                if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " this." + fieldName + " = 0\n"
                 } else {
                     constructorSrc += " this." + fieldName + " = null\n"
@@ -498,12 +472,12 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " return this\n"
     constructorSrc += "}\n\n"
 
-    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object, lazy){\n"
     // First of all i will set reference in the result.
     constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
     constructorSrc += "   this.UUID = object.UUID\n"
     constructorSrc += "   this.IsInit = false\n"
-    constructorSrc += "   setObjectValues(this, object)\n"
+    constructorSrc += "   setObjectValues(this, object, lazy)\n"
     constructorSrc += "}\n\n"
 
     // Set the function.

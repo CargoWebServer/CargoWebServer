@@ -340,7 +340,6 @@ EntityPanel.prototype.setEntity = function (entity) {
 		}
 	})
 
-
 	// So here I will set the propertie of the object.
 	for (var i = 0; i < this.proto.FieldsOrder.length; i++) {
 		var index = this.proto.FieldsOrder[i]
@@ -550,7 +549,7 @@ EntityPanel.prototype.initHeader = function () {
 							// Here I will get the last valid entity value and set it back on entities map
 							var entity = caller.entity
 							delete entities[entity.UUID]
-							server.entityManager.getEntityByUuid(entity.UUID,
+							server.entityManager.getEntityByUuid(entity.UUID, false,
 								function (entity, caller) {
 									// I will also set it value back in the panel.
 									var entityPanel = caller.entityPanel
@@ -1731,7 +1730,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 
 	// TODO use query instead of download all elements.
 
-	server.entityManager.getEntities(typeName, typeName.substring(0, typeName.indexOf(".")), null, 0, -1, [], true,
+	server.entityManager.getEntities(typeName, typeName.substring(0, typeName.indexOf(".")), null, 0, -1, [], true, false,
 		// Progress...
 		function () {
 

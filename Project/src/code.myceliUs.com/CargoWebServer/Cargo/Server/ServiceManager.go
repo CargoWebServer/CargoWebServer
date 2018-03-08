@@ -160,7 +160,6 @@ func (this *ServiceManager) registerServiceListeners(conn *WebSocketConnection) 
 		err := json.Unmarshal(results[0].DataBytes, &channels)
 		if err == nil {
 			for i := 0; i < len(channels); i++ {
-				log.Println("---->channel: ", channels[i])
 				listener := NewEventListener(channels[i], rspMsg.from)
 				GetServer().GetEventManager().AddEventListener(listener)
 			}
@@ -624,7 +623,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "					}\n"
 								clientSrc += "				}\n"
 								clientSrc += "				entities.push(entity)\n"
-								clientSrc += "				entity.init(caller.results[0][i])\n"
+								clientSrc += "				entity.init(caller.results[0][i], false)\n"
 								clientSrc += "			}\n"
 							} else {
 								// In case of a regular entity.
@@ -650,7 +649,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "					}\n"
 								clientSrc += "				}\n"
 								clientSrc += "			}(caller)\n"
-								clientSrc += "			entity.init(caller.results[0])\n"
+								clientSrc += "			entity.init(caller.results[0], false)\n"
 							}
 
 							clientSrc += "			},\n"

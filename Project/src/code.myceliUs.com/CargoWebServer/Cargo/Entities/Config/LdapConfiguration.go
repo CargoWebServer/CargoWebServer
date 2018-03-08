@@ -20,6 +20,10 @@ type LdapConfiguration struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Configuration **/
 	M_id string
@@ -95,6 +99,11 @@ func (this *LdapConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *LdapConfiguration) GetChilds() []interface{}{
+	var childs []interface{}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *LdapConfiguration) IsNeedSave() bool{
 	return this.NeedSave
@@ -106,6 +115,14 @@ func (this *LdapConfiguration) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *LdapConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *LdapConfiguration) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *LdapConfiguration) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *LdapConfiguration) GetId()string{

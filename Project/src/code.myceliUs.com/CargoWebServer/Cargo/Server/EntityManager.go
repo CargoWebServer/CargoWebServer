@@ -45,6 +45,8 @@ var entityManager *EntityManager
 
 // Function to be use a function pointer.
 var getEntityFct func(uuid string) (interface{}, error)
+var setEntityFct func(interface{})
+var generateUuidFct func(interface{}) string
 
 func (this *Server) GetEntityManager() *EntityManager {
 	if entityManager == nil {
@@ -80,6 +82,15 @@ func newEntityManager() *EntityManager {
 			return nil, errors.New(err.GetBody())
 		}
 		return entity, nil
+	}
+
+	setEntityFct = func(entity interface{}) {
+		GetServer().GetEntityManager().m_setEntityChan <- entity.(Entity)
+	}
+
+	generateUuidFct = func(entity interface{}) string {
+		uuid := GetServer().GetEntityManager().GenerateEntityUUID(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids(), "", "")
+		return uuid
 	}
 
 	// TODO set those value in the server config...
@@ -125,11 +136,15 @@ func newEntityManager() *EntityManager {
 						if err == nil {
 							if reflect.TypeOf(val).String() != "map[string]interface {}" {
 								val.(Entity).SetEntityGetter(getEntityFct)
+								val.(Entity).SetEntitySetter(setEntityFct)
+								val.(Entity).SetUuidGenerator(generateUuidFct)
 								entities = append(entities, val.(Entity))
 							} else {
 								entity := NewDynamicEntity()
 								entity.setObject(val.(map[string]interface{}))
 								entity.SetEntityGetter(getEntityFct)
+								entity.SetEntitySetter(setEntityFct)
+								entity.SetUuidGenerator(generateUuidFct)
 								entities = append(entities, entity)
 							}
 						}
@@ -170,6 +185,7 @@ func newEntityManager() *EntityManager {
 				// Remove from the cache.
 				entityManager.m_cache.Delete(entity.GetUuid())
 			case entity := <-entityManager.m_setEntityChan:
+				//log.Println("---> entity ", entity)
 				// Append in the map:
 				if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
 					var bytes, err = Utility.ToBytes(entity)
@@ -277,17 +293,19 @@ func FromTriples(values [][]interface{}) map[string]interface{} {
 							obj[propertie] = append(obj[propertie].([]string), value.(string))
 						}
 					} else {
-						if strings.HasPrefix(fieldType, "[]xs.") {
-							// simple type the values are contain inside
-							//array := make([]interface{}, 0)
-							//json.Unmarshal([]byte(value), &array)
+						if Utility.IsValidEntityReferenceName(value.(string)) {
+							// So here I will get the value from the store.
+							if obj[propertie] == nil {
+								obj[propertie] = make([]string, 0)
+							}
+							obj[propertie] = append(obj[propertie].([]string), value.(string))
 						} else {
-							if Utility.IsValidEntityReferenceName(value.(string)) {
-								// So here I will get the value from the store.
-								if obj[propertie] == nil {
-									obj[propertie] = make([]string, 0)
+							values_ := make([]interface{}, 0)
+							err := json.Unmarshal([]byte(value.(string)), &values_)
+							if err == nil {
+								if values_ != nil {
+									obj[propertie] = values_
 								}
-								obj[propertie] = append(obj[propertie].([]string), value.(string))
 							}
 						}
 					}
@@ -573,7 +591,8 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
 		entity = obj.Interface().(Entity)
 		entity.SetEntityGetter(getEntityFct)
-
+		entity.SetEntitySetter(setEntityFct)
+		entity.SetUuidGenerator(generateUuidFct)
 		// Set the entity in the cache
 		this.m_setEntityChan <- entity
 
@@ -581,6 +600,9 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		// Dynamic entity here.
 		entity = NewDynamicEntity()
 		entity.SetEntityGetter(getEntityFct)
+		entity.SetEntitySetter(setEntityFct)
+		entity.SetUuidGenerator(generateUuidFct)
+
 		entity.(*DynamicEntity).setObject(values)
 
 		// set the entity in the cache.
@@ -623,6 +645,10 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 
 	// So here I will retreive the entity uuid from the entity id.
 	prototype, _ := this.getEntityPrototype(typeName, storeId)
+	if prototype == nil {
+		errObj := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype with name "+typeName+" not found!"))
+		return "", errObj
+	}
 
 	// First of all I will get the uuid...
 	fieldType := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[1])]
@@ -642,7 +668,6 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 			}
 		}
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
-		//log.Println(errObj.GetBody())
 		return "", errObj
 	}
 
@@ -664,6 +689,7 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 
 		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 		fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
+
 		if strings.HasPrefix(fieldType, "[]") {
 			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		} else {
@@ -702,26 +728,16 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
 	*triples = append(*triples, parentLnkTriple)
 
-	// The event data...
-	eventData := make([]*MessageData, 2)
-	msgData0 := new(MessageData)
-	msgData0.Name = "entity"
-	if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
-		msgData0.Value = parent.(*DynamicEntity).getObject()
-	} else {
-		msgData0.Value = parent
-	}
-	eventData[0] = msgData0
-
-	msgData1 := new(MessageData)
-	msgData1.Name = "prototype"
-	msgData1.Value = parentPrototype
-	eventData[1] = msgData1
-
-	evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
-	GetServer().GetEventManager().BroadcastEvent(evt)
-
 	return nil
+}
+
+func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype) {
+	// The list of childs.
+	childs := entity.GetChilds()
+	// Save the childs...
+	for i := 0; i < len(childs); i++ {
+		this.saveEntity(childs[i].(Entity))
+	}
 }
 
 /**
@@ -737,7 +753,11 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Here I will set the uuid if is not already set
 	uuid := this.GenerateEntityUUID(typeName, parentUuid, entity.Ids(), "", "")
 	entity.SetUuid(uuid)
+
+	// Set entity accessor.
 	entity.SetEntityGetter(getEntityFct)
+	entity.SetEntitySetter(setEntityFct)
+	entity.SetUuidGenerator(generateUuidFct)
 
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
@@ -749,7 +769,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Get values as map[string]interface{} and also set the entity in it parent.
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getObject()
+		values = entity.(*DynamicEntity).getValues()
 	} else {
 		values, err = Utility.ToMap(entity)
 		if err != nil {
@@ -760,6 +780,9 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
+
+	// Set it childs...
+	this.saveChilds(entity, prototype)
 
 	// Now I will call the meth
 	triples := make([]interface{}, 0)
@@ -790,7 +813,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	msgData0 := new(MessageData)
 	msgData0.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		msgData0.Value = entity.(*DynamicEntity).getObject()
+		msgData0.Value = entity.(*DynamicEntity).getValues()
 	} else {
 		msgData0.Value = entity
 	}
@@ -820,14 +843,17 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		uuid := this.GenerateEntityUUID(typeName, entity.GetParentUuid(), entity.Ids(), "", "")
 		entity.SetUuid(uuid)
 	}
+
+	// Set the entity accessor
 	entity.SetEntityGetter(getEntityFct)
+	entity.SetEntitySetter(setEntityFct)
+	entity.SetUuidGenerator(generateUuidFct)
 
 	var values map[string]interface{}
-
 	var err error
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getObject()
+		values = entity.(*DynamicEntity).getValues()
 	} else {
 		values, err = Utility.ToMap(entity)
 		if err != nil {
@@ -837,6 +863,12 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	}
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
+
+	storeId := typeName[0:strings.Index(typeName, ".")]
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+
+	// Set it childs...
+	this.saveChilds(entity, prototype)
 
 	// Here is the triple to be saved.
 	triples := make([]interface{}, 0)
@@ -854,14 +886,11 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		}
 	}
 
-	storeId := typeName[0:strings.Index(typeName, ".")]
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-
 	eventData := make([]*MessageData, 2)
 	msgData0 := new(MessageData)
 	msgData0.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		msgData0.Value = entity.(*DynamicEntity).getObject()
+		msgData0.Value = entity.(*DynamicEntity).getValues()
 	} else {
 		msgData0.Value = entity
 	}
@@ -884,6 +913,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	if len(existingTriples) == 0 {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 	} else {
+		// TODO send only the change.
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 	}
 
@@ -922,10 +952,10 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		}
 	}
 
-	//log.Println("--> triples ", existingTriples)
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
 	entity.ResetNeedSave()
+
 	return nil
 }
 
@@ -964,20 +994,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
 		// Set the parent value in the cache.
 		this.m_setEntityChan <- parent
-
-		// Update the parent here.
-		var eventDatas []*MessageData
-		evtData := new(MessageData)
-		evtData.TYPENAME = "Server.MessageData"
-		evtData.Name = "entity"
-		if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
-			evtData.Value = parent.(*DynamicEntity).getObject()
-		} else {
-			evtData.Value = parent
-		}
-		eventDatas = append(eventDatas, evtData)
-		evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventDatas)
-		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 
 	// remove it from the cache.
@@ -987,7 +1003,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	var err error
 
 	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getObject()
+		values = entity.(*DynamicEntity).getValues()
 	} else {
 		values, err = Utility.ToMap(entity)
 		if err != nil {
@@ -1053,12 +1069,13 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 				this.m_setEntityChan <- ref
 
 				// Update the reference here.
+				// TODO Send only the change...
 				var eventDatas []*MessageData
 				evtData := new(MessageData)
 				evtData.TYPENAME = "Server.MessageData"
 				evtData.Name = "entity"
 				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
-					evtData.Value = ref.(*DynamicEntity).getObject()
+					evtData.Value = ref.(*DynamicEntity).getValues()
 				} else {
 					evtData.Value = ref
 				}
@@ -1084,7 +1101,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		evtData.Value = entity.(*DynamicEntity).getObject()
+		evtData.Value = entity.(*DynamicEntity).getValues()
 	} else {
 		evtData.Value = entity
 	}
@@ -1214,6 +1231,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 //	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
 //}
 func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
+
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1458,7 +1476,7 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 			entity.setValue("UUID", nil)          // Set it uuid to nil
 			entity.setValue("TYPENAME", typeName) // Set it new typeName
 			// Recreate it with it new type
-			newEntity, errObj := this.newDynamicEntity(entity.GetParentUuid(), entity.GetObject().(map[string]interface{}))
+			newEntity, errObj := this.newDynamicEntity(entity.GetParentUuid(), entity.getValues().(map[string]interface{}))
 			if errObj != nil {
 				newEntity.SaveEntity() // Save the new entity
 			}
@@ -1624,7 +1642,7 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //                    EventHub.prototype.onEvent.call(self, evt)
 //                }
 //            } (this, evt, entity)
-//            entity.init(evt.dataMap["entity"])
+//            entity.init(evt.dataMap["entity"], false)
 //        } else {
 //            // update the object values.
 //            // but before I call the event I will be sure the entity have
@@ -1758,7 +1776,7 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //                    }
 //                }
 //            } (caller)
-//            entity.init(result[0])
+//            entity.init(result[0], false)
 //        },
 //        function (errMsg, caller) {
 //          server.errorManager.onError(errMsg)
@@ -1797,7 +1815,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
 				}
-				return entity.getObject()
+				return entity.getValues()
 			}
 		} else {
 			errObj = NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -1858,7 +1876,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //                    }
 //                }
 //            } (caller)
-//            entity.init(result[0])
+//            entity.init(result[0], false)
 //        },
 //        function (errMsg, caller) {
 //          server.errorManager.onError(errMsg)
@@ -1899,7 +1917,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
 				}
-				return entity.getObject()
+				return entity.getValues()
 			}
 		} else {
 			errObj = NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -1938,8 +1956,8 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 	entity, errObj = this.getEntityByUuid(uuid)
 
 	if entity != nil {
-		// validate over the entity TODO active it latter...
-		/*errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
+		// validate over the entity
+		/*errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities., entity)
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return // exit here.
@@ -1967,13 +1985,14 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 // @param {int} limit	The number of results to return. Can be use to create page of results.
 // @param {[]string} orderBy the list of field that specifie the result order.
 // @param {bool} asc the list of field that specifie the result order.
+// @param {bool} lazy Load all child's value if false or just child's uuid if true.
 // @result{[]interface{}} Return an array of object's (Entities)
 // @scope {public}
 // @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntities = function (typeName, storeId, query, offset, limit, orderBy, asc, progressCallback, successCallback, errorCallback, caller) {
+//EntityManager.prototype.getEntities = function (typeName, storeId, query, offset, limit, orderBy, asc, lazy, progressCallback, successCallback, errorCallback, caller) {
 //    // First of all i will get the entity prototype.
 //    server.entityManager.getEntityPrototype(typeName, storeId,
 //        // The success callback.
@@ -1985,6 +2004,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //            var successCallback = caller.successCallback
 //            var progressCallback = caller.progressCallback
 //            var errorCallback = caller.errorCallback
+//			  var lazy = caller.lazy
 //            var caller = caller.caller
 //            // Create the list of parameters.
 //            var params = []
@@ -2007,7 +2027,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                    var entities = []
 //                    if (result[0] != undefined) {
 //                        for (var i = 0; i < result[0].length; i++) {
-//                            var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
+//                            var entity = eval("new " + caller.prototype.TypeName + "()")
 //                            if (i == result[0].length - 1) {
 //                                entity.initCallback = function (caller) {
 //                                    return function (entity) {
@@ -2026,7 +2046,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                            // push the entitie before init it...
 //                            entities.push(entity)
 //                            // call init...
-//                            entity.init(result[0][i])
+//                            entity.init(result[0][i], lazy)
 //                        }
 //                    }
 //                    if (result[0] == null || result[0].length==0) {
@@ -2045,7 +2065,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                    // dispatch the message.
 //                    server.errorManager.onError(errMsg)
 //                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "prototype": result } // The caller
+//                { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "prototype": result, "lazy":lazy } // The caller
 //            )
 //        },
 //        // The error callback.
@@ -2057,7 +2077,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //				}
 //            // dispatch the message.
 //            server.errorManager.onError(errMsg)
-//        }, { "typeName": typeName, "storeId": storeId, "query": query, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback })
+//        }, { "typeName": typeName, "storeId": storeId, "query": query, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "lazy":lazy })
 //}
 func (this *EntityManager) GetEntities(typeName string, storeId string, query *EntityQuery, offset int, limit int, orderBy []interface{}, asc bool, messageId string, sessionId string) []Entity {
 
@@ -2107,6 +2127,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 // @api 1.0
 // That function is use to retreive objects with a given type.
 // @param {string} uuid The uuid of the entity we looking for. The uuid must has form typeName%UUID.
+// @param {bool} lazy Load all child's value if false or just child's uuid if true.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @result{interface{}} Return an object (Entity)
@@ -2114,7 +2135,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, errorCallback, caller) {
+//EntityManager.prototype.getEntityByUuid = function (uuid, lazy, successCallback, errorCallback, caller) {
 //    if(uuid.length == 0){
 //		console.log("No uuid to found!")
 //		return
@@ -2129,7 +2150,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //    var typeName = uuid.substring(0, uuid.indexOf("%"))
 //    var storeId = typeName.substring(0, typeName.indexOf("."))
 //    // Create the entity prototype here.
-//    var entity = eval("new " + typeName + "(caller.prototype)")
+//    var entity = eval("new " + typeName + "()")
 //    entity.UUID = uuid
 //    entity.TYPENAME = typeName
 //    server.entityManager.setEntity(entity)
@@ -2142,6 +2163,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //            var successCallback = caller.successCallback
 //            var progressCallback = caller.progressCallback
 //            var errorCallback = caller.errorCallback
+//			  var lazy = caller.lazy
 //            var caller = caller.caller
 //            var params = []
 //            params.push(createRpcData(uuid, "STRING", "uuid"))
@@ -2164,7 +2186,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //                        }
 //                    } (caller)
 //                    if (entity.IsInit == false) {
-//                        entity.init(result[0])
+//                        entity.init(result[0], lazy)
 //                    } else {
 //						if(caller.successCallback != undefined){
 //                            caller.successCallback(entity, caller.caller)
@@ -2179,7 +2201,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //						caller.errorCallback = undefined
 //					}
 //                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result } // The caller
+//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "lazy":lazy } // The caller
 //            )
 //        },
 //        // The error callback.
@@ -2189,7 +2211,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //          	caller.errorCallback(errMsg, caller.caller)
 //				caller.errorCallback = undefined
 //			}
-//        }, { "uuid": uuid, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
+//        }, { "uuid": uuid, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy":lazy })
 //}
 func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -2205,7 +2227,12 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 	}
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		return entity.(*DynamicEntity).getObject()
+		if len(entity.GetUuid()) == 0 {
+			//log.Println("---> ", entity.(*DynamicEntity).getValues())
+			//log.Panicln("---> no uuid found for uuid: ", uuid)
+
+		}
+		return entity.(*DynamicEntity).getValues()
 	}
 
 	return entity
@@ -2216,6 +2243,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 // @param {string} typeName The object type name.
 // @param {string} storeId The object type name.
 // @param {string} ids The id's (not uuid) of the object to look for.
+// @param {bool} lazy Load all child's value if false or just child's uuid if true.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @result{interface{}} Return an object (Entity)
@@ -2223,7 +2251,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityById = function (typeName, storeId, ids, successCallback, errorCallback, caller, parent) {
+//EntityManager.prototype.getEntityById = function (typeName, storeId, ids, lazy, successCallback, errorCallback, caller, parent) {
 //    if (!isArray(ids)) {
 //        console.log("ids must be an array! ", ids)
 //    }
@@ -2250,6 +2278,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //            var successCallback = caller.successCallback
 //            var progressCallback = caller.progressCallback
 //            var errorCallback = caller.errorCallback
+//			  var lazy = caller.lazy
 //            var caller = caller.caller
 //            var params = []
 //            params.push(createRpcData(typeName, "STRING", "typeName"))
@@ -2283,7 +2312,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //							}
 //                        }
 //                    } (caller)
-//                    entity.init(result[0])
+//                    entity.init(result[0], lazy)
 //                },
 //                function (errMsg, caller) {
 //          		server.errorManager.onError(errMsg)
@@ -2292,14 +2321,14 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //						caller.errorCallback = undefined
 //					}
 //                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "ids": ids } // The caller
+//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "ids": ids, "lazy":lazy } // The caller
 //            )
 //        },
 //        // The error callback.
 //        function (errMsg, caller) {
 //            server.errorManager.onError(errMsg)
 //            caller.errorCallback(errMsg, caller)
-//        }, { "storeId": storeId, "typeName": typeName, "ids": ids, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
+//        }, { "storeId": storeId, "typeName": typeName, "ids": ids, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy":lazy })
 //}
 func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []interface{}, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -2309,13 +2338,14 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 	}
 
 	entity, errObj := this.getEntityById(typeName, storeId, ids)
+
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		obj := entity.(*DynamicEntity).getObject()
+		obj := entity.(*DynamicEntity).getValues()
 		return obj
 	}
 
@@ -2371,30 +2401,37 @@ func (this *EntityManager) GenerateEntityUUID(typeName string, parentUuid string
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return ""
 	}
+
 	var keyInfo string
 	if len(parentUuid) > 0 {
 		keyInfo += parentUuid + ":"
 	}
+
 	keyInfo = typeName + ":"
 	for i := 0; i < len(ids); i++ {
-		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
-			keyInfo += ids[i].(string)
-		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
-			keyInfo += strconv.Itoa(ids[i].(int))
-		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
-			keyInfo += strconv.Itoa(int(ids[i].(int8)))
-		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
-			keyInfo += strconv.Itoa(int(ids[i].(int16)))
-		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
-			keyInfo += strconv.Itoa(int(ids[i].(int32)))
-		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
-			keyInfo += strconv.Itoa(int(ids[i].(int64)))
-		}
-		// Append underscore for readability in case of problem...
-		if i < len(ids)-1 {
-			keyInfo += "_"
+		if ids[i] != nil {
+			if reflect.TypeOf(ids[i]).Kind() == reflect.String {
+				keyInfo += ids[i].(string)
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
+				keyInfo += strconv.Itoa(ids[i].(int))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
+				keyInfo += strconv.Itoa(int(ids[i].(int8)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
+				keyInfo += strconv.Itoa(int(ids[i].(int16)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
+				keyInfo += strconv.Itoa(int(ids[i].(int32)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
+				keyInfo += strconv.Itoa(int(ids[i].(int64)))
+			}
+			// Append underscore for readability in case of problem...
+			if i < len(ids)-1 {
+				keyInfo += "_"
+			}
 		}
 	}
+
+	uuid := typeName + "%" + Utility.GenerateUUID(keyInfo)
+
 	// Return the uuid from the input information.
-	return typeName + "%" + Utility.GenerateUUID(keyInfo)
+	return uuid
 }

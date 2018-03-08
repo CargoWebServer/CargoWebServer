@@ -70,6 +70,13 @@
 				<xsd:attribute name="schemasPath" type="xsd:string" />
 				<xsd:attribute name="tmpPath" type="xsd:string" />
 				<xsd:attribute name="binPath" type="xsd:string" />
+				<xsd:attribute name="shards" type="xsd:integer" />
+				<xsd:attribute name="lifeWindow" type="xsd:integer" />
+				<xsd:attribute name="maxEntriesInWindow" type="xsd:integer" />
+				<xsd:attribute name="maxEntrySize" type="xsd:integer" />
+				<xsd:attribute name="verbose" type="xsd:boolean" />
+				<xsd:attribute name="hardMaxCacheSize" type="xsd:integer" />
+				
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>

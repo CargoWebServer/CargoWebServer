@@ -1,6 +1,7 @@
 package Server
 
 import (
+	//	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -18,6 +19,12 @@ type DynamicEntity struct {
 
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string) (interface{}, error)
+
+	/** Put the entity on the cache **/
+	setEntity func(interface{})
+
+	/** Set the uuid function **/
+	generateUuid func(interface{}) string
 
 	/**
 	 * Use to protected the ressource access...
@@ -59,9 +66,11 @@ func (this *DynamicEntity) getValue(field string) interface{} {
  * of an entity in the cache.
  */
 func (this *DynamicEntity) getValues() map[string]interface{} {
+	// Set child uuid's here if there is not already sets...
 	this.Lock()
 	defer this.Unlock()
 	values := make(map[string]interface{})
+
 	// return the values without all sub-entity values
 	for k, v := range this.object {
 		if v != nil {
@@ -71,7 +80,11 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 						if v.([]interface{})[0].(map[string]interface{})["UUID"] != nil {
 							childs := make([]string, 0)
 							for i := 0; i < len(v.([]interface{})); i++ {
-								childs = append(childs, v.([]interface{})[0].(map[string]interface{})["UUID"].(string))
+								// In case the uuid is not already set...
+								if len(v.([]interface{})[i].(map[string]interface{})["UUID"].(string)) != 0 {
+									// In that case I will set it uuid.
+									childs = append(childs, v.([]interface{})[i].(map[string]interface{})["UUID"].(string))
+								}
 							}
 							values[k] = childs
 						} else {
@@ -83,16 +96,17 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 				}
 			} else if reflect.TypeOf(v).String() == "map[string]interface {}" {
 				if v.(map[string]interface{})["UUID"] != nil {
-					values[k] = v.(map[string]interface{})["UUID"]
+					// In case the uuid is not already set...
+					if len(v.(map[string]interface{})["UUID"].(string)) != 0 {
+						values[k] = v.(map[string]interface{})["UUID"]
+					}
 				} else {
 					values[k] = v
 				}
 			} else {
 				values[k] = v
 			}
-		} /*else {
-			values[k] = v
-		}*/
+		}
 	}
 	return values
 }
@@ -116,6 +130,27 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 	this.Lock()
 	defer this.Unlock()
 	this.object = obj
+
+	if obj["UUID"] == nil {
+		obj["UUID"] = ""
+	}
+
+	if obj["ParentUuid"] == nil {
+		obj["ParentUuid"] = ""
+	}
+
+	// Set uuid
+	if len(obj["UUID"].(string)) == 0 {
+		ids := make([]interface{}, 0)
+		typeName := obj["TYPENAME"].(string)
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+		// skip The first element, the uuid
+		for i := 1; i < len(prototype.Ids); i++ {
+			ids = append(ids, obj[prototype.Ids[i]])
+		}
+		// In that case I will set it uuid.
+		obj["UUID"] = GetServer().GetEntityManager().GenerateEntityUUID(obj["TYPENAME"].(string), obj["ParentUuid"].(string), ids, "", "")
+	}
 }
 
 /**
@@ -138,9 +173,9 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 	} else {
 		// An array already exist in that case.
 		if reflect.TypeOf(value).Kind() == reflect.String {
-			if reflect.TypeOf(values).Kind().String() == "[]interface {}" {
+			if reflect.TypeOf(values).String() == "[]interface {}" {
 				values = append(values.([]interface{}), value.(string))
-			} else if reflect.TypeOf(values).Kind().String() == " []string" {
+			} else if reflect.TypeOf(values).String() == "[]string" {
 				values = append(values.([]string), value.(string))
 			}
 			this.setValue(field, values)
@@ -150,7 +185,6 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 			this.setValue(field, values)
 		}
 	}
-
 }
 
 /**
@@ -209,8 +243,9 @@ func (this *DynamicEntity) GetTypeName() string {
  * Each entity must have one uuid.
  */
 func (this *DynamicEntity) GetUuid() string {
-	if this.getValue("UUID") != nil {
-		return this.getValue("UUID").(string)
+	uuid := this.getValue("UUID")
+	if uuid != nil {
+		return uuid.(string)
 	}
 	return "" // Can be an error here.
 }
@@ -227,17 +262,27 @@ func (this *DynamicEntity) SetEntityGetter(fct func(uuid string) (interface{}, e
 	this.getEntityByUuid = fct
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *DynamicEntity) SetEntitySetter(fct func(entity interface{})) {
+	this.setEntity = fct
+}
+
+/** Set the uuid generator function **/
+func (this *DynamicEntity) SetUuidGenerator(fct func(entity interface{}) string) {
+	this.generateUuid = fct
+}
+
 /**
  * Return the array of id's for a given entity, it not contain it UUID.
  */
 func (this *DynamicEntity) Ids() []interface{} {
+	ids := make([]interface{}, 0)
 	typeName := this.GetTypeName()
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
 	if err != nil {
-		return nil
+		return ids
 	}
-
-	ids := make([]interface{}, 0)
+	// skip The first element, the uuid
 	for i := 1; i < len(prototype.Ids); i++ {
 		ids = append(ids, this.getValue(prototype.Ids[i]))
 	}
@@ -275,8 +320,68 @@ func (this *DynamicEntity) SetParentLnk(lnk string) {
 }
 
 /**
+ * Return the list of all it childs.
+ */
+func (this *DynamicEntity) GetChilds() []interface{} {
+	var childs []interface{}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(this.GetTypeName(), strings.Split(this.GetTypeName(), ".")[0])
+	for i := 0; i < len(prototype.Fields); i++ {
+		field := prototype.Fields[i]
+		if strings.HasPrefix(field, "M_") {
+			fieldType := prototype.FieldsType[i]
+			if !(strings.HasPrefix(fieldType, "[]xs.") && strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref")) {
+				if strings.HasPrefix(fieldType, "[]") {
+					// The value is an array...
+					val := this.getValue(field)
+					if val != nil {
+						if reflect.TypeOf(val).String() == "[]interface {}" {
+							for j := 0; j < len(val.([]interface{})); j++ {
+								if reflect.TypeOf(val.([]interface{})[j]).String() == "map[string]interface {}" {
+									if val.([]interface{})[j].(map[string]interface{})["TYPENAME"] != nil {
+										// Set parent information if is not already set.
+										val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = this.GetUuid()
+										val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
+										child := NewDynamicEntity()
+										child.setObject(val.([]interface{})[j].(map[string]interface{}))
+										child.GetChilds()
+										childs = append(childs, child)
+									}
+								}
+							}
+						}
+
+					}
+				} else {
+					// The value is not an array.
+					val := this.getValue(field)
+					if val != nil {
+						if reflect.TypeOf(val).String() == "map[string]interface {}" {
+							if val.(map[string]interface{})["TYPENAME"] != nil {
+								// Set parent information if is not already set.
+								val.(map[string]interface{})["ParentUuid"] = this.GetUuid()
+								val.(map[string]interface{})["ParentLnk"] = field
+								child := NewDynamicEntity()
+								child.setObject(val.(map[string]interface{}))
+								child.GetChilds()
+								childs = append(childs, child)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return childs
+}
+
+/**
  * Test if an entity need to be save.
  */
 func (this *DynamicEntity) IsNeedSave() bool {
-	return this.getValue("NeedSave").(bool)
+	NeeedSave := this.getValue("NeedSave")
+	if NeeedSave == nil {
+		return true
+	}
+
+	return NeeedSave.(bool)
 }

@@ -403,6 +403,24 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="binPath" name="binPath">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="shards" name="shards">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="lifeWindow" name="lifeWindow">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="maxEntriesInWindow" name="maxEntriesInWindow">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="maxEntrySize" name="maxEntrySize">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hardMaxCacheSize" name="hardMaxCacheSize">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="verbose" name="verbose">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_serverConfiguration_Configurations" name="A_serverConfiguration_Configurations" visibility="private" memberEnd="Configurations-ServerConfiguration A_serverConfiguration_Configurations-Configurations">

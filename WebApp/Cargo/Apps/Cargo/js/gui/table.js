@@ -1308,7 +1308,7 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 		if (isObjectReference(formatedValue)) {
 			// Here the value represent an object reference.
 			var lnk = new Element(null, { "tag": "a", "href": "#", "class": fieldType.replaceAll(".", "_") });
-			server.entityManager.getEntityByUuid(formatedValue,
+			server.entityManager.getEntityByUuid(formatedValue, false,
 				function (entity, caller) {
 					var titles = entity.getTitles();
 					if (titles.length > 0) {

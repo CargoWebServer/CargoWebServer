@@ -78,7 +78,7 @@ function main() {
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 
-    //testEntityQuery()
+    testEntityQuery()
 
     //TestWebRtc2()
 
@@ -317,12 +317,12 @@ function testServiceContainer() {
 function testEntityQuery() {
     //{"TypeName":"CargoEntities.Log","Fields":["uuid"],"Indexs":["M_id=defaultErrorLogger"],"Query":""}
     var query = {}
-    query.TypeName = "Test.Item"
-    query.Fields = ["M_name", "M_description"]
+    //query.TypeName = "Test.Item"
+    //query.Fields = ["M_name", "M_description"]
     // Regex
     //query.Query = 'Test.Item.M_description == /Ceci est [a-z|\s|0-9]+/ && Test.Item.M_id != "item_5"'
     //query.Query = 'Test.Item.M_stringLst == /t[a-z]t[a-z](\\.)?/'
-    query.Query = 'Test.Item.M_description ^= "Ceci"'
+    //query.Query = 'Test.Item.M_description ^= "Ceci"'
     // bool value
     // query.Query = 'Test.Item.M_inStock == true'
     // int value
@@ -331,8 +331,7 @@ function testEntityQuery() {
     //query.Query = 'Test.Item.M_price <= 3.0'
     // Date... using the 8601 string format.
     //query.Query = 'Test.Item.M_date >= "2016-07-12T15:42:22.720Z" && Test.Item.M_date <= "2016-09-12T15:42:22.720Z"'
-
-    server.dataManager.read("Test", JSON.stringify(query), [], [],
+    /*server.dataManager.read("Test", JSON.stringify(query), [], [],
         function (results, caller) {
             console.log("-------> results: ", results)
         },
@@ -340,7 +339,7 @@ function testEntityQuery() {
 
         }, function (errMsg, caller) {
 
-        }, undefined)
+        }, undefined)*/
 
     query.TypeName = "CargoEntities.User"
     query.Fields = ["M_id", "M_firstName", "M_lastName", "M_email"]
@@ -357,7 +356,7 @@ function testEntityQuery() {
 
         }, undefined)
 
-    server.entityManager.getEntities("CargoEntities.User", "CargoEntities", '(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"', 0, -1, [], true,
+    server.entityManager.getEntities("CargoEntities.User", "CargoEntities", '(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"', 0, -1, [], true, false,
         // Sucess...
         function (results, caller) {
             console.log(results)
@@ -375,7 +374,7 @@ function entityDump(id, typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result, caller) {
             // Here I will initialyse the catalog...
-            server.entityManager.getEntityById(typeName, typeName.split(".")[0], [id],
+            server.entityManager.getEntityById(typeName, typeName.split(".")[0], [id], false,
                 function (result) {
 
                     // Here I will overload the way to display the name in the interface.
@@ -402,7 +401,7 @@ function entitiesDump(typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result) {
             // Here I will initialyse the catalog...
-            server.entityManager.getEntities(typeName, typeName.split(".")[0], "", 0, -1, [], true,
+            server.entityManager.getEntities(typeName, typeName.split(".")[0], "", 0, -1, [], true, false,
                 // Progress callback...
                 function () {
 

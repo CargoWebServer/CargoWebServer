@@ -61,6 +61,11 @@ type Entity interface {
 	SetParentLnk(string)
 
 	/**
+	 * Return link to entity childs.
+	 */
+	GetChilds() []interface{}
+
+	/**
 	 * Evaluate if an entity needs to be saved.
 	 */
 	IsNeedSave() bool
@@ -70,9 +75,22 @@ type Entity interface {
 	 */
 	ResetNeedSave()
 
+	// External function linking...
+
 	/**
 	 * Set the function GetEntityByUuid as a pointer. The entity manager can't
 	 * be access by Entities package...
 	 */
 	SetEntityGetter(func(uuid string) (interface{}, error))
+
+	/**
+	 * That function is use to set the entity on the cache so other part of program
+	 * can access it.
+	 */
+	SetEntitySetter(func(entity interface{}))
+
+	/**
+	 * That function control the way the uuid is generated.
+	 */
+	SetUuidGenerator(func(entity interface{}) string)
 }

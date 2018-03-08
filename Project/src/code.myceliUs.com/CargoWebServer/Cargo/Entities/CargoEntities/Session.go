@@ -20,6 +20,10 @@ type Session struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Session **/
 	M_id string
@@ -86,6 +90,11 @@ func (this *Session) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Session) GetChilds() []interface{}{
+	var childs []interface{}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Session) IsNeedSave() bool{
 	return this.NeedSave
@@ -97,6 +106,14 @@ func (this *Session) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Session) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Session) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Session) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Session) GetId()string{

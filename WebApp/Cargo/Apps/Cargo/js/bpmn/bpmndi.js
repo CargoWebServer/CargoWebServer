@@ -76,7 +76,7 @@ SvgDiagram.prototype.init = function (callback) {
 		// Here I will call the same function on the next element.
 		var diagramElement = diagramElements[index]
 
-		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement,
+		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement, false,
 			// success callback
 			function (bpmnElement, caller) {
 				bpmnElement.getDiagramElement = function (diagramElement) {
@@ -108,7 +108,7 @@ SvgDiagram.prototype.drawDiagramElements = function () {
 		// Here I will call the same function on the next element.
 		var diagramElement = diagramElements[index]
 		// Here I will create a function to get the diagram element...
-		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement,
+		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement, false,
 			function (bpmnElement, caller) { 
 				caller.svgDiagram.drawDiagramElement(caller.diagramElement, bpmnElement)
 			},

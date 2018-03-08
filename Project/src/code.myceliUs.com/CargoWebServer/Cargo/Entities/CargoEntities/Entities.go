@@ -20,6 +20,10 @@ type Entities struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entities **/
 	M_id string
@@ -93,6 +97,37 @@ func (this *Entities) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Entities) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_entities); i++ {
+		child, err = this.getEntityByUuid( this.M_entities[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_roles); i++ {
+		child, err = this.getEntityByUuid( this.M_roles[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_permissions); i++ {
+		child, err = this.getEntityByUuid( this.M_permissions[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_actions); i++ {
+		child, err = this.getEntityByUuid( this.M_actions[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Entities) IsNeedSave() bool{
 	return this.NeedSave
@@ -104,6 +139,14 @@ func (this *Entities) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Entities) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Entities) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Entities) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Entities) GetId()string{
@@ -150,6 +193,13 @@ func (this *Entities) GetEntities()[]Entity{
 func (this *Entities) SetEntities(val []Entity){
 	this.M_entities= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_entities")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_entities=append(this.M_entities, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -162,6 +212,13 @@ func (this *Entities) AppendEntities(val Entity){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_entities")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_entities = append(this.M_entities, val.GetUuid())
 }
 
@@ -192,6 +249,13 @@ func (this *Entities) GetRoles()[]*Role{
 func (this *Entities) SetRoles(val []*Role){
 	this.M_roles= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_roles")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_roles=append(this.M_roles, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -204,6 +268,13 @@ func (this *Entities) AppendRoles(val *Role){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_roles")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_roles = append(this.M_roles, val.GetUuid())
 }
 
@@ -234,6 +305,13 @@ func (this *Entities) GetPermissions()[]*Permission{
 func (this *Entities) SetPermissions(val []*Permission){
 	this.M_permissions= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_permissions")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -246,6 +324,13 @@ func (this *Entities) AppendPermissions(val *Permission){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_permissions")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_permissions = append(this.M_permissions, val.GetUuid())
 }
 
@@ -276,6 +361,13 @@ func (this *Entities) GetActions()[]*Action{
 func (this *Entities) SetActions(val []*Action){
 	this.M_actions= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_actions")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -288,6 +380,13 @@ func (this *Entities) AppendActions(val *Action){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_actions")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_actions = append(this.M_actions, val.GetUuid())
 }
 

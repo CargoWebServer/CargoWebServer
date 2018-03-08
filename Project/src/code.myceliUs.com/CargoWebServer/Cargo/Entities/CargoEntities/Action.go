@@ -20,6 +20,10 @@ type Action struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Action **/
 	M_name string
@@ -81,6 +85,25 @@ func (this *Action) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Action) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_parameters); i++ {
+		child, err = this.getEntityByUuid( this.M_parameters[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_results); i++ {
+		child, err = this.getEntityByUuid( this.M_results[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Action) IsNeedSave() bool{
 	return this.NeedSave
@@ -92,6 +115,14 @@ func (this *Action) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Action) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Action) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Action) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Action) GetName()string{
@@ -128,6 +159,13 @@ func (this *Action) GetParameters()[]*Parameter{
 func (this *Action) SetParameters(val []*Parameter){
 	this.M_parameters= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_parameters")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_parameters=append(this.M_parameters, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -140,6 +178,13 @@ func (this *Action) AppendParameters(val *Parameter){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_parameters")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_parameters = append(this.M_parameters, val.GetUuid())
 }
 
@@ -170,6 +215,13 @@ func (this *Action) GetResults()[]*Parameter{
 func (this *Action) SetResults(val []*Parameter){
 	this.M_results= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_results")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_results=append(this.M_results, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -182,6 +234,13 @@ func (this *Action) AppendResults(val *Parameter){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_results")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_results = append(this.M_results, val.GetUuid())
 }
 

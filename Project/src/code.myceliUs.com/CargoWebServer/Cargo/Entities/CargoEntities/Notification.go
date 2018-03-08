@@ -20,6 +20,10 @@ type Notification struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entity **/
 	M_id string
@@ -96,6 +100,11 @@ func (this *Notification) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Notification) GetChilds() []interface{}{
+	var childs []interface{}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Notification) IsNeedSave() bool{
 	return this.NeedSave
@@ -107,6 +116,14 @@ func (this *Notification) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Notification) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Notification) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Notification) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Notification) GetId()string{

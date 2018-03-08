@@ -1,0 +1,81 @@
+
+
+/** White space escape **/
+!whitespace : '\t' | '\n' | '\r' | ' ' ;
+
+/** fragment **/
+_digit : '0'-'9' ;
+_exponent :  ('e' | 'E') ['+'|'-']  {_digit} ;	
+_hex_digit : ('0'-'9'|'a'-'f'|'A'-'F') ;
+_octal_esc
+    :   '\\' ('0'-'3') ('0'-'7') ('0'-'7')
+    |   '\\' ('0'-'7') ('0'-'7')
+    |   '\\' ('0'-'7')
+    ;
+_unicode_esc
+    :   '\\' 'u' _hex_digit _hex_digit _hex_digit _hex_digit
+    ;
+_esc_seq
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\') 
+	| _unicode_esc 
+	| _octal_esc
+    ;
+	
+/** various symbol accpeted to be part of a string. **/
+_esc_string : '\\';
+_group : '{' | '}' | '(' | ')' | '[' | ']';
+_separator :  '/' | '\\' | '|';
+_accent : 'É' | 'é' | 'è' | 'È' | 'ê' | 'Ê' | 'à' | 'À' | 'Ç' | 'ë' | 'Ë' | 'Ô' | 'ô'; 
+_ponctuation : '?' | '!' | '.' | ',' | ':' | ';' | '`' | '_';
+_symbol : '~' | '@'  | '#' | '`' | '^' | '%' | '-' | '+' | '*' | '$' | '=' | '<'| '>'| '!';
+
+/** letter **/
+_letter :  'a'-'z' | 'A'-'Z';
+
+/** Token **/
+/** integer number **/
+int64 : ['-']'1'-'9' {_digit} ;
+
+/** float number **/
+float64 : ['-'][[{_digit}] '.'] {_digit}  [_exponent] ;
+
+/** String **/
+string :  '"' {_esc_seq | _esc_string | _letter | _symbol | _digit | _group | _separator | _ponctuation | _accent | ' '} '"';
+
+regex : '/' {_esc_seq | _esc_string | _letter | _symbol | _digit | _group  | _ponctuation | _accent | '\\'  | '|' | ' '} '/' ;
+
+/** Boolean **/
+boolean: 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e';
+
+/** identifier **/
+id  :	('a'-'z'|'A'-'Z'|'_') [{'a'-'z'|'A'-'Z'|'0'-'9'|'_'}];
+ 
+/** Comparator **/
+comparator: '!''=' | '=''=' | '~''=' | '>' | '<' | '>''=' | '<''=' | '^''=' | '$''=' ;
+
+/** Opereator **/
+operator:	'&''&' | '|''|';
+
+<< import "code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast" >>
+
+Query 	:
+		"(" Query ")" << ast.NewQueryAst($1) >>
+	| 	Query operator Query << ast.AppendQueryAst($0, $1, $2) >>
+	|   Object comparator Value << ast.NewExpressionAst($0, $1, $2) >>
+	;
+	
+/** value **/
+Value 	:	
+		  int64 << ast.NewIntegerValue($0) >>
+		| float64 << ast.NewFloatValue($0) >>
+		| string << ast.NewStringValue($0) >>
+		| boolean << ast.NewBoolValue($0) >>
+		| regex << ast.NewRegexExpr($0) >>
+		;
+		
+
+/** object **/
+Object	:
+		  id "." id << ast.NewIdValue($0, $2) >>
+		| Object "." id << ast.AppendIdValue($0, $2) >>;
+		

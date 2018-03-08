@@ -161,7 +161,7 @@ function testCreateDynamicEntity() {
             server.entityManager.saveEntity(instance_2,
                 function (result, caller) {
                     // Set the equivalent... reference...
-                    server.entityManager.getEntityByUuid(caller.instance_1_uuid,
+                    server.entityManager.getEntityByUuid(caller.instance_1_uuid, false,
                         function (instance_1, instance_2) {
                             instance_1.setEquivalent(instance_2)
                             instance_2.setEquivalent(instance_1)
@@ -172,7 +172,7 @@ function testCreateDynamicEntity() {
                                     server.entityManager.saveEntity(instance_1,
                                         function (instance1, caller) {
                                             console.log("---> instance 1", result)
-                                            /*server.entityManager.getEntityById("CargoEntities.User", "mm006819@ud6.uf6", 
+                                            /*server.entityManager.getEntityById("CargoEntities.User", "mm006819@ud6.uf6", false, 
                                             function(result, instance1){
                                                 instance1.setCreator(result)
                                                server.entityManager.saveEntity(instance_1)

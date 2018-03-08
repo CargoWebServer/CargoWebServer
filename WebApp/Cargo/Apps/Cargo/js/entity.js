@@ -337,7 +337,7 @@ function setRef(owner, property, refValue, isArray) {
                         }
 
                     } else {
-                        server.entityManager.getEntityByUuid(refValue,
+                        server.entityManager.getEntityByUuid(refValue, false,
                             function (result, caller) {
                                 var propertyName = caller.propertyName
                                 var index = caller.index
@@ -397,7 +397,7 @@ function setRef(owner, property, refValue, isArray) {
                         initCallback = undefined
                     }
                 } else {
-                    server.entityManager.getEntityByUuid(refValue,
+                    server.entityManager.getEntityByUuid(refValue, false,
                         function (result, caller) {
                             var propertyName = caller.propertyName
                             var entity = entities[caller.entityUuid]
@@ -424,13 +424,19 @@ function setRef(owner, property, refValue, isArray) {
  * That function initialyse an object created from a given prototype constructor with the values from a plain JSON object.
  * @param {object} object The object to initialyse.
  * @param {object} values The plain JSON object that contain values.
+ * @param {bool} lazy If the value is at false child must be intialyse from te server, if not only childs uuid's are set.
  */
-function setObjectValues(object, values) {
+function setObjectValues(object, values, lazy) {
 
     // Get the entity prototype.
     var prototype = getEntityPrototype(object["TYPENAME"])
     if (prototype == undefined) {
         return
+    }
+
+    // Lazy by default.
+    if (lazy == undefined) {
+        lazy = false;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -528,11 +534,7 @@ function setObjectValues(object, values) {
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
-            // var baseType = getBaseTypeExtension(propertyType)
-
-            // M_listOf, M_valueOf field or enumeration type contain plain value.
-            var isBaseType = /*isXsBaseType(baseType) ||*/ propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
-
+            var isBaseType = propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
             if (values[property] != null) {
                 if (isBaseType) {
                     // String, int, double...
@@ -588,14 +590,23 @@ function setObjectValues(object, values) {
                                 if (isRef) {
                                     setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                    if(!lazy){
+                                        subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                    }
                                 }
+                            }
+                            if(lazy){
+                                object[property] = values[property]
                             }
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
-                                subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                if(!lazy){
+                                    subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                }else{
+                                    object[property] = values[property]
+                                }
                             }
                         }
                     }
@@ -609,39 +620,55 @@ function setObjectValues(object, values) {
      */
     function setSubObject(parent, subObjects, callback) {
         if (subObjects.length > 0) {
-            subObject = subObjects.shift()
-            server.entityManager.getEntityByUuid(subObject.uuid,
-                function (entity, caller) {
-                    if(caller.subObject.isArray == true){
-                        caller.parent[caller.subObject.property][caller.subObject.index] = entity
-                    }else{
-                        caller.parent[caller.subObject.property] = entity
-                    }
-                    if (subObjects.length == 0) {
-                        caller.callback(caller.parent)
-                    } else {
-                        setSubObject(caller.parent, caller.subObjects, caller.callback)
-                    }
-                },
-                function (err, caller) {
-                    console.log("err ", err)
-                },
-                { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
+            var subObject = subObjects.shift()
+            if (isString(subObject.uuid)) {
+                if (subObject.uuid.length > 0) {
+                    server.entityManager.getEntityByUuid(subObject.uuid, false,
+                        function (entity, caller) {
+                            if (caller.subObject.isArray == true) {
+                                caller.parent[caller.subObject.property][caller.subObject.index] = entity
+                            } else {
+                                caller.parent[caller.subObject.property] = entity
+                            }
+                            if (subObjects.length == 0) {
+                                caller.callback(caller.parent)
+                            } else {
+                                setSubObject(caller.parent, caller.subObjects, caller.callback)
+                            }
+                        },
+                        function (err, caller) {
+                            console.log("err ", err)
+                        },
+                        { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
+                } else {
+                    setSubObject(parent, subObjects, callback)
+                }
+            } else if (isObject(subObject)) {
+                // skip to the next object.
+                setSubObject(parent, subObjects, callback)
+            }
         }
     }
-
-    setSubObject(object, subObjects, function (object) {
-        if (object.initCallback != undefined) {
-            object.initCallback(object)
-            object.initCallback == undefined
-        }
-    })
 
     // Call the init callback.
     if (subObjects.length == 0) {
         if (object.initCallback != undefined) {
             object.initCallback(object)
             object.initCallback == undefined
+        }
+    } else if (subObjects.length > 0) {
+        if (lazy) {
+            if (object.initCallback != undefined) {
+                object.initCallback(object)
+                object.initCallback == undefined
+            }
+        } else {
+            setSubObject(object, subObjects, function (object) {
+                if (object.initCallback != undefined) {
+                    object.initCallback(object)
+                    object.initCallback == undefined
+                }
+            })
         }
     }
 

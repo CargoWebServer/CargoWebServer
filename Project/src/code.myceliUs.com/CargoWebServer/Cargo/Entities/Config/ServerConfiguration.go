@@ -20,6 +20,10 @@ type ServerConfiguration struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Configuration **/
 	M_id string
@@ -36,6 +40,12 @@ type ServerConfiguration struct{
 	M_schemasPath string
 	M_tmpPath string
 	M_binPath string
+	M_shards int
+	M_lifeWindow int
+	M_maxEntriesInWindow int
+	M_maxEntrySize int
+	M_hardMaxCacheSize int
+	M_verbose bool
 
 
 	/** Associations **/
@@ -60,6 +70,12 @@ type XsdServerConfiguration struct {
 	M_schemasPath	string	`xml:"schemasPath,attr"`
 	M_tmpPath	string	`xml:"tmpPath,attr"`
 	M_binPath	string	`xml:"binPath,attr"`
+	M_shards	int	`xml:"shards,attr"`
+	M_lifeWindow	int	`xml:"lifeWindow,attr"`
+	M_maxEntriesInWindow	int	`xml:"maxEntriesInWindow,attr"`
+	M_maxEntrySize	int	`xml:"maxEntrySize,attr"`
+	M_verbose	bool	`xml:"verbose,attr"`
+	M_hardMaxCacheSize	int	`xml:"hardMaxCacheSize,attr"`
 
 }
 /***************** Entity **************************/
@@ -103,6 +119,11 @@ func (this *ServerConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *ServerConfiguration) GetChilds() []interface{}{
+	var childs []interface{}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *ServerConfiguration) IsNeedSave() bool{
 	return this.NeedSave
@@ -114,6 +135,14 @@ func (this *ServerConfiguration) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ServerConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *ServerConfiguration) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *ServerConfiguration) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *ServerConfiguration) GetId()string{
@@ -233,6 +262,66 @@ func (this *ServerConfiguration) GetBinPath()string{
 func (this *ServerConfiguration) SetBinPath(val string){
 	this.NeedSave = this.M_binPath== val
 	this.M_binPath= val
+}
+
+
+func (this *ServerConfiguration) GetShards()int{
+	return this.M_shards
+}
+
+func (this *ServerConfiguration) SetShards(val int){
+	this.NeedSave = this.M_shards== val
+	this.M_shards= val
+}
+
+
+func (this *ServerConfiguration) GetLifeWindow()int{
+	return this.M_lifeWindow
+}
+
+func (this *ServerConfiguration) SetLifeWindow(val int){
+	this.NeedSave = this.M_lifeWindow== val
+	this.M_lifeWindow= val
+}
+
+
+func (this *ServerConfiguration) GetMaxEntriesInWindow()int{
+	return this.M_maxEntriesInWindow
+}
+
+func (this *ServerConfiguration) SetMaxEntriesInWindow(val int){
+	this.NeedSave = this.M_maxEntriesInWindow== val
+	this.M_maxEntriesInWindow= val
+}
+
+
+func (this *ServerConfiguration) GetMaxEntrySize()int{
+	return this.M_maxEntrySize
+}
+
+func (this *ServerConfiguration) SetMaxEntrySize(val int){
+	this.NeedSave = this.M_maxEntrySize== val
+	this.M_maxEntrySize= val
+}
+
+
+func (this *ServerConfiguration) GetHardMaxCacheSize()int{
+	return this.M_hardMaxCacheSize
+}
+
+func (this *ServerConfiguration) SetHardMaxCacheSize(val int){
+	this.NeedSave = this.M_hardMaxCacheSize== val
+	this.M_hardMaxCacheSize= val
+}
+
+
+func (this *ServerConfiguration) IsVerbose()bool{
+	return this.M_verbose
+}
+
+func (this *ServerConfiguration) SetVerbose(val bool){
+	this.NeedSave = this.M_verbose== val
+	this.M_verbose= val
 }
 
 

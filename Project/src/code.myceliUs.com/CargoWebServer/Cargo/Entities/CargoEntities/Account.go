@@ -20,6 +20,10 @@ type Account struct{
 	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
+	/** Use to put the entity in the cache **/
+	setEntity func(interface{})
+	/** Generate the entity uuid **/
+	generateUuid func(interface{}) string
 
 	/** members of Entity **/
 	M_id string
@@ -97,6 +101,25 @@ func (this *Account) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
 }
 
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Account) GetChilds() []interface{}{
+	var childs []interface{}
+	var child interface{}
+	var err error
+	for i:=0; i < len(this.M_sessions); i++ {
+		child, err = this.getEntityByUuid( this.M_sessions[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	for i:=0; i < len(this.M_messages); i++ {
+		child, err = this.getEntityByUuid( this.M_messages[i])
+		if err == nil {
+			childs = append( childs, child)
+		}
+	}
+	return childs
+}
 /** Evaluate if an entity needs to be saved. **/
 func (this *Account) IsNeedSave() bool{
 	return this.NeedSave
@@ -108,6 +131,14 @@ func (this *Account) ResetNeedSave(){
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Account) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
+}
+/** Use it the set the entity on the cache. **/
+func (this *Account) SetEntitySetter(fct func(entity interface{})){
+	this.setEntity = fct
+}
+/** Set the uuid generator function **/
+func (this *Account) SetUuidGenerator(fct func(entity interface{}) string){
+	this.generateUuid = fct
 }
 
 func (this *Account) GetId()string{
@@ -164,6 +195,13 @@ func (this *Account) GetSessions()[]*Session{
 func (this *Account) SetSessions(val []*Session){
 	this.M_sessions= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_sessions")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_sessions=append(this.M_sessions, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -176,6 +214,13 @@ func (this *Account) AppendSessions(val *Session){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_sessions")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_sessions = append(this.M_sessions, val.GetUuid())
 }
 
@@ -206,6 +251,13 @@ func (this *Account) GetMessages()[]Message{
 func (this *Account) SetMessages(val []Message){
 	this.M_messages= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentLnk("M_messages")
+		if len(val[i].GetUuid()) == 0 {
+			val[i].SetUuid(this.generateUuid(val[i]))
+		}
+		this.setEntity(val[i])
+
 		this.M_messages=append(this.M_messages, val[i].GetUuid())
 	}
 	this.NeedSave= true
@@ -218,6 +270,13 @@ func (this *Account) AppendMessages(val Message){
 		}
 	}
 	this.NeedSave= true
+	val.SetParentUuid(this.UUID)
+	val.SetParentLnk("M_messages")
+	if len(val.GetUuid()) == 0 {
+		val.SetUuid(this.generateUuid(val))
+	}
+	this.setEntity(val)
+
 	this.M_messages = append(this.M_messages, val.GetUuid())
 }
 

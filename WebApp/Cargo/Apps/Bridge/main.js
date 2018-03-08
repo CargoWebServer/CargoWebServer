@@ -3,7 +3,7 @@
  */
 var applicationName = document.getElementsByTagName("title")[0].text;
 
-// Local event...
+// Local event.
 var ChangeFileEvent = 100;
 var ChangeThemeEvent = 101;
 
@@ -13,7 +13,7 @@ var catalog = null;
 var homePage = null;
 
 function init() {
-    // console.log("welcome to bridge!")
+    // console.log("welcome to bridge!").
     // Set style informations.
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"));
     if (cargoThemeInfos !== undefined) {

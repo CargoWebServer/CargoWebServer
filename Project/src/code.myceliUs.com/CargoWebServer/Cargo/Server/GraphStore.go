@@ -11,10 +11,20 @@ import (
 	"reflect"
 	"strings"
 
+	"regexp"
+	"strconv"
+	"time"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
+
+	"github.com/xrash/smetrics"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
 
 	// The backend...
 	"github.com/boltdb/bolt"
@@ -671,6 +681,523 @@ func (this *GraphStore) DeleteEntityPrototypes() error {
 		}
 	}
 	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Search functionality.
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Merge tow results in one...
+ */
+func (this *GraphStore) merge(r1 map[string]map[string]interface{}, r2 map[string]map[string]interface{}) map[string]map[string]interface{} {
+
+	for k, v := range r1 {
+		r2[k] = v
+	}
+	return r2
+}
+
+/**
+ * Evaluate an expression.
+ */
+func (this *GraphStore) evaluate(typeName string, fieldName string, comparator string, expected interface{}, value interface{}) (bool, error) {
+	isMatch := false
+
+	// if the value is nil i will automatically return
+	if value == nil {
+		return isMatch, nil
+	}
+
+	prototype, err := this.GetEntityPrototype(typeName)
+	if err != nil {
+		return false, err
+	}
+
+	// The type name.
+	fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
+	fieldType = strings.Replace(fieldType, "[]", "", -1)
+
+	// here for the date I will get it unix time value...
+	if fieldType == "xs.date" || fieldType == "xs.dateTime" {
+		expectedDateValue, err := Utility.MatchISO8601_Date(expected.(string))
+		if err == nil {
+			dateValue, _ := Utility.MatchISO8601_Date(value.(string))
+			if fieldType == "xs.dateTime" {
+				expected = expectedDateValue.Unix() // get the unix time for calcul
+				value = dateValue.Unix()            // get the unix time for calcul
+			} else {
+				expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+				value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+			}
+		} else {
+			// I will try with data time instead.
+			expectedDateValue, err := Utility.MatchISO8601_DateTime(expected.(string))
+			if err == nil {
+				dateValue, _ := Utility.MatchISO8601_DateTime(value.(string))
+				if fieldType == "xs.dateTime" {
+					expected = expectedDateValue.Unix() // get the unix time for calcul
+					value = dateValue.Unix()            // get the unix time for calcul
+				} else {
+					expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+					value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+				}
+			} else {
+				return false, err
+			}
+		}
+	}
+
+	if comparator == "==" {
+		// Equality comparator.
+		// Case of string type.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			isRegex := strings.HasPrefix(expected.(string), "/") && strings.HasSuffix(expected.(string), "/")
+			if isRegex {
+				// here I will try to match the regular expression.
+				var err error
+				isMatch, err = regexp.MatchString(expected.(string)[1:len(expected.(string))-1], value.(string))
+				if err != nil {
+					return false, err
+				}
+			} else {
+				isMatch = Utility.RemoveAccent(expected.(string)) == Utility.RemoveAccent(value.(string))
+			}
+		} else if reflect.TypeOf(expected).Kind() == reflect.Bool && reflect.TypeOf(value).Kind() == reflect.Bool {
+			return expected.(bool) == value.(bool), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return expected.(int64) == value.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return expected.(float64) == value.(float64), nil
+		}
+	} else if comparator == "~=" {
+		// Approximation comparator, string only...
+		// Case of string types.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			distance := smetrics.JaroWinkler(Utility.RemoveAccent(expected.(string)), Utility.RemoveAccent(value.(string)), 0.7, 4)
+			isMatch = distance >= .85
+		} else {
+			return false, errors.New("Operator ~= can be only used with strings.")
+		}
+	} else if comparator == "!=" {
+		// Equality comparator.
+		// Case of string type.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			isMatch = Utility.RemoveAccent(expected.(string)) != Utility.RemoveAccent(value.(string))
+		} else if reflect.TypeOf(expected).Kind() == reflect.Bool && reflect.TypeOf(value).Kind() == reflect.Bool {
+			return expected.(bool) != value.(bool), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return expected.(int64) != value.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return expected.(float64) != value.(float64), nil
+		}
+	} else if comparator == "^=" {
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			return strings.HasPrefix(value.(string), expected.(string)), nil
+		} else {
+			return false, nil
+		}
+	} else if comparator == "$=" {
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			return strings.HasSuffix(value.(string), expected.(string)), nil
+		} else {
+			return false, nil
+		}
+	} else if comparator == "<" {
+		// Number operator only...
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) < expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) < expected.(float64), nil
+		}
+	} else if comparator == "<=" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) <= expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) <= expected.(float64), nil
+		}
+	} else if comparator == ">" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) > expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) > expected.(float64), nil
+		}
+	} else if comparator == ">=" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) >= expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) >= expected.(float64), nil
+		}
+	}
+
+	return isMatch, nil
+}
+
+/**
+ * That function test if a given value match all expressions of a given ast...
+ */
+func (this *GraphStore) match(ast *ast.QueryAst, values map[string]interface{}) (bool, error) {
+	// test if the value is composite.
+	if ast.IsComposite() {
+		ast1, _, ast2 := ast.GetSubQueries()
+		// both side of the tree must match.
+		isMatch, err := this.match(ast1, values)
+		if err != nil {
+			return false, err
+		}
+		if isMatch == false {
+			return false, nil
+		}
+
+		isMatch, err = this.match(ast2, values)
+		if err != nil {
+			return false, err
+		}
+
+		if isMatch == false {
+			return false, nil
+		}
+	} else {
+		// I will evaluate the expression...
+		typeName, fieldName, comparator, expected := ast.GetExpression()
+		return this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
+	}
+
+	return true, nil
+}
+
+func (this *GraphStore) getValues(uuid string, fields []string) (map[string]interface{}, error) {
+	object := make(map[string]interface{}, 0)
+
+	// So here I will retreive values for given object fields...
+	typeName := strings.Split(uuid, "%")[0]
+	var prototype, err = this.GetEntityPrototype(typeName)
+	if err != nil {
+		return object, err
+	}
+
+	for i := 0; i < len(fields); i++ {
+		fieldName := fields[i]
+		fieldIndex := prototype.getFieldIndex(fieldName)
+		if fieldIndex != -1 {
+			fieldType := prototype.FieldsType[fieldIndex]
+			fieldType_ := strings.Replace(fieldType, "[]", "", -1)
+			fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
+			predicat := typeName + ":" + fieldType_ + ":" + fieldName
+
+			q := "( " + uuid + ", " + predicat + ", ? )"
+			results, err := this.Read(q, []interface{}{}, []interface{}{})
+			if err == nil {
+				if len(results) > 0 {
+					// Only the first value will be keep here.
+					// In case of array values are store as json string so no more than
+					// one element must be here.
+					object[fieldName] = results[0][2]
+				}
+			}
+		}
+	}
+	return object, nil
+}
+
+func (this *GraphStore) getIndexation(typeName string, fieldName string, expected interface{}) ([]interface{}, error) {
+	// Indexations contain array of string
+	var ids []interface{}
+	var prototype, err = this.GetEntityPrototype(typeName)
+	if err != nil {
+		return ids, err
+	}
+	// I will retreive the value...
+	if len(fieldName) == 0 {
+		// Indexation by typeName...
+		q := "( ?, TYPENAME, " + typeName + " )"
+		results, err := this.Read(q, []interface{}{}, []interface{}{})
+		if err != nil {
+			return ids, err
+		}
+		for i := 0; i < len(results); i++ {
+			ids = append(ids, results[i][0].(string))
+		}
+	} else {
+		fieldIndex := prototype.getFieldIndex(fieldName)
+		if fieldIndex != -1 {
+			fieldType := prototype.FieldsType[fieldIndex]
+			fieldType_ := strings.Replace(fieldType, "[]", "", -1)
+			fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
+			predicat := typeName + ":" + fieldType_ + ":" + fieldName
+
+			q := "( ?, " + predicat + ", " + Utility.ToString(expected) + " )"
+			results, err := this.Read(q, []interface{}{}, []interface{}{})
+			if err != nil {
+				return ids, err
+			}
+
+			// Now I will get the results...
+			for i := 0; i < len(results); i++ {
+				ids = append(ids, results[i][0].(string))
+			}
+		}
+	}
+
+	return ids, nil
+}
+
+/**
+ * Here i will walk the tree and generate the query.
+ */
+func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string]map[string]interface{}, error) {
+
+	// I will create the array if it dosent exist.
+	results := make(map[string]map[string]interface{}, 0)
+
+	if ast.IsComposite() {
+		// Get the sub-queries
+		ast1, operator, ast2 := ast.GetSubQueries()
+
+		r1, err := this.runQuery(ast1, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		r2, err := this.runQuery(ast2, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		if operator == "&&" { // conjonction
+			for k, v := range r2 {
+				isMatch, err := this.match(ast1, v)
+				if err != nil {
+					return nil, err
+				}
+				if isMatch {
+					results[k] = v
+				}
+			}
+			for k, v := range r1 {
+				isMatch, err := this.match(ast2, v)
+				if err != nil {
+					return nil, err
+				}
+				if isMatch {
+					results[k] = v
+				}
+			}
+		} else if operator == "||" { // disjonction
+			results = this.merge(r1, r2)
+		}
+
+	} else {
+
+		typeName, fieldName, comparator, expected := ast.GetExpression()
+		values := make(map[string]map[string]interface{}, 0)
+		// Need the prototype here.
+		prototype, err := this.GetEntityPrototype(typeName)
+		if err != nil {
+			return nil, err
+		}
+		fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
+		isArray := strings.HasPrefix(fieldType, "[]")
+		isRef := strings.HasSuffix(fieldType, ":Ref")
+		fieldType = strings.Replace(fieldType, "[]", "", -1)
+		isString := fieldType == "xs.string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.NCName" || fieldType == "xs.ID" || fieldType == "xs.language"
+
+		// Integers types.
+		isInt := fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong"
+
+		// decimal value
+		isDecimal := fieldType == "xs.float" || fieldType == "xs.decimal" || fieldType == "xs.double"
+
+		// Date time
+		isDate := fieldType == "xs.date" || fieldType == "xs.dateTime"
+
+		// I will append the indexs and the ids to the list of field if there's
+		// not already in.
+		for i := 0; i < len(prototype.Ids); i++ {
+			if !Utility.Contains(fields, prototype.Ids[i]) {
+				fields = append(fields, prototype.Ids[i])
+			}
+		}
+		// The indexs
+		for i := 0; i < len(prototype.Indexs); i++ {
+			if !Utility.Contains(fields, prototype.Indexs[i]) {
+				fields = append(fields, prototype.Indexs[i])
+			}
+		}
+
+		// Strings or references...
+		if isString || isRef {
+			// The string expected value...
+			expectedStr := expected.(string)
+			isRegex := strings.HasPrefix(expectedStr, "/") && strings.HasSuffix(expectedStr, "/")
+			if comparator == "==" && !isRegex {
+				// Now i will get the value from the indexation.
+				indexations, err := this.getIndexation(typeName, fieldName, expectedStr)
+				if err == nil {
+					for i := 0; i < len(indexations); i++ {
+
+						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						if err != nil {
+							return nil, err
+						}
+
+						var isMatch bool
+						if isArray {
+							// Here I have an array of values to test.
+							var strValues []string
+							err = json.Unmarshal([]byte(values[indexations[i].(string)][fieldName].(string)), &strValues)
+							if err != nil {
+								return nil, err
+							}
+							for j := 0; j < len(strValues); j++ {
+								isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, strValues[j])
+							}
+						} else {
+							isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						}
+
+						if err != nil {
+							return nil, err
+						}
+						if isMatch {
+							// if the result match I put it inside the map result.
+							results[indexations[i].(string)] = values[indexations[i].(string)]
+						}
+					}
+				}
+			} else if comparator == "~=" || comparator == "!=" || comparator == "^=" || comparator == "$=" || (isRegex && comparator == "==") {
+				// Here I will use the typename as indexation key...
+				indexations, err := this.getIndexation(typeName, "", "")
+				if err == nil {
+					for i := 0; i < len(indexations); i++ {
+						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						if err != nil {
+							return nil, err
+						}
+
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						if err != nil {
+							return nil, err
+						}
+						if isMatch {
+							// if the result match I put it inside the map result.
+							results[indexations[i].(string)] = values[indexations[i].(string)]
+						}
+					}
+				}
+			} else {
+				if !isRegex {
+					return nil, errors.New("Unexpexted comparator " + comparator + " for type \"string\".")
+				} else {
+					return nil, errors.New("Unexpexted comparator " + comparator + " for regex, use \"==\" insted")
+				}
+			}
+		} else if fieldType == "xs.boolean" {
+			if !(comparator == "==" || comparator == "!=") {
+				return nil, errors.New("Unexpexted comparator " + comparator + " for bool values, use \"==\" or  \"!=\"")
+			}
+
+			// Get the boolean value.
+			indexations, err := this.getIndexation(typeName, fieldName, strconv.FormatBool(expected.(bool)))
+			if err == nil {
+				for i := 0; i < len(indexations); i++ {
+					values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+					if err != nil {
+						return nil, err
+					}
+
+					isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+					if err != nil {
+						return nil, err
+					}
+					if isMatch {
+						// if the result match I put it inside the map result.
+						results[indexations[i].(string)] = values[indexations[i].(string)]
+					}
+				}
+			}
+		} else if isInt || isDecimal || isDate { // Numeric values or date that are covert at evaluation time as integer.
+			if comparator == "~=" {
+				return nil, errors.New("Unexpexted comparator " + comparator + " for type numeric value.")
+			}
+			// Get the boolean value.
+			if comparator == "==" {
+				indexations, err := this.getIndexation(typeName, fieldName, expected)
+				if err == nil {
+					for i := 0; i < len(indexations); i++ {
+						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						if err != nil {
+							return nil, err
+						}
+
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						if err != nil {
+							return nil, err
+						}
+						if isMatch {
+							// if the result match I put it inside the map result.
+							results[indexations[i].(string)] = values[indexations[i].(string)]
+						}
+					}
+				}
+			} else {
+				// for the other comparator I will get all the entities of the given type and test each of those.
+				indexations, err := this.getIndexation(typeName, "", "")
+				if err == nil {
+					for i := 0; i < len(indexations); i++ {
+						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						if err != nil {
+							return nil, err
+						}
+
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						if err != nil {
+							return nil, err
+						}
+						if isMatch {
+							// if the result match I put it inside the map result.
+							results[indexations[i].(string)] = values[indexations[i].(string)]
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return results, nil
+}
+
+/**
+ * Execute a search query.
+ */
+func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]interface{}, error) {
+	s := lexer.NewLexer([]byte(query))
+	p := parser.NewParser()
+	a, err := p.Parse(s)
+	if err == nil {
+		astree := a.(*ast.QueryAst)
+		fieldLength := len(fields)
+
+		r, err := this.runQuery(astree, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		// Here I will keep the result part...
+		results := make([][]interface{}, 0)
+		for _, object := range r {
+			results_ := make([]interface{}, 0)
+			for i := 0; i < fieldLength; i++ {
+				results_ = append(results_, object[fields[i]])
+			}
+			results = append(results, results_)
+		}
+
+		return results, err
+	} else {
+		log.Println("--> search error ", err)
+	}
+	return nil, err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1401,15 +1928,34 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 			bucketId := "O"
 			triples = this.getTriples(o, bucketId)
 		}
-	}
 
-	if len(triples) == 0 {
-		return nil, errors.New("No values found!")
-	}
+		if len(triples) == 0 {
+			return nil, errors.New("No values found!")
+		}
 
-	results = make([][]interface{}, 0)
-	for i := 0; i < len(triples); i++ {
-		results = append(results, []interface{}{triples[i].Subject, triples[i].Predicate, triples[i].Object})
+		results = make([][]interface{}, 0)
+		for i := 0; i < len(triples); i++ {
+			results = append(results, []interface{}{triples[i].Subject, triples[i].Predicate, triples[i].Object})
+		}
+
+		return results, nil
+
+	} else {
+		// First of all i will init the query...
+		var query EntityQuery
+		err := json.Unmarshal([]byte(queryStr), &query)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(query.Query) > 0 {
+			searchResult, err := this.executeSearchQuery(query.Query, query.Fields)
+			if err != nil {
+				return nil, err
+			}
+			return searchResult, nil
+		}
 	}
 	return
 }
@@ -1600,7 +2146,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		log.Println("remove triple: ", triples[i])
+		// log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {
