@@ -1,12 +1,12 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-// Fichier contenant les différents test.
+// Fichier contenant les différents test..
 var languageInfo = {
     "en": {
     }
 }
 
 /**
- * This function is the entry point of the application...
+ * This function is the entry point of the application
  */
 function main() {
     // eventTests()

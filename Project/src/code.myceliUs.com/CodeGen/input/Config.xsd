@@ -13,7 +13,7 @@
 
 	<xsd:simpleType name="tDataStoreVendor">
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="CAYLEY"/>
+			<xsd:enumeration value="CARGO"/>
 			<xsd:enumeration value="MYSQL"/>
 			<xsd:enumeration value="MSSQL"/>
 		</xsd:restriction>

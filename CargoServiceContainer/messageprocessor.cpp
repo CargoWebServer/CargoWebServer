@@ -115,24 +115,19 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
                 // All chuck are received here...
                 QByteArray originalMessageData;
                 for(QVector<QByteArray>::iterator it = array.begin(); it != array.end(); ++it){
-                    originalMessageData.append(*it);
+                     originalMessageData.append(*it);
                 }
 
                 this->pendingMsgChunk.remove(messageId);
-                qDebug() << "Remove message: " << messageId << " pending count: " << this->pendingMsgChunk.count();
                 // Here I will recreate the original message from the assembled data array...
                 com::mycelius::message::Message originalMessage;
                 if(originalMessage.ParseFromArray(originalMessageData.constData(), originalMessageData.size())){
                     this->processIncommingMessage(originalMessageData, sessionId);
                 }else{
                     // If the original message was a b64 string...
-                    originalMessageData = QByteArray::fromBase64(originalMessageData);
-                    if(originalMessage.ParseFromArray(originalMessageData.constData(), originalMessageData.size())){
-                        this->processIncommingMessage(originalMessageData, sessionId);
-                    }else{
-                        qDebug() << "Fail to recreate the original message: ";
-                        qDebug() << originalMessageData.constData();
-                    }
+                   qDebug() << "Fail to recreate the original message: ";
+                   qDebug() << originalMessageData.constData();
+
                 }
             }
         }else{

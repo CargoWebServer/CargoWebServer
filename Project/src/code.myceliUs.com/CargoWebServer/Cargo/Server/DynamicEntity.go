@@ -1,10 +1,12 @@
 package Server
 
 import (
-	//	"log"
+	"log"
 	"reflect"
 	"strings"
 	"sync"
+
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -44,7 +46,6 @@ func NewDynamicEntity() *DynamicEntity {
 func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	this.Lock()
 	defer this.Unlock()
-
 	// Here the value is in the map.
 	this.object[field] = value
 	this.object["NeedSave"] = true
@@ -127,29 +128,86 @@ func (this *DynamicEntity) deleteValue(field string) {
  * Set object.
  */
 func (this *DynamicEntity) setObject(obj map[string]interface{}) {
-	this.Lock()
-	defer this.Unlock()
+	// this.Lock()
+	// defer this.Unlock()
 	this.object = obj
 
-	if obj["UUID"] == nil {
-		obj["UUID"] = ""
+	if this.object["UUID"] == nil {
+		this.object["UUID"] = ""
 	}
 
-	if obj["ParentUuid"] == nil {
-		obj["ParentUuid"] = ""
+	if this.object["ParentUuid"] == nil {
+		this.object["ParentUuid"] = ""
 	}
 
 	// Set uuid
-	if len(obj["UUID"].(string)) == 0 {
+	if len(this.object["UUID"].(string)) == 0 {
 		ids := make([]interface{}, 0)
-		typeName := obj["TYPENAME"].(string)
+		typeName := this.object["TYPENAME"].(string)
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
 		// skip The first element, the uuid
 		for i := 1; i < len(prototype.Ids); i++ {
 			ids = append(ids, obj[prototype.Ids[i]])
 		}
 		// In that case I will set it uuid.
-		obj["UUID"] = GetServer().GetEntityManager().GenerateEntityUUID(obj["TYPENAME"].(string), obj["ParentUuid"].(string), ids, "", "")
+		this.object["UUID"] = GetServer().GetEntityManager().GenerateEntityUUID(obj["TYPENAME"].(string), this.object["ParentUuid"].(string), ids, "", "")
+	}
+
+	// Here I will initilalyse sub-entity if there one, so theire map will not be part of this entity.
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(this.GetTypeName(), strings.Split(this.GetTypeName(), ".")[0])
+	for i := 0; i < len(prototype.Fields); i++ {
+		field := prototype.Fields[i]
+		if strings.HasPrefix(field, "M_") {
+			fieldType := prototype.FieldsType[i]
+			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
+				if strings.HasPrefix(fieldType, "[]") {
+					// The value is an array...
+					val := this.object[field]
+					if val != nil {
+						if reflect.TypeOf(val).String() == "[]interface {}" {
+							uuids := make([]interface{}, 0)
+							for j := 0; j < len(val.([]interface{})); j++ {
+								if reflect.TypeOf(val.([]interface{})[j]).String() == "map[string]interface {}" {
+									if val.([]interface{})[j].(map[string]interface{})["TYPENAME"] != nil {
+										// Set parent information if is not already set.
+										val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = this.object["UUID"]
+										val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
+										val.([]interface{})[j].(map[string]interface{})["NeedSave"] = true
+										child := NewDynamicEntity()
+										child.setObject(val.([]interface{})[j].(map[string]interface{}))
+										// Keep it on the cache
+										GetServer().GetEntityManager().m_setEntityChan <- child
+										uuids = append(uuids, child.object["UUID"])
+									}
+								}
+							}
+							if len(uuids) > 0 {
+								this.object[field] = uuids
+							}
+						}
+
+					}
+				} else {
+					// The value is not an array.
+					val := this.object[field]
+					if val != nil {
+						if reflect.TypeOf(val).String() == "map[string]interface {}" {
+							if val.(map[string]interface{})["TYPENAME"] != nil {
+								// Set parent information if is not already set.
+								val.(map[string]interface{})["ParentUuid"] = this.object["UUID"]
+								val.(map[string]interface{})["ParentLnk"] = field
+								val.(map[string]interface{})["NeedSave"] = true
+								child := NewDynamicEntity()
+								child.setObject(val.(map[string]interface{}))
+								// Keep it on the cache
+								GetServer().GetEntityManager().m_setEntityChan <- child
+								this.object[field] = child.object["UUID"]
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -329,42 +387,35 @@ func (this *DynamicEntity) GetChilds() []interface{} {
 		field := prototype.Fields[i]
 		if strings.HasPrefix(field, "M_") {
 			fieldType := prototype.FieldsType[i]
-			if !(strings.HasPrefix(fieldType, "[]xs.") && strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref")) {
+			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
 				if strings.HasPrefix(fieldType, "[]") {
 					// The value is an array...
 					val := this.getValue(field)
 					if val != nil {
 						if reflect.TypeOf(val).String() == "[]interface {}" {
 							for j := 0; j < len(val.([]interface{})); j++ {
-								if reflect.TypeOf(val.([]interface{})[j]).String() == "map[string]interface {}" {
-									if val.([]interface{})[j].(map[string]interface{})["TYPENAME"] != nil {
-										// Set parent information if is not already set.
-										val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = this.GetUuid()
-										val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
-										child := NewDynamicEntity()
-										child.setObject(val.([]interface{})[j].(map[string]interface{}))
-										child.GetChilds()
+								if Utility.IsValidEntityReferenceName(val.([]interface{})[j].(string)) {
+									child, err := GetServer().GetEntityManager().getEntityByUuid(val.([]interface{})[j].(string))
+									if child != nil {
 										childs = append(childs, child)
+									}
+									if err != nil {
+										log.Println(err.GetBody())
 									}
 								}
 							}
 						}
-
 					}
 				} else {
 					// The value is not an array.
 					val := this.getValue(field)
-					if val != nil {
-						if reflect.TypeOf(val).String() == "map[string]interface {}" {
-							if val.(map[string]interface{})["TYPENAME"] != nil {
-								// Set parent information if is not already set.
-								val.(map[string]interface{})["ParentUuid"] = this.GetUuid()
-								val.(map[string]interface{})["ParentLnk"] = field
-								child := NewDynamicEntity()
-								child.setObject(val.(map[string]interface{}))
-								child.GetChilds()
-								childs = append(childs, child)
-							}
+					if Utility.IsValidEntityReferenceName(val.(string)) {
+						child, err := GetServer().GetEntityManager().getEntityByUuid(val.(string))
+						if child != nil {
+							childs = append(childs, child)
+						}
+						if err != nil {
+							log.Println(err.GetBody())
 						}
 					}
 				}

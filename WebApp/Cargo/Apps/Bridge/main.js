@@ -13,7 +13,7 @@ var catalog = null;
 var homePage = null;
 
 function init() {
-    // console.log("welcome to bridge!").
+    // console.log("welcome to bridge!")
     // Set style informations.
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"));
     if (cargoThemeInfos !== undefined) {

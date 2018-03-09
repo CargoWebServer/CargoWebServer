@@ -11,7 +11,7 @@
 
 	<!-- The data store product id... -->
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreVendor" name="DataStoreVendor">
-      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-CAYLEY" name="CAYLEY" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-CARGO" name="CARGO" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYSQL" name="MYSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MSSQL" name="MSSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-ODBC" name="ODBC" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>

@@ -520,8 +520,17 @@ func (this *EntityManager) isEntityExist(uuid string) bool {
 }
 
 func (this *EntityManager) getEntities(typeName string, storeId string, query *EntityQuery) ([]Entity, *CargoEntities.Error) {
+	var q string
+	if query == nil {
+		q = "( ?, TYPENAME, " + typeName + " )"
+	} else {
+		query.Fields = []string{"UUID"} // Only the uuid is need here...
+		val, err := json.Marshal(query)
+		if err == nil {
+			q = string(val)
+		}
+	}
 
-	q := "( ?, TYPENAME, " + typeName + " )"
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(q, []interface{}{}, []interface{}{})
 	if err != nil {
@@ -1808,6 +1817,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 				}
 				return obj.Interface().(Entity)
 			} else {
+
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
 				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, entity)
@@ -2086,7 +2096,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
 	entities, errObj := this.getEntities(typeName, storeId, query)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

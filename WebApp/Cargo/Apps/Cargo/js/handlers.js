@@ -228,7 +228,7 @@ var Message = function (id, conn, progressCallback, successCallback, errorCallba
 
 // Must be implement by child's.
 Message.prototype.getRpcMessageData = function () {
-    var msg = new RpcMessage({ "id": this.id, "type": Msg_TRANSFER, "index": this.index, "total": this.total, "data": utf8_to_b64(this.data) });
+    var msg = new RpcMessage({ "id": this.id, "type": Msg_TRANSFER, "index": this.index, "total": this.total, "data": this.data });
     return msg.toArrayBuffer();
 }
 
@@ -325,7 +325,7 @@ Message.prototype.send = function () {
             }
 
             // Set the msg data.
-            msg.data = Uint8ToBase64(fragment)
+            msg.data =  fragment
             msg.index = i
             msg.total = self.total
             pendingMessage[this.id][i] = msg;
