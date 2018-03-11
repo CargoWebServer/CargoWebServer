@@ -52,9 +52,13 @@ type XsdGroup struct {
 
 /** UUID **/
 func (this *Group) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Group) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -87,6 +91,14 @@ func (this *Group) GetParentLnk() string{
 }
 func (this *Group) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Group) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -125,6 +137,8 @@ func (this *Group) SetId(val string){
 }
 
 
+
+
 func (this *Group) GetName()string{
 	return this.M_name
 }
@@ -135,15 +149,17 @@ func (this *Group) SetName(val string){
 }
 
 
+
+
 func (this *Group) GetMembersRef()[]*User{
-	membersRef := make([]*User, 0)
+	values := make([]*User, 0)
 	for i := 0; i < len(this.M_membersRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_membersRef[i])
 		if err == nil {
-			membersRef = append(membersRef, entity.(*User))
+			values = append( values, entity.(*User))
 		}
 	}
-	return membersRef
+	return values
 }
 
 func (this *Group) SetMembersRef(val []*User){
@@ -153,6 +169,7 @@ func (this *Group) SetMembersRef(val []*User){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *Group) AppendMembersRef(val *User){
 	for i:=0; i < len(this.M_membersRef); i++{
@@ -165,15 +182,15 @@ func (this *Group) AppendMembersRef(val *User){
 }
 
 func (this *Group) RemoveMembersRef(val *User){
-	membersRef := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_membersRef); i++{
 		if this.M_membersRef[i] != val.GetUuid() {
-			membersRef = append(membersRef, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_membersRef = membersRef
+	this.M_membersRef = values
 }
 
 
@@ -189,6 +206,7 @@ func (this *Group) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Group) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

@@ -63,9 +63,13 @@ type XsdNotification struct {
 
 /** UUID **/
 func (this *Notification) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Notification) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -98,6 +102,14 @@ func (this *Notification) GetParentLnk() string{
 }
 func (this *Notification) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Notification) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -136,6 +148,8 @@ func (this *Notification) SetId(val string){
 }
 
 
+
+
 func (this *Notification) GetBody()string{
 	return this.M_body
 }
@@ -144,6 +158,8 @@ func (this *Notification) SetBody(val string){
 	this.NeedSave = this.M_body== val
 	this.M_body= val
 }
+
+
 
 
 func (this *Notification) GetFromRef()*Account{
@@ -158,6 +174,7 @@ func (this *Notification) SetFromRef(val *Account){
 	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
 }
+
 
 func (this *Notification) ResetFromRef(){
 	this.M_fromRef= ""
@@ -177,6 +194,7 @@ func (this *Notification) SetToRef(val *Account){
 	this.M_toRef= val.GetUuid()
 }
 
+
 func (this *Notification) ResetToRef(){
 	this.M_toRef= ""
 }
@@ -192,6 +210,8 @@ func (this *Notification) SetType(val string){
 }
 
 
+
+
 func (this *Notification) GetCode()int{
 	return this.M_code
 }
@@ -200,6 +220,8 @@ func (this *Notification) SetCode(val int){
 	this.NeedSave = this.M_code== val
 	this.M_code= val
 }
+
+
 
 
 func (this *Notification) GetEntitiesPtr()*Entities{
@@ -214,6 +236,7 @@ func (this *Notification) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Notification) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

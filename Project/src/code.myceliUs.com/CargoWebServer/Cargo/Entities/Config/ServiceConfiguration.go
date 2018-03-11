@@ -60,9 +60,13 @@ type XsdServiceConfiguration struct {
 
 /** UUID **/
 func (this *ServiceConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *ServiceConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -95,6 +99,14 @@ func (this *ServiceConfiguration) GetParentLnk() string{
 }
 func (this *ServiceConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *ServiceConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -133,6 +145,8 @@ func (this *ServiceConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *ServiceConfiguration) GetHostName()string{
 	return this.M_hostName
 }
@@ -141,6 +155,8 @@ func (this *ServiceConfiguration) SetHostName(val string){
 	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
+
+
 
 
 func (this *ServiceConfiguration) GetIpv4()string{
@@ -153,6 +169,8 @@ func (this *ServiceConfiguration) SetIpv4(val string){
 }
 
 
+
+
 func (this *ServiceConfiguration) GetPort()int{
 	return this.M_port
 }
@@ -161,6 +179,8 @@ func (this *ServiceConfiguration) SetPort(val int){
 	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
+
+
 
 
 func (this *ServiceConfiguration) GetUser()string{
@@ -173,6 +193,8 @@ func (this *ServiceConfiguration) SetUser(val string){
 }
 
 
+
+
 func (this *ServiceConfiguration) GetPwd()string{
 	return this.M_pwd
 }
@@ -183,6 +205,8 @@ func (this *ServiceConfiguration) SetPwd(val string){
 }
 
 
+
+
 func (this *ServiceConfiguration) IsStart()bool{
 	return this.M_start
 }
@@ -191,6 +215,8 @@ func (this *ServiceConfiguration) SetStart(val bool){
 	this.NeedSave = this.M_start== val
 	this.M_start= val
 }
+
+
 
 
 func (this *ServiceConfiguration) GetParentPtr()*Configurations{
@@ -205,6 +231,7 @@ func (this *ServiceConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *ServiceConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

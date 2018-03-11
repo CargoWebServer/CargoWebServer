@@ -13,7 +13,6 @@ import (
 	"github.com/allegro/bigcache"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -46,7 +45,55 @@ var entityManager *EntityManager
 // Function to be use a function pointer.
 var getEntityFct func(uuid string) (interface{}, error)
 var setEntityFct func(interface{})
-var generateUuidFct func(interface{}) string
+
+// Function to set the entity uuid.
+var (
+	generateUuidFct = func(entity interface{}) string {
+		uuid := generateEntityUuid(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids())
+		return uuid
+	}
+)
+
+func generateEntityUuid(typeName string, parentUuid string, ids []interface{}) string {
+
+	if len(ids) == 0 {
+		// if there is no ids in the entity I will generate a random uuid.
+		return typeName + "%" + Utility.RandomUUID()
+	}
+
+	var keyInfo string
+	if len(parentUuid) > 0 {
+		keyInfo += parentUuid + ":"
+	}
+
+	keyInfo = typeName + ":"
+	for i := 0; i < len(ids); i++ {
+		if ids[i] != nil {
+			if reflect.TypeOf(ids[i]).Kind() == reflect.String {
+				keyInfo += ids[i].(string)
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
+				keyInfo += strconv.Itoa(ids[i].(int))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
+				keyInfo += strconv.Itoa(int(ids[i].(int8)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
+				keyInfo += strconv.Itoa(int(ids[i].(int16)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
+				keyInfo += strconv.Itoa(int(ids[i].(int32)))
+			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
+				keyInfo += strconv.Itoa(int(ids[i].(int64)))
+			}
+			// Append underscore for readability in case of problem...
+			if i < len(ids)-1 {
+				keyInfo += "_"
+			}
+		}
+	}
+
+	uuid := typeName + "%" + Utility.GenerateUUID(keyInfo)
+
+	// Return the uuid from the input information.
+	return uuid
+}
 
 func (this *Server) GetEntityManager() *EntityManager {
 	if entityManager == nil {
@@ -86,11 +133,6 @@ func newEntityManager() *EntityManager {
 
 	setEntityFct = func(entity interface{}) {
 		GetServer().GetEntityManager().m_setEntityChan <- entity.(Entity)
-	}
-
-	generateUuidFct = func(entity interface{}) string {
-		uuid := GetServer().GetEntityManager().GenerateEntityUUID(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids(), "", "")
-		return uuid
 	}
 
 	// TODO set those value in the server config...
@@ -153,7 +195,7 @@ func newEntityManager() *EntityManager {
 				} else if len(entityInfo.ids) > 0 {
 					// The uuid generated here is local and not the entity uuid because the
 					// parentUuid is not know... clash can append if entity with same ids and typeName exist at same time.
-					id := entityManager.GenerateEntityUUID(entityInfo.typeName, "", entityInfo.ids, "", "")
+					id := generateEntityUuid(entityInfo.typeName, "", entityInfo.ids)
 
 					// From the id I will get the uuid...
 					uuid, err := entityManager.m_cache.Get(id)
@@ -179,7 +221,7 @@ func newEntityManager() *EntityManager {
 			case entity := <-entityManager.m_removeEntityChan:
 				// Remove it from the map.
 				if len(entity.Ids()) > 0 {
-					id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+					id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 					entityManager.m_cache.Delete(id)
 				}
 				// Remove from the cache.
@@ -192,7 +234,7 @@ func newEntityManager() *EntityManager {
 					if err == nil {
 						// By id
 						if len(entity.Ids()) > 0 {
-							id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+							id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 							entityManager.m_cache.Set(id, []byte(entity.GetUuid()))
 						}
 						// By uuid
@@ -204,7 +246,7 @@ func newEntityManager() *EntityManager {
 					if err == nil {
 						// By id
 						if len(entity.Ids()) > 0 {
-							id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+							id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 							entityManager.m_cache.Set(id, []byte(entity.GetUuid()))
 						}
 						// By uuid
@@ -497,7 +539,7 @@ func (this *EntityManager) getCargoEntities() *CargoEntities.Entities {
 
 // Return the uuid for the CargoEntities
 func (this *EntityManager) getCargoEntitiesUuid() string {
-	return this.GenerateEntityUUID("CargoEntities.Entities", "", []interface{}{"CARGO_ENTITIES"}, "", "")
+	return generateEntityUuid("CargoEntities.Entities", "", []interface{}{"CARGO_ENTITIES"})
 }
 
 func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (*EntityPrototype, error) {
@@ -759,8 +801,11 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	entity.SetParentLnk(attributeName)
 	entity.SetParentUuid(parentUuid)
 
+	// Set the uuid generator function before save
+	entity.SetUuidGenerator(generateUuidFct)
+
 	// Here I will set the uuid if is not already set
-	uuid := this.GenerateEntityUUID(typeName, parentUuid, entity.Ids(), "", "")
+	uuid := generateEntityUuid(typeName, parentUuid, entity.Ids())
 	entity.SetUuid(uuid)
 
 	// Set entity accessor.
@@ -845,11 +890,13 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		return nil
 	}
 
+	// Set the uuid generator function before save
+	entity.SetUuidGenerator(generateUuidFct)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 
 	// Here I will set the uuid if is not already set
 	if len(entity.GetUuid()) == 0 {
-		uuid := this.GenerateEntityUUID(typeName, entity.GetParentUuid(), entity.Ids(), "", "")
+		uuid := generateEntityUuid(typeName, entity.GetParentUuid(), entity.Ids())
 		entity.SetUuid(uuid)
 	}
 
@@ -2400,47 +2447,11 @@ func (this *EntityManager) IsEntityExist(typeName string, storeId string, ids []
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *EntityManager) GenerateEntityUUID(typeName string, parentUuid string, ids []interface{}, messageId string, sessionId string) string {
-	if len(ids) == 0 {
-		// if there is no ids in the entity I will generate a random uuid.
-		return typeName + "%" + Utility.RandomUUID()
-	}
-
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return ""
 	}
 
-	var keyInfo string
-	if len(parentUuid) > 0 {
-		keyInfo += parentUuid + ":"
-	}
-
-	keyInfo = typeName + ":"
-	for i := 0; i < len(ids); i++ {
-		if ids[i] != nil {
-			if reflect.TypeOf(ids[i]).Kind() == reflect.String {
-				keyInfo += ids[i].(string)
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
-				keyInfo += strconv.Itoa(ids[i].(int))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
-				keyInfo += strconv.Itoa(int(ids[i].(int8)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
-				keyInfo += strconv.Itoa(int(ids[i].(int16)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
-				keyInfo += strconv.Itoa(int(ids[i].(int32)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
-				keyInfo += strconv.Itoa(int(ids[i].(int64)))
-			}
-			// Append underscore for readability in case of problem...
-			if i < len(ids)-1 {
-				keyInfo += "_"
-			}
-		}
-	}
-
-	uuid := typeName + "%" + Utility.GenerateUUID(keyInfo)
-
-	// Return the uuid from the input information.
-	return uuid
+	return generateEntityUuid(typeName, parentUuid, ids)
 }

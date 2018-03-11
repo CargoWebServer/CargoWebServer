@@ -62,9 +62,13 @@ type XsdLdapConfiguration struct {
 
 /** UUID **/
 func (this *LdapConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *LdapConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -97,6 +101,14 @@ func (this *LdapConfiguration) GetParentLnk() string{
 }
 func (this *LdapConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *LdapConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -135,6 +147,8 @@ func (this *LdapConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *LdapConfiguration) GetHostName()string{
 	return this.M_hostName
 }
@@ -143,6 +157,8 @@ func (this *LdapConfiguration) SetHostName(val string){
 	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
+
+
 
 
 func (this *LdapConfiguration) GetIpv4()string{
@@ -155,6 +171,8 @@ func (this *LdapConfiguration) SetIpv4(val string){
 }
 
 
+
+
 func (this *LdapConfiguration) GetPort()int{
 	return this.M_port
 }
@@ -163,6 +181,8 @@ func (this *LdapConfiguration) SetPort(val int){
 	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
+
+
 
 
 func (this *LdapConfiguration) GetUser()string{
@@ -175,6 +195,8 @@ func (this *LdapConfiguration) SetUser(val string){
 }
 
 
+
+
 func (this *LdapConfiguration) GetPwd()string{
 	return this.M_pwd
 }
@@ -183,6 +205,8 @@ func (this *LdapConfiguration) SetPwd(val string){
 	this.NeedSave = this.M_pwd== val
 	this.M_pwd= val
 }
+
+
 
 
 func (this *LdapConfiguration) GetDomain()string{
@@ -195,6 +219,8 @@ func (this *LdapConfiguration) SetDomain(val string){
 }
 
 
+
+
 func (this *LdapConfiguration) GetSearchBase()string{
 	return this.M_searchBase
 }
@@ -203,6 +229,8 @@ func (this *LdapConfiguration) SetSearchBase(val string){
 	this.NeedSave = this.M_searchBase== val
 	this.M_searchBase= val
 }
+
+
 
 
 func (this *LdapConfiguration) GetParentPtr()*Configurations{
@@ -217,6 +245,7 @@ func (this *LdapConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *LdapConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

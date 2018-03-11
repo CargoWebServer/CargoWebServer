@@ -63,9 +63,13 @@ type XsdTextMessage struct {
 
 /** UUID **/
 func (this *TextMessage) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *TextMessage) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -98,6 +102,14 @@ func (this *TextMessage) GetParentLnk() string{
 }
 func (this *TextMessage) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *TextMessage) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -136,6 +148,8 @@ func (this *TextMessage) SetId(val string){
 }
 
 
+
+
 func (this *TextMessage) GetBody()string{
 	return this.M_body
 }
@@ -146,6 +160,8 @@ func (this *TextMessage) SetBody(val string){
 }
 
 
+
+
 func (this *TextMessage) GetCreationTime()int64{
 	return this.M_creationTime
 }
@@ -154,6 +170,8 @@ func (this *TextMessage) SetCreationTime(val int64){
 	this.NeedSave = this.M_creationTime== val
 	this.M_creationTime= val
 }
+
+
 
 
 func (this *TextMessage) GetFromRef()*Account{
@@ -168,6 +186,7 @@ func (this *TextMessage) SetFromRef(val *Account){
 	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
 }
+
 
 func (this *TextMessage) ResetFromRef(){
 	this.M_fromRef= ""
@@ -187,6 +206,7 @@ func (this *TextMessage) SetToRef(val *Account){
 	this.M_toRef= val.GetUuid()
 }
 
+
 func (this *TextMessage) ResetToRef(){
 	this.M_toRef= ""
 }
@@ -202,6 +222,8 @@ func (this *TextMessage) SetTitle(val string){
 }
 
 
+
+
 func (this *TextMessage) GetEntitiesPtr()*Entities{
 	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
 	if err == nil {
@@ -214,6 +236,7 @@ func (this *TextMessage) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *TextMessage) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

@@ -51,9 +51,13 @@ type XsdLog struct {
 
 /** UUID **/
 func (this *Log) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Log) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -86,6 +90,14 @@ func (this *Log) GetParentLnk() string{
 }
 func (this *Log) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Log) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -132,15 +144,17 @@ func (this *Log) SetId(val string){
 }
 
 
+
+
 func (this *Log) GetEntries()[]*LogEntry{
-	entries := make([]*LogEntry, 0)
+	values := make([]*LogEntry, 0)
 	for i := 0; i < len(this.M_entries); i++ {
 		entity, err := this.getEntityByUuid(this.M_entries[i])
 		if err == nil {
-			entries = append(entries, entity.(*LogEntry))
+			values = append( values, entity.(*LogEntry))
 		}
 	}
-	return entries
+	return values
 }
 
 func (this *Log) SetEntries(val []*LogEntry){
@@ -148,15 +162,12 @@ func (this *Log) SetEntries(val []*LogEntry){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_entries")
-		if len(val[i].GetUuid()) == 0 {
-			val[i].SetUuid(this.generateUuid(val[i]))
-		}
 		this.setEntity(val[i])
-
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
 	}
 	this.NeedSave= true
 }
+
 
 func (this *Log) AppendEntries(val *LogEntry){
 	for i:=0; i < len(this.M_entries); i++{
@@ -167,24 +178,20 @@ func (this *Log) AppendEntries(val *LogEntry){
 	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_entries")
-	if len(val.GetUuid()) == 0 {
-		val.SetUuid(this.generateUuid(val))
-	}
 	this.setEntity(val)
-
 	this.M_entries = append(this.M_entries, val.GetUuid())
 }
 
 func (this *Log) RemoveEntries(val *LogEntry){
-	entries := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_entries); i++{
 		if this.M_entries[i] != val.GetUuid() {
-			entries = append(entries, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_entries = entries
+	this.M_entries = values
 }
 
 
@@ -200,6 +207,7 @@ func (this *Log) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Log) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

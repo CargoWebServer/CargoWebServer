@@ -53,9 +53,13 @@ type XsdLogEntry struct {
 
 /** UUID **/
 func (this *LogEntry) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *LogEntry) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -88,6 +92,14 @@ func (this *LogEntry) GetParentLnk() string{
 }
 func (this *LogEntry) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *LogEntry) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -126,6 +138,8 @@ func (this *LogEntry) SetId(val string){
 }
 
 
+
+
 func (this *LogEntry) GetCreationTime()int64{
 	return this.M_creationTime
 }
@@ -134,6 +148,8 @@ func (this *LogEntry) SetCreationTime(val int64){
 	this.NeedSave = this.M_creationTime== val
 	this.M_creationTime= val
 }
+
+
 
 
 func (this *LogEntry) GetEntityRef()Entity{
@@ -150,6 +166,8 @@ func (this *LogEntry) SetEntityRef(val Entity){
 }
 
 
+
+
 func (this *LogEntry) GetLoggerPtr()*Log{
 	entity, err := this.getEntityByUuid(this.M_loggerPtr)
 	if err == nil {
@@ -162,6 +180,7 @@ func (this *LogEntry) SetLoggerPtr(val *Log){
 	this.NeedSave = this.M_loggerPtr != val.GetUuid()
 	this.M_loggerPtr= val.GetUuid()
 }
+
 
 func (this *LogEntry) ResetLoggerPtr(){
 	this.M_loggerPtr= ""
@@ -180,6 +199,7 @@ func (this *LogEntry) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *LogEntry) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

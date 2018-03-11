@@ -56,9 +56,13 @@ type XsdComputer struct {
 
 /** UUID **/
 func (this *Computer) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Computer) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -91,6 +95,14 @@ func (this *Computer) GetParentLnk() string{
 }
 func (this *Computer) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Computer) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -129,6 +141,8 @@ func (this *Computer) SetId(val string){
 }
 
 
+
+
 func (this *Computer) GetName()string{
 	return this.M_name
 }
@@ -137,6 +151,8 @@ func (this *Computer) SetName(val string){
 	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
+
+
 
 
 func (this *Computer) GetIpv4()string{
@@ -149,6 +165,8 @@ func (this *Computer) SetIpv4(val string){
 }
 
 
+
+
 func (this *Computer) GetOsType()OsType{
 	return this.M_osType
 }
@@ -157,6 +175,7 @@ func (this *Computer) SetOsType(val OsType){
 	this.NeedSave = this.M_osType== val
 	this.M_osType= val
 }
+
 
 func (this *Computer) ResetOsType(){
 	this.M_osType= 0
@@ -171,6 +190,7 @@ func (this *Computer) SetPlatformType(val PlatformType){
 	this.NeedSave = this.M_platformType== val
 	this.M_platformType= val
 }
+
 
 func (this *Computer) ResetPlatformType(){
 	this.M_platformType= 0
@@ -189,6 +209,7 @@ func (this *Computer) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Computer) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

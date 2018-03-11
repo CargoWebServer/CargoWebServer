@@ -61,9 +61,13 @@ type XsdUser struct {
 
 /** UUID **/
 func (this *User) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *User) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -96,6 +100,14 @@ func (this *User) GetParentLnk() string{
 }
 func (this *User) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *User) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -134,6 +146,8 @@ func (this *User) SetId(val string){
 }
 
 
+
+
 func (this *User) GetFirstName()string{
 	return this.M_firstName
 }
@@ -142,6 +156,8 @@ func (this *User) SetFirstName(val string){
 	this.NeedSave = this.M_firstName== val
 	this.M_firstName= val
 }
+
+
 
 
 func (this *User) GetLastName()string{
@@ -154,6 +170,8 @@ func (this *User) SetLastName(val string){
 }
 
 
+
+
 func (this *User) GetMiddle()string{
 	return this.M_middle
 }
@@ -162,6 +180,8 @@ func (this *User) SetMiddle(val string){
 	this.NeedSave = this.M_middle== val
 	this.M_middle= val
 }
+
+
 
 
 func (this *User) GetPhone()string{
@@ -174,6 +194,8 @@ func (this *User) SetPhone(val string){
 }
 
 
+
+
 func (this *User) GetEmail()string{
 	return this.M_email
 }
@@ -184,15 +206,17 @@ func (this *User) SetEmail(val string){
 }
 
 
+
+
 func (this *User) GetMemberOfRef()[]*Group{
-	memberOfRef := make([]*Group, 0)
+	values := make([]*Group, 0)
 	for i := 0; i < len(this.M_memberOfRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_memberOfRef[i])
 		if err == nil {
-			memberOfRef = append(memberOfRef, entity.(*Group))
+			values = append( values, entity.(*Group))
 		}
 	}
-	return memberOfRef
+	return values
 }
 
 func (this *User) SetMemberOfRef(val []*Group){
@@ -202,6 +226,7 @@ func (this *User) SetMemberOfRef(val []*Group){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *User) AppendMemberOfRef(val *Group){
 	for i:=0; i < len(this.M_memberOfRef); i++{
@@ -214,27 +239,27 @@ func (this *User) AppendMemberOfRef(val *Group){
 }
 
 func (this *User) RemoveMemberOfRef(val *Group){
-	memberOfRef := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_memberOfRef); i++{
 		if this.M_memberOfRef[i] != val.GetUuid() {
-			memberOfRef = append(memberOfRef, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_memberOfRef = memberOfRef
+	this.M_memberOfRef = values
 }
 
 
 func (this *User) GetAccounts()[]*Account{
-	accounts := make([]*Account, 0)
+	values := make([]*Account, 0)
 	for i := 0; i < len(this.M_accounts); i++ {
 		entity, err := this.getEntityByUuid(this.M_accounts[i])
 		if err == nil {
-			accounts = append(accounts, entity.(*Account))
+			values = append( values, entity.(*Account))
 		}
 	}
-	return accounts
+	return values
 }
 
 func (this *User) SetAccounts(val []*Account){
@@ -244,6 +269,7 @@ func (this *User) SetAccounts(val []*Account){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *User) AppendAccounts(val *Account){
 	for i:=0; i < len(this.M_accounts); i++{
@@ -256,15 +282,15 @@ func (this *User) AppendAccounts(val *Account){
 }
 
 func (this *User) RemoveAccounts(val *Account){
-	accounts := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_accounts); i++{
 		if this.M_accounts[i] != val.GetUuid() {
-			accounts = append(accounts, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_accounts = accounts
+	this.M_accounts = values
 }
 
 
@@ -280,6 +306,7 @@ func (this *User) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *User) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

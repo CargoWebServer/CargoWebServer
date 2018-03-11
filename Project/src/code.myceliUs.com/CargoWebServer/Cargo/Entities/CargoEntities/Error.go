@@ -60,9 +60,13 @@ type XsdError struct {
 
 /** UUID **/
 func (this *Error) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Error) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -95,6 +99,14 @@ func (this *Error) GetParentLnk() string{
 }
 func (this *Error) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Error) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -133,6 +145,8 @@ func (this *Error) SetId(val string){
 }
 
 
+
+
 func (this *Error) GetBody()string{
 	return this.M_body
 }
@@ -141,6 +155,8 @@ func (this *Error) SetBody(val string){
 	this.NeedSave = this.M_body== val
 	this.M_body= val
 }
+
+
 
 
 func (this *Error) GetErrorPath()string{
@@ -153,6 +169,8 @@ func (this *Error) SetErrorPath(val string){
 }
 
 
+
+
 func (this *Error) GetCode()int{
 	return this.M_code
 }
@@ -161,6 +179,8 @@ func (this *Error) SetCode(val int){
 	this.NeedSave = this.M_code== val
 	this.M_code= val
 }
+
+
 
 
 func (this *Error) GetAccountRef()*Account{
@@ -175,6 +195,7 @@ func (this *Error) SetAccountRef(val *Account){
 	this.NeedSave = this.M_accountRef != val.GetUuid()
 	this.M_accountRef= val.GetUuid()
 }
+
 
 func (this *Error) ResetAccountRef(){
 	this.M_accountRef= ""
@@ -193,6 +214,7 @@ func (this *Error) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Error) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

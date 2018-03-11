@@ -53,9 +53,13 @@ type XsdSession struct {
 
 /** UUID **/
 func (this *Session) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Session) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -88,6 +92,14 @@ func (this *Session) GetParentLnk() string{
 }
 func (this *Session) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Session) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -126,6 +138,8 @@ func (this *Session) SetId(val string){
 }
 
 
+
+
 func (this *Session) GetStartTime()int64{
 	return this.M_startTime
 }
@@ -134,6 +148,8 @@ func (this *Session) SetStartTime(val int64){
 	this.NeedSave = this.M_startTime== val
 	this.M_startTime= val
 }
+
+
 
 
 func (this *Session) GetEndTime()int64{
@@ -146,6 +162,8 @@ func (this *Session) SetEndTime(val int64){
 }
 
 
+
+
 func (this *Session) GetStatusTime()int64{
 	return this.M_statusTime
 }
@@ -156,6 +174,8 @@ func (this *Session) SetStatusTime(val int64){
 }
 
 
+
+
 func (this *Session) GetSessionState()SessionState{
 	return this.M_sessionState
 }
@@ -164,6 +184,7 @@ func (this *Session) SetSessionState(val SessionState){
 	this.NeedSave = this.M_sessionState== val
 	this.M_sessionState= val
 }
+
 
 func (this *Session) ResetSessionState(){
 	this.M_sessionState= 0
@@ -183,6 +204,7 @@ func (this *Session) SetComputerRef(val *Computer){
 	this.M_computerRef= val.GetUuid()
 }
 
+
 func (this *Session) ResetComputerRef(){
 	this.M_computerRef= ""
 }
@@ -200,6 +222,7 @@ func (this *Session) SetAccountPtr(val *Account){
 	this.NeedSave = this.M_accountPtr != val.GetUuid()
 	this.M_accountPtr= val.GetUuid()
 }
+
 
 func (this *Session) ResetAccountPtr(){
 	this.M_accountPtr= ""

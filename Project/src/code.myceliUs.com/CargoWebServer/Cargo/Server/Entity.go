@@ -61,6 +61,11 @@ type Entity interface {
 	SetParentLnk(string)
 
 	/**
+	 * Return link to parent, or nil if the entity has no parent.
+	 */
+	GetParent() interface{}
+
+	/**
 	 * Return link to entity childs.
 	 */
 	GetChilds() []interface{}

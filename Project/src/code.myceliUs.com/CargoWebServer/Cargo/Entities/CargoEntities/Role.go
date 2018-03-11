@@ -38,6 +38,8 @@ type Role struct{
 /** Xml parser for Role **/
 type XsdRole struct {
 	XMLName xml.Name	`xml:"role"`
+	M_accounts	[]*XsdAccount	`xml:"accounts,omitempty"`
+	M_actions	[]*XsdAction	`xml:"actions,omitempty"`
 	M_id	string	`xml:"id,attr"`
 
 }
@@ -45,9 +47,13 @@ type XsdRole struct {
 
 /** UUID **/
 func (this *Role) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Role) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -80,6 +86,14 @@ func (this *Role) GetParentLnk() string{
 }
 func (this *Role) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Role) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -118,15 +132,17 @@ func (this *Role) SetId(val string){
 }
 
 
+
+
 func (this *Role) GetAccounts()[]*Account{
-	accounts := make([]*Account, 0)
+	values := make([]*Account, 0)
 	for i := 0; i < len(this.M_accounts); i++ {
 		entity, err := this.getEntityByUuid(this.M_accounts[i])
 		if err == nil {
-			accounts = append(accounts, entity.(*Account))
+			values = append( values, entity.(*Account))
 		}
 	}
-	return accounts
+	return values
 }
 
 func (this *Role) SetAccounts(val []*Account){
@@ -136,6 +152,7 @@ func (this *Role) SetAccounts(val []*Account){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *Role) AppendAccounts(val *Account){
 	for i:=0; i < len(this.M_accounts); i++{
@@ -148,27 +165,27 @@ func (this *Role) AppendAccounts(val *Account){
 }
 
 func (this *Role) RemoveAccounts(val *Account){
-	accounts := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_accounts); i++{
 		if this.M_accounts[i] != val.GetUuid() {
-			accounts = append(accounts, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_accounts = accounts
+	this.M_accounts = values
 }
 
 
 func (this *Role) GetActions()[]*Action{
-	actions := make([]*Action, 0)
+	values := make([]*Action, 0)
 	for i := 0; i < len(this.M_actions); i++ {
 		entity, err := this.getEntityByUuid(this.M_actions[i])
 		if err == nil {
-			actions = append(actions, entity.(*Action))
+			values = append( values, entity.(*Action))
 		}
 	}
-	return actions
+	return values
 }
 
 func (this *Role) SetActions(val []*Action){
@@ -178,6 +195,7 @@ func (this *Role) SetActions(val []*Action){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *Role) AppendActions(val *Action){
 	for i:=0; i < len(this.M_actions); i++{
@@ -190,15 +208,15 @@ func (this *Role) AppendActions(val *Action){
 }
 
 func (this *Role) RemoveActions(val *Action){
-	actions := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_actions); i++{
 		if this.M_actions[i] != val.GetUuid() {
-			actions = append(actions, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_actions = actions
+	this.M_actions = values
 }
 
 
@@ -214,6 +232,7 @@ func (this *Role) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Role) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

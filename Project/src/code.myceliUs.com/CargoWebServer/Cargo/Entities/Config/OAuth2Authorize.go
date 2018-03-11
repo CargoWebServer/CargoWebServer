@@ -52,9 +52,13 @@ type XsdOAuth2Authorize struct {
 
 /** UUID **/
 func (this *OAuth2Authorize) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2Authorize) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -87,6 +91,14 @@ func (this *OAuth2Authorize) GetParentLnk() string{
 }
 func (this *OAuth2Authorize) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2Authorize) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -125,6 +137,8 @@ func (this *OAuth2Authorize) SetId(val string){
 }
 
 
+
+
 func (this *OAuth2Authorize) GetClient()*OAuth2Client{
 	entity, err := this.getEntityByUuid(this.M_client)
 	if err == nil {
@@ -137,6 +151,7 @@ func (this *OAuth2Authorize) SetClient(val *OAuth2Client){
 	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
+
 
 func (this *OAuth2Authorize) ResetClient(){
 	this.M_client= ""
@@ -153,6 +168,8 @@ func (this *OAuth2Authorize) SetExpiresIn(val int64){
 }
 
 
+
+
 func (this *OAuth2Authorize) GetScope()string{
 	return this.M_scope
 }
@@ -161,6 +178,8 @@ func (this *OAuth2Authorize) SetScope(val string){
 	this.NeedSave = this.M_scope== val
 	this.M_scope= val
 }
+
+
 
 
 func (this *OAuth2Authorize) GetRedirectUri()string{
@@ -173,6 +192,8 @@ func (this *OAuth2Authorize) SetRedirectUri(val string){
 }
 
 
+
+
 func (this *OAuth2Authorize) GetState()string{
 	return this.M_state
 }
@@ -181,6 +202,8 @@ func (this *OAuth2Authorize) SetState(val string){
 	this.NeedSave = this.M_state== val
 	this.M_state= val
 }
+
+
 
 
 func (this *OAuth2Authorize) GetUserData()*OAuth2IdToken{
@@ -196,6 +219,7 @@ func (this *OAuth2Authorize) SetUserData(val *OAuth2IdToken){
 	this.M_userData= val.GetUuid()
 }
 
+
 func (this *OAuth2Authorize) ResetUserData(){
 	this.M_userData= ""
 }
@@ -209,4 +233,6 @@ func (this *OAuth2Authorize) SetCreatedAt(val int64){
 	this.NeedSave = this.M_createdAt== val
 	this.M_createdAt= val
 }
+
+
 

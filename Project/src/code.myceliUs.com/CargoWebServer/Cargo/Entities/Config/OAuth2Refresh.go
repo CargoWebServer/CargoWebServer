@@ -44,9 +44,13 @@ type XsdOAuth2Refresh struct {
 
 /** UUID **/
 func (this *OAuth2Refresh) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2Refresh) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -79,6 +83,14 @@ func (this *OAuth2Refresh) GetParentLnk() string{
 }
 func (this *OAuth2Refresh) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2Refresh) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -117,6 +129,8 @@ func (this *OAuth2Refresh) SetId(val string){
 }
 
 
+
+
 func (this *OAuth2Refresh) GetAccess()*OAuth2Access{
 	entity, err := this.getEntityByUuid(this.M_access)
 	if err == nil {
@@ -129,6 +143,7 @@ func (this *OAuth2Refresh) SetAccess(val *OAuth2Access){
 	this.NeedSave = this.M_access != val.GetUuid()
 	this.M_access= val.GetUuid()
 }
+
 
 func (this *OAuth2Refresh) ResetAccess(){
 	this.M_access= ""
@@ -147,6 +162,7 @@ func (this *OAuth2Refresh) SetParentPtr(val *OAuth2Configuration){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *OAuth2Refresh) ResetParentPtr(){
 	this.M_parentPtr= ""

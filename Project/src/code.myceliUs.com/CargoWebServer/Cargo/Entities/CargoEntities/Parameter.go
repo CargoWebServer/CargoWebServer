@@ -47,9 +47,13 @@ type XsdParameter struct {
 
 /** UUID **/
 func (this *Parameter) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Parameter) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -81,6 +85,14 @@ func (this *Parameter) GetParentLnk() string{
 }
 func (this *Parameter) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Parameter) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -119,6 +131,8 @@ func (this *Parameter) SetName(val string){
 }
 
 
+
+
 func (this *Parameter) GetType()string{
 	return this.M_type
 }
@@ -129,6 +143,8 @@ func (this *Parameter) SetType(val string){
 }
 
 
+
+
 func (this *Parameter) IsArray()bool{
 	return this.M_isArray
 }
@@ -137,6 +153,8 @@ func (this *Parameter) SetIsArray(val bool){
 	this.NeedSave = this.M_isArray== val
 	this.M_isArray= val
 }
+
+
 
 
 func (this *Parameter) GetParametersPtr()*Parameter{
@@ -151,6 +169,7 @@ func (this *Parameter) SetParametersPtr(val *Parameter){
 	this.NeedSave = this.M_parametersPtr != val.GetUuid()
 	this.M_parametersPtr= val.GetUuid()
 }
+
 
 func (this *Parameter) ResetParametersPtr(){
 	this.M_parametersPtr= ""

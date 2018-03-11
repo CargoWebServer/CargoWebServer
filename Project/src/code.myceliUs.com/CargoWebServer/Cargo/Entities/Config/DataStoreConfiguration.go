@@ -66,9 +66,13 @@ type XsdDataStoreConfiguration struct {
 
 /** UUID **/
 func (this *DataStoreConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *DataStoreConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -101,6 +105,14 @@ func (this *DataStoreConfiguration) GetParentLnk() string{
 }
 func (this *DataStoreConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *DataStoreConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -139,6 +151,8 @@ func (this *DataStoreConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *DataStoreConfiguration) GetDataStoreType()DataStoreType{
 	return this.M_dataStoreType
 }
@@ -147,6 +161,7 @@ func (this *DataStoreConfiguration) SetDataStoreType(val DataStoreType){
 	this.NeedSave = this.M_dataStoreType== val
 	this.M_dataStoreType= val
 }
+
 
 func (this *DataStoreConfiguration) ResetDataStoreType(){
 	this.M_dataStoreType= 0
@@ -162,6 +177,7 @@ func (this *DataStoreConfiguration) SetDataStoreVendor(val DataStoreVendor){
 	this.M_dataStoreVendor= val
 }
 
+
 func (this *DataStoreConfiguration) ResetDataStoreVendor(){
 	this.M_dataStoreVendor= 0
 }
@@ -175,6 +191,7 @@ func (this *DataStoreConfiguration) SetTextEncoding(val Encoding){
 	this.NeedSave = this.M_textEncoding== val
 	this.M_textEncoding= val
 }
+
 
 func (this *DataStoreConfiguration) ResetTextEncoding(){
 	this.M_textEncoding= 0
@@ -191,6 +208,8 @@ func (this *DataStoreConfiguration) SetStoreName(val string){
 }
 
 
+
+
 func (this *DataStoreConfiguration) GetHostName()string{
 	return this.M_hostName
 }
@@ -199,6 +218,8 @@ func (this *DataStoreConfiguration) SetHostName(val string){
 	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
+
+
 
 
 func (this *DataStoreConfiguration) GetIpv4()string{
@@ -211,6 +232,8 @@ func (this *DataStoreConfiguration) SetIpv4(val string){
 }
 
 
+
+
 func (this *DataStoreConfiguration) GetUser()string{
 	return this.M_user
 }
@@ -219,6 +242,8 @@ func (this *DataStoreConfiguration) SetUser(val string){
 	this.NeedSave = this.M_user== val
 	this.M_user= val
 }
+
+
 
 
 func (this *DataStoreConfiguration) GetPwd()string{
@@ -231,6 +256,8 @@ func (this *DataStoreConfiguration) SetPwd(val string){
 }
 
 
+
+
 func (this *DataStoreConfiguration) GetPort()int{
 	return this.M_port
 }
@@ -239,6 +266,8 @@ func (this *DataStoreConfiguration) SetPort(val int){
 	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
+
+
 
 
 func (this *DataStoreConfiguration) GetParentPtr()*Configurations{
@@ -253,6 +282,7 @@ func (this *DataStoreConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *DataStoreConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

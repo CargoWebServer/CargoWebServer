@@ -38,6 +38,7 @@ type Permission struct{
 /** Xml parser for Permission **/
 type XsdPermission struct {
 	XMLName xml.Name	`xml:"permissionsRef"`
+	M_accounts	[]*XsdAccount	`xml:"accounts,omitempty"`
 	M_id	string	`xml:"id,attr"`
 	M_types	int	`xml:"types,attr"`
 
@@ -46,9 +47,13 @@ type XsdPermission struct {
 
 /** UUID **/
 func (this *Permission) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *Permission) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -81,6 +86,14 @@ func (this *Permission) GetParentLnk() string{
 }
 func (this *Permission) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *Permission) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -119,6 +132,8 @@ func (this *Permission) SetId(val string){
 }
 
 
+
+
 func (this *Permission) GetTypes()int{
 	return this.M_types
 }
@@ -129,15 +144,17 @@ func (this *Permission) SetTypes(val int){
 }
 
 
+
+
 func (this *Permission) GetAccountsRef()[]*Account{
-	accountsRef := make([]*Account, 0)
+	values := make([]*Account, 0)
 	for i := 0; i < len(this.M_accountsRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_accountsRef[i])
 		if err == nil {
-			accountsRef = append(accountsRef, entity.(*Account))
+			values = append( values, entity.(*Account))
 		}
 	}
-	return accountsRef
+	return values
 }
 
 func (this *Permission) SetAccountsRef(val []*Account){
@@ -147,6 +164,7 @@ func (this *Permission) SetAccountsRef(val []*Account){
 	}
 	this.NeedSave= true
 }
+
 
 func (this *Permission) AppendAccountsRef(val *Account){
 	for i:=0; i < len(this.M_accountsRef); i++{
@@ -159,15 +177,15 @@ func (this *Permission) AppendAccountsRef(val *Account){
 }
 
 func (this *Permission) RemoveAccountsRef(val *Account){
-	accountsRef := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_accountsRef); i++{
 		if this.M_accountsRef[i] != val.GetUuid() {
-			accountsRef = append(accountsRef, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_accountsRef = accountsRef
+	this.M_accountsRef = values
 }
 
 
@@ -183,6 +201,7 @@ func (this *Permission) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *Permission) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

@@ -100,36 +100,39 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// Configuration db itself.
 	cargoConfigDB := new(Config.DataStoreConfiguration)
+	cargoConfigDB.SetUuidGenerator(generateUuidFct)
 	cargoConfigDB.M_id = ConfigDB
 	cargoConfigDB.M_storeName = ConfigDB
 	cargoConfigDB.M_hostName = hostName
 	cargoConfigDB.M_ipv4 = ipv4
 	cargoConfigDB.M_port = port
-	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoConfigDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	cargoConfigDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
 
 	// The cargo entities store config
 	cargoEntitiesDB := new(Config.DataStoreConfiguration)
+	cargoEntitiesDB.SetUuidGenerator(generateUuidFct)
 	cargoEntitiesDB.M_id = CargoEntitiesDB
 	cargoEntitiesDB.M_storeName = CargoEntitiesDB
 	cargoEntitiesDB.M_hostName = hostName
 	cargoEntitiesDB.M_ipv4 = ipv4
 	cargoEntitiesDB.M_port = port
-	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	cargoEntitiesDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
 	// The sql info data store.
 	sqlInfoDB := new(Config.DataStoreConfiguration)
+	sqlInfoDB.SetUuidGenerator(generateUuidFct)
 	sqlInfoDB.M_id = "sql_info"
 	sqlInfoDB.M_storeName = "sql_info"
 	sqlInfoDB.M_hostName = hostName
 	sqlInfoDB.M_ipv4 = ipv4
 	sqlInfoDB.M_port = port
-	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	sqlInfoDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	sqlInfoDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
@@ -164,6 +167,7 @@ func (this *ConfigurationManager) initialize() {
 		os.MkdirAll(this.GetBinPath(), 0777)
 
 		this.m_activeConfigurations = new(Config.Configurations)
+		this.m_activeConfigurations.SetUuidGenerator(generateUuidFct)
 		this.m_activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Cargo Default Configurations"
 		this.m_activeConfigurations.M_version = "1.0"
@@ -180,6 +184,7 @@ func (this *ConfigurationManager) initialize() {
 		// Sever default values...
 		var serverConfig = new(Config.ServerConfiguration)
 		serverConfig = new(Config.ServerConfiguration)
+		serverConfig.SetUuidGenerator(generateUuidFct)
 		serverConfig.NeedSave = true
 		serverConfig.M_id = "CARGO_DEFAULT_SERVER"
 		serverConfig.M_serverPort = 9393
@@ -341,6 +346,7 @@ func (this *ConfigurationManager) GetConfigurationServicePort() int {
 func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 	// Create the default service configurations
 	config := new(Config.ServiceConfiguration)
+	config.SetUuidGenerator(generateUuidFct)
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true

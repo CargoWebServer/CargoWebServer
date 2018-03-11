@@ -57,5 +57,9 @@ type Entity interface{
 	 SetEntityGetter(func(uuid string) (interface{}, error))
 
 
+GetId()string
+SetId(val string)
+
+
 
 }

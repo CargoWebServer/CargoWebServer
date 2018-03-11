@@ -82,9 +82,13 @@ type XsdServerConfiguration struct {
 
 /** UUID **/
 func (this *ServerConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *ServerConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -117,6 +121,14 @@ func (this *ServerConfiguration) GetParentLnk() string{
 }
 func (this *ServerConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *ServerConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -155,6 +167,8 @@ func (this *ServerConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *ServerConfiguration) GetHostName()string{
 	return this.M_hostName
 }
@@ -163,6 +177,8 @@ func (this *ServerConfiguration) SetHostName(val string){
 	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetIpv4()string{
@@ -175,6 +191,8 @@ func (this *ServerConfiguration) SetIpv4(val string){
 }
 
 
+
+
 func (this *ServerConfiguration) GetServerPort()int{
 	return this.M_serverPort
 }
@@ -183,6 +201,8 @@ func (this *ServerConfiguration) SetServerPort(val int){
 	this.NeedSave = this.M_serverPort== val
 	this.M_serverPort= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetServiceContainerPort()int{
@@ -195,6 +215,8 @@ func (this *ServerConfiguration) SetServiceContainerPort(val int){
 }
 
 
+
+
 func (this *ServerConfiguration) GetApplicationsPath()string{
 	return this.M_applicationsPath
 }
@@ -203,6 +225,8 @@ func (this *ServerConfiguration) SetApplicationsPath(val string){
 	this.NeedSave = this.M_applicationsPath== val
 	this.M_applicationsPath= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetDataPath()string{
@@ -215,6 +239,8 @@ func (this *ServerConfiguration) SetDataPath(val string){
 }
 
 
+
+
 func (this *ServerConfiguration) GetScriptsPath()string{
 	return this.M_scriptsPath
 }
@@ -223,6 +249,8 @@ func (this *ServerConfiguration) SetScriptsPath(val string){
 	this.NeedSave = this.M_scriptsPath== val
 	this.M_scriptsPath= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetDefinitionsPath()string{
@@ -235,6 +263,8 @@ func (this *ServerConfiguration) SetDefinitionsPath(val string){
 }
 
 
+
+
 func (this *ServerConfiguration) GetSchemasPath()string{
 	return this.M_schemasPath
 }
@@ -243,6 +273,8 @@ func (this *ServerConfiguration) SetSchemasPath(val string){
 	this.NeedSave = this.M_schemasPath== val
 	this.M_schemasPath= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetTmpPath()string{
@@ -255,6 +287,8 @@ func (this *ServerConfiguration) SetTmpPath(val string){
 }
 
 
+
+
 func (this *ServerConfiguration) GetBinPath()string{
 	return this.M_binPath
 }
@@ -263,6 +297,8 @@ func (this *ServerConfiguration) SetBinPath(val string){
 	this.NeedSave = this.M_binPath== val
 	this.M_binPath= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetShards()int{
@@ -275,6 +311,8 @@ func (this *ServerConfiguration) SetShards(val int){
 }
 
 
+
+
 func (this *ServerConfiguration) GetLifeWindow()int{
 	return this.M_lifeWindow
 }
@@ -283,6 +321,8 @@ func (this *ServerConfiguration) SetLifeWindow(val int){
 	this.NeedSave = this.M_lifeWindow== val
 	this.M_lifeWindow= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetMaxEntriesInWindow()int{
@@ -295,6 +335,8 @@ func (this *ServerConfiguration) SetMaxEntriesInWindow(val int){
 }
 
 
+
+
 func (this *ServerConfiguration) GetMaxEntrySize()int{
 	return this.M_maxEntrySize
 }
@@ -303,6 +345,8 @@ func (this *ServerConfiguration) SetMaxEntrySize(val int){
 	this.NeedSave = this.M_maxEntrySize== val
 	this.M_maxEntrySize= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetHardMaxCacheSize()int{
@@ -315,6 +359,8 @@ func (this *ServerConfiguration) SetHardMaxCacheSize(val int){
 }
 
 
+
+
 func (this *ServerConfiguration) IsVerbose()bool{
 	return this.M_verbose
 }
@@ -323,6 +369,8 @@ func (this *ServerConfiguration) SetVerbose(val bool){
 	this.NeedSave = this.M_verbose== val
 	this.M_verbose= val
 }
+
+
 
 
 func (this *ServerConfiguration) GetParentPtr()*Configurations{
@@ -337,6 +385,7 @@ func (this *ServerConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *ServerConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

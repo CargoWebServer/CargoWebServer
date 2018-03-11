@@ -57,5 +57,9 @@ type Message interface{
 	 SetEntityGetter(func(uuid string) (interface{}, error))
 
 
+GetBody()string
+SetBody(val string)
+
+
 
 }

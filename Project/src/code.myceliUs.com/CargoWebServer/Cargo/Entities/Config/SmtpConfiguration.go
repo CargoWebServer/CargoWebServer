@@ -60,9 +60,13 @@ type XsdSmtpConfiguration struct {
 
 /** UUID **/
 func (this *SmtpConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *SmtpConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -95,6 +99,14 @@ func (this *SmtpConfiguration) GetParentLnk() string{
 }
 func (this *SmtpConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *SmtpConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -133,6 +145,8 @@ func (this *SmtpConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *SmtpConfiguration) GetTextEncoding()Encoding{
 	return this.M_textEncoding
 }
@@ -141,6 +155,7 @@ func (this *SmtpConfiguration) SetTextEncoding(val Encoding){
 	this.NeedSave = this.M_textEncoding== val
 	this.M_textEncoding= val
 }
+
 
 func (this *SmtpConfiguration) ResetTextEncoding(){
 	this.M_textEncoding= 0
@@ -157,6 +172,8 @@ func (this *SmtpConfiguration) SetHostName(val string){
 }
 
 
+
+
 func (this *SmtpConfiguration) GetIpv4()string{
 	return this.M_ipv4
 }
@@ -165,6 +182,8 @@ func (this *SmtpConfiguration) SetIpv4(val string){
 	this.NeedSave = this.M_ipv4== val
 	this.M_ipv4= val
 }
+
+
 
 
 func (this *SmtpConfiguration) GetPort()int{
@@ -177,6 +196,8 @@ func (this *SmtpConfiguration) SetPort(val int){
 }
 
 
+
+
 func (this *SmtpConfiguration) GetUser()string{
 	return this.M_user
 }
@@ -187,6 +208,8 @@ func (this *SmtpConfiguration) SetUser(val string){
 }
 
 
+
+
 func (this *SmtpConfiguration) GetPwd()string{
 	return this.M_pwd
 }
@@ -195,6 +218,8 @@ func (this *SmtpConfiguration) SetPwd(val string){
 	this.NeedSave = this.M_pwd== val
 	this.M_pwd= val
 }
+
+
 
 
 func (this *SmtpConfiguration) GetParentPtr()*Configurations{
@@ -209,6 +234,7 @@ func (this *SmtpConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *SmtpConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

@@ -82,7 +82,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_associations = make(map[string]bool, 0)
 	store.m_refInfos = make(map[string][][]string, 0)
 
-	if store.m_vendor == Config.DataStoreVendor_CAYLEY {
+	if store.m_vendor == Config.DataStoreVendor_CARGO {
 		return nil, errors.New("Mycelius is a Key value store not sql.")
 	}
 
@@ -864,7 +864,7 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()
-		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CAYLEY)
+		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CARGO)
 	} else {
 		prototype, err = store.GetEntityPrototype(schemaId + "." + id)
 		if err == nil {

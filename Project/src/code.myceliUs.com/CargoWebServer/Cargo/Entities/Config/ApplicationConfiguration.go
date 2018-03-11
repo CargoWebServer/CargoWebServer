@@ -50,9 +50,13 @@ type XsdApplicationConfiguration struct {
 
 /** UUID **/
 func (this *ApplicationConfiguration) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *ApplicationConfiguration) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -85,6 +89,14 @@ func (this *ApplicationConfiguration) GetParentLnk() string{
 }
 func (this *ApplicationConfiguration) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *ApplicationConfiguration) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -123,6 +135,8 @@ func (this *ApplicationConfiguration) SetId(val string){
 }
 
 
+
+
 func (this *ApplicationConfiguration) GetIndexPage()string{
 	return this.M_indexPage
 }
@@ -131,6 +145,8 @@ func (this *ApplicationConfiguration) SetIndexPage(val string){
 	this.NeedSave = this.M_indexPage== val
 	this.M_indexPage= val
 }
+
+
 
 
 func (this *ApplicationConfiguration) GetParentPtr()*Configurations{
@@ -145,6 +161,7 @@ func (this *ApplicationConfiguration) SetParentPtr(val *Configurations){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *ApplicationConfiguration) ResetParentPtr(){
 	this.M_parentPtr= ""

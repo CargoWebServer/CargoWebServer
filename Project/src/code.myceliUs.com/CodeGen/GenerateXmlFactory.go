@@ -59,7 +59,6 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 
 	// The factory is created in the BPMS package...
 	factoryStr := "type " + name + "XmlFactory struct {\n"
-
 	// The map of reference by id...
 	factoryStr += "	m_references map[string] interface{}\n"
 	// That contain, the map of owner id -> the map of properties, the list of ref id to set.
@@ -69,8 +68,6 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	// Initialisation function.
 	factoryStr += "\n/** Initialization function from xml file **/\n"
 	factoryStr += "func (this *" + name + "XmlFactory)InitXml(inputPath string, object *" + elementPackName + strings.ToUpper(elementType[0:1]) + elementType[1:] + ") error{\n"
-	factoryStr += "	this.m_references = make(map[string]interface{})\n"
-	factoryStr += "	this.m_object = make(map[string]map[string][]string)\n"
 	factoryStr += "	xmlFilePath, err := filepath.Abs(inputPath)\n"
 	factoryStr += "	if err != nil {\n"
 	factoryStr += "		log.Println(err)\n"
@@ -93,7 +90,6 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 
 	// So here I will call the generate function...
 	factoryStr += "	this.Init" + strings.ToUpper(elementType[0:1]) + elementType[1:] + "(\"\", xmlElement, object)\n"
-
 	// Now I will set the reference inside the model...
 	factoryStr += "	for ref0, refMap := range this.m_object {\n"
 	factoryStr += "		refOwner := this.m_references[ref0]\n"
@@ -105,13 +101,11 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "					if  ref != nil {\n"
 	factoryStr += "						params := make([]interface {},0)\n"
 	factoryStr += "						params = append(params,ref)\n"
-	factoryStr += "						methodName := \"Set\" + strings.ToUpper(ref1[0:1]) + ref1[1:]\n"
-	factoryStr += "						Utility.CallMethod(refOwner, methodName, params )\n"
+	factoryStr += "						Utility.CallMethod(refOwner, ref1, params )\n"
 	factoryStr += "					}else{\n"
 	factoryStr += "						params := make([]interface {},0)\n"
 	factoryStr += "						params = append(params,refs[i])\n"
-	factoryStr += "						methodName := \"Set\" + strings.ToUpper(ref1[0:1]) + ref1[1:]\n"
-	factoryStr += "						Utility.CallMethod(refOwner, methodName, params)\n"
+	factoryStr += "						Utility.CallMethod(refOwner, ref1, params)\n"
 	factoryStr += "					}\n"
 	factoryStr += "				}\n"
 	factoryStr += "			}\n"
@@ -142,7 +136,7 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	// So here I will call the generate function...
 	factoryStr += "	this.Serialyze" + strings.ToUpper(elementType[0:1]) + elementType[1:] + "(xmlElement, toSerialize)\n"
 
-	// Finaly I will wrote the file in the file.
+	// Finaly I will wrote the file.
 	factoryStr += "	output, err := xml.MarshalIndent(xmlElement, \"  \", \"    \")\n"
 	factoryStr += "	if err != nil {\n"
 	factoryStr += "		log.Println(err)\n"
@@ -252,6 +246,8 @@ func generateGoXmlFactoryElementInitFunction(element *XML_Schemas.XSD_Element, p
 		elementFunctionParserStr += ",object *" + elementPackName + className + impl
 		elementFunctionParserStr += "){\n"
 		elementFunctionParserStr += "	log.Println(\"Initialize " + className + "\")\n"
+		elementFunctionParserStr += "	object.TYPENAME = \"" + elementPackName + className + "\"\n"
+		elementFunctionParserStr += "	object.SetParentUuid(parentUuid)\n"
 
 		elementFunctionParserStr += generateGoXmlFactoryElementContent(elementType, elementType, packName, true, name)
 
@@ -259,9 +255,6 @@ func generateGoXmlFactoryElementInitFunction(element *XML_Schemas.XSD_Element, p
 		if elementType == "Expression" || elementType == "FormalExpression" {
 			elementFunctionParserStr += "	/** other content **/\n"
 			elementFunctionParserStr += "	exprStr := xmlElement.M_other\n"
-			// Keep the escaped text...
-			//elementFunctionParserStr += "	exprStr = strings.Replace(exprStr, \"<![CDATA[\", \"\", -1)\n"
-			//elementFunctionParserStr += "	exprStr = strings.Replace(exprStr, \"]]>\", \"\", -1)\n"
 			elementFunctionParserStr += "	object.SetOther(exprStr)\n"
 		}
 
@@ -294,6 +287,14 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 				if len(baseType_) > 0 {
 					elementParserFunctionContentStr += generateGoXmlFactoryElementContent(baseType_, baseElementType, packName, isInitialisation, name)
 
+					// Now it list of attributes...
+					for i := 0; i < len(complexElement.ComplexContent.Extension.Attributes); i++ {
+						attribute := complexElement.ComplexContent.Extension.Attributes[i]
+						if len(attribute.Name) > 0 && member != nil {
+							elementParserFunctionContentStr += generateGoXmlFactoryElementAttribute(&attribute, member, baseElementType, packName, baseElementType, isInitialisation)
+						}
+					}
+
 					// Contain a sequences...
 					if complexElement.ComplexContent.Extension.Sequence != nil {
 						for i := 0; i < len(complexElement.ComplexContent.Extension.Sequence.Elements); i++ {
@@ -304,14 +305,6 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 								generateGoXmlFactoryElementSeiralizeFunction(&subElement, packName, name)
 							}
 							elementParserFunctionContentStr += generateGoXmlFactoryElementReference(elementType, member, &subElement, packName, isInitialisation, name)
-						}
-					}
-
-					// Now it list of attributes...
-					for i := 0; i < len(complexElement.ComplexContent.Extension.Attributes); i++ {
-						attribute := complexElement.ComplexContent.Extension.Attributes[i]
-						if len(attribute.Name) > 0 && member != nil {
-							elementParserFunctionContentStr += generateGoXmlFactoryElementAttribute(&attribute, member, baseType_, packName, baseElementType, isInitialisation)
 						}
 					}
 
@@ -342,36 +335,13 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 				}
 			}
 		}
-
-		// The sequence
-		if complexElement.Sequence != nil {
-			// Elements contained in a sequences...
-			for i := 0; i < len(complexElement.Sequence.Elements); i++ {
-				subElement := complexElement.Sequence.Elements[i]
-				if isInitialisation == true {
-					generateGoXmlFactoryElementInitFunction(&subElement, packName, name)
-				} else {
-					generateGoXmlFactoryElementSeiralizeFunction(&subElement, packName, name)
-				}
-				elementParserFunctionContentStr += generateGoXmlFactoryElementReference(elementType, member, &subElement, packName, isInitialisation, name)
-			}
-
-			// Attribute contain in a sequences...
-			for i := 0; i < len(complexElement.Sequence.Any); i++ {
-				attribute := complexElement.Sequence.Any[i]
-				if len(attribute.Name) > 0 {
-					elementParserFunctionContentStr += generateGoXmlFactoryElementAny(&attribute, member, baseElementType, packName, isInitialisation)
-				}
-			}
-		}
-
 		// The attributes
 		if complexElement.Attributes != nil {
 			// Now it list of complexElement...
 			for i := 0; i < len(complexElement.Attributes); i++ {
 				attribute := complexElement.Attributes[i]
 				if len(attribute.Name) > 0 && member != nil {
-					elementParserFunctionContentStr += generateGoXmlFactoryElementAttribute(&attribute, member, baseElementType, packName, baseElementType, isInitialisation)
+					elementParserFunctionContentStr += generateGoXmlFactoryElementAttribute(&attribute, member, elementType, packName, baseElementType, isInitialisation)
 				}
 			}
 		}
@@ -403,6 +373,28 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 			} else {
 				// Set element ref by type
 				elementParserFunctionContentStr += "	this.m_references[object.UUID] = object\n"
+			}
+		}
+
+		// The sequence
+		if complexElement.Sequence != nil {
+			// Attribute contain in a sequences...
+			for i := 0; i < len(complexElement.Sequence.Any); i++ {
+				attribute := complexElement.Sequence.Any[i]
+				if len(attribute.Name) > 0 {
+					elementParserFunctionContentStr += generateGoXmlFactoryElementAny(&attribute, member, baseElementType, packName, isInitialisation)
+				}
+			}
+
+			// Elements contained in a sequences...
+			for i := 0; i < len(complexElement.Sequence.Elements); i++ {
+				subElement := complexElement.Sequence.Elements[i]
+				if isInitialisation == true {
+					generateGoXmlFactoryElementInitFunction(&subElement, packName, name)
+				} else {
+					generateGoXmlFactoryElementSeiralizeFunction(&subElement, packName, name)
+				}
+				elementParserFunctionContentStr += generateGoXmlFactoryElementReference(elementType, member, &subElement, packName, isInitialisation, name)
 			}
 		}
 
@@ -516,42 +508,16 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 			if maxOccurs == "unbounded" || attribute.Upper == "*" {
 				// The element is an array
 				// So here I will create an array...
-				if memberIndex != nil {
-					if *memberIndex == 0 {
-						if isInitialisation {
-							if !isRef {
-								if Utility.Contains(abstractClassLst, elementBaseType) {
-									elementMemberInitStr += "	object.M_" + relationName + "= make([]" + elementPackName0 + elementBaseType + ",0)\n"
-								} else if Utility.Contains(superClassesLst, elementBaseType) {
-									elementMemberInitStr += "	object.M_" + relationName + "= make([]" + elementPackName0 + elementBaseType + ",0)\n"
-								} else {
-									elementMemberInitStr += "	object.M_" + relationName + "= make([]*" + elementPackName0 + elementBaseType + ",0)\n"
-								}
-							}
-						}
-					}
-				} else {
-					if isInitialisation {
-						if !isRef {
-							if Utility.Contains(abstractClassLst, elementBaseType) {
-								elementMemberInitStr += "	object.M_" + relationName + "= make([]" + elementPackName0 + elementBaseType + ",0)\n"
-							} else if Utility.Contains(superClassesLst, elementBaseType) {
-								elementMemberInitStr += "	object.M_" + relationName + "= make([]" + elementPackName0 + elementBaseType + ",0)\n"
-							} else {
-								elementMemberInitStr += "	object.M_" + relationName + "= make([]*" + elementPackName0 + elementBaseType + ",0)\n"
-							}
-						}
-					}
-				}
+				elementMemberInitStr += "	object.M_" + relationName + "= make([]string,0)\n"
+
 				// Initialyse the values here...
 				if isInitialisation {
 					// So now I will create the initialisation loop...
 					if !isRef {
 						elementMemberInitStr += "	for i:=0;i<len(xmlElement.M_" + relationName_ + "); i++{\n"
 						elementMemberInitStr += "		val:=new(" + elementPackName1 + elementType + impl + ")\n"
-						elementMemberInitStr += "		this.Init" + elementType + "(object.UUID, xmlElement.M_" + relationName_ + "[i],val)\n"
-						elementMemberInitStr += "		object.M_" + relationName + "= append(object.M_" + relationName + ", val)\n"
-
+						elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + "[i],val)\n"
+						elementMemberInitStr += "		object.M_" + relationName + "= append(object.M_" + relationName + ", val.GetUuid())\n"
 						elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, true)
 						elementMemberInitStr += "	}\n"
 					}
@@ -560,8 +526,9 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 				if isInitialisation {
 					if !isRef {
 						elementMemberInitStr += "	if xmlElement.M_" + relationName_ + "!= nil{\n"
-						elementMemberInitStr += "		object.M_" + relationName + "= new(" + elementPackName1 + elementType + ")\n"
-						elementMemberInitStr += "		this.Init" + elementType + "(object.UUID, xmlElement.M_" + relationName_ + ",object.M_" + relationName + implCast + ")\n"
+						elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + ")\n"
+						elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
+						elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
 						elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 						elementMemberInitStr += "	}\n"
 					}
@@ -576,39 +543,34 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 					if Utility.Contains(abstractClassLst, attributeTypeName) {
 						if !isRef {
 							elementMemberInitStr += "	if xmlElement.M_" + relationName_ + "!= nil{\n"
-							elementMemberInitStr += "		if object.M_" + relationName + "== nil{\n"
-							elementMemberInitStr += "			object.M_" + relationName + "= new(" + elementPackName1 + elementType + impl + ")\n"
-							elementMemberInitStr += "		}\n"
-							elementMemberInitStr += "		this.Init" + elementType + "(object.UUID, xmlElement.M_" + relationName_ + ",&object.M_" + relationName + implCast + ")\n"
+							elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + impl + ")\n"
+							elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
+							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 							elementMemberInitStr += "	}\n"
 						}
 					} else if minOccurs == "0" || attribute.Lower == "0" {
 						if !isRef {
 							elementMemberInitStr += "	if xmlElement.M_" + relationName_ + "!= nil{\n"
-							elementMemberInitStr += "		if object.M_" + relationName + "== nil{\n"
-							elementMemberInitStr += "			object.M_" + relationName + "= new(" + elementPackName1 + elementType + impl + ")\n"
-							elementMemberInitStr += "		}\n"
-
+							elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + impl + ")\n"
 							if len(aliasType) > 0 {
-								elementMemberInitStr += "	this.Init" + elementType + "(object.UUID, (" + aliasType + ")(unsafe.Pointer(xmlElement.M_" + relationName + implCast + ")),object.M_" + relationName + implCast + ")\n"
+								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), (" + aliasType + ")(unsafe.Pointer(xmlElement.M_" + relationName + implCast + ")), val)\n"
 							} else {
-								elementMemberInitStr += "		this.Init" + elementType + "(object.UUID, xmlElement.M_" + relationName_ + ",object.M_" + relationName + implCast + ")\n"
+								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
 							}
+							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 							elementMemberInitStr += "	}\n"
 						}
 					} else {
 						if !isRef {
-							elementMemberInitStr += "	if object.M_" + relationName + "== nil{\n"
-							elementMemberInitStr += "		object.M_" + relationName + "= new(" + elementPackName1 + elementType + impl + ")\n"
-							elementMemberInitStr += "	}\n"
+							elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + impl + ")\n"
 							if len(aliasType) > 0 {
-								elementMemberInitStr += "	this.Init" + elementType + "(object.UUID, (" + aliasType + ")(unsafe.Pointer(&xmlElement.M_" + relationName_ + ")),object.M_" + relationName + implCast + ")\n"
+								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), (" + aliasType + ")(unsafe.Pointer(&xmlElement.M_" + relationName_ + ")), val)\n"
 							} else {
-								elementMemberInitStr += "	this.Init" + elementType + "(object.UUID, &xmlElement.M_" + relationName_ + ",object.M_" + relationName + implCast + ")\n"
+								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), &xmlElement.M_" + relationName_ + ", val)\n"
 							}
-
+							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 						}
 					}
@@ -631,7 +593,7 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 // Xml Attributes
 /////////////////////////////////////////////////////////////////////////////////
 func generateGoXmlFactorySimpleType(simpleType *XML_Schemas.XSD_SimpleType, attribute *XML_Schemas.XSD_Attribute, simpleTypeName string, elementPackName string, isInitialisation bool) string {
-	simpleTypesStr := "\n	/** " + simpleTypeName + " **/\n"
+	simpleTypesStr := "\n"
 	for i := 0; i < len(simpleType.Restriction.Enumeration); i++ {
 		if isInitialisation {
 			if i == 0 {
@@ -749,18 +711,6 @@ func generateGoXmlFactoryElementAttribute(attribute *XML_Schemas.XSD_Attribute, 
 					} else {
 						attributeInitialisationStr += "	xmlElement.M_" + attribute.Name + "= object." + "M_" + attribute.Name + "\n"
 					}
-					// In case of id I will generate the object uuid...
-					if attributeType == "xsd:ID" && isInitialisation {
-						attributeInitialisationStr += "	if len(object.M_" + attribute.Name + ") == 0 {\n"
-						attributeInitialisationStr += "		object.M_" + attribute.Name + "= Utility.RandomUUID()\n"
-						attributeInitialisationStr += "	}\n"
-						attributeInitialisationStr += "	var uuidStr string\n"
-						attributeInitialisationStr += "	if len(parentUuid) > 0 {\n"
-						attributeInitialisationStr += "		uuidStr += parentUuid + \":\"\n"
-						attributeInitialisationStr += "	}\n"
-						attributeInitialisationStr += "	uuidStr += \"" + elementPackName + elementType + ":\" + object.M_" + attribute.Name + "\n"
-						attributeInitialisationStr += "	object.UUID = \"" + elementPackName + elementType + "%\" + Utility.GenerateUUID(uuidStr)\n"
-					}
 				}
 			}
 		}
@@ -843,7 +793,6 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		}
 		return bpmnElementStr
 	}
-
 	mapMemberId := ""
 	if hasId(member) {
 		// Set with it id...
@@ -856,13 +805,10 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		mapMemberId = "\"" + attributeType + "\""
 	}
 	attributeInitialisationStr := ""
-	attributeTypeName := getAttributeType(attributeName, member)
 
-	isRef := IsRef(getAttribute(attributeName, member))
-
-	// Create the entry in the m_object map...
 	if isInitialisation {
-
+		// Now I will set the value...
+		// attributeInitialisationStr += "	object.M_" + attributeName + " = xmlElement.M_" + attributeName + "\n"
 		attributeInitialisationStr += "\n	/** Init ref " + attributeName + " **/\n"
 		attributeInitialisationStr += "	if len(" + mapMemberId + ") == 0 {\n"
 		attributeInitialisationStr += "		this.m_references[object.UUID] = object\n"
@@ -882,104 +828,31 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 			}
 		}
 
-		attributeInitialisationStr += "		if _, ok:= this.m_object[" + mapMemberId + "][\"" + attributeName + "\"]; !ok {\n"
-		attributeInitialisationStr += "			this.m_object[" + mapMemberId + "][\"" + attributeName + "\"]=make([]string,0)\n"
-		attributeInitialisationStr += "		}\n"
 		// Set the value
 		if isRefArray {
-			attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"" + attributeName + "\"] = append(this.m_object[" + mapMemberId + "][\"" + attributeName + "\"], xmlElement.M_" + attributeName + "[i])\n"
+			attributeInitialisationStr += "		if _, ok:= this.m_object[" + mapMemberId + "][\"Append" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"]; !ok {\n"
+			attributeInitialisationStr += "			this.m_object[" + mapMemberId + "][\"Append" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"]=make([]string,0)\n"
+			attributeInitialisationStr += "		}\n"
+			attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"Append" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"] = append(this.m_object[" + mapMemberId + "][\"Append" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"], xmlElement.M_" + attributeName + "[i])\n"
 		} else {
+			attributeInitialisationStr += "		if _, ok:= this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"]; !ok {\n"
+			attributeInitialisationStr += "			this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"]=make([]string,0)\n"
+			attributeInitialisationStr += "		}\n"
 			if isRefPointer == true {
-				attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"" + attributeName + "\"] = append(this.m_object[" + mapMemberId + "][\"" + attributeName + "\"], *xmlElement.M_" + attributeName + ")\n"
+				attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"] = append(this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"], *xmlElement.M_" + attributeName + ")\n"
 			} else {
-				attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"" + attributeName + "\"] = append(this.m_object[" + mapMemberId + "][\"" + attributeName + "\"], xmlElement.M_" + attributeName + ")\n"
+				attributeInitialisationStr += "		this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"] = append(this.m_object[" + mapMemberId + "][\"Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:] + "\"], xmlElement.M_" + attributeName + ")\n"
 			}
 		}
 		attributeInitialisationStr += "	}\n"
 	} else {
 		// Serialization...
 		attributeInitialisationStr += "\n	/** Serialyze ref " + attributeName + " **/\n"
-		ptrOp := ""
 		if isRefPointer {
-			ptrOp = "&"
-		}
-
-		if isRefArray {
-
-			if !isRef {
-				attributeInitialisationStr += "	for i:=0; i < len(object.M_" + attributeName + "); i++ {\n"
-				// So here I will save the id of the reference into the xml element.
-				if hasId(member) {
-					abstractClassName := getAbstractClassNameByAttributeName("id", member, packName)
-					if Utility.Contains(superClassesLst, attributeTypeName) {
-						attributeInitialisationStr += "		var val	" + getClassPackName(abstractClassName, packName) + abstractClassName + "\n"
-						attributeInitialisationStr += "		val=" + "object.M_" + attributeName + "[i].(" + getClassPackName(abstractClassName, packName) + abstractClassName + ")\n"
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ", val.GetId())\n"
-					} else if attributeTypeName == "interface{}" {
-
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ",object.M_" + attributeName + "[i].(string))\n"
-					} else {
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ",object.M_" + attributeName + "[i].GetId())\n"
-					}
-
-				} else if hasName(member) {
-					abstractClassName := getAbstractClassNameByAttributeName("id", member, packName)
-					if Utility.Contains(superClassesLst, attributeTypeName) {
-						attributeInitialisationStr += "		var val	" + getClassPackName(abstractClassName, packName) + abstractClassName + "\n"
-						attributeInitialisationStr += "		val=" + "object.M_" + attributeName + "[i].(" + getClassPackName(abstractClassName, packName) + abstractClassName + ")\n"
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ", val.GetName())\n"
-					} else if attributeTypeName == "interface{}" {
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ",object.M_" + attributeName + "[i].(string))\n"
-					} else {
-						attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=append(xmlElement.M_" + attributeName + ",object.M_" + attributeName + "[i].GetName())\n"
-					}
-				}
-				attributeInitialisationStr += "	}\n"
-			} else {
-				// Simply set the array of ref...
-				attributeInitialisationStr += "		xmlElement.M_" + attributeName + "= object.M_" + attributeName + "\n"
-			}
+			attributeInitialisationStr += "	xmlElement.M_" + attributeName + "=&object.M_" + attributeName + "\n"
 		} else {
-			if !isRef {
-				attributeInitialisationStr += "	if object.M_" + attributeName + " !=nil {\n"
-				// So here I will save the id of the reference into the xml element.
-				if hasId(member) {
-					abstractClassName := getAbstractClassNameByAttributeName("id", member, packName)
-					attributeInitialisationStr += "		id:="
-					if Utility.Contains(superClassesLst, attributeTypeName) {
-						attributeInitialisationStr += "object.M_" + attributeName + ".(" + abstractClassName + ").GetId()\n"
-					} else if attributeTypeName == "interface{}" {
-						if attributeName == "object" { // Specific...
-							attributeInitialisationStr += "object.M_" + attributeName + ".(BPMN20.BaseElement).GetId()\n"
-						} else {
-							attributeInitialisationStr += "object.M_" + attributeName + ".(string)\n"
-						}
-					} else {
-						attributeInitialisationStr += "object.M_" + attributeName + ".GetId()\n"
-					}
-					attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=" + ptrOp + "id\n"
-				} else if hasName(member) {
-					abstractClassName := getAbstractClassNameByAttributeName("id", member, packName)
-					attributeInitialisationStr += "		name:="
-					if Utility.Contains(superClassesLst, attributeTypeName) {
-						attributeInitialisationStr += "object.M_" + attributeName + ".(" + abstractClassName + ").GetName()\n"
-					} else if attributeTypeName == "interface{}" {
-						attributeInitialisationStr += "object.M_" + attributeName + ".(string)\n"
-					} else {
-						attributeInitialisationStr += "object.M_" + attributeName + ".GetName()\n"
-					}
-					attributeInitialisationStr += "		xmlElement.M_" + attributeName + "=" + ptrOp + "name\n"
-				}
-				attributeInitialisationStr += "	}\n"
-			} else {
-				if isRefPointer {
-					attributeInitialisationStr += "	xmlElement.M_" + attributeName + "=&object.M_" + attributeName + "\n"
-				} else {
-					attributeInitialisationStr += "	xmlElement.M_" + attributeName + "=object.M_" + attributeName + "\n"
-				}
-			}
+			attributeInitialisationStr += "	xmlElement.M_" + attributeName + "=object.M_" + attributeName + "\n"
 		}
-		// Here the refence is nil...
 	}
 	return attributeInitialisationStr
 }
@@ -1100,12 +973,13 @@ func generateGoXmlFactoryElementCompositeAssociation(relationName string, ownerE
 		}
 		if association != nil {
 			associationTypeName, _, _ := getAttributeTypeName(association)
+			isArray = association.Upper == "*"
 			if associationTypeName == ownerElementType {
 				// In that case I will set association...
 				if isArray == true {
-					elementMemberInitStr += "		val.Set" + strings.ToUpper(associationId[0:1]) + associationId[1:] + "Ptr(object)\n"
+					elementMemberInitStr += "		val.Append" + strings.ToUpper(associationId[0:1]) + associationId[1:] + "Ptr(object)\n"
 				} else {
-					elementMemberInitStr += "		object.M_" + relationName + implCast + ".Set" + strings.ToUpper(associationId[0:1]) + associationId[1:] + "Ptr(object)\n"
+					elementMemberInitStr += "		val.Set" + strings.ToUpper(associationId[0:1]) + associationId[1:] + "Ptr(object)\n"
 				}
 			} else {
 				log.Println("==============> bad relation type, expected ", ownerElementType, " found ", associationTypeName)
@@ -1215,7 +1089,7 @@ func generateGoXmlElementSerialyzeInit(ownerElementType string, relationType str
 	if isArray {
 		xmlElementSerialyzeStr += "	for i:=0; i<len(object.M_" + relationName + ");i++{\n"
 	} else {
-		xmlElementSerialyzeStr += "	if object.M_" + relationName + "!=nil{\n"
+		xmlElementSerialyzeStr += "	if object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "()!=nil{\n"
 	}
 
 	// Here I will make a type switch to get the good value to init...
@@ -1240,25 +1114,25 @@ func generateGoXmlElementSerialyzeInit(ownerElementType string, relationType str
 
 		if isArray {
 			xmlElementSerialyzeStr += "		xmlElement.M_" + relationName + "=append(xmlElement.M_" + relationName + ",new(" + getClassPackName(elementType, packName) + "Xsd" + elementType + "))\n"
-			xmlElementSerialyzeStr += "		" + serializeFunctionName + "(xmlElement.M_" + relationName + "[i],object.M_" + relationName + impl + "[i]" + cast + ")\n"
+			xmlElementSerialyzeStr += "		" + serializeFunctionName + "(xmlElement.M_" + relationName + "[i],object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + impl + "()[i]" + cast + ")\n"
 		} else if isPointer {
 			if len(aliasType) > 0 {
-				xmlElementSerialyzeStr += "		" + serializeFunctionName + "((" + aliasType + ")(unsafe.Pointer(xmlElement.M_" + relationName + suffix + ")),object.M_" + relationName + impl + cast + ")\n"
+				xmlElementSerialyzeStr += "		" + serializeFunctionName + "((" + aliasType + ")(unsafe.Pointer(xmlElement.M_" + relationName + suffix + ")),object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + impl + cast + "())\n"
 			} else {
-				xmlElementSerialyzeStr += "		" + serializeFunctionName + "(xmlElement.M_" + relationName + suffix + ",object.M_" + relationName + impl + cast + ")\n"
+				xmlElementSerialyzeStr += "		" + serializeFunctionName + "(xmlElement.M_" + relationName + suffix + ",object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + impl + cast + "())\n"
 			}
 		} else {
 			if len(aliasType) > 0 {
-				xmlElementSerialyzeStr += "		" + serializeFunctionName + "((" + aliasType + ")(unsafe.Pointer(&xmlElement.M_" + relationName + suffix + ")),object.M_" + relationName + impl + cast + ")\n"
+				xmlElementSerialyzeStr += "		" + serializeFunctionName + "((" + aliasType + ")(unsafe.Pointer(&xmlElement.M_" + relationName + suffix + ")),object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + impl + cast + "())\n"
 			} else {
-				xmlElementSerialyzeStr += "		" + serializeFunctionName + "(&xmlElement.M_" + relationName + suffix + ",object.M_" + relationName + impl + cast + ")\n"
+				xmlElementSerialyzeStr += "		" + serializeFunctionName + "(&xmlElement.M_" + relationName + suffix + ",object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + impl + cast + "())\n"
 			}
 		}
 	} else {
 		if isArray {
-			xmlElementSerialyzeStr += "		switch v:= object.M_" + relationName + "[i].(type){\n"
+			xmlElementSerialyzeStr += "		switch v:= object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "()[i].(type){\n"
 		} else {
-			xmlElementSerialyzeStr += "		switch v:= object.M_" + relationName + ".(type){\n"
+			xmlElementSerialyzeStr += "		switch v:= object.Get" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "().(type){\n"
 		}
 		for i := 0; i < len(*implementationTypes); i++ {
 			elementType := (*implementationTypes)[i]
@@ -1312,7 +1186,7 @@ func generateGoXmlElementSerialyze(relationName string, elementType string, pack
 			xmlElementSerialyzeStr += "		xmlElement.M_" + relationName + "= make([]*" + getClassPackName((*implementationTypes)[i], packName) + "Xsd" + (*implementationTypes)[i] + ",0)\n"
 			xmlElementSerialyzeStr += "	}\n"
 		} else if isPointer {
-			xmlElementSerialyzeStr += "	if object.M_" + relationName_ + "!= nil {\n"
+			xmlElementSerialyzeStr += "	if object.Get" + strings.ToUpper(relationName_[0:1]) + relationName_[1:] + "()!= nil {\n"
 			if len(aliasType) > 0 {
 				xmlElementSerialyzeStr += "		xmlElement.M_" + relationName + "= new(" + aliasType + ")\n"
 			} else {

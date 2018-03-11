@@ -60,9 +60,13 @@ type XsdOAuth2Access struct {
 
 /** UUID **/
 func (this *OAuth2Access) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2Access) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -95,6 +99,14 @@ func (this *OAuth2Access) GetParentLnk() string{
 }
 func (this *OAuth2Access) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2Access) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -133,6 +145,8 @@ func (this *OAuth2Access) SetId(val string){
 }
 
 
+
+
 func (this *OAuth2Access) GetClient()*OAuth2Client{
 	entity, err := this.getEntityByUuid(this.M_client)
 	if err == nil {
@@ -145,6 +159,7 @@ func (this *OAuth2Access) SetClient(val *OAuth2Client){
 	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
+
 
 func (this *OAuth2Access) ResetClient(){
 	this.M_client= ""
@@ -161,6 +176,8 @@ func (this *OAuth2Access) SetAuthorize(val string){
 }
 
 
+
+
 func (this *OAuth2Access) GetPrevious()string{
 	return this.M_previous
 }
@@ -169,6 +186,8 @@ func (this *OAuth2Access) SetPrevious(val string){
 	this.NeedSave = this.M_previous== val
 	this.M_previous= val
 }
+
+
 
 
 func (this *OAuth2Access) GetRefreshToken()*OAuth2Refresh{
@@ -183,6 +202,7 @@ func (this *OAuth2Access) SetRefreshToken(val *OAuth2Refresh){
 	this.NeedSave = this.M_refreshToken != val.GetUuid()
 	this.M_refreshToken= val.GetUuid()
 }
+
 
 func (this *OAuth2Access) ResetRefreshToken(){
 	this.M_refreshToken= ""
@@ -199,6 +219,8 @@ func (this *OAuth2Access) SetExpiresIn(val int64){
 }
 
 
+
+
 func (this *OAuth2Access) GetScope()string{
 	return this.M_scope
 }
@@ -209,6 +231,8 @@ func (this *OAuth2Access) SetScope(val string){
 }
 
 
+
+
 func (this *OAuth2Access) GetRedirectUri()string{
 	return this.M_redirectUri
 }
@@ -217,6 +241,8 @@ func (this *OAuth2Access) SetRedirectUri(val string){
 	this.NeedSave = this.M_redirectUri== val
 	this.M_redirectUri= val
 }
+
+
 
 
 func (this *OAuth2Access) GetUserData()*OAuth2IdToken{
@@ -231,6 +257,7 @@ func (this *OAuth2Access) SetUserData(val *OAuth2IdToken){
 	this.NeedSave = this.M_userData != val.GetUuid()
 	this.M_userData= val.GetUuid()
 }
+
 
 func (this *OAuth2Access) ResetUserData(){
 	this.M_userData= ""
@@ -247,6 +274,8 @@ func (this *OAuth2Access) SetCreatedAt(val int64){
 }
 
 
+
+
 func (this *OAuth2Access) GetParentPtr()*OAuth2Configuration{
 	entity, err := this.getEntityByUuid(this.M_parentPtr)
 	if err == nil {
@@ -259,6 +288,7 @@ func (this *OAuth2Access) SetParentPtr(val *OAuth2Configuration){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *OAuth2Access) ResetParentPtr(){
 	this.M_parentPtr= ""

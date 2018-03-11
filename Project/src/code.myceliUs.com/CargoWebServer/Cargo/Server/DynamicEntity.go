@@ -150,7 +150,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 			ids = append(ids, obj[prototype.Ids[i]])
 		}
 		// In that case I will set it uuid.
-		this.object["UUID"] = GetServer().GetEntityManager().GenerateEntityUUID(obj["TYPENAME"].(string), this.object["ParentUuid"].(string), ids, "", "")
+		this.object["UUID"] = generateEntityUuid(obj["TYPENAME"].(string), this.object["ParentUuid"].(string), ids)
 	}
 
 	// Here I will initilalyse sub-entity if there one, so theire map will not be part of this entity.
@@ -375,6 +375,14 @@ func (this *DynamicEntity) GetParentLnk() string {
 
 func (this *DynamicEntity) SetParentLnk(lnk string) {
 	this.setValue("ParentLnk", lnk)
+}
+
+func (this *DynamicEntity) GetParent() interface{} {
+	parent, err := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid())
+	if err != nil {
+		return err
+	}
+	return parent
 }
 
 /**

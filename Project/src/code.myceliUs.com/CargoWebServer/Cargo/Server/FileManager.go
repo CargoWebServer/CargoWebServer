@@ -362,8 +362,10 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	} else {
 		log.Println("Create entity for file: ", filepath+"/"+filename)
 		file = new(CargoEntities.File)
-		file.NeedSave = true
 		file.SetId(fileId)
+		file.SetParentUuid(parentDir.GetUuid())
+		file.SetParentLnk("M_files")
+		file.SetUuidGenerator(generateUuidFct)
 	}
 
 	// Disk file.

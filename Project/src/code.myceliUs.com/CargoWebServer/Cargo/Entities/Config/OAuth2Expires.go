@@ -45,9 +45,13 @@ type XsdOAuth2Expires struct {
 
 /** UUID **/
 func (this *OAuth2Expires) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2Expires) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -80,6 +84,14 @@ func (this *OAuth2Expires) GetParentLnk() string{
 }
 func (this *OAuth2Expires) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2Expires) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -118,6 +130,8 @@ func (this *OAuth2Expires) SetId(val string){
 }
 
 
+
+
 func (this *OAuth2Expires) GetExpiresAt()int64{
 	return this.M_expiresAt
 }
@@ -126,6 +140,8 @@ func (this *OAuth2Expires) SetExpiresAt(val int64){
 	this.NeedSave = this.M_expiresAt== val
 	this.M_expiresAt= val
 }
+
+
 
 
 func (this *OAuth2Expires) GetParentPtr()*OAuth2Configuration{
@@ -140,6 +156,7 @@ func (this *OAuth2Expires) SetParentPtr(val *OAuth2Configuration){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *OAuth2Expires) ResetParentPtr(){
 	this.M_parentPtr= ""

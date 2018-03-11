@@ -64,9 +64,13 @@ type XsdOAuth2IdToken struct {
 
 /** UUID **/
 func (this *OAuth2IdToken) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2IdToken) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -99,6 +103,14 @@ func (this *OAuth2IdToken) GetParentLnk() string{
 }
 func (this *OAuth2IdToken) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2IdToken) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -137,6 +149,8 @@ func (this *OAuth2IdToken) SetIssuer(val string){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetId()string{
 	return this.M_id
 }
@@ -145,6 +159,8 @@ func (this *OAuth2IdToken) SetId(val string){
 	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
+
+
 
 
 func (this *OAuth2IdToken) GetClient()*OAuth2Client{
@@ -159,6 +175,7 @@ func (this *OAuth2IdToken) SetClient(val *OAuth2Client){
 	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
 }
+
 
 func (this *OAuth2IdToken) ResetClient(){
 	this.M_client= ""
@@ -175,6 +192,8 @@ func (this *OAuth2IdToken) SetExpiration(val int64){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetIssuedAt()int64{
 	return this.M_issuedAt
 }
@@ -183,6 +202,8 @@ func (this *OAuth2IdToken) SetIssuedAt(val int64){
 	this.NeedSave = this.M_issuedAt== val
 	this.M_issuedAt= val
 }
+
+
 
 
 func (this *OAuth2IdToken) GetNonce()string{
@@ -195,6 +216,8 @@ func (this *OAuth2IdToken) SetNonce(val string){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetEmail()string{
 	return this.M_email
 }
@@ -203,6 +226,8 @@ func (this *OAuth2IdToken) SetEmail(val string){
 	this.NeedSave = this.M_email== val
 	this.M_email= val
 }
+
+
 
 
 func (this *OAuth2IdToken) IsEmailVerified()bool{
@@ -215,6 +240,8 @@ func (this *OAuth2IdToken) SetEmailVerified(val bool){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetName()string{
 	return this.M_name
 }
@@ -223,6 +250,8 @@ func (this *OAuth2IdToken) SetName(val string){
 	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
+
+
 
 
 func (this *OAuth2IdToken) GetFamilyName()string{
@@ -235,6 +264,8 @@ func (this *OAuth2IdToken) SetFamilyName(val string){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetGivenName()string{
 	return this.M_givenName
 }
@@ -245,6 +276,8 @@ func (this *OAuth2IdToken) SetGivenName(val string){
 }
 
 
+
+
 func (this *OAuth2IdToken) GetLocal()string{
 	return this.M_local
 }
@@ -253,6 +286,8 @@ func (this *OAuth2IdToken) SetLocal(val string){
 	this.NeedSave = this.M_local== val
 	this.M_local= val
 }
+
+
 
 
 func (this *OAuth2IdToken) GetParentPtr()*OAuth2Configuration{
@@ -267,6 +302,7 @@ func (this *OAuth2IdToken) SetParentPtr(val *OAuth2Configuration){
 	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
 }
+
 
 func (this *OAuth2IdToken) ResetParentPtr(){
 	this.M_parentPtr= ""

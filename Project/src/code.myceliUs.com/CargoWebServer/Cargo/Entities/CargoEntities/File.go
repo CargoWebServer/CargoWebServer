@@ -71,9 +71,13 @@ type XsdFile struct {
 
 /** UUID **/
 func (this *File) GetUuid() string{
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *File) SetUuid(uuid string){
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -106,6 +110,14 @@ func (this *File) GetParentLnk() string{
 }
 func (this *File) SetParentLnk(parentLnk string){
 	this.ParentLnk = parentLnk
+}
+
+func (this *File) GetParent() interface{}{
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
@@ -152,6 +164,8 @@ func (this *File) SetId(val string){
 }
 
 
+
+
 func (this *File) GetName()string{
 	return this.M_name
 }
@@ -160,6 +174,8 @@ func (this *File) SetName(val string){
 	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
+
+
 
 
 func (this *File) GetPath()string{
@@ -172,6 +188,8 @@ func (this *File) SetPath(val string){
 }
 
 
+
+
 func (this *File) GetSize()int{
 	return this.M_size
 }
@@ -180,6 +198,8 @@ func (this *File) SetSize(val int){
 	this.NeedSave = this.M_size== val
 	this.M_size= val
 }
+
+
 
 
 func (this *File) GetModeTime()int64{
@@ -192,6 +212,8 @@ func (this *File) SetModeTime(val int64){
 }
 
 
+
+
 func (this *File) IsDir()bool{
 	return this.M_isDir
 }
@@ -200,6 +222,8 @@ func (this *File) SetIsDir(val bool){
 	this.NeedSave = this.M_isDir== val
 	this.M_isDir= val
 }
+
+
 
 
 func (this *File) GetChecksum()string{
@@ -212,6 +236,8 @@ func (this *File) SetChecksum(val string){
 }
 
 
+
+
 func (this *File) GetData()string{
 	return this.M_data
 }
@@ -220,6 +246,8 @@ func (this *File) SetData(val string){
 	this.NeedSave = this.M_data== val
 	this.M_data= val
 }
+
+
 
 
 func (this *File) GetThumbnail()string{
@@ -232,6 +260,8 @@ func (this *File) SetThumbnail(val string){
 }
 
 
+
+
 func (this *File) GetMime()string{
 	return this.M_mime
 }
@@ -242,15 +272,17 @@ func (this *File) SetMime(val string){
 }
 
 
+
+
 func (this *File) GetFiles()[]*File{
-	files := make([]*File, 0)
+	values := make([]*File, 0)
 	for i := 0; i < len(this.M_files); i++ {
 		entity, err := this.getEntityByUuid(this.M_files[i])
 		if err == nil {
-			files = append(files, entity.(*File))
+			values = append( values, entity.(*File))
 		}
 	}
-	return files
+	return values
 }
 
 func (this *File) SetFiles(val []*File){
@@ -258,15 +290,12 @@ func (this *File) SetFiles(val []*File){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_files")
-		if len(val[i].GetUuid()) == 0 {
-			val[i].SetUuid(this.generateUuid(val[i]))
-		}
 		this.setEntity(val[i])
-
 		this.M_files=append(this.M_files, val[i].GetUuid())
 	}
 	this.NeedSave= true
 }
+
 
 func (this *File) AppendFiles(val *File){
 	for i:=0; i < len(this.M_files); i++{
@@ -277,24 +306,20 @@ func (this *File) AppendFiles(val *File){
 	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_files")
-	if len(val.GetUuid()) == 0 {
-		val.SetUuid(this.generateUuid(val))
-	}
 	this.setEntity(val)
-
 	this.M_files = append(this.M_files, val.GetUuid())
 }
 
 func (this *File) RemoveFiles(val *File){
-	files := make([]string,0)
+	values := make([]string,0)
 	for i:=0; i < len(this.M_files); i++{
 		if this.M_files[i] != val.GetUuid() {
-			files = append(files, val.GetUuid())
+			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_files = files
+	this.M_files = values
 }
 
 
@@ -306,6 +331,7 @@ func (this *File) SetFileType(val FileType){
 	this.NeedSave = this.M_fileType== val
 	this.M_fileType= val
 }
+
 
 func (this *File) ResetFileType(){
 	this.M_fileType= 0
@@ -325,6 +351,7 @@ func (this *File) SetParentDirPtr(val *File){
 	this.M_parentDirPtr= val.GetUuid()
 }
 
+
 func (this *File) ResetParentDirPtr(){
 	this.M_parentDirPtr= ""
 }
@@ -342,6 +369,7 @@ func (this *File) SetEntitiesPtr(val *Entities){
 	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
 }
+
 
 func (this *File) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""

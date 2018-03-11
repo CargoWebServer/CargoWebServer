@@ -41,35 +41,29 @@
 	<xsd:complexType name="tAction">
 		<xsd:attribute name="name" type="xsd:ID"/>
 		<xsd:attribute name="doc" type="xsd:string"/>
-		<xsd:complexContent> 
-			<xsd:sequence>
-				<xsd:element ref="parameters" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
-				<xsd:element ref="results" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
-			</xsd:sequence>
-			<xsd:attribute name="accessType" type="tAccessType" default="Hidden"/>
-		</xsd:complexContent> 
+		<xsd:sequence>
+			<xsd:element name="parameters" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element name="results" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
+		</xsd:sequence>
+		<xsd:attribute name="accessType" type="tAccessType" default="Hidden"/>
 	</xsd:complexType>
 	
 	<xsd:element name="role" type="tRole"/> 
 	<xsd:complexType name="tRole">
 		<xsd:attribute name="id" type="xsd:ID"/>
-		<xsd:complexContent> 
-			<xsd:sequence>
-				<xsd:element ref="accounts" type="tAccount" minOccurs="0" maxOccurs="*"/> 
-				<xsd:element ref="actions" type="tAction" minOccurs="0" maxOccurs="*"/> 
-			</xsd:sequence>
-		</xsd:complexContent> 
+		<xsd:sequence>
+			<xsd:element name="accounts" type="tAccount" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element name="actions" type="tAction" minOccurs="0" maxOccurs="unbounded"/> 
+		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:element name="permission" type="tPermission"/> 
 	<xsd:complexType name="tPermission">
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="types" type="xsd:integer"/>
-		<xsd:complexContent> 
-			<xsd:sequence>
-				<xsd:element ref="accountsRef" type="tAccount" minOccurs="0" maxOccurs="*"/>
-			</xsd:sequence>
-		</xsd:complexContent> 
+		<xsd:sequence>
+			<xsd:element name="accounts" type="tAccount" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:simpleType name="tFileType">

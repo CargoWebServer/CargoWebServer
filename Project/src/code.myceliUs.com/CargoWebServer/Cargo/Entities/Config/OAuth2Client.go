@@ -50,9 +50,13 @@ type XsdOAuth2Client struct {
 
 /** UUID **/
 func (this *OAuth2Client) GetUuid() string {
+	if len(this.UUID) == 0 {
+		this.SetUuid(this.generateUuid(this))
+	}
 	return this.UUID
 }
 func (this *OAuth2Client) SetUuid(uuid string) {
+	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -85,6 +89,14 @@ func (this *OAuth2Client) GetParentLnk() string {
 }
 func (this *OAuth2Client) SetParentLnk(parentLnk string) {
 	this.ParentLnk = parentLnk
+}
+
+func (this *OAuth2Client) GetParent() interface{} {
+	parent, err := this.getEntityByUuid(this.ParentUuid)
+	if err != nil {
+		return nil
+	}
+	return parent
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/

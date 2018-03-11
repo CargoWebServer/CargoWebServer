@@ -465,72 +465,82 @@ func generateGoClassMembersCode(class *XML_Schemas.CMOF_OwnedMember, packageId s
  * like GetResolution()float32
  */
 func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML_Schemas.CMOF_OwnedMember, isAssociation bool, packName string) string {
+
+	// Here we are in a struct...
+	typeName, isPrimitive, isPointer := getAttributeTypeName(attribute)
+	var methodName = strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:]
+	var attributeName = attribute.Name
+	if isAssociation {
+		attributeName += "Ptr"
+		methodName += "Ptr"
+	}
+
+	// The getter function...
+	getterStr := ""
+	if typeName == "bool" || typeName == "boolean" {
+		if !strings.HasPrefix(methodName, "Is") {
+
+			getterStr += "Is"
+		}
+	} else {
+		getterStr += "Get"
+	}
+
+	getterStr += methodName + "()"
+	if attribute.Upper == "*" {
+		getterStr += "[]"
+	}
+	isInterface := Utility.Contains(superClassesLst, typeName) || Utility.Contains(abstractClassLst, typeName)
+	if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+		getterStr += "*"
+	}
+	if membersPackage[typeName] != packName {
+		if !isPrimitive && enumMap[typeName] == nil {
+			typeName = membersPackage[typeName] + "." + typeName
+		}
+	}
+
+	getterStr += typeName
 	if owner != nil {
 		ownerName := owner.Name
 		if Utility.Contains(superClassesLst, ownerName) == true {
 			ownerName += "_impl"
 		}
-
-		// Here we are in a struct...
-		typeName, isPrimitive, isPointer := getAttributeTypeName(attribute)
-		var methodName = strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:]
-		var attributeName = attribute.Name
-		if isAssociation {
-			attributeName += "Ptr"
-			methodName += "Ptr"
-		}
-
-		// The getter function...
-		getterStr := "func (this *" + ownerName + ") "
-		if typeName == "bool" || typeName == "boolean" {
-			if !strings.HasPrefix(methodName, "Is") {
-
-				getterStr += "Is"
-			}
-		} else {
-			getterStr += "Get"
-		}
-		getterStr += methodName + "()"
-		if attribute.Upper == "*" {
-			getterStr += "[]"
-		}
-		isInterface := Utility.Contains(superClassesLst, typeName) || Utility.Contains(abstractClassLst, typeName)
-		if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
-			getterStr += "*"
-		}
-
-		getterStr += typeName
+		getterStr = "func (this *" + ownerName + ") " + getterStr
 		getterStr += "{\n"
 
 		// The getter function body here.
 		if isPrimitive || enumMap[typeName] != nil {
 			getterStr += "	return this.M_" + attribute.Name + "\n"
 		} else {
+
 			if attribute.Upper == "*" {
-				getterStr += "	" + attribute.Name + " := make([]"
-				if isPointer {
+				getterStr += "	values := make([]"
+
+				if isPointer == true && !isInterface {
 					getterStr += "*"
 				}
+
 				getterStr += typeName
 				getterStr += ", 0)\n"
 				getterStr += "	for i := 0; i < len(this.M_" + attributeName + "); i++ {\n"
 				getterStr += "		entity, err := this.getEntityByUuid(this.M_" + attributeName + "[i])\n"
 				getterStr += "		if err == nil {\n"
 
-				getterStr += "			" + attributeName + " = append(" + attributeName + ", entity.("
-				if isPointer {
+				getterStr += "			values = append( values, entity.("
+				if isPointer == true && !isInterface {
 					getterStr += "*"
 				}
 				getterStr += typeName
 				getterStr += "))\n"
 				getterStr += "		}\n"
 				getterStr += "	}\n"
-				getterStr += "	return " + attributeName + "\n"
+				getterStr += "	return values\n"
 			} else {
 				getterStr += "	entity, err := this.getEntityByUuid(this.M_" + attributeName + ")\n"
 				getterStr += "	if err == nil {\n"
 				getterStr += "		return entity.("
-				if isPointer {
+				if isPointer == true && !isInterface {
 					getterStr += "*"
 				}
 				getterStr += typeName
@@ -540,18 +550,26 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			}
 		}
 		getterStr += "}\n"
+	}
 
-		// The setter function...
-		setterStr := "func (this *" + ownerName + ") Set"
-		setterStr += methodName
-		setterStr += "(val "
-		if attribute.Upper == "*" {
-			setterStr += "[]"
+	// The setter function...
+	setterStr := "Set"
+	setterStr += methodName
+	setterStr += "(val "
+	if attribute.Upper == "*" {
+		setterStr += "[]"
+	}
+	if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+		setterStr += "*"
+	}
+	setterStr += typeName + ")"
+
+	if owner != nil {
+		ownerName := owner.Name
+		if Utility.Contains(superClassesLst, ownerName) == true {
+			ownerName += "_impl"
 		}
-		if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
-			setterStr += "*"
-		}
-		setterStr += typeName + ")"
+		setterStr = "func (this *" + ownerName + ") " + setterStr
 		setterStr += "{\n"
 		// The setter function body here.
 		if isPrimitive || enumMap[typeName] != nil {
@@ -567,10 +585,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					// Set the parent infos in the child.
 					setterStr += "		val[i].SetParentUuid(this.UUID)\n"
 					setterStr += "		val[i].SetParentLnk(\"M_" + attributeName + "\")\n"
-					setterStr += "		if len(val[i].GetUuid()) == 0 {\n"
-					setterStr += "			val[i].SetUuid(this.generateUuid(val[i]))\n"
-					setterStr += "		}\n"
-					setterStr += "		this.setEntity(val[i])\n\n"
+					setterStr += "		this.setEntity(val[i])\n"
 				}
 				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
 				setterStr += "	}\n"
@@ -581,10 +596,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					// Set the parent infos in the child.
 					setterStr += "	val.SetParentUuid(this.UUID)\n"
 					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
-					setterStr += "	if len(val.GetUuid()) == 0 {\n"
-					setterStr += "		val.SetUuid(this.generateUuid(val))\n"
-					setterStr += "	}\n"
-					setterStr += "	this.setEntity(val)\n\n"
+					setterStr += "	this.setEntity(val)\n"
 				}
 				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
 
@@ -592,79 +604,91 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 		}
 		setterStr += "}\n"
+	}
 
-		// In case of array I will also create append method...
-		if attribute.Upper == "*" {
-			setterStr += "\nfunc (this *" + ownerName + ") Append"
-			setterStr += methodName
-			setterStr += "(val "
-			if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
-				setterStr += "*"
+	// In case of array I will also create append method...
+	var appendStr string
+	if attribute.Upper == "*" {
+		appendStr = " Append"
+		appendStr += methodName
+		appendStr += "(val "
+		if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+			appendStr += "*"
+		}
+		appendStr += typeName + ")"
+		if owner != nil {
+			ownerName := owner.Name
+			if Utility.Contains(superClassesLst, ownerName) == true {
+				ownerName += "_impl"
 			}
-			setterStr += typeName + ")"
-			setterStr += "{\n"
+			appendStr = "\nfunc (this *" + ownerName + ")" + appendStr
+			appendStr += "{\n"
 			// The append function body here.
 			if isPrimitive {
-				setterStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + ", val)\n"
-				setterStr += "	this.NeedSave= true\n"
+				appendStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + ", val)\n"
+				appendStr += "	this.NeedSave= true\n"
 			} else {
-				setterStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
-				setterStr += "		if this.M_" + attributeName + "[i] == val.GetUuid() {\n"
-				setterStr += "			return\n"
-				setterStr += "		}\n"
-				setterStr += "	}\n"
-				setterStr += "	this.NeedSave= true\n"
+				appendStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
+				appendStr += "		if this.M_" + attributeName + "[i] == val.GetUuid() {\n"
+				appendStr += "			return\n"
+				appendStr += "		}\n"
+				appendStr += "	}\n"
+				appendStr += "	this.NeedSave= true\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
-					setterStr += "	val.SetParentUuid(this.UUID)\n"
-					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
-					setterStr += "	if len(val.GetUuid()) == 0 {\n"
-					setterStr += "		val.SetUuid(this.generateUuid(val))\n"
-					setterStr += "	}\n"
-					setterStr += "	this.setEntity(val)\n\n"
+					appendStr += "	val.SetParentUuid(this.UUID)\n"
+					appendStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
+					appendStr += "	this.setEntity(val)\n"
 				}
 
-				setterStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
+				appendStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
 			}
+			appendStr += "}\n"
+		}
+	}
 
-			setterStr += "}\n"
+	var removerStr string
+	if (isPointer || attribute.Upper == "*") && !isPrimitive {
+		// The remover function...
+		if attribute.Upper == "*" {
+			removerStr += "Remove"
+			removerStr += methodName + "("
+			if !isPrimitive {
+				removerStr += "val "
+				if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
+					removerStr += "*"
+				}
+				removerStr += typeName
+			} else {
+				removerStr += "index int"
+			}
+			removerStr += ")"
+		} else {
+			removerStr += "Reset" + methodName + "()"
 		}
 
-		var removerStr string
-		if (isPointer || attribute.Upper == "*") && !isPrimitive {
-			// The remover function...
-			removerStr = "func (this *" + ownerName + ") "
-			if attribute.Upper == "*" {
-				removerStr += "Remove"
-				removerStr += methodName + "("
-				if !isPrimitive {
-					removerStr += "val "
-					if isPointer == true && !isInterface && simpleTypesMap[typeName] == nil {
-						removerStr += "*"
-					}
-					removerStr += typeName
-				} else {
-					removerStr += "index int"
-				}
-				removerStr += ")"
-			} else {
-				removerStr += "Reset" + methodName + "()"
+		if owner != nil {
+			ownerName := owner.Name
+			if Utility.Contains(superClassesLst, ownerName) == true {
+				ownerName += "_impl"
 			}
+
+			removerStr = "func (this *" + ownerName + ") " + removerStr
 			removerStr += "{\n"
 			// The delete function body here.
 			if attribute.Upper == "*" {
 				if isPrimitive {
 					removerStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + "[0:index], [index+1:], ...)\n"
 				} else {
-					removerStr += "	" + attributeName + " := make([]string,0)\n"
+					removerStr += "	values := make([]string,0)\n"
 					removerStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
 					removerStr += "		if this.M_" + attributeName + "[i] != val.GetUuid() {\n"
-					removerStr += "			" + attributeName + " = append(" + attributeName + ", val.GetUuid())\n"
+					removerStr += "			values = append(values, val.GetUuid())\n"
 					removerStr += "		}else{\n"
 					removerStr += "			this.NeedSave = true\n"
 					removerStr += "		}\n"
 					removerStr += "	}\n"
-					removerStr += "	this.M_" + attributeName + " = " + attributeName + "\n"
+					removerStr += "	this.M_" + attributeName + " = values\n"
 				}
 			} else {
 				if enumMap[typeName] != nil {
@@ -675,14 +699,11 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			}
 
 			removerStr += "}\n"
-
-			return getterStr + "\n" + setterStr + "\n" + removerStr + "\n"
 		}
-
-		return getterStr + "\n" + setterStr + "\n"
 	}
 
-	return ""
+	return getterStr + "\n" + setterStr + "\n" + appendStr + "\n" + removerStr + "\n"
+
 }
 
 // Interface
@@ -863,10 +884,14 @@ func generateGoClassCode(packageId string) {
 
 				classStr += "/** UUID **/\n"
 				classStr += "func (this *" + className + ") GetUuid() string{\n"
+				classStr += "	if len(this.UUID) == 0 {\n"
+				classStr += "		this.SetUuid(this.generateUuid(this))\n"
+				classStr += "	}\n"
 				classStr += "	return this.UUID\n"
 				classStr += "}\n"
 
 				classStr += "func (this *" + className + ") SetUuid(uuid string){\n"
+				classStr += "	this.NeedSave = this.UUID == uuid\n"
 				classStr += "	this.UUID = uuid\n"
 				classStr += "}\n\n"
 
@@ -918,6 +943,14 @@ func generateGoClassCode(packageId string) {
 				classStr += "}\n"
 				classStr += "func (this *" + className + ") SetParentLnk(parentLnk string){\n"
 				classStr += "	this.ParentLnk = parentLnk\n"
+				classStr += "}\n\n"
+
+				classStr += "func (this *" + className + ") GetParent() interface{}{\n"
+				classStr += "	parent, err := this.getEntityByUuid(this.ParentUuid)\n"
+				classStr += "	if err != nil {\n"
+				classStr += "		return nil\n"
+				classStr += "	}\n"
+				classStr += "	return parent\n"
 				classStr += "}\n\n"
 
 				classStr += "/** Return it relation with it parent, only one parent is possible by entity. **/\n"
