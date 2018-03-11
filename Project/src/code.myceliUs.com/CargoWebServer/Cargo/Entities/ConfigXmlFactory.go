@@ -15,8 +15,26 @@ import (
 )
 
 type ConfigXmlFactory struct {
-	m_references map[string]interface{}
-	m_object     map[string]map[string][]string
+	m_references      map[string]interface{}
+	m_object          map[string]map[string][]string
+	m_getEntityByUuid func(string) (interface{}, error)
+	m_setEntity       func(interface{})
+	m_generateUuid    func(interface{}) string
+}
+
+/** Get entity by uuid function **/
+func (this *ConfigXmlFactory) SetEntityGetter(fct func(string) (interface{}, error)) {
+	this.m_getEntityByUuid = fct
+}
+
+/** Use to put the entity in the cache **/
+func (this *ConfigXmlFactory) SetEntitySetter(fct func(interface{})) {
+	this.m_setEntity = fct
+}
+
+/** Set the uuid genarator function. **/
+func (this *ConfigXmlFactory) SetUuidGenerator(fct func(entity interface{}) string) {
+	this.m_generateUuid = fct
 }
 
 /** Initialization function from xml file **/
@@ -38,6 +56,8 @@ func (this *ConfigXmlFactory) InitXml(inputPath string, object *Config.Configura
 	if err := decoder.Decode(xmlElement); err != nil {
 		return err
 	}
+	this.m_references = make(map[string]interface{}, 0)
+	this.m_object = make(map[string]map[string][]string, 0)
 	this.InitConfigurations("", xmlElement, object)
 	for ref0, refMap := range this.m_object {
 		refOwner := this.m_references[ref0]
@@ -75,6 +95,7 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 			panic(err)
 		}
 	}()
+
 	var xmlElement *Config.XsdConfigurations
 	xmlElement = new(Config.XsdConfigurations)
 
@@ -90,98 +111,81 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 	return nil
 }
 
-/** inititialisation of Configurations **/
-func (this *ConfigXmlFactory) InitConfigurations(parentUuid string, xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
-	log.Println("Initialize Configurations")
-	object.TYPENAME = "Config.Configurations"
+/** inititialisation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) InitServiceConfiguration(parentUuid string, xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	log.Println("Initialize ServiceConfiguration")
+	object.TYPENAME = "Config.ServiceConfiguration"
 	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
 
-	/** Configurations **/
+	/** Configuration **/
 	object.M_id = xmlElement.M_id
 
-	/** Configurations **/
-	object.M_name = xmlElement.M_name
+	/** ServiceConfiguration **/
+	object.M_hostName = xmlElement.M_hostName
 
-	/** Configurations **/
-	object.M_version = xmlElement.M_version
+	/** ServiceConfiguration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** ServiceConfiguration **/
+	object.M_port = xmlElement.M_port
+
+	/** ServiceConfiguration **/
+	object.M_user = xmlElement.M_user
+
+	/** ServiceConfiguration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** ServiceConfiguration **/
+	object.M_start = xmlElement.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
+}
 
-	/** Init serverConfiguration **/
-	val := new(Config.ServerConfiguration)
-	this.InitServerConfiguration(object.GetUuid(), &xmlElement.M_serverConfig, val)
-	object.M_serverConfig = val.GetUuid()
+/** inititialisation of ScheduledTask **/
+func (this *ConfigXmlFactory) InitScheduledTask(parentUuid string, xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
+	log.Println("Initialize ScheduledTask")
+	object.TYPENAME = "Config.ScheduledTask"
+	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
 
-	/** association initialisation **/
+	/** Configuration **/
+	object.M_id = xmlElement.M_id
 
-	/** Init applicationConfiguration **/
-	object.M_applicationConfigs = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_applicationConfigs); i++ {
-		val := new(Config.ApplicationConfiguration)
-		this.InitApplicationConfiguration(object.GetUuid(), xmlElement.M_applicationConfigs[i], val)
-		object.M_applicationConfigs = append(object.M_applicationConfigs, val.GetUuid())
+	/** ScheduledTask **/
+	object.M_isActive = xmlElement.M_isActive
 
-		/** association initialisation **/
+	/** ScheduledTask **/
+	object.M_script = xmlElement.M_script
+
+	/** ScheduledTask **/
+	object.M_startTime = xmlElement.M_startTime
+
+	/** ScheduledTask **/
+	object.M_expirationTime = xmlElement.M_expirationTime
+
+	/** ScheduledTask **/
+	object.M_frequency = xmlElement.M_frequency
+
+	if xmlElement.M_frequencyType == "##ONCE" {
+		object.M_frequencyType = Config.FrequencyType_ONCE
+	} else if xmlElement.M_frequencyType == "##DAILY" {
+		object.M_frequencyType = Config.FrequencyType_DAILY
+	} else if xmlElement.M_frequencyType == "##WEEKELY" {
+		object.M_frequencyType = Config.FrequencyType_WEEKELY
+	} else if xmlElement.M_frequencyType == "##MONTHLY" {
+		object.M_frequencyType = Config.FrequencyType_MONTHLY
 	}
 
-	/** Init smtpConfiguration **/
-	object.M_smtpConfigs = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_smtpConfigs); i++ {
-		val := new(Config.SmtpConfiguration)
-		this.InitSmtpConfiguration(object.GetUuid(), xmlElement.M_smtpConfigs[i], val)
-		object.M_smtpConfigs = append(object.M_smtpConfigs, val.GetUuid())
-
-		/** association initialisation **/
-	}
-
-	/** Init ldapConfiguration **/
-	object.M_ldapConfigs = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_ldapConfigs); i++ {
-		val := new(Config.LdapConfiguration)
-		this.InitLdapConfiguration(object.GetUuid(), xmlElement.M_ldapConfigs[i], val)
-		object.M_ldapConfigs = append(object.M_ldapConfigs, val.GetUuid())
-
-		/** association initialisation **/
-	}
-
-	/** Init dataStoreConfiguration **/
-	object.M_dataStoreConfigs = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_dataStoreConfigs); i++ {
-		val := new(Config.DataStoreConfiguration)
-		this.InitDataStoreConfiguration(object.GetUuid(), xmlElement.M_dataStoreConfigs[i], val)
-		object.M_dataStoreConfigs = append(object.M_dataStoreConfigs, val.GetUuid())
-
-		/** association initialisation **/
-	}
-
-	/** Init serviceConfiguration **/
-	object.M_serviceConfigs = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_serviceConfigs); i++ {
-		val := new(Config.ServiceConfiguration)
-		this.InitServiceConfiguration(object.GetUuid(), xmlElement.M_serviceConfigs[i], val)
-		object.M_serviceConfigs = append(object.M_serviceConfigs, val.GetUuid())
-
-		/** association initialisation **/
-	}
-
-	/** Init oauth2Configuration **/
-	if xmlElement.M_oauth2Configuration != nil {
-		val := new(Config.OAuth2Configuration)
-		this.InitOAuth2Configuration(object.GetUuid(), xmlElement.M_oauth2Configuration, val)
-		object.M_oauth2Configuration = val.GetUuid()
-
-		/** association initialisation **/
-	}
-
-	/** Init scheduledTask **/
-	object.M_scheduledTasks = make([]string, 0)
-	for i := 0; i < len(xmlElement.M_scheduledTasks); i++ {
-		val := new(Config.ScheduledTask)
-		this.InitScheduledTask(object.GetUuid(), xmlElement.M_scheduledTasks[i], val)
-		object.M_scheduledTasks = append(object.M_scheduledTasks, val.GetUuid())
-
-		/** association initialisation **/
+	/** ScheduledTask **/
+	object.M_offsets = xmlElement.M_offsets
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
 	}
 }
 
@@ -190,6 +194,9 @@ func (this *ConfigXmlFactory) InitServerConfiguration(parentUuid string, xmlElem
 	log.Println("Initialize ServerConfiguration")
 	object.TYPENAME = "Config.ServerConfiguration"
 	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
 
 	/** Configuration **/
 	object.M_id = xmlElement.M_id
@@ -249,11 +256,220 @@ func (this *ConfigXmlFactory) InitServerConfiguration(parentUuid string, xmlElem
 	}
 }
 
+/** inititialisation of ApplicationConfiguration **/
+func (this *ConfigXmlFactory) InitApplicationConfiguration(parentUuid string, xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
+	log.Println("Initialize ApplicationConfiguration")
+	object.TYPENAME = "Config.ApplicationConfiguration"
+	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
+
+	/** Configuration **/
+	object.M_id = xmlElement.M_id
+
+	/** ApplicationConfiguration **/
+	object.M_indexPage = xmlElement.M_indexPage
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of LdapConfiguration **/
+func (this *ConfigXmlFactory) InitLdapConfiguration(parentUuid string, xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	log.Println("Initialize LdapConfiguration")
+	object.TYPENAME = "Config.LdapConfiguration"
+	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
+
+	/** Configuration **/
+	object.M_id = xmlElement.M_id
+
+	/** LdapConfiguration **/
+	object.M_hostName = xmlElement.M_hostName
+
+	/** LdapConfiguration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** LdapConfiguration **/
+	object.M_port = xmlElement.M_port
+
+	/** LdapConfiguration **/
+	object.M_user = xmlElement.M_user
+
+	/** LdapConfiguration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** LdapConfiguration **/
+	object.M_domain = xmlElement.M_domain
+
+	/** LdapConfiguration **/
+	object.M_searchBase = xmlElement.M_searchBase
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) InitOAuth2Configuration(parentUuid string, xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+	log.Println("Initialize OAuth2Configuration")
+	object.TYPENAME = "Config.OAuth2Configuration"
+	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
+
+	/** Configuration **/
+	object.M_id = xmlElement.M_id
+
+	/** OAuth2Configuration **/
+	object.M_authorizationExpiration = xmlElement.M_authorizationExpiration
+
+	/** OAuth2Configuration **/
+	object.M_accessExpiration = xmlElement.M_accessExpiration
+
+	/** OAuth2Configuration **/
+	object.M_tokenType = xmlElement.M_tokenType
+
+	/** OAuth2Configuration **/
+	object.M_errorStatusCode = xmlElement.M_errorStatusCode
+
+	/** OAuth2Configuration **/
+	object.M_allowClientSecretInParams = xmlElement.M_allowClientSecretInParams
+
+	/** OAuth2Configuration **/
+	object.M_allowGetAccessRequest = xmlElement.M_allowGetAccessRequest
+
+	/** OAuth2Configuration **/
+	object.M_redirectUriSeparator = xmlElement.M_redirectUriSeparator
+
+	/** OAuth2Configuration **/
+	object.M_privateKey = xmlElement.M_privateKey
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of Configurations **/
+func (this *ConfigXmlFactory) InitConfigurations(parentUuid string, xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
+	log.Println("Initialize Configurations")
+	object.TYPENAME = "Config.Configurations"
+	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
+
+	/** Configurations **/
+	object.M_id = xmlElement.M_id
+
+	/** Configurations **/
+	object.M_name = xmlElement.M_name
+
+	/** Configurations **/
+	object.M_version = xmlElement.M_version
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+
+	/** Init serverConfiguration **/
+	val := new(Config.ServerConfiguration)
+	this.InitServerConfiguration(object.GetUuid(), &xmlElement.M_serverConfig, val)
+	object.SetServerConfig(val)
+
+	/** association initialisation **/
+
+	/** Init applicationConfiguration **/
+	for i := 0; i < len(xmlElement.M_applicationConfigs); i++ {
+		if object.M_applicationConfigs == nil {
+			object.M_applicationConfigs = make([]string, 0)
+		}
+		val := new(Config.ApplicationConfiguration)
+		this.InitApplicationConfiguration(object.GetUuid(), xmlElement.M_applicationConfigs[i], val)
+		object.AppendApplicationConfigs(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init smtpConfiguration **/
+	for i := 0; i < len(xmlElement.M_smtpConfigs); i++ {
+		if object.M_smtpConfigs == nil {
+			object.M_smtpConfigs = make([]string, 0)
+		}
+		val := new(Config.SmtpConfiguration)
+		this.InitSmtpConfiguration(object.GetUuid(), xmlElement.M_smtpConfigs[i], val)
+		object.AppendSmtpConfigs(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init ldapConfiguration **/
+	for i := 0; i < len(xmlElement.M_ldapConfigs); i++ {
+		if object.M_ldapConfigs == nil {
+			object.M_ldapConfigs = make([]string, 0)
+		}
+		val := new(Config.LdapConfiguration)
+		this.InitLdapConfiguration(object.GetUuid(), xmlElement.M_ldapConfigs[i], val)
+		object.AppendLdapConfigs(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init dataStoreConfiguration **/
+	for i := 0; i < len(xmlElement.M_dataStoreConfigs); i++ {
+		if object.M_dataStoreConfigs == nil {
+			object.M_dataStoreConfigs = make([]string, 0)
+		}
+		val := new(Config.DataStoreConfiguration)
+		this.InitDataStoreConfiguration(object.GetUuid(), xmlElement.M_dataStoreConfigs[i], val)
+		object.AppendDataStoreConfigs(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init serviceConfiguration **/
+	for i := 0; i < len(xmlElement.M_serviceConfigs); i++ {
+		if object.M_serviceConfigs == nil {
+			object.M_serviceConfigs = make([]string, 0)
+		}
+		val := new(Config.ServiceConfiguration)
+		this.InitServiceConfiguration(object.GetUuid(), xmlElement.M_serviceConfigs[i], val)
+		object.AppendServiceConfigs(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init oauth2Configuration **/
+	if xmlElement.M_oauth2Configuration != nil {
+		val := new(Config.OAuth2Configuration)
+		this.InitOAuth2Configuration(object.GetUuid(), xmlElement.M_oauth2Configuration, val)
+		object.SetOauth2Configuration(val)
+
+		/** association initialisation **/
+	}
+
+	/** Init scheduledTask **/
+	for i := 0; i < len(xmlElement.M_scheduledTasks); i++ {
+		if object.M_scheduledTasks == nil {
+			object.M_scheduledTasks = make([]string, 0)
+		}
+		val := new(Config.ScheduledTask)
+		this.InitScheduledTask(object.GetUuid(), xmlElement.M_scheduledTasks[i], val)
+		object.AppendScheduledTasks(val)
+
+		/** association initialisation **/
+	}
+}
+
 /** inititialisation of SmtpConfiguration **/
 func (this *ConfigXmlFactory) InitSmtpConfiguration(parentUuid string, xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
 	log.Println("Initialize SmtpConfiguration")
 	object.TYPENAME = "Config.SmtpConfiguration"
 	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
 
 	/** Configuration **/
 	object.M_id = xmlElement.M_id
@@ -331,92 +547,14 @@ func (this *ConfigXmlFactory) InitSmtpConfiguration(parentUuid string, xmlElemen
 	}
 }
 
-/** inititialisation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) InitServiceConfiguration(parentUuid string, xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	log.Println("Initialize ServiceConfiguration")
-	object.TYPENAME = "Config.ServiceConfiguration"
-	object.SetParentUuid(parentUuid)
-
-	/** Configuration **/
-	object.M_id = xmlElement.M_id
-
-	/** ServiceConfiguration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** ServiceConfiguration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** ServiceConfiguration **/
-	object.M_port = xmlElement.M_port
-
-	/** ServiceConfiguration **/
-	object.M_user = xmlElement.M_user
-
-	/** ServiceConfiguration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** ServiceConfiguration **/
-	object.M_start = xmlElement.M_start
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of ApplicationConfiguration **/
-func (this *ConfigXmlFactory) InitApplicationConfiguration(parentUuid string, xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
-	log.Println("Initialize ApplicationConfiguration")
-	object.TYPENAME = "Config.ApplicationConfiguration"
-	object.SetParentUuid(parentUuid)
-
-	/** Configuration **/
-	object.M_id = xmlElement.M_id
-
-	/** ApplicationConfiguration **/
-	object.M_indexPage = xmlElement.M_indexPage
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of LdapConfiguration **/
-func (this *ConfigXmlFactory) InitLdapConfiguration(parentUuid string, xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	log.Println("Initialize LdapConfiguration")
-	object.TYPENAME = "Config.LdapConfiguration"
-	object.SetParentUuid(parentUuid)
-
-	/** Configuration **/
-	object.M_id = xmlElement.M_id
-
-	/** LdapConfiguration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** LdapConfiguration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** LdapConfiguration **/
-	object.M_port = xmlElement.M_port
-
-	/** LdapConfiguration **/
-	object.M_user = xmlElement.M_user
-
-	/** LdapConfiguration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** LdapConfiguration **/
-	object.M_domain = xmlElement.M_domain
-
-	/** LdapConfiguration **/
-	object.M_searchBase = xmlElement.M_searchBase
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** inititialisation of DataStoreConfiguration **/
 func (this *ConfigXmlFactory) InitDataStoreConfiguration(parentUuid string, xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
 	log.Println("Initialize DataStoreConfiguration")
 	object.TYPENAME = "Config.DataStoreConfiguration"
 	object.SetParentUuid(parentUuid)
+	object.SetUuidGenerator(this.m_generateUuid)
+	object.SetEntitySetter(this.m_setEntity)
+	object.SetEntityGetter(this.m_getEntityByUuid)
 
 	/** Configuration **/
 	object.M_id = xmlElement.M_id
@@ -511,86 +649,8 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(parentUuid string, xmlE
 	}
 }
 
-/** inititialisation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) InitOAuth2Configuration(parentUuid string, xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
-	log.Println("Initialize OAuth2Configuration")
-	object.TYPENAME = "Config.OAuth2Configuration"
-	object.SetParentUuid(parentUuid)
-
-	/** Configuration **/
-	object.M_id = xmlElement.M_id
-
-	/** OAuth2Configuration **/
-	object.M_authorizationExpiration = xmlElement.M_authorizationExpiration
-
-	/** OAuth2Configuration **/
-	object.M_accessExpiration = xmlElement.M_accessExpiration
-
-	/** OAuth2Configuration **/
-	object.M_tokenType = xmlElement.M_tokenType
-
-	/** OAuth2Configuration **/
-	object.M_errorStatusCode = xmlElement.M_errorStatusCode
-
-	/** OAuth2Configuration **/
-	object.M_allowClientSecretInParams = xmlElement.M_allowClientSecretInParams
-
-	/** OAuth2Configuration **/
-	object.M_allowGetAccessRequest = xmlElement.M_allowGetAccessRequest
-
-	/** OAuth2Configuration **/
-	object.M_redirectUriSeparator = xmlElement.M_redirectUriSeparator
-
-	/** OAuth2Configuration **/
-	object.M_privateKey = xmlElement.M_privateKey
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of ScheduledTask **/
-func (this *ConfigXmlFactory) InitScheduledTask(parentUuid string, xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
-	log.Println("Initialize ScheduledTask")
-	object.TYPENAME = "Config.ScheduledTask"
-	object.SetParentUuid(parentUuid)
-
-	/** Configuration **/
-	object.M_id = xmlElement.M_id
-
-	/** ScheduledTask **/
-	object.M_isActive = xmlElement.M_isActive
-
-	/** ScheduledTask **/
-	object.M_script = xmlElement.M_script
-
-	/** ScheduledTask **/
-	object.M_startTime = xmlElement.M_startTime
-
-	/** ScheduledTask **/
-	object.M_expirationTime = xmlElement.M_expirationTime
-
-	/** ScheduledTask **/
-	object.M_frequency = xmlElement.M_frequency
-
-	if xmlElement.M_frequencyType == "##ONCE" {
-		object.M_frequencyType = Config.FrequencyType_ONCE
-	} else if xmlElement.M_frequencyType == "##DAILY" {
-		object.M_frequencyType = Config.FrequencyType_DAILY
-	} else if xmlElement.M_frequencyType == "##WEEKELY" {
-		object.M_frequencyType = Config.FrequencyType_WEEKELY
-	} else if xmlElement.M_frequencyType == "##MONTHLY" {
-		object.M_frequencyType = Config.FrequencyType_MONTHLY
-	}
-
-	/** ScheduledTask **/
-	object.M_offsets = xmlElement.M_offsets
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+/** serialysation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
 	if xmlElement == nil {
 		return
 	}
@@ -598,23 +658,70 @@ func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.X
 	/** Configuration **/
 	xmlElement.M_id = object.M_id
 
-	/** ServiceConfiguration **/
-	xmlElement.M_hostName = object.M_hostName
+	/** OAuth2Configuration **/
+	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
 
-	/** ServiceConfiguration **/
-	xmlElement.M_ipv4 = object.M_ipv4
+	/** OAuth2Configuration **/
+	xmlElement.M_accessExpiration = object.M_accessExpiration
 
-	/** ServiceConfiguration **/
-	xmlElement.M_port = object.M_port
+	/** OAuth2Configuration **/
+	xmlElement.M_tokenType = object.M_tokenType
 
-	/** ServiceConfiguration **/
-	xmlElement.M_user = object.M_user
+	/** OAuth2Configuration **/
+	xmlElement.M_errorStatusCode = object.M_errorStatusCode
 
-	/** ServiceConfiguration **/
-	xmlElement.M_pwd = object.M_pwd
+	/** OAuth2Configuration **/
+	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
 
-	/** ServiceConfiguration **/
-	xmlElement.M_start = object.M_start
+	/** OAuth2Configuration **/
+	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
+
+	/** OAuth2Configuration **/
+	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
+
+	/** OAuth2Configuration **/
+	xmlElement.M_privateKey = object.M_privateKey
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ScheduledTask **/
+func (this *ConfigXmlFactory) SerialyzeScheduledTask(xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** Configuration **/
+	xmlElement.M_id = object.M_id
+
+	/** ScheduledTask **/
+	xmlElement.M_isActive = object.M_isActive
+
+	/** ScheduledTask **/
+	xmlElement.M_script = object.M_script
+
+	/** ScheduledTask **/
+	xmlElement.M_startTime = object.M_startTime
+
+	/** ScheduledTask **/
+	xmlElement.M_expirationTime = object.M_expirationTime
+
+	/** ScheduledTask **/
+	xmlElement.M_frequency = object.M_frequency
+
+	if object.M_frequencyType == Config.FrequencyType_ONCE {
+		xmlElement.M_frequencyType = "##ONCE"
+	} else if object.M_frequencyType == Config.FrequencyType_DAILY {
+		xmlElement.M_frequencyType = "##DAILY"
+	} else if object.M_frequencyType == Config.FrequencyType_WEEKELY {
+		xmlElement.M_frequencyType = "##WEEKELY"
+	} else if object.M_frequencyType == Config.FrequencyType_MONTHLY {
+		xmlElement.M_frequencyType = "##MONTHLY"
+	}
+
+	/** ScheduledTask **/
+	xmlElement.M_offsets = object.M_offsets
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -684,8 +791,8 @@ func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *Config.Xs
 	}
 }
 
-/** serialysation of LdapConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+/** serialysation of ApplicationConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
 	if xmlElement == nil {
 		return
 	}
@@ -693,26 +800,8 @@ func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdL
 	/** Configuration **/
 	xmlElement.M_id = object.M_id
 
-	/** LdapConfiguration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** LdapConfiguration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** LdapConfiguration **/
-	xmlElement.M_port = object.M_port
-
-	/** LdapConfiguration **/
-	xmlElement.M_user = object.M_user
-
-	/** LdapConfiguration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** LdapConfiguration **/
-	xmlElement.M_domain = object.M_domain
-
-	/** LdapConfiguration **/
-	xmlElement.M_searchBase = object.M_searchBase
+	/** ApplicationConfiguration **/
+	xmlElement.M_indexPage = object.M_indexPage
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -795,6 +884,40 @@ func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdS
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
 		xmlElement.M_textEncoding = "##KOI8U"
 	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of LdapConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** Configuration **/
+	xmlElement.M_id = object.M_id
+
+	/** LdapConfiguration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** LdapConfiguration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** LdapConfiguration **/
+	xmlElement.M_port = object.M_port
+
+	/** LdapConfiguration **/
+	xmlElement.M_user = object.M_user
+
+	/** LdapConfiguration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** LdapConfiguration **/
+	xmlElement.M_domain = object.M_domain
+
+	/** LdapConfiguration **/
+	xmlElement.M_searchBase = object.M_searchBase
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -899,84 +1022,6 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 	}
 }
 
-/** serialysation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** Configuration **/
-	xmlElement.M_id = object.M_id
-
-	/** OAuth2Configuration **/
-	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
-
-	/** OAuth2Configuration **/
-	xmlElement.M_accessExpiration = object.M_accessExpiration
-
-	/** OAuth2Configuration **/
-	xmlElement.M_tokenType = object.M_tokenType
-
-	/** OAuth2Configuration **/
-	xmlElement.M_errorStatusCode = object.M_errorStatusCode
-
-	/** OAuth2Configuration **/
-	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
-
-	/** OAuth2Configuration **/
-	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
-
-	/** OAuth2Configuration **/
-	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
-
-	/** OAuth2Configuration **/
-	xmlElement.M_privateKey = object.M_privateKey
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ScheduledTask **/
-func (this *ConfigXmlFactory) SerialyzeScheduledTask(xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** Configuration **/
-	xmlElement.M_id = object.M_id
-
-	/** ScheduledTask **/
-	xmlElement.M_isActive = object.M_isActive
-
-	/** ScheduledTask **/
-	xmlElement.M_script = object.M_script
-
-	/** ScheduledTask **/
-	xmlElement.M_startTime = object.M_startTime
-
-	/** ScheduledTask **/
-	xmlElement.M_expirationTime = object.M_expirationTime
-
-	/** ScheduledTask **/
-	xmlElement.M_frequency = object.M_frequency
-
-	if object.M_frequencyType == Config.FrequencyType_ONCE {
-		xmlElement.M_frequencyType = "##ONCE"
-	} else if object.M_frequencyType == Config.FrequencyType_DAILY {
-		xmlElement.M_frequencyType = "##DAILY"
-	} else if object.M_frequencyType == Config.FrequencyType_WEEKELY {
-		xmlElement.M_frequencyType = "##WEEKELY"
-	} else if object.M_frequencyType == Config.FrequencyType_MONTHLY {
-		xmlElement.M_frequencyType = "##MONTHLY"
-	}
-
-	/** ScheduledTask **/
-	xmlElement.M_offsets = object.M_offsets
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** serialysation of Configurations **/
 func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
 	if xmlElement == nil {
@@ -1001,7 +1046,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 	if object.GetServerConfig() != nil {
 		this.SerialyzeServerConfiguration(&xmlElement.M_serverConfig, object.GetServerConfig())
 	}
-	object.M_applicationConfigs = make([]string, 0)
 
 	/** Serialyze ApplicationConfiguration **/
 	if len(object.M_applicationConfigs) > 0 {
@@ -1013,7 +1057,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 		xmlElement.M_applicationConfigs = append(xmlElement.M_applicationConfigs, new(Config.XsdApplicationConfiguration))
 		this.SerialyzeApplicationConfiguration(xmlElement.M_applicationConfigs[i], object.GetApplicationConfigs()[i])
 	}
-	object.M_smtpConfigs = make([]string, 0)
 
 	/** Serialyze SmtpConfiguration **/
 	if len(object.M_smtpConfigs) > 0 {
@@ -1025,7 +1068,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 		xmlElement.M_smtpConfigs = append(xmlElement.M_smtpConfigs, new(Config.XsdSmtpConfiguration))
 		this.SerialyzeSmtpConfiguration(xmlElement.M_smtpConfigs[i], object.GetSmtpConfigs()[i])
 	}
-	object.M_ldapConfigs = make([]string, 0)
 
 	/** Serialyze LdapConfiguration **/
 	if len(object.M_ldapConfigs) > 0 {
@@ -1037,7 +1079,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 		xmlElement.M_ldapConfigs = append(xmlElement.M_ldapConfigs, new(Config.XsdLdapConfiguration))
 		this.SerialyzeLdapConfiguration(xmlElement.M_ldapConfigs[i], object.GetLdapConfigs()[i])
 	}
-	object.M_dataStoreConfigs = make([]string, 0)
 
 	/** Serialyze DataStoreConfiguration **/
 	if len(object.M_dataStoreConfigs) > 0 {
@@ -1049,7 +1090,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 		xmlElement.M_dataStoreConfigs = append(xmlElement.M_dataStoreConfigs, new(Config.XsdDataStoreConfiguration))
 		this.SerialyzeDataStoreConfiguration(xmlElement.M_dataStoreConfigs[i], object.GetDataStoreConfigs()[i])
 	}
-	object.M_serviceConfigs = make([]string, 0)
 
 	/** Serialyze ServiceConfiguration **/
 	if len(object.M_serviceConfigs) > 0 {
@@ -1071,7 +1111,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 	if object.GetOauth2Configuration() != nil {
 		this.SerialyzeOAuth2Configuration(xmlElement.M_oauth2Configuration, object.GetOauth2Configuration())
 	}
-	object.M_scheduledTasks = make([]string, 0)
 
 	/** Serialyze ScheduledTask **/
 	if len(object.M_scheduledTasks) > 0 {
@@ -1085,8 +1124,8 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 	}
 }
 
-/** serialysation of ApplicationConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
 	if xmlElement == nil {
 		return
 	}
@@ -1094,8 +1133,23 @@ func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Conf
 	/** Configuration **/
 	xmlElement.M_id = object.M_id
 
-	/** ApplicationConfiguration **/
-	xmlElement.M_indexPage = object.M_indexPage
+	/** ServiceConfiguration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** ServiceConfiguration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** ServiceConfiguration **/
+	xmlElement.M_port = object.M_port
+
+	/** ServiceConfiguration **/
+	xmlElement.M_user = object.M_user
+
+	/** ServiceConfiguration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** ServiceConfiguration **/
+	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

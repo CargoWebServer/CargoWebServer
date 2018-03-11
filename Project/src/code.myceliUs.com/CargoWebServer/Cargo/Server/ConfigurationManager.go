@@ -100,7 +100,6 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// Configuration db itself.
 	cargoConfigDB := new(Config.DataStoreConfiguration)
-	cargoConfigDB.SetUuidGenerator(generateUuidFct)
 	cargoConfigDB.M_id = ConfigDB
 	cargoConfigDB.M_storeName = ConfigDB
 	cargoConfigDB.M_hostName = hostName
@@ -113,7 +112,6 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// The cargo entities store config
 	cargoEntitiesDB := new(Config.DataStoreConfiguration)
-	cargoEntitiesDB.SetUuidGenerator(generateUuidFct)
 	cargoEntitiesDB.M_id = CargoEntitiesDB
 	cargoEntitiesDB.M_storeName = CargoEntitiesDB
 	cargoEntitiesDB.M_hostName = hostName
@@ -126,7 +124,6 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// The sql info data store.
 	sqlInfoDB := new(Config.DataStoreConfiguration)
-	sqlInfoDB.SetUuidGenerator(generateUuidFct)
 	sqlInfoDB.M_id = "sql_info"
 	sqlInfoDB.M_storeName = "sql_info"
 	sqlInfoDB.M_hostName = hostName
@@ -368,6 +365,7 @@ func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
  * Append a default store configurations.
  */
 func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Config.DataStoreConfiguration) {
+	config.SetUuidGenerator(generateUuidFct)
 	this.m_datastoreConfiguration = append(this.m_datastoreConfiguration, config)
 }
 

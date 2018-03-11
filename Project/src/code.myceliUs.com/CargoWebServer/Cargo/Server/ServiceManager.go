@@ -430,7 +430,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						adminRoleEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"adminRole"})
 						if adminRoleEntity != nil {
 							if action.GetAccessType() != CargoEntities.AccessType_Hidden {
-								adminRoleEntity.(*CargoEntities.Role).AppendActions(action)
+								adminRoleEntity.(*CargoEntities.Role).AppendActionsRef(action)
 								GetServer().GetEntityManager().saveEntity(adminRoleEntity)
 							}
 						}
@@ -438,7 +438,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						guestRoleEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"guestRole"})
 						if guestRoleEntity != nil {
 							if action.GetAccessType() == CargoEntities.AccessType_Public {
-								guestRoleEntity.(*CargoEntities.Role).AppendActions(action)
+								guestRoleEntity.(*CargoEntities.Role).AppendActionsRef(action)
 								GetServer().GetEntityManager().saveEntity(guestRoleEntity)
 							}
 						}

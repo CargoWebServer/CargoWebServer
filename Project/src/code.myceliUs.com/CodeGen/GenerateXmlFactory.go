@@ -41,12 +41,7 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	rootElement := elementsNameMap[rootElementId]
 	elementType := getElementType(rootElement.Type)
 	elementPackName := membersPackage[elementType]
-
-	/*if elementType != packName {*/
 	elementPackName += "."
-	/*} else {
-		elementPackName = ""
-	}*/
 
 	// The now package to import...
 	factoryImports = append(factoryImports, "golang.org/x/net/html/charset")
@@ -63,7 +58,25 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "	m_references map[string] interface{}\n"
 	// That contain, the map of owner id -> the map of properties, the list of ref id to set.
 	factoryStr += "	m_object map[string]map[string][]string\n"
-	factoryStr += "}\n"
+	factoryStr += "	m_getEntityByUuid func(string)(interface{}, error)\n"
+	factoryStr += "	m_setEntity func(interface{})\n"
+	factoryStr += "	m_generateUuid func(interface{}) string\n"
+	factoryStr += "}\n\n"
+
+	factoryStr += "	/** Get entity by uuid function **/\n"
+	factoryStr += "func (this *" + name + "XmlFactory) SetEntityGetter(fct func(string)(interface{}, error)){\n"
+	factoryStr += "	this.m_getEntityByUuid = fct\n"
+	factoryStr += "}\n\n"
+
+	factoryStr += "	/** Use to put the entity in the cache **/\n"
+	factoryStr += "func (this *" + name + "XmlFactory) SetEntitySetter(fct func(interface{})){\n"
+	factoryStr += "	this.m_setEntity = fct\n"
+	factoryStr += "}\n\n"
+
+	factoryStr += "\n/** Set the uuid genarator function. **/\n"
+	factoryStr += "func (this *" + name + "XmlFactory) SetUuidGenerator(fct func(entity interface{}) string){\n"
+	factoryStr += "	this.m_generateUuid = fct\n"
+	factoryStr += "}\n\n"
 
 	// Initialisation function.
 	factoryStr += "\n/** Initialization function from xml file **/\n"
@@ -87,7 +100,8 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "	if err := decoder.Decode(xmlElement); err != nil {\n"
 	factoryStr += "		return err\n"
 	factoryStr += "	}\n"
-
+	factoryStr += "	this.m_references = make(map[string] interface{}, 0)\n"
+	factoryStr += "	this.m_object = make(map[string]map[string][]string, 0)\n"
 	// So here I will call the generate function...
 	factoryStr += "	this.Init" + strings.ToUpper(elementType[0:1]) + elementType[1:] + "(\"\", xmlElement, object)\n"
 	// Now I will set the reference inside the model...
@@ -111,9 +125,8 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "			}\n"
 	factoryStr += "		}\n"
 	factoryStr += "	}\n"
-
 	factoryStr += "	return nil\n"
-	factoryStr += "}\n"
+	factoryStr += "}\n\n"
 
 	// Serialization function
 	factoryStr += "\n/** Serialization to xml file **/\n"
@@ -129,7 +142,7 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "		if err := fo.Close(); err != nil {\n"
 	factoryStr += "			panic(err)\n"
 	factoryStr += "		}\n"
-	factoryStr += "	}()\n"
+	factoryStr += "	}()\n\n"
 
 	factoryStr += "	var xmlElement *" + elementPackName + "Xsd" + strings.ToUpper(elementType[0:1]) + elementType[1:] + "\n"
 	factoryStr += "	xmlElement = new(" + elementPackName + "Xsd" + strings.ToUpper(elementType[0:1]) + elementType[1:] + ")\n\n"
@@ -248,6 +261,9 @@ func generateGoXmlFactoryElementInitFunction(element *XML_Schemas.XSD_Element, p
 		elementFunctionParserStr += "	log.Println(\"Initialize " + className + "\")\n"
 		elementFunctionParserStr += "	object.TYPENAME = \"" + elementPackName + className + "\"\n"
 		elementFunctionParserStr += "	object.SetParentUuid(parentUuid)\n"
+		elementFunctionParserStr += "	object.SetUuidGenerator(this.m_generateUuid)\n"
+		elementFunctionParserStr += "	object.SetEntitySetter(this.m_setEntity)\n"
+		elementFunctionParserStr += "	object.SetEntityGetter(this.m_getEntityByUuid)\n"
 
 		elementFunctionParserStr += generateGoXmlFactoryElementContent(elementType, elementType, packName, true, name)
 
@@ -372,7 +388,7 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 				elementParserFunctionContentStr += "	}\n"
 			} else {
 				// Set element ref by type
-				elementParserFunctionContentStr += "	this.m_references[object.UUID] = object\n"
+				elementParserFunctionContentStr += "	this.m_references[object.GetUuid()] = object\n"
 			}
 		}
 
@@ -508,16 +524,18 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 			if maxOccurs == "unbounded" || attribute.Upper == "*" {
 				// The element is an array
 				// So here I will create an array...
-				elementMemberInitStr += "	object.M_" + relationName + "= make([]string,0)\n"
-
 				// Initialyse the values here...
 				if isInitialisation {
 					// So now I will create the initialisation loop...
 					if !isRef {
 						elementMemberInitStr += "	for i:=0;i<len(xmlElement.M_" + relationName_ + "); i++{\n"
+						elementMemberInitStr += "		if object.M_" + relationName + "==nil{\n"
+						elementMemberInitStr += "			object.M_" + relationName + "= make([]string,0)\n"
+						elementMemberInitStr += "		}\n"
 						elementMemberInitStr += "		val:=new(" + elementPackName1 + elementType + impl + ")\n"
 						elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + "[i],val)\n"
-						elementMemberInitStr += "		object.M_" + relationName + "= append(object.M_" + relationName + ", val.GetUuid())\n"
+						elementMemberInitStr += "		object.Append" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "(val)\n"
+
 						elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, true)
 						elementMemberInitStr += "	}\n"
 					}
@@ -528,7 +546,7 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 						elementMemberInitStr += "	if xmlElement.M_" + relationName_ + "!= nil{\n"
 						elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + ")\n"
 						elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
-						elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
+						elementMemberInitStr += "		object.Set" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "(val)\n"
 						elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 						elementMemberInitStr += "	}\n"
 					}
@@ -545,7 +563,7 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 							elementMemberInitStr += "	if xmlElement.M_" + relationName_ + "!= nil{\n"
 							elementMemberInitStr += "		val := new(" + elementPackName1 + elementType + impl + ")\n"
 							elementMemberInitStr += "		this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
-							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
+							elementMemberInitStr += "		object.Set" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "(val)\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 							elementMemberInitStr += "	}\n"
 						}
@@ -558,7 +576,7 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 							} else {
 								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), xmlElement.M_" + relationName_ + ", val)\n"
 							}
-							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
+							elementMemberInitStr += "		object.Set" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "(val)\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 							elementMemberInitStr += "	}\n"
 						}
@@ -570,7 +588,7 @@ func generateGoXmlFactoryElementMember(ownerElementType string, elementBaseType 
 							} else {
 								elementMemberInitStr += "	this.Init" + elementType + "(object.GetUuid(), &xmlElement.M_" + relationName_ + ", val)\n"
 							}
-							elementMemberInitStr += "		object.M_" + relationName + "= val.GetUuid()\n"
+							elementMemberInitStr += "		object.Set" + strings.ToUpper(relationName[0:1]) + relationName[1:] + "(val)\n"
 							elementMemberInitStr += generateGoXmlFactoryElementCompositeAssociation(relationName, ownerElementType, elementType, implCast, attribute, false)
 						}
 					}
@@ -775,16 +793,16 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		if isInitialisation {
 			bpmnElementStr = "	/** Init bpmnElement **/\n"
 			bpmnElementStr += "	if len(object.M_id) == 0{\n"
-			bpmnElementStr += "		this.m_references[object.UUID] = object\n"
+			bpmnElementStr += "		this.m_references[object.GetUuid()] = object\n"
 			bpmnElementStr += "	}\n"
 			bpmnElementStr += "	if len(xmlElement.M_bpmnElement)>0{\n"
 			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id]; !ok {\n"
 			bpmnElementStr += "			this.m_object[object.M_id]=make(map[string][]string)\n"
 			bpmnElementStr += "		}\n"
-			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id][\"bpmnElement\"]; !ok {\n"
+			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id][\"SetBpmnElement\"]; !ok {\n"
 			bpmnElementStr += "			this.m_object[object.M_id][\"bpmnElement\"]=make([]string,0)\n"
 			bpmnElementStr += "		}\n"
-			bpmnElementStr += "		this.m_object[object.M_id][\"bpmnElement\"] = append(this.m_object[object.M_id][\"bpmnElement\"], xmlElement.M_bpmnElement)\n"
+			bpmnElementStr += "		this.m_object[object.M_id][\"SetBpmnElement\"] = append(this.m_object[object.M_id][\"SetBpmnElement\"], xmlElement.M_bpmnElement)\n"
 			bpmnElementStr += "		object.M_bpmnElement =  xmlElement.M_bpmnElement\n"
 			bpmnElementStr += "	}\n"
 		} else {
@@ -811,7 +829,7 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		// attributeInitialisationStr += "	object.M_" + attributeName + " = xmlElement.M_" + attributeName + "\n"
 		attributeInitialisationStr += "\n	/** Init ref " + attributeName + " **/\n"
 		attributeInitialisationStr += "	if len(" + mapMemberId + ") == 0 {\n"
-		attributeInitialisationStr += "		this.m_references[object.UUID] = object\n"
+		attributeInitialisationStr += "		this.m_references[object.GetUuid()] = object\n"
 
 		attributeInitialisationStr += "	}\n"
 		attributeInitialisationStr += "	if _, ok:= this.m_object[" + mapMemberId + "]; !ok {\n"
@@ -887,12 +905,15 @@ func generateGoXmlFactoryElementReference(ownerElementType string, member *XML_S
 	attribute, _ := getOwnedAttributeByName(elementRefName, member)
 	if attribute != nil {
 		isRef = IsRef(attribute)
+	} else {
+		attribute = getAttribute(elementRefName, member)
 	}
-
 	// The reference is outside the memeber...
 	if elementType == "xsd:IDREF" || elementType == "xsd:QName" || isRef {
 		attributeType := getAttributeType(elementRefName, member)
+
 		isArray := attribute.Upper == "*"
+
 		isPointer := !isArray && (attribute.Lower == "0")
 
 		if maxOccurs != "" {

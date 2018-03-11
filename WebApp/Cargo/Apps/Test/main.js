@@ -1,5 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-// Fichier contenant les différents test..
+// Fichier contenant les différents test.
 var languageInfo = {
     "en": {
     }
@@ -74,11 +74,29 @@ function main() {
     //entitiesDump("CargoEntities.Action")
 
     //testSayHello("Dave")
-    // entityDump( "CARGO_ENTITIES", "CargoEntities.User")
+    // entityDump( "BPMN20", "BPMN20.Definitions")
+    server.entityManager.getEntityPrototypes("BPMN20", 
+    // success callback
+    function(prototypes, caller){
+        server.entityManager.getEntityByUuid("BPMN20.Definitions%f7a5ed3c-3cb3-3220-acf6-0942e5d6cfad", false,
+        // The success callback
+        function(definitions, caller){
+            console.log(definitions)
+        },
+        // The error callback
+        function(error, caller){
+            console.log(error)
+        }, {})
+    }, 
+    // error callback.
+    function(){
+
+    })
+
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 
-    testEntityQuery()
+    //testEntityQuery()
 
     //TestWebRtc2()
 

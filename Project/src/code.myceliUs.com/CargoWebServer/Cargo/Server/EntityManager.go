@@ -389,7 +389,6 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 
 		// append the type name as a relation.
 		*triples = append(*triples, Triple{uuid, "TYPENAME", typeName, true})
-
 		prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
 		for k, v := range values {
 			fieldIndex := prototype.getFieldIndex(k)

@@ -39,7 +39,7 @@ type Entities struct{
 /** Xml parser for Entities **/
 type XsdEntities struct {
 	XMLName xml.Name	`xml:"entities"`
-	M_entities_0	[]*XsdAccount	`xml:"toRef,omitempty"`
+	M_entities_0	[]*XsdAccount	`xml:"accountsRef,omitempty"`
 	M_entities_1	[]*XsdFile	`xml:"filesRef,omitempty"`
 	M_entities_2	[]*XsdProject	`xml:"project,omitempty"`
 	M_entities_3	[]*XsdComputer	`xml:"computerRef,omitempty"`

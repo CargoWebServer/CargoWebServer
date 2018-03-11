@@ -45,7 +45,7 @@ type Account struct{
 
 /** Xml parser for Account **/
 type XsdAccount struct {
-	XMLName xml.Name	`xml:"toRef"`
+	XMLName xml.Name	`xml:"accountsRef"`
 	/** Entity **/
 	M_id	string	`xml:"id,attr"`
 

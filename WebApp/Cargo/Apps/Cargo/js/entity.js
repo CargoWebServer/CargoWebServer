@@ -427,7 +427,6 @@ function setRef(owner, property, refValue, isArray) {
  * @param {bool} lazy If the value is at false child must be intialyse from te server, if not only childs uuid's are set.
  */
 function setObjectValues(object, values, lazy) {
-
     // Get the entity prototype.
     var prototype = getEntityPrototype(object["TYPENAME"])
     if (prototype == undefined) {
@@ -642,10 +641,20 @@ function setObjectValues(object, values, lazy) {
                         { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
                 } else {
                     setSubObject(parent, subObjects, callback)
+                    if (subObjects.length == 0) {
+                        if(callback != undefined){
+                            callback(parent)
+                        }
+                    } 
                 }
             } else if (isObject(subObject)) {
                 // skip to the next object.
                 setSubObject(parent, subObjects, callback)
+                if (subObjects.length == 0) {
+                    if(callback != undefined){
+                        callback(parent)
+                    }
+                } 
             }
         }
     }
@@ -674,6 +683,7 @@ function setObjectValues(object, values, lazy) {
 
     // Set the initialyse object.
     server.entityManager.setEntity(object)
+
 }
 
 /**

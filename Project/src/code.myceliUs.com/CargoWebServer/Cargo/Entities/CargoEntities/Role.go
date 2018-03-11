@@ -27,8 +27,8 @@ type Role struct{
 
 	/** members of Role **/
 	M_id string
-	M_accounts []string
-	M_actions []string
+	M_accountsRef []string
+	M_actionsRef []string
 
 
 	/** Associations **/
@@ -38,8 +38,8 @@ type Role struct{
 /** Xml parser for Role **/
 type XsdRole struct {
 	XMLName xml.Name	`xml:"role"`
-	M_accounts	[]*XsdAccount	`xml:"accounts,omitempty"`
-	M_actions	[]*XsdAction	`xml:"actions,omitempty"`
+	M_accountsRef	[]string	`xml:"accountsRef"`
+	M_actionsRef	[]string	`xml:"actionsRef"`
 	M_id	string	`xml:"id,attr"`
 
 }
@@ -134,10 +134,10 @@ func (this *Role) SetId(val string){
 
 
 
-func (this *Role) GetAccounts()[]*Account{
+func (this *Role) GetAccountsRef()[]*Account{
 	values := make([]*Account, 0)
-	for i := 0; i < len(this.M_accounts); i++ {
-		entity, err := this.getEntityByUuid(this.M_accounts[i])
+	for i := 0; i < len(this.M_accountsRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_accountsRef[i])
 		if err == nil {
 			values = append( values, entity.(*Account))
 		}
@@ -145,42 +145,42 @@ func (this *Role) GetAccounts()[]*Account{
 	return values
 }
 
-func (this *Role) SetAccounts(val []*Account){
-	this.M_accounts= make([]string,0)
+func (this *Role) SetAccountsRef(val []*Account){
+	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
+		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
 	}
 	this.NeedSave= true
 }
 
 
-func (this *Role) AppendAccounts(val *Account){
-	for i:=0; i < len(this.M_accounts); i++{
-		if this.M_accounts[i] == val.GetUuid() {
+func (this *Role) AppendAccountsRef(val *Account){
+	for i:=0; i < len(this.M_accountsRef); i++{
+		if this.M_accountsRef[i] == val.GetUuid() {
 			return
 		}
 	}
 	this.NeedSave= true
-	this.M_accounts = append(this.M_accounts, val.GetUuid())
+	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
 }
 
-func (this *Role) RemoveAccounts(val *Account){
+func (this *Role) RemoveAccountsRef(val *Account){
 	values := make([]string,0)
-	for i:=0; i < len(this.M_accounts); i++{
-		if this.M_accounts[i] != val.GetUuid() {
+	for i:=0; i < len(this.M_accountsRef); i++{
+		if this.M_accountsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_accounts = values
+	this.M_accountsRef = values
 }
 
 
-func (this *Role) GetActions()[]*Action{
+func (this *Role) GetActionsRef()[]*Action{
 	values := make([]*Action, 0)
-	for i := 0; i < len(this.M_actions); i++ {
-		entity, err := this.getEntityByUuid(this.M_actions[i])
+	for i := 0; i < len(this.M_actionsRef); i++ {
+		entity, err := this.getEntityByUuid(this.M_actionsRef[i])
 		if err == nil {
 			values = append( values, entity.(*Action))
 		}
@@ -188,35 +188,35 @@ func (this *Role) GetActions()[]*Action{
 	return values
 }
 
-func (this *Role) SetActions(val []*Action){
-	this.M_actions= make([]string,0)
+func (this *Role) SetActionsRef(val []*Action){
+	this.M_actionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_actions=append(this.M_actions, val[i].GetUuid())
+		this.M_actionsRef=append(this.M_actionsRef, val[i].GetUuid())
 	}
 	this.NeedSave= true
 }
 
 
-func (this *Role) AppendActions(val *Action){
-	for i:=0; i < len(this.M_actions); i++{
-		if this.M_actions[i] == val.GetUuid() {
+func (this *Role) AppendActionsRef(val *Action){
+	for i:=0; i < len(this.M_actionsRef); i++{
+		if this.M_actionsRef[i] == val.GetUuid() {
 			return
 		}
 	}
 	this.NeedSave= true
-	this.M_actions = append(this.M_actions, val.GetUuid())
+	this.M_actionsRef = append(this.M_actionsRef, val.GetUuid())
 }
 
-func (this *Role) RemoveActions(val *Action){
+func (this *Role) RemoveActionsRef(val *Action){
 	values := make([]string,0)
-	for i:=0; i < len(this.M_actions); i++{
-		if this.M_actions[i] != val.GetUuid() {
+	for i:=0; i < len(this.M_actionsRef); i++{
+		if this.M_actionsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
 		}else{
 			this.NeedSave = true
 		}
 	}
-	this.M_actions = values
+	this.M_actionsRef = values
 }
 
 

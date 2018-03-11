@@ -86,7 +86,7 @@ function main() {
                                                 "SecurityEvent",
                                                 function () {
                                                     // now the prototypes...
-                                                    server.entityManager.getEntityPrototypes("BPMS",
+                                                    server.entityManager.getEntityPrototypes("BPMN20",
                                                         function () {
                                                             service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
                                                                 function (service) {

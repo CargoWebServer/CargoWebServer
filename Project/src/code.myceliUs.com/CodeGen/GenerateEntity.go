@@ -273,8 +273,13 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	prototypeVar := strings.ToLower(class.Name[0:1]) + class.Name[1:] + "EntityProto"
 
 	entityPrototypeStr += "	var " + prototypeVar + " EntityPrototype\n"
-
-	entityPrototypeStr += "	" + prototypeVar + ".TypeName = \"" + packageId + "." + class.Name + "\"\n"
+	className := class.Name
+	if Utility.Contains(superClassesLst, class.Name) {
+		if !Utility.Contains(abstractClassLst, class.Name) {
+			className += "_impl"
+		}
+	}
+	entityPrototypeStr += "	" + prototypeVar + ".TypeName = \"" + packageId + "." + className + "\"\n"
 
 	if Utility.Contains(abstractClassLst, class.Name) {
 		entityPrototypeStr += "	" + prototypeVar + ".IsAbstract=true\n"

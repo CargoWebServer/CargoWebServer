@@ -38,7 +38,7 @@ type Permission struct{
 /** Xml parser for Permission **/
 type XsdPermission struct {
 	XMLName xml.Name	`xml:"permissionsRef"`
-	M_accounts	[]*XsdAccount	`xml:"accounts,omitempty"`
+	M_accountsRef	[]string	`xml:"accountsRef"`
 	M_id	string	`xml:"id,attr"`
 	M_types	int	`xml:"types,attr"`
 

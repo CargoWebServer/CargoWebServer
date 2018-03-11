@@ -49,7 +49,7 @@ func (this *SecurityManager) createAdminRole() {
 
 		// Create adminRole
 		adminRole, _ := this.createRole("adminRole")
-		adminRole.AppendAccounts(adminAccount)
+		adminRole.AppendAccountsRef(adminAccount)
 		adminAccount.AppendRolesRef(adminRole)
 
 		GetServer().GetEntityManager().saveEntity(adminRole)
@@ -71,7 +71,7 @@ func (this *SecurityManager) createGuestRole() {
 
 		// Create guestRole
 		guestRole, _ := this.createRole("guestRole")
-		guestRole.AppendAccounts(guestAccount)
+		guestRole.AppendAccountsRef(guestAccount)
 
 		// Setting guestRole to guest account
 		guestAccount.AppendRolesRef(guestRole)
@@ -194,7 +194,7 @@ func (this *SecurityManager) appendAccount(roleId string, accountId string) *Car
 		account := accountEntity.(*CargoEntities.Account)
 
 		// Set the account to the role
-		role.AppendAccounts(account)
+		role.AppendAccountsRef(account)
 		account.AppendRolesRef(role)
 
 		GetServer().GetEntityManager().saveEntity(roleEntity)
@@ -220,8 +220,8 @@ func (this *SecurityManager) hasAccount(roleId string, accountId string) bool {
 	}
 
 	role := roleEntity.(*CargoEntities.Role)
-	for i := 0; i < len(role.M_accounts); i++ {
-		if role.M_accounts[i] == accountEntity.GetUuid() {
+	for i := 0; i < len(role.M_accountsRef); i++ {
+		if role.M_accountsRef[i] == accountEntity.GetUuid() {
 			return true
 		}
 	}
@@ -254,7 +254,7 @@ func (this *SecurityManager) removeAccount(roleId string, accountId string) *Car
 		account := accountEntity.(*CargoEntities.Account)
 
 		// Remove the account from the role
-		role.RemoveAccounts(account)
+		role.RemoveAccountsRef(account)
 		account.RemoveRolesRef(role)
 
 		GetServer().GetEntityManager().saveEntity(roleEntity)
@@ -295,7 +295,7 @@ func (this *SecurityManager) appendAction(roleId string, actionName string) *Car
 		// Get the account entity
 		action := actionEntity.(*CargoEntities.Action)
 		// Set the account to the role
-		role.AppendActions(action)
+		role.AppendActionsRef(action)
 
 		// Save the entities.
 		GetServer().GetEntityManager().saveEntity(roleEntity)
@@ -321,8 +321,8 @@ func (this *SecurityManager) hasAction(roleId string, actionName string) bool {
 	}
 
 	role := roleEntity.(*CargoEntities.Role)
-	for i := 0; i < len(role.M_actions); i++ {
-		if role.M_actions[i] == actionEntity.GetUuid() {
+	for i := 0; i < len(role.M_actionsRef); i++ {
+		if role.M_actionsRef[i] == actionEntity.GetUuid() {
 			return true
 		}
 	}
@@ -354,7 +354,7 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
 		action := actionEntity.(*CargoEntities.Action)
 
 		// Remove the account from the role
-		role.RemoveActions(action)
+		role.RemoveActionsRef(action)
 		GetServer().GetEntityManager().saveEntity(roleEntity)
 
 	} else {

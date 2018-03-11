@@ -116,8 +116,8 @@
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Role-id" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
     </ownedAttribute>
-    <ownedAttribute xmi:type="cmof:Property" xmi:id="Role-accounts" name="accounts" visibility="public" _type="Account" lower="0" upper="*"/>
-	<ownedAttribute xmi:type="cmof:Property" xmi:id="Role-actions" name="actions" visibility="public" _type="Action" lower="0" upper="*" />
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Role-accounts" name="accountsRef" visibility="public" _type="Account" lower="0" upper="*"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Role-actions" name="actionsRef" visibility="public" _type="Action" lower="0" upper="*" />
 </ownedMember>
 <ownedMember xmi:type="cmof:Association" xmi:id="A_session_account" name="A_session_account" visibility="private" memberEnd="Entities-entity A_session_account-account">
     <ownedEnd xmi:type="cmof:Property" xmi:id="A_session_account-account" name="account" _type="Account" lower="0" owningAssociation="A_session_account" association="A_session_account"/>

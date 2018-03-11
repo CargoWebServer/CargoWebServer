@@ -52,8 +52,8 @@
 	<xsd:complexType name="tRole">
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:sequence>
-			<xsd:element name="accounts" type="tAccount" minOccurs="0" maxOccurs="unbounded"/> 
-			<xsd:element name="actions" type="tAction" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element ref="accountsRef" type="tAccount" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element ref="actionsRef" type="tAction" minOccurs="0" maxOccurs="unbounded"/> 
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -62,7 +62,7 @@
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="types" type="xsd:integer"/>
 		<xsd:sequence>
-			<xsd:element name="accounts" type="tAccount" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="accountsRef" type="tAccount" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
