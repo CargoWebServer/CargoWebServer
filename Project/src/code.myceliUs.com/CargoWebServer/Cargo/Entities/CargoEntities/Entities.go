@@ -16,8 +16,6 @@ type Entities struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -66,7 +64,6 @@ func (this *Entities) GetUuid() string{
 	return this.UUID
 }
 func (this *Entities) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -140,14 +137,6 @@ func (this *Entities) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Entities) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Entities) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Entities) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -166,7 +155,6 @@ func (this *Entities) GetId()string{
 }
 
 func (this *Entities) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -178,7 +166,6 @@ func (this *Entities) GetName()string{
 }
 
 func (this *Entities) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -190,7 +177,6 @@ func (this *Entities) GetVersion()string{
 }
 
 func (this *Entities) SetVersion(val string){
-	this.NeedSave = this.M_version== val
 	this.M_version= val
 }
 
@@ -213,10 +199,10 @@ func (this *Entities) SetEntities(val []Entity){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_entities")
-		this.setEntity(val[i])
 		this.M_entities=append(this.M_entities, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -226,11 +212,11 @@ func (this *Entities) AppendEntities(val Entity){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_entities")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_entities = append(this.M_entities, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Entities) RemoveEntities(val Entity){
@@ -238,11 +224,10 @@ func (this *Entities) RemoveEntities(val Entity){
 	for i:=0; i < len(this.M_entities); i++{
 		if this.M_entities[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_entities = values
+	this.setEntity(this)
 }
 
 
@@ -262,10 +247,10 @@ func (this *Entities) SetRoles(val []*Role){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_roles")
-		this.setEntity(val[i])
 		this.M_roles=append(this.M_roles, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -275,11 +260,11 @@ func (this *Entities) AppendRoles(val *Role){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_roles")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_roles = append(this.M_roles, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Entities) RemoveRoles(val *Role){
@@ -287,11 +272,10 @@ func (this *Entities) RemoveRoles(val *Role){
 	for i:=0; i < len(this.M_roles); i++{
 		if this.M_roles[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_roles = values
+	this.setEntity(this)
 }
 
 
@@ -311,10 +295,10 @@ func (this *Entities) SetPermissions(val []*Permission){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_permissions")
-		this.setEntity(val[i])
 		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -324,11 +308,11 @@ func (this *Entities) AppendPermissions(val *Permission){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_permissions")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_permissions = append(this.M_permissions, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Entities) RemovePermissions(val *Permission){
@@ -336,11 +320,10 @@ func (this *Entities) RemovePermissions(val *Permission){
 	for i:=0; i < len(this.M_permissions); i++{
 		if this.M_permissions[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_permissions = values
+	this.setEntity(this)
 }
 
 
@@ -360,10 +343,10 @@ func (this *Entities) SetActions(val []*Action){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_actions")
-		this.setEntity(val[i])
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -373,11 +356,11 @@ func (this *Entities) AppendActions(val *Action){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_actions")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_actions = append(this.M_actions, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Entities) RemoveActions(val *Action){
@@ -385,10 +368,9 @@ func (this *Entities) RemoveActions(val *Action){
 	for i:=0; i < len(this.M_actions); i++{
 		if this.M_actions[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_actions = values
+	this.setEntity(this)
 }
 

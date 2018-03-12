@@ -16,8 +16,6 @@ type Session struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -59,7 +57,6 @@ func (this *Session) GetUuid() string{
 	return this.UUID
 }
 func (this *Session) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -107,14 +104,6 @@ func (this *Session) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Session) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Session) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Session) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -133,7 +122,6 @@ func (this *Session) GetId()string{
 }
 
 func (this *Session) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -145,7 +133,6 @@ func (this *Session) GetStartTime()int64{
 }
 
 func (this *Session) SetStartTime(val int64){
-	this.NeedSave = this.M_startTime== val
 	this.M_startTime= val
 }
 
@@ -157,7 +144,6 @@ func (this *Session) GetEndTime()int64{
 }
 
 func (this *Session) SetEndTime(val int64){
-	this.NeedSave = this.M_endTime== val
 	this.M_endTime= val
 }
 
@@ -169,7 +155,6 @@ func (this *Session) GetStatusTime()int64{
 }
 
 func (this *Session) SetStatusTime(val int64){
-	this.NeedSave = this.M_statusTime== val
 	this.M_statusTime= val
 }
 
@@ -181,7 +166,6 @@ func (this *Session) GetSessionState()SessionState{
 }
 
 func (this *Session) SetSessionState(val SessionState){
-	this.NeedSave = this.M_sessionState== val
 	this.M_sessionState= val
 }
 
@@ -200,8 +184,8 @@ func (this *Session) GetComputerRef()*Computer{
 }
 
 func (this *Session) SetComputerRef(val *Computer){
-	this.NeedSave = this.M_computerRef != val.GetUuid()
 	this.M_computerRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -219,8 +203,8 @@ func (this *Session) GetAccountPtr()*Account{
 }
 
 func (this *Session) SetAccountPtr(val *Account){
-	this.NeedSave = this.M_accountPtr != val.GetUuid()
 	this.M_accountPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

@@ -304,6 +304,9 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			session.M_startTime = int64(time.Now().Unix())
 			session.M_statusTime = int64(time.Now().Unix())
 			session.M_sessionState = CargoEntities.SessionState_Online
+			session.SetEntitySetter(setEntityFct)
+			session.SetEntityGetter(getEntityFct)
+			session.SetUuidGenerator(generateUuidFct)
 			session.ParentLnk = "M_sessions"
 
 			//Set the computer reference.

@@ -16,8 +16,6 @@ type Project struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -58,7 +56,6 @@ func (this *Project) GetUuid() string{
 	return this.UUID
 }
 func (this *Project) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -106,14 +103,6 @@ func (this *Project) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Project) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Project) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Project) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -132,7 +121,6 @@ func (this *Project) GetId()string{
 }
 
 func (this *Project) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -144,7 +132,6 @@ func (this *Project) GetName()string{
 }
 
 func (this *Project) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -166,8 +153,9 @@ func (this *Project) SetFilesRef(val []*File){
 	this.M_filesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_filesRef=append(this.M_filesRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -177,8 +165,8 @@ func (this *Project) AppendFilesRef(val *File){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_filesRef = append(this.M_filesRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Project) RemoveFilesRef(val *File){
@@ -186,11 +174,10 @@ func (this *Project) RemoveFilesRef(val *File){
 	for i:=0; i < len(this.M_filesRef); i++{
 		if this.M_filesRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_filesRef = values
+	this.setEntity(this)
 }
 
 
@@ -203,8 +190,8 @@ func (this *Project) GetEntitiesPtr()*Entities{
 }
 
 func (this *Project) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

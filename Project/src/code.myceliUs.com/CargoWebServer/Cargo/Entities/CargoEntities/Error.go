@@ -16,8 +16,6 @@ type Error struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -66,7 +64,6 @@ func (this *Error) GetUuid() string{
 	return this.UUID
 }
 func (this *Error) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -114,14 +111,6 @@ func (this *Error) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Error) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Error) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Error) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -140,7 +129,6 @@ func (this *Error) GetId()string{
 }
 
 func (this *Error) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -152,7 +140,6 @@ func (this *Error) GetBody()string{
 }
 
 func (this *Error) SetBody(val string){
-	this.NeedSave = this.M_body== val
 	this.M_body= val
 }
 
@@ -164,7 +151,6 @@ func (this *Error) GetErrorPath()string{
 }
 
 func (this *Error) SetErrorPath(val string){
-	this.NeedSave = this.M_errorPath== val
 	this.M_errorPath= val
 }
 
@@ -176,7 +162,6 @@ func (this *Error) GetCode()int{
 }
 
 func (this *Error) SetCode(val int){
-	this.NeedSave = this.M_code== val
 	this.M_code= val
 }
 
@@ -192,8 +177,8 @@ func (this *Error) GetAccountRef()*Account{
 }
 
 func (this *Error) SetAccountRef(val *Account){
-	this.NeedSave = this.M_accountRef != val.GetUuid()
 	this.M_accountRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -211,8 +196,8 @@ func (this *Error) GetEntitiesPtr()*Entities{
 }
 
 func (this *Error) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

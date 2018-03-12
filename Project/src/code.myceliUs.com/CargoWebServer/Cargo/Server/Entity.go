@@ -70,16 +70,6 @@ type Entity interface {
 	 */
 	GetChilds() []interface{}
 
-	/**
-	 * Evaluate if an entity needs to be saved.
-	 */
-	IsNeedSave() bool
-
-	/**
-	 * Set the need save state to false.
-	 */
-	ResetNeedSave()
-
 	// External function linking...
 
 	/**

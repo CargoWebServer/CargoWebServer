@@ -48,7 +48,6 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	defer this.Unlock()
 	// Here the value is in the map.
 	this.object[field] = value
-	this.object["NeedSave"] = true
 	return nil
 }
 
@@ -172,7 +171,6 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 										// Set parent information if is not already set.
 										val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = this.object["UUID"]
 										val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
-										val.([]interface{})[j].(map[string]interface{})["NeedSave"] = true
 										child := NewDynamicEntity()
 										child.setObject(val.([]interface{})[j].(map[string]interface{}))
 										// Keep it on the cache
@@ -196,7 +194,6 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 								// Set parent information if is not already set.
 								val.(map[string]interface{})["ParentUuid"] = this.object["UUID"]
 								val.(map[string]interface{})["ParentLnk"] = field
-								val.(map[string]interface{})["NeedSave"] = true
 								child := NewDynamicEntity()
 								child.setObject(val.(map[string]interface{}))
 								// Keep it on the cache
@@ -306,13 +303,6 @@ func (this *DynamicEntity) GetUuid() string {
 		return uuid.(string)
 	}
 	return "" // Can be an error here.
-}
-
-/**
- * Each entity must have one uuid.
- */
-func (this *DynamicEntity) ResetNeedSave() {
-	this.setValue("NeedSave", false)
 }
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
@@ -431,16 +421,4 @@ func (this *DynamicEntity) GetChilds() []interface{} {
 		}
 	}
 	return childs
-}
-
-/**
- * Test if an entity need to be save.
- */
-func (this *DynamicEntity) IsNeedSave() bool {
-	NeeedSave := this.getValue("NeedSave")
-	if NeeedSave == nil {
-		return true
-	}
-
-	return NeeedSave.(bool)
 }

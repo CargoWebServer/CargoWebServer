@@ -16,8 +16,6 @@ type Notification struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -69,7 +67,6 @@ func (this *Notification) GetUuid() string{
 	return this.UUID
 }
 func (this *Notification) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -117,14 +114,6 @@ func (this *Notification) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Notification) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Notification) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Notification) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -143,7 +132,6 @@ func (this *Notification) GetId()string{
 }
 
 func (this *Notification) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -155,7 +143,6 @@ func (this *Notification) GetBody()string{
 }
 
 func (this *Notification) SetBody(val string){
-	this.NeedSave = this.M_body== val
 	this.M_body= val
 }
 
@@ -171,8 +158,8 @@ func (this *Notification) GetFromRef()*Account{
 }
 
 func (this *Notification) SetFromRef(val *Account){
-	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -190,8 +177,8 @@ func (this *Notification) GetToRef()*Account{
 }
 
 func (this *Notification) SetToRef(val *Account){
-	this.NeedSave = this.M_toRef != val.GetUuid()
 	this.M_toRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -205,7 +192,6 @@ func (this *Notification) GetType()string{
 }
 
 func (this *Notification) SetType(val string){
-	this.NeedSave = this.M_type== val
 	this.M_type= val
 }
 
@@ -217,7 +203,6 @@ func (this *Notification) GetCode()int{
 }
 
 func (this *Notification) SetCode(val int){
-	this.NeedSave = this.M_code== val
 	this.M_code= val
 }
 
@@ -233,8 +218,8 @@ func (this *Notification) GetEntitiesPtr()*Entities{
 }
 
 func (this *Notification) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

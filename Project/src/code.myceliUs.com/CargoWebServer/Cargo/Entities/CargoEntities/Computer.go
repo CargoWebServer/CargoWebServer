@@ -16,8 +16,6 @@ type Computer struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -62,7 +60,6 @@ func (this *Computer) GetUuid() string{
 	return this.UUID
 }
 func (this *Computer) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -110,14 +107,6 @@ func (this *Computer) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Computer) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Computer) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Computer) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -136,7 +125,6 @@ func (this *Computer) GetId()string{
 }
 
 func (this *Computer) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -148,7 +136,6 @@ func (this *Computer) GetName()string{
 }
 
 func (this *Computer) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -160,7 +147,6 @@ func (this *Computer) GetIpv4()string{
 }
 
 func (this *Computer) SetIpv4(val string){
-	this.NeedSave = this.M_ipv4== val
 	this.M_ipv4= val
 }
 
@@ -172,7 +158,6 @@ func (this *Computer) GetOsType()OsType{
 }
 
 func (this *Computer) SetOsType(val OsType){
-	this.NeedSave = this.M_osType== val
 	this.M_osType= val
 }
 
@@ -187,7 +172,6 @@ func (this *Computer) GetPlatformType()PlatformType{
 }
 
 func (this *Computer) SetPlatformType(val PlatformType){
-	this.NeedSave = this.M_platformType== val
 	this.M_platformType= val
 }
 
@@ -206,8 +190,8 @@ func (this *Computer) GetEntitiesPtr()*Entities{
 }
 
 func (this *Computer) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

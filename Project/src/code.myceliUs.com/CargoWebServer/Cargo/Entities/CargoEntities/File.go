@@ -16,8 +16,6 @@ type File struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -77,7 +75,6 @@ func (this *File) GetUuid() string{
 	return this.UUID
 }
 func (this *File) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -133,14 +130,6 @@ func (this *File) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *File) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *File) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *File) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -159,7 +148,6 @@ func (this *File) GetId()string{
 }
 
 func (this *File) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -171,7 +159,6 @@ func (this *File) GetName()string{
 }
 
 func (this *File) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -183,7 +170,6 @@ func (this *File) GetPath()string{
 }
 
 func (this *File) SetPath(val string){
-	this.NeedSave = this.M_path== val
 	this.M_path= val
 }
 
@@ -195,7 +181,6 @@ func (this *File) GetSize()int{
 }
 
 func (this *File) SetSize(val int){
-	this.NeedSave = this.M_size== val
 	this.M_size= val
 }
 
@@ -207,7 +192,6 @@ func (this *File) GetModeTime()int64{
 }
 
 func (this *File) SetModeTime(val int64){
-	this.NeedSave = this.M_modeTime== val
 	this.M_modeTime= val
 }
 
@@ -219,7 +203,6 @@ func (this *File) IsDir()bool{
 }
 
 func (this *File) SetIsDir(val bool){
-	this.NeedSave = this.M_isDir== val
 	this.M_isDir= val
 }
 
@@ -231,7 +214,6 @@ func (this *File) GetChecksum()string{
 }
 
 func (this *File) SetChecksum(val string){
-	this.NeedSave = this.M_checksum== val
 	this.M_checksum= val
 }
 
@@ -243,7 +225,6 @@ func (this *File) GetData()string{
 }
 
 func (this *File) SetData(val string){
-	this.NeedSave = this.M_data== val
 	this.M_data= val
 }
 
@@ -255,7 +236,6 @@ func (this *File) GetThumbnail()string{
 }
 
 func (this *File) SetThumbnail(val string){
-	this.NeedSave = this.M_thumbnail== val
 	this.M_thumbnail= val
 }
 
@@ -267,7 +247,6 @@ func (this *File) GetMime()string{
 }
 
 func (this *File) SetMime(val string){
-	this.NeedSave = this.M_mime== val
 	this.M_mime= val
 }
 
@@ -290,10 +269,10 @@ func (this *File) SetFiles(val []*File){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_files")
-		this.setEntity(val[i])
 		this.M_files=append(this.M_files, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -303,11 +282,11 @@ func (this *File) AppendFiles(val *File){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_files")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_files = append(this.M_files, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *File) RemoveFiles(val *File){
@@ -315,11 +294,10 @@ func (this *File) RemoveFiles(val *File){
 	for i:=0; i < len(this.M_files); i++{
 		if this.M_files[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_files = values
+	this.setEntity(this)
 }
 
 
@@ -328,7 +306,6 @@ func (this *File) GetFileType()FileType{
 }
 
 func (this *File) SetFileType(val FileType){
-	this.NeedSave = this.M_fileType== val
 	this.M_fileType= val
 }
 
@@ -347,8 +324,8 @@ func (this *File) GetParentDirPtr()*File{
 }
 
 func (this *File) SetParentDirPtr(val *File){
-	this.NeedSave = this.M_parentDirPtr != val.GetUuid()
 	this.M_parentDirPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -366,8 +343,8 @@ func (this *File) GetEntitiesPtr()*Entities{
 }
 
 func (this *File) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

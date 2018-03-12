@@ -16,8 +16,6 @@ type Action struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -57,7 +55,6 @@ func (this *Action) GetUuid() string{
 	return this.UUID
 }
 func (this *Action) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -119,14 +116,6 @@ func (this *Action) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Action) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Action) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Action) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -145,7 +134,6 @@ func (this *Action) GetName()string{
 }
 
 func (this *Action) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -157,7 +145,6 @@ func (this *Action) GetDoc()string{
 }
 
 func (this *Action) SetDoc(val string){
-	this.NeedSave = this.M_doc== val
 	this.M_doc= val
 }
 
@@ -180,10 +167,10 @@ func (this *Action) SetParameters(val []*Parameter){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_parameters")
-		this.setEntity(val[i])
 		this.M_parameters=append(this.M_parameters, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -193,11 +180,11 @@ func (this *Action) AppendParameters(val *Parameter){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_parameters")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_parameters = append(this.M_parameters, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Action) RemoveParameters(val *Parameter){
@@ -205,11 +192,10 @@ func (this *Action) RemoveParameters(val *Parameter){
 	for i:=0; i < len(this.M_parameters); i++{
 		if this.M_parameters[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_parameters = values
+	this.setEntity(this)
 }
 
 
@@ -229,10 +215,10 @@ func (this *Action) SetResults(val []*Parameter){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_results")
-		this.setEntity(val[i])
 		this.M_results=append(this.M_results, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -242,11 +228,11 @@ func (this *Action) AppendResults(val *Parameter){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_results")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_results = append(this.M_results, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Action) RemoveResults(val *Parameter){
@@ -254,11 +240,10 @@ func (this *Action) RemoveResults(val *Parameter){
 	for i:=0; i < len(this.M_results); i++{
 		if this.M_results[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_results = values
+	this.setEntity(this)
 }
 
 
@@ -267,7 +252,6 @@ func (this *Action) GetAccessType()AccessType{
 }
 
 func (this *Action) SetAccessType(val AccessType){
-	this.NeedSave = this.M_accessType== val
 	this.M_accessType= val
 }
 
@@ -286,8 +270,8 @@ func (this *Action) GetEntitiesPtr()*Entities{
 }
 
 func (this *Action) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

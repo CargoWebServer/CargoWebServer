@@ -16,8 +16,6 @@ type OAuth2Refresh struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -50,7 +48,6 @@ func (this *OAuth2Refresh) GetUuid() string{
 	return this.UUID
 }
 func (this *OAuth2Refresh) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -98,14 +95,6 @@ func (this *OAuth2Refresh) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *OAuth2Refresh) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *OAuth2Refresh) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Refresh) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -124,7 +113,6 @@ func (this *OAuth2Refresh) GetId()string{
 }
 
 func (this *OAuth2Refresh) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -140,8 +128,8 @@ func (this *OAuth2Refresh) GetAccess()*OAuth2Access{
 }
 
 func (this *OAuth2Refresh) SetAccess(val *OAuth2Access){
-	this.NeedSave = this.M_access != val.GetUuid()
 	this.M_access= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -159,8 +147,8 @@ func (this *OAuth2Refresh) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2Refresh) SetParentPtr(val *OAuth2Configuration){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

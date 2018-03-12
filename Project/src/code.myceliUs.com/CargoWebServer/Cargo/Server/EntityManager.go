@@ -189,6 +189,8 @@ func newEntityManager() *EntityManager {
 								entity.SetUuidGenerator(generateUuidFct)
 								entities = append(entities, entity)
 							}
+						} else {
+							log.Panicln("--> go error ", err)
 						}
 					}
 					entityInfo.entities <- entities
@@ -530,7 +532,6 @@ func (this *EntityManager) getCargoEntities() *CargoEntities.Entities {
 		cargoEntities.SetId("CARGO_ENTITIES")
 		cargoEntities.SetName("Cargo entities")
 		cargoEntities.SetVersion("1.0")
-		cargoEntities.NeedSave = true
 		this.saveEntity(cargoEntities)
 	}
 	return cargoEntities
@@ -659,8 +660,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		this.m_setEntityChan <- entity
 	}
 
-	entity.ResetNeedSave()
-
 	return entity, nil
 }
 
@@ -786,6 +785,7 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 	childs := entity.GetChilds()
 	// Save the childs...
 	for i := 0; i < len(childs); i++ {
+		//log.Println("----> save child ", childs[i].(Entity).GetUuid())
 		this.saveEntity(childs[i].(Entity))
 	}
 }
@@ -879,15 +879,11 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	evt, _ := NewEvent(NewEntityEvent, EntityEvent, eventData)
 	GetServer().GetEventManager().BroadcastEvent(evt)
-	entity.ResetNeedSave()
 
 	return entity, nil
 }
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
-	if entity.IsNeedSave() == false {
-		return nil
-	}
 
 	// Set the uuid generator function before save
 	entity.SetUuidGenerator(generateUuidFct)
@@ -1009,7 +1005,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
-	entity.ResetNeedSave()
 
 	return nil
 }
@@ -1494,17 +1489,15 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 	if err == nil {
 		for i := 0; i < len(prototypes); i++ {
 			p := prototypes[i]
-			needSave := false
 			for j := 0; j < len(p.FieldsType); j++ {
 				if strings.Index(p.FieldsType[j], oldName) > 0 {
-					needSave = true
 					strings.Replace(p.FieldsType[j], oldName, typeName, -1)
 				}
 			}
-			if needSave == true {
-				// save the prototype.
-				p.Save(storeId)
-			}
+
+			// save the prototype.
+			p.Save(storeId)
+
 		}
 	} else {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_UPDATE_ERROR, SERVER_ERROR_CODE, err)
@@ -1909,7 +1902,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 // @src
 //EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
 //    // server is the client side singleton.
-//    entity.NeedSave = true
 //    var params = []
 //    params.push(createRpcData(entity, "JSON_STR", "entity"))
 //    params.push(createRpcData(entity.TYPENAME, "STRING", "typeName"))

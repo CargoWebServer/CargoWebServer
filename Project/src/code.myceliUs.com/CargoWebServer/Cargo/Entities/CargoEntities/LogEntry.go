@@ -16,8 +16,6 @@ type LogEntry struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -59,7 +57,6 @@ func (this *LogEntry) GetUuid() string{
 	return this.UUID
 }
 func (this *LogEntry) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -107,14 +104,6 @@ func (this *LogEntry) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *LogEntry) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *LogEntry) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *LogEntry) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -133,7 +122,6 @@ func (this *LogEntry) GetId()string{
 }
 
 func (this *LogEntry) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -145,7 +133,6 @@ func (this *LogEntry) GetCreationTime()int64{
 }
 
 func (this *LogEntry) SetCreationTime(val int64){
-	this.NeedSave = this.M_creationTime== val
 	this.M_creationTime= val
 }
 
@@ -161,8 +148,8 @@ func (this *LogEntry) GetEntityRef()Entity{
 }
 
 func (this *LogEntry) SetEntityRef(val Entity){
-	this.NeedSave = this.M_entityRef != val.GetUuid()
 	this.M_entityRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -177,8 +164,8 @@ func (this *LogEntry) GetLoggerPtr()*Log{
 }
 
 func (this *LogEntry) SetLoggerPtr(val *Log){
-	this.NeedSave = this.M_loggerPtr != val.GetUuid()
 	this.M_loggerPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -196,8 +183,8 @@ func (this *LogEntry) GetEntitiesPtr()*Entities{
 }
 
 func (this *LogEntry) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

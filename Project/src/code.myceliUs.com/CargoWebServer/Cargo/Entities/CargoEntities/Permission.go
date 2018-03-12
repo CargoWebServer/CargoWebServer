@@ -16,8 +16,6 @@ type Permission struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -53,7 +51,6 @@ func (this *Permission) GetUuid() string{
 	return this.UUID
 }
 func (this *Permission) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -101,14 +98,6 @@ func (this *Permission) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Permission) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Permission) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Permission) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -127,7 +116,6 @@ func (this *Permission) GetId()string{
 }
 
 func (this *Permission) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -139,7 +127,6 @@ func (this *Permission) GetTypes()int{
 }
 
 func (this *Permission) SetTypes(val int){
-	this.NeedSave = this.M_types== val
 	this.M_types= val
 }
 
@@ -161,8 +148,9 @@ func (this *Permission) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -172,8 +160,8 @@ func (this *Permission) AppendAccountsRef(val *Account){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Permission) RemoveAccountsRef(val *Account){
@@ -181,11 +169,10 @@ func (this *Permission) RemoveAccountsRef(val *Account){
 	for i:=0; i < len(this.M_accountsRef); i++{
 		if this.M_accountsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_accountsRef = values
+	this.setEntity(this)
 }
 
 
@@ -198,8 +185,8 @@ func (this *Permission) GetEntitiesPtr()*Entities{
 }
 
 func (this *Permission) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

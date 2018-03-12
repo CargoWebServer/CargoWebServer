@@ -16,8 +16,6 @@ type OAuth2Expires struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -51,7 +49,6 @@ func (this *OAuth2Expires) GetUuid() string{
 	return this.UUID
 }
 func (this *OAuth2Expires) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -99,14 +96,6 @@ func (this *OAuth2Expires) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *OAuth2Expires) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *OAuth2Expires) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Expires) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -125,7 +114,6 @@ func (this *OAuth2Expires) GetId()string{
 }
 
 func (this *OAuth2Expires) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -137,7 +125,6 @@ func (this *OAuth2Expires) GetExpiresAt()int64{
 }
 
 func (this *OAuth2Expires) SetExpiresAt(val int64){
-	this.NeedSave = this.M_expiresAt== val
 	this.M_expiresAt= val
 }
 
@@ -153,8 +140,8 @@ func (this *OAuth2Expires) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2Expires) SetParentPtr(val *OAuth2Configuration){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

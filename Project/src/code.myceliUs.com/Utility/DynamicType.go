@@ -38,9 +38,6 @@ func RegisterType(typedNil interface{}) {
 	t := reflect.TypeOf(typedNil).Elem()
 	index := strings.LastIndex(t.PkgPath(), "/")
 	var typeName = t.Name()
-	if strings.HasSuffix(typeName, "_impl") == true {
-		typeName = strings.Replace(typeName, "_impl", "", -1)
-	}
 	if _, ok := typeRegistry[t.PkgPath()[index+1:]+"."+typeName]; !ok {
 		if index > 0 {
 

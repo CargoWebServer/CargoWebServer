@@ -305,7 +305,6 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	dir.SetName(dirName)
 	dir.SetPath(dirPath)
 	dir.SetFileType(CargoEntities.FileType_DiskFile)
-	dir.NeedSave = true
 
 	// Set the cargo entities object.
 	entities := GetServer().GetEntityManager().getCargoEntities()
@@ -583,14 +582,12 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		}
 
 		file.SetChecksum(checksum)
-		file.NeedSave = true
 		err := GetServer().GetEntityManager().saveEntity(file)
 		if err != nil {
 			log.Println("---> save file error ", err)
 		}
 
 	} else {
-		file.NeedSave = false // Not need to be save...
 		return nil
 	}
 
@@ -827,7 +824,6 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	dbFile.M_id = id
 	dbFile.M_name = name
 	dbFile.M_mime = mimeType
-	dbFile.NeedSave = true
 	// Create the file.
 	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.File", id, dbFile)
 

@@ -16,8 +16,6 @@ type Log struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -57,7 +55,6 @@ func (this *Log) GetUuid() string{
 	return this.UUID
 }
 func (this *Log) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -113,14 +110,6 @@ func (this *Log) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Log) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Log) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Log) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -139,7 +128,6 @@ func (this *Log) GetId()string{
 }
 
 func (this *Log) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -162,10 +150,10 @@ func (this *Log) SetEntries(val []*LogEntry){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_entries")
-		this.setEntity(val[i])
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -175,11 +163,11 @@ func (this *Log) AppendEntries(val *LogEntry){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_entries")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_entries = append(this.M_entries, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Log) RemoveEntries(val *LogEntry){
@@ -187,11 +175,10 @@ func (this *Log) RemoveEntries(val *LogEntry){
 	for i:=0; i < len(this.M_entries); i++{
 		if this.M_entries[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_entries = values
+	this.setEntity(this)
 }
 
 
@@ -204,8 +191,8 @@ func (this *Log) GetEntitiesPtr()*Entities{
 }
 
 func (this *Log) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

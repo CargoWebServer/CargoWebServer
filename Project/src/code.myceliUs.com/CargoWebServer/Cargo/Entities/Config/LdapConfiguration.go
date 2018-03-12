@@ -16,8 +16,6 @@ type LdapConfiguration struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -68,7 +66,6 @@ func (this *LdapConfiguration) GetUuid() string{
 	return this.UUID
 }
 func (this *LdapConfiguration) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -116,14 +113,6 @@ func (this *LdapConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *LdapConfiguration) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *LdapConfiguration) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *LdapConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -142,7 +131,6 @@ func (this *LdapConfiguration) GetId()string{
 }
 
 func (this *LdapConfiguration) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -154,7 +142,6 @@ func (this *LdapConfiguration) GetHostName()string{
 }
 
 func (this *LdapConfiguration) SetHostName(val string){
-	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
 
@@ -166,7 +153,6 @@ func (this *LdapConfiguration) GetIpv4()string{
 }
 
 func (this *LdapConfiguration) SetIpv4(val string){
-	this.NeedSave = this.M_ipv4== val
 	this.M_ipv4= val
 }
 
@@ -178,7 +164,6 @@ func (this *LdapConfiguration) GetPort()int{
 }
 
 func (this *LdapConfiguration) SetPort(val int){
-	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
 
@@ -190,7 +175,6 @@ func (this *LdapConfiguration) GetUser()string{
 }
 
 func (this *LdapConfiguration) SetUser(val string){
-	this.NeedSave = this.M_user== val
 	this.M_user= val
 }
 
@@ -202,7 +186,6 @@ func (this *LdapConfiguration) GetPwd()string{
 }
 
 func (this *LdapConfiguration) SetPwd(val string){
-	this.NeedSave = this.M_pwd== val
 	this.M_pwd= val
 }
 
@@ -214,7 +197,6 @@ func (this *LdapConfiguration) GetDomain()string{
 }
 
 func (this *LdapConfiguration) SetDomain(val string){
-	this.NeedSave = this.M_domain== val
 	this.M_domain= val
 }
 
@@ -226,7 +208,6 @@ func (this *LdapConfiguration) GetSearchBase()string{
 }
 
 func (this *LdapConfiguration) SetSearchBase(val string){
-	this.NeedSave = this.M_searchBase== val
 	this.M_searchBase= val
 }
 
@@ -242,8 +223,8 @@ func (this *LdapConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *LdapConfiguration) SetParentPtr(val *Configurations){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

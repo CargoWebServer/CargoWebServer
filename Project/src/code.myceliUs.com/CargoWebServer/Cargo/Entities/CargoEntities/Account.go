@@ -16,8 +16,6 @@ type Account struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -70,7 +68,6 @@ func (this *Account) GetUuid() string{
 	return this.UUID
 }
 func (this *Account) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -132,14 +129,6 @@ func (this *Account) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Account) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Account) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Account) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -158,7 +147,6 @@ func (this *Account) GetId()string{
 }
 
 func (this *Account) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -170,7 +158,6 @@ func (this *Account) GetName()string{
 }
 
 func (this *Account) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -182,7 +169,6 @@ func (this *Account) GetPassword()string{
 }
 
 func (this *Account) SetPassword(val string){
-	this.NeedSave = this.M_password== val
 	this.M_password= val
 }
 
@@ -194,7 +180,6 @@ func (this *Account) GetEmail()string{
 }
 
 func (this *Account) SetEmail(val string){
-	this.NeedSave = this.M_email== val
 	this.M_email= val
 }
 
@@ -217,10 +202,10 @@ func (this *Account) SetSessions(val []*Session){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_sessions")
-		this.setEntity(val[i])
 		this.M_sessions=append(this.M_sessions, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -230,11 +215,11 @@ func (this *Account) AppendSessions(val *Session){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_sessions")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_sessions = append(this.M_sessions, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Account) RemoveSessions(val *Session){
@@ -242,11 +227,10 @@ func (this *Account) RemoveSessions(val *Session){
 	for i:=0; i < len(this.M_sessions); i++{
 		if this.M_sessions[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_sessions = values
+	this.setEntity(this)
 }
 
 
@@ -266,10 +250,10 @@ func (this *Account) SetMessages(val []Message){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_messages")
-		this.setEntity(val[i])
 		this.M_messages=append(this.M_messages, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -279,11 +263,11 @@ func (this *Account) AppendMessages(val Message){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_messages")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_messages = append(this.M_messages, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Account) RemoveMessages(val Message){
@@ -291,11 +275,10 @@ func (this *Account) RemoveMessages(val Message){
 	for i:=0; i < len(this.M_messages); i++{
 		if this.M_messages[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_messages = values
+	this.setEntity(this)
 }
 
 
@@ -308,8 +291,8 @@ func (this *Account) GetUserRef()*User{
 }
 
 func (this *Account) SetUserRef(val *User){
-	this.NeedSave = this.M_userRef != val.GetUuid()
 	this.M_userRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -333,8 +316,9 @@ func (this *Account) SetRolesRef(val []*Role){
 	this.M_rolesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_rolesRef=append(this.M_rolesRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -344,8 +328,8 @@ func (this *Account) AppendRolesRef(val *Role){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_rolesRef = append(this.M_rolesRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Account) RemoveRolesRef(val *Role){
@@ -353,11 +337,10 @@ func (this *Account) RemoveRolesRef(val *Role){
 	for i:=0; i < len(this.M_rolesRef); i++{
 		if this.M_rolesRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_rolesRef = values
+	this.setEntity(this)
 }
 
 
@@ -376,8 +359,9 @@ func (this *Account) SetPermissionsRef(val []*Permission){
 	this.M_permissionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_permissionsRef=append(this.M_permissionsRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -387,8 +371,8 @@ func (this *Account) AppendPermissionsRef(val *Permission){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_permissionsRef = append(this.M_permissionsRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Account) RemovePermissionsRef(val *Permission){
@@ -396,11 +380,10 @@ func (this *Account) RemovePermissionsRef(val *Permission){
 	for i:=0; i < len(this.M_permissionsRef); i++{
 		if this.M_permissionsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_permissionsRef = values
+	this.setEntity(this)
 }
 
 
@@ -413,8 +396,8 @@ func (this *Account) GetEntitiesPtr()*Entities{
 }
 
 func (this *Account) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

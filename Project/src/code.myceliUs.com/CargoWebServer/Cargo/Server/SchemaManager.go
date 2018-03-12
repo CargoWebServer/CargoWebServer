@@ -1690,7 +1690,6 @@ func (this *XmlDocumentHandler) EndDocument() {
 	for i := 0; i < len(this.globalObjects); i++ {
 		object := this.globalObjects[i]
 		compactObject(object)
-		object["NeedSave"] = true
 		entity := NewDynamicEntity()
 		entity.setObject(object)
 		GetServer().GetEntityManager().saveEntity(entity)
@@ -1907,7 +1906,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 				fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 				object = make(map[string]interface{})
 				object["TYPENAME"] = fieldType
-				object["NeedSave"] = true
 				this.objects.Push(object)
 			} else {
 				// The element is not found with it name in the prototype...
@@ -1928,7 +1926,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 							} else {
 								object["TYPENAME"] = this.SchemaId + "." + element.Name
 							}
-							object["NeedSave"] = true
 							this.objects.Push(object)
 						} else {
 							log.Println(" 1615 -------------> Element not found ", e.Name.Local)
@@ -1954,7 +1951,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 			} else {
 				object["TYPENAME"] = this.SchemaId + "." + elementNameLocal
 			}
-			object["NeedSave"] = true
 			this.objects.Push(object)
 			this.globalObjects = append(this.globalObjects, object)
 		}
@@ -1980,7 +1976,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 					attrObject := make(map[string]interface{})
 					attrObject["TYPENAME"] = fieldType
 					attrObject["M_valueOf"] = attr.Value
-					attrObject["NeedSave"] = true
 					object[attrName] = attrObject
 				}
 			}

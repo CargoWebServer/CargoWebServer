@@ -16,8 +16,6 @@ type OAuth2Configuration struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -79,7 +77,6 @@ func (this *OAuth2Configuration) GetUuid() string{
 	return this.UUID
 }
 func (this *OAuth2Configuration) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -165,14 +162,6 @@ func (this *OAuth2Configuration) GetChilds() []interface{}{
 	}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *OAuth2Configuration) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *OAuth2Configuration) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Configuration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -191,7 +180,6 @@ func (this *OAuth2Configuration) GetId()string{
 }
 
 func (this *OAuth2Configuration) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -203,7 +191,6 @@ func (this *OAuth2Configuration) GetAuthorizationExpiration()int{
 }
 
 func (this *OAuth2Configuration) SetAuthorizationExpiration(val int){
-	this.NeedSave = this.M_authorizationExpiration== val
 	this.M_authorizationExpiration= val
 }
 
@@ -215,7 +202,6 @@ func (this *OAuth2Configuration) GetAccessExpiration()int64{
 }
 
 func (this *OAuth2Configuration) SetAccessExpiration(val int64){
-	this.NeedSave = this.M_accessExpiration== val
 	this.M_accessExpiration= val
 }
 
@@ -227,7 +213,6 @@ func (this *OAuth2Configuration) GetTokenType()string{
 }
 
 func (this *OAuth2Configuration) SetTokenType(val string){
-	this.NeedSave = this.M_tokenType== val
 	this.M_tokenType= val
 }
 
@@ -239,7 +224,6 @@ func (this *OAuth2Configuration) GetErrorStatusCode()int{
 }
 
 func (this *OAuth2Configuration) SetErrorStatusCode(val int){
-	this.NeedSave = this.M_errorStatusCode== val
 	this.M_errorStatusCode= val
 }
 
@@ -251,7 +235,6 @@ func (this *OAuth2Configuration) IsAllowClientSecretInParams()bool{
 }
 
 func (this *OAuth2Configuration) SetAllowClientSecretInParams(val bool){
-	this.NeedSave = this.M_allowClientSecretInParams== val
 	this.M_allowClientSecretInParams= val
 }
 
@@ -263,7 +246,6 @@ func (this *OAuth2Configuration) IsAllowGetAccessRequest()bool{
 }
 
 func (this *OAuth2Configuration) SetAllowGetAccessRequest(val bool){
-	this.NeedSave = this.M_allowGetAccessRequest== val
 	this.M_allowGetAccessRequest= val
 }
 
@@ -275,7 +257,6 @@ func (this *OAuth2Configuration) GetRedirectUriSeparator()string{
 }
 
 func (this *OAuth2Configuration) SetRedirectUriSeparator(val string){
-	this.NeedSave = this.M_redirectUriSeparator== val
 	this.M_redirectUriSeparator= val
 }
 
@@ -287,7 +268,6 @@ func (this *OAuth2Configuration) GetPrivateKey()string{
 }
 
 func (this *OAuth2Configuration) SetPrivateKey(val string){
-	this.NeedSave = this.M_privateKey== val
 	this.M_privateKey= val
 }
 
@@ -305,7 +285,6 @@ func (this *OAuth2Configuration) SetAllowedAuthorizeTypes(val []string){
 
 func (this *OAuth2Configuration) AppendAllowedAuthorizeTypes(val string){
 	this.M_allowedAuthorizeTypes=append(this.M_allowedAuthorizeTypes, val)
-	this.NeedSave= true
 }
 
 
@@ -321,7 +300,6 @@ func (this *OAuth2Configuration) SetAllowedAccessTypes(val []string){
 
 func (this *OAuth2Configuration) AppendAllowedAccessTypes(val string){
 	this.M_allowedAccessTypes=append(this.M_allowedAccessTypes, val)
-	this.NeedSave= true
 }
 
 
@@ -342,10 +320,10 @@ func (this *OAuth2Configuration) SetClients(val []*OAuth2Client){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_clients")
-		this.setEntity(val[i])
 		this.M_clients=append(this.M_clients, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -355,11 +333,11 @@ func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_clients")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_clients = append(this.M_clients, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveClients(val *OAuth2Client){
@@ -367,11 +345,10 @@ func (this *OAuth2Configuration) RemoveClients(val *OAuth2Client){
 	for i:=0; i < len(this.M_clients); i++{
 		if this.M_clients[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_clients = values
+	this.setEntity(this)
 }
 
 
@@ -391,10 +368,10 @@ func (this *OAuth2Configuration) SetAuthorize(val []*OAuth2Authorize){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_authorize")
-		this.setEntity(val[i])
 		this.M_authorize=append(this.M_authorize, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -404,11 +381,11 @@ func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_authorize")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_authorize = append(this.M_authorize, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveAuthorize(val *OAuth2Authorize){
@@ -416,11 +393,10 @@ func (this *OAuth2Configuration) RemoveAuthorize(val *OAuth2Authorize){
 	for i:=0; i < len(this.M_authorize); i++{
 		if this.M_authorize[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_authorize = values
+	this.setEntity(this)
 }
 
 
@@ -440,10 +416,10 @@ func (this *OAuth2Configuration) SetAccess(val []*OAuth2Access){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_access")
-		this.setEntity(val[i])
 		this.M_access=append(this.M_access, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -453,11 +429,11 @@ func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_access")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_access = append(this.M_access, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveAccess(val *OAuth2Access){
@@ -465,11 +441,10 @@ func (this *OAuth2Configuration) RemoveAccess(val *OAuth2Access){
 	for i:=0; i < len(this.M_access); i++{
 		if this.M_access[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_access = values
+	this.setEntity(this)
 }
 
 
@@ -489,10 +464,10 @@ func (this *OAuth2Configuration) SetIds(val []*OAuth2IdToken){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_ids")
-		this.setEntity(val[i])
 		this.M_ids=append(this.M_ids, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -502,11 +477,11 @@ func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_ids")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_ids = append(this.M_ids, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveIds(val *OAuth2IdToken){
@@ -514,11 +489,10 @@ func (this *OAuth2Configuration) RemoveIds(val *OAuth2IdToken){
 	for i:=0; i < len(this.M_ids); i++{
 		if this.M_ids[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_ids = values
+	this.setEntity(this)
 }
 
 
@@ -538,10 +512,10 @@ func (this *OAuth2Configuration) SetRefresh(val []*OAuth2Refresh){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_refresh")
-		this.setEntity(val[i])
 		this.M_refresh=append(this.M_refresh, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -551,11 +525,11 @@ func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_refresh")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_refresh = append(this.M_refresh, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveRefresh(val *OAuth2Refresh){
@@ -563,11 +537,10 @@ func (this *OAuth2Configuration) RemoveRefresh(val *OAuth2Refresh){
 	for i:=0; i < len(this.M_refresh); i++{
 		if this.M_refresh[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_refresh = values
+	this.setEntity(this)
 }
 
 
@@ -587,10 +560,10 @@ func (this *OAuth2Configuration) SetExpire(val []*OAuth2Expires){
 	for i:=0; i < len(val); i++{
 		val[i].SetParentUuid(this.UUID)
 		val[i].SetParentLnk("M_expire")
-		this.setEntity(val[i])
 		this.M_expire=append(this.M_expire, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -600,11 +573,11 @@ func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
 			return
 		}
 	}
-	this.NeedSave= true
 	val.SetParentUuid(this.UUID)
 	val.SetParentLnk("M_expire")
-	this.setEntity(val)
+  this.setEntity(val)
 	this.M_expire = append(this.M_expire, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *OAuth2Configuration) RemoveExpire(val *OAuth2Expires){
@@ -612,11 +585,10 @@ func (this *OAuth2Configuration) RemoveExpire(val *OAuth2Expires){
 	for i:=0; i < len(this.M_expire); i++{
 		if this.M_expire[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_expire = values
+	this.setEntity(this)
 }
 
 
@@ -629,8 +601,8 @@ func (this *OAuth2Configuration) GetParentPtr()*Configurations{
 }
 
 func (this *OAuth2Configuration) SetParentPtr(val *Configurations){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

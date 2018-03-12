@@ -78,7 +78,7 @@ function main() {
     server.entityManager.getEntityPrototypes("BPMN20", 
     // success callback
     function(prototypes, caller){
-        server.entityManager.getEntityByUuid("BPMN20.Definitions%f7a5ed3c-3cb3-3220-acf6-0942e5d6cfad", false,
+        server.entityManager.getEntityByUuid("BPMN20.Definitions%a0f982f5-e7d2-3522-9a7e-2422ae200b0a", false,
         // The success callback
         function(definitions, caller){
             console.log(definitions)

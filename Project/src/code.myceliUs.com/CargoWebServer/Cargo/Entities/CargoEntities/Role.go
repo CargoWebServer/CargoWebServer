@@ -16,8 +16,6 @@ type Role struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -53,7 +51,6 @@ func (this *Role) GetUuid() string{
 	return this.UUID
 }
 func (this *Role) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -101,14 +98,6 @@ func (this *Role) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Role) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Role) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Role) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -127,7 +116,6 @@ func (this *Role) GetId()string{
 }
 
 func (this *Role) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -149,8 +137,9 @@ func (this *Role) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -160,8 +149,8 @@ func (this *Role) AppendAccountsRef(val *Account){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Role) RemoveAccountsRef(val *Account){
@@ -169,11 +158,10 @@ func (this *Role) RemoveAccountsRef(val *Account){
 	for i:=0; i < len(this.M_accountsRef); i++{
 		if this.M_accountsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_accountsRef = values
+	this.setEntity(this)
 }
 
 
@@ -192,8 +180,9 @@ func (this *Role) SetActionsRef(val []*Action){
 	this.M_actionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_actionsRef=append(this.M_actionsRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -203,8 +192,8 @@ func (this *Role) AppendActionsRef(val *Action){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_actionsRef = append(this.M_actionsRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Role) RemoveActionsRef(val *Action){
@@ -212,11 +201,10 @@ func (this *Role) RemoveActionsRef(val *Action){
 	for i:=0; i < len(this.M_actionsRef); i++{
 		if this.M_actionsRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_actionsRef = values
+	this.setEntity(this)
 }
 
 
@@ -229,8 +217,8 @@ func (this *Role) GetEntitiesPtr()*Entities{
 }
 
 func (this *Role) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

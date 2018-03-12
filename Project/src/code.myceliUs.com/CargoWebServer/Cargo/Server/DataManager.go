@@ -280,7 +280,6 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
-		storeConfig.NeedSave = true
 		configEntity := GetServer().GetConfigurationManager().m_activeConfigurations
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
 		if err_ != nil {
@@ -296,7 +295,6 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
-		storeConfig.NeedSave = true
 		err := GetServer().GetEntityManager().saveEntity(storeConfig)
 		if err != nil {
 			return nil, err
@@ -1080,7 +1078,6 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 			if reflect.TypeOf(obj).String() == "map[string]interface {}" {
 				entity := NewDynamicEntity()
 				entity.setObject(obj.(map[string]interface{}))
-				entity.setValue("NeedSave", true)
 				entities = append(entities, entity)
 			} else {
 				// In that case I will create a static entity.

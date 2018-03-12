@@ -325,7 +325,6 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.ParentLnk = \"\"\n"
 	constructorSrc += " this.childsUuid = []\n"
 	constructorSrc += " this.references = []\n"
-	constructorSrc += " this.NeedSave = true\n"
 	constructorSrc += " this.IsInit = false\n"
 	constructorSrc += " this.exist = false\n"
 	constructorSrc += " this.initCallback = undefined\n"

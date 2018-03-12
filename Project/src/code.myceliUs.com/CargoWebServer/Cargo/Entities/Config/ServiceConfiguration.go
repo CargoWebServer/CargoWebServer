@@ -16,8 +16,6 @@ type ServiceConfiguration struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -66,7 +64,6 @@ func (this *ServiceConfiguration) GetUuid() string{
 	return this.UUID
 }
 func (this *ServiceConfiguration) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -114,14 +111,6 @@ func (this *ServiceConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *ServiceConfiguration) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *ServiceConfiguration) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ServiceConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -140,7 +129,6 @@ func (this *ServiceConfiguration) GetId()string{
 }
 
 func (this *ServiceConfiguration) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -152,7 +140,6 @@ func (this *ServiceConfiguration) GetHostName()string{
 }
 
 func (this *ServiceConfiguration) SetHostName(val string){
-	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
 
@@ -164,7 +151,6 @@ func (this *ServiceConfiguration) GetIpv4()string{
 }
 
 func (this *ServiceConfiguration) SetIpv4(val string){
-	this.NeedSave = this.M_ipv4== val
 	this.M_ipv4= val
 }
 
@@ -176,7 +162,6 @@ func (this *ServiceConfiguration) GetPort()int{
 }
 
 func (this *ServiceConfiguration) SetPort(val int){
-	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
 
@@ -188,7 +173,6 @@ func (this *ServiceConfiguration) GetUser()string{
 }
 
 func (this *ServiceConfiguration) SetUser(val string){
-	this.NeedSave = this.M_user== val
 	this.M_user= val
 }
 
@@ -200,7 +184,6 @@ func (this *ServiceConfiguration) GetPwd()string{
 }
 
 func (this *ServiceConfiguration) SetPwd(val string){
-	this.NeedSave = this.M_pwd== val
 	this.M_pwd= val
 }
 
@@ -212,7 +195,6 @@ func (this *ServiceConfiguration) IsStart()bool{
 }
 
 func (this *ServiceConfiguration) SetStart(val bool){
-	this.NeedSave = this.M_start== val
 	this.M_start= val
 }
 
@@ -228,8 +210,8 @@ func (this *ServiceConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *ServiceConfiguration) SetParentPtr(val *Configurations){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

@@ -107,7 +107,6 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoConfigDB.M_port = port
 	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoConfigDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
-	cargoConfigDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
 
 	// The cargo entities store config
@@ -119,7 +118,6 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.M_port = port
 	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
-	cargoEntitiesDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
 	// The sql info data store.
@@ -131,7 +129,6 @@ func newConfigurationManager() *ConfigurationManager {
 	sqlInfoDB.M_port = port
 	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	sqlInfoDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
-	sqlInfoDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
 
 	// Create the default configurations
@@ -169,9 +166,6 @@ func (this *ConfigurationManager) initialize() {
 		this.m_activeConfigurations.M_name = "Cargo Default Configurations"
 		this.m_activeConfigurations.M_version = "1.0"
 
-		// Where queries are store by default...
-		this.m_activeConfigurations.NeedSave = true
-
 		// Create the configuration entity from the configuration and save it.
 		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
 
@@ -182,7 +176,6 @@ func (this *ConfigurationManager) initialize() {
 		var serverConfig = new(Config.ServerConfiguration)
 		serverConfig = new(Config.ServerConfiguration)
 		serverConfig.SetUuidGenerator(generateUuidFct)
-		serverConfig.NeedSave = true
 		serverConfig.M_id = "CARGO_DEFAULT_SERVER"
 		serverConfig.M_serverPort = 9393
 		serverConfig.M_serviceContainerPort = 9494
@@ -347,7 +340,6 @@ func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true
-	config.NeedSave = true
 
 	if port == -1 {
 		config.M_port = this.GetServerPort()

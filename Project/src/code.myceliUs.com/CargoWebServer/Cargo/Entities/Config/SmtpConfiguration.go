@@ -16,8 +16,6 @@ type SmtpConfiguration struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -66,7 +64,6 @@ func (this *SmtpConfiguration) GetUuid() string{
 	return this.UUID
 }
 func (this *SmtpConfiguration) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -114,14 +111,6 @@ func (this *SmtpConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *SmtpConfiguration) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *SmtpConfiguration) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *SmtpConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -140,7 +129,6 @@ func (this *SmtpConfiguration) GetId()string{
 }
 
 func (this *SmtpConfiguration) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -152,7 +140,6 @@ func (this *SmtpConfiguration) GetTextEncoding()Encoding{
 }
 
 func (this *SmtpConfiguration) SetTextEncoding(val Encoding){
-	this.NeedSave = this.M_textEncoding== val
 	this.M_textEncoding= val
 }
 
@@ -167,7 +154,6 @@ func (this *SmtpConfiguration) GetHostName()string{
 }
 
 func (this *SmtpConfiguration) SetHostName(val string){
-	this.NeedSave = this.M_hostName== val
 	this.M_hostName= val
 }
 
@@ -179,7 +165,6 @@ func (this *SmtpConfiguration) GetIpv4()string{
 }
 
 func (this *SmtpConfiguration) SetIpv4(val string){
-	this.NeedSave = this.M_ipv4== val
 	this.M_ipv4= val
 }
 
@@ -191,7 +176,6 @@ func (this *SmtpConfiguration) GetPort()int{
 }
 
 func (this *SmtpConfiguration) SetPort(val int){
-	this.NeedSave = this.M_port== val
 	this.M_port= val
 }
 
@@ -203,7 +187,6 @@ func (this *SmtpConfiguration) GetUser()string{
 }
 
 func (this *SmtpConfiguration) SetUser(val string){
-	this.NeedSave = this.M_user== val
 	this.M_user= val
 }
 
@@ -215,7 +198,6 @@ func (this *SmtpConfiguration) GetPwd()string{
 }
 
 func (this *SmtpConfiguration) SetPwd(val string){
-	this.NeedSave = this.M_pwd== val
 	this.M_pwd= val
 }
 
@@ -231,8 +213,8 @@ func (this *SmtpConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *SmtpConfiguration) SetParentPtr(val *Configurations){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

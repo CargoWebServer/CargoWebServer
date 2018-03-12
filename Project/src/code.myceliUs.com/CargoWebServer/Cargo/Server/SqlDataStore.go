@@ -1587,9 +1587,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 					toSave[uuid] = entity
 				} else {
 					entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
-					if entity.IsNeedSave() {
-						toSave[uuid] = entity
-					}
+					toSave[uuid] = entity
 				}
 			}
 		}

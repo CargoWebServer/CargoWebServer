@@ -16,8 +16,6 @@ type Parameter struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -53,7 +51,6 @@ func (this *Parameter) GetUuid() string{
 	return this.UUID
 }
 func (this *Parameter) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -100,14 +97,6 @@ func (this *Parameter) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Parameter) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Parameter) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Parameter) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -126,7 +115,6 @@ func (this *Parameter) GetName()string{
 }
 
 func (this *Parameter) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -138,7 +126,6 @@ func (this *Parameter) GetType()string{
 }
 
 func (this *Parameter) SetType(val string){
-	this.NeedSave = this.M_type== val
 	this.M_type= val
 }
 
@@ -150,7 +137,6 @@ func (this *Parameter) IsArray()bool{
 }
 
 func (this *Parameter) SetIsArray(val bool){
-	this.NeedSave = this.M_isArray== val
 	this.M_isArray= val
 }
 
@@ -166,8 +152,8 @@ func (this *Parameter) GetParametersPtr()*Parameter{
 }
 
 func (this *Parameter) SetParametersPtr(val *Parameter){
-	this.NeedSave = this.M_parametersPtr != val.GetUuid()
 	this.M_parametersPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

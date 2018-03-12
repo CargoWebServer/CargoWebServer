@@ -16,8 +16,6 @@ type TextMessage struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -69,7 +67,6 @@ func (this *TextMessage) GetUuid() string{
 	return this.UUID
 }
 func (this *TextMessage) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -117,14 +114,6 @@ func (this *TextMessage) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *TextMessage) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *TextMessage) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *TextMessage) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -143,7 +132,6 @@ func (this *TextMessage) GetId()string{
 }
 
 func (this *TextMessage) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -155,7 +143,6 @@ func (this *TextMessage) GetBody()string{
 }
 
 func (this *TextMessage) SetBody(val string){
-	this.NeedSave = this.M_body== val
 	this.M_body= val
 }
 
@@ -167,7 +154,6 @@ func (this *TextMessage) GetCreationTime()int64{
 }
 
 func (this *TextMessage) SetCreationTime(val int64){
-	this.NeedSave = this.M_creationTime== val
 	this.M_creationTime= val
 }
 
@@ -183,8 +169,8 @@ func (this *TextMessage) GetFromRef()*Account{
 }
 
 func (this *TextMessage) SetFromRef(val *Account){
-	this.NeedSave = this.M_fromRef != val.GetUuid()
 	this.M_fromRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -202,8 +188,8 @@ func (this *TextMessage) GetToRef()*Account{
 }
 
 func (this *TextMessage) SetToRef(val *Account){
-	this.NeedSave = this.M_toRef != val.GetUuid()
 	this.M_toRef= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -217,7 +203,6 @@ func (this *TextMessage) GetTitle()string{
 }
 
 func (this *TextMessage) SetTitle(val string){
-	this.NeedSave = this.M_title== val
 	this.M_title= val
 }
 
@@ -233,8 +218,8 @@ func (this *TextMessage) GetEntitiesPtr()*Entities{
 }
 
 func (this *TextMessage) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

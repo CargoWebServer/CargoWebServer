@@ -16,8 +16,6 @@ type OAuth2IdToken struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -70,7 +68,6 @@ func (this *OAuth2IdToken) GetUuid() string{
 	return this.UUID
 }
 func (this *OAuth2IdToken) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -118,14 +115,6 @@ func (this *OAuth2IdToken) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *OAuth2IdToken) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *OAuth2IdToken) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2IdToken) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -144,7 +133,6 @@ func (this *OAuth2IdToken) GetIssuer()string{
 }
 
 func (this *OAuth2IdToken) SetIssuer(val string){
-	this.NeedSave = this.M_issuer== val
 	this.M_issuer= val
 }
 
@@ -156,7 +144,6 @@ func (this *OAuth2IdToken) GetId()string{
 }
 
 func (this *OAuth2IdToken) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -172,8 +159,8 @@ func (this *OAuth2IdToken) GetClient()*OAuth2Client{
 }
 
 func (this *OAuth2IdToken) SetClient(val *OAuth2Client){
-	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -187,7 +174,6 @@ func (this *OAuth2IdToken) GetExpiration()int64{
 }
 
 func (this *OAuth2IdToken) SetExpiration(val int64){
-	this.NeedSave = this.M_expiration== val
 	this.M_expiration= val
 }
 
@@ -199,7 +185,6 @@ func (this *OAuth2IdToken) GetIssuedAt()int64{
 }
 
 func (this *OAuth2IdToken) SetIssuedAt(val int64){
-	this.NeedSave = this.M_issuedAt== val
 	this.M_issuedAt= val
 }
 
@@ -211,7 +196,6 @@ func (this *OAuth2IdToken) GetNonce()string{
 }
 
 func (this *OAuth2IdToken) SetNonce(val string){
-	this.NeedSave = this.M_nonce== val
 	this.M_nonce= val
 }
 
@@ -223,7 +207,6 @@ func (this *OAuth2IdToken) GetEmail()string{
 }
 
 func (this *OAuth2IdToken) SetEmail(val string){
-	this.NeedSave = this.M_email== val
 	this.M_email= val
 }
 
@@ -235,7 +218,6 @@ func (this *OAuth2IdToken) IsEmailVerified()bool{
 }
 
 func (this *OAuth2IdToken) SetEmailVerified(val bool){
-	this.NeedSave = this.M_emailVerified== val
 	this.M_emailVerified= val
 }
 
@@ -247,7 +229,6 @@ func (this *OAuth2IdToken) GetName()string{
 }
 
 func (this *OAuth2IdToken) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -259,7 +240,6 @@ func (this *OAuth2IdToken) GetFamilyName()string{
 }
 
 func (this *OAuth2IdToken) SetFamilyName(val string){
-	this.NeedSave = this.M_familyName== val
 	this.M_familyName= val
 }
 
@@ -271,7 +251,6 @@ func (this *OAuth2IdToken) GetGivenName()string{
 }
 
 func (this *OAuth2IdToken) SetGivenName(val string){
-	this.NeedSave = this.M_givenName== val
 	this.M_givenName= val
 }
 
@@ -283,7 +262,6 @@ func (this *OAuth2IdToken) GetLocal()string{
 }
 
 func (this *OAuth2IdToken) SetLocal(val string){
-	this.NeedSave = this.M_local== val
 	this.M_local= val
 }
 
@@ -299,8 +277,8 @@ func (this *OAuth2IdToken) GetParentPtr()*OAuth2Configuration{
 }
 
 func (this *OAuth2IdToken) SetParentPtr(val *OAuth2Configuration){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

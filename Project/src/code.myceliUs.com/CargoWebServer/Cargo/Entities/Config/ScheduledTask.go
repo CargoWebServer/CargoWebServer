@@ -16,8 +16,6 @@ type ScheduledTask struct {
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string) (interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -66,7 +64,6 @@ func (this *ScheduledTask) GetUuid() string {
 	return this.UUID
 }
 func (this *ScheduledTask) SetUuid(uuid string) {
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -115,14 +112,6 @@ func (this *ScheduledTask) GetChilds() []interface{} {
 	return childs
 }
 
-/** Evaluate if an entity needs to be saved. **/
-func (this *ScheduledTask) IsNeedSave() bool {
-	return this.NeedSave
-}
-func (this *ScheduledTask) ResetNeedSave() {
-	this.NeedSave = false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ScheduledTask) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
 	this.getEntityByUuid = fct
@@ -143,7 +132,6 @@ func (this *ScheduledTask) GetId() string {
 }
 
 func (this *ScheduledTask) SetId(val string) {
-	this.NeedSave = this.M_id == val
 	this.M_id = val
 }
 
@@ -152,7 +140,6 @@ func (this *ScheduledTask) IsActive() bool {
 }
 
 func (this *ScheduledTask) SetIsActive(val bool) {
-	this.NeedSave = this.M_isActive == val
 	this.M_isActive = val
 }
 
@@ -161,7 +148,6 @@ func (this *ScheduledTask) GetScript() string {
 }
 
 func (this *ScheduledTask) SetScript(val string) {
-	this.NeedSave = this.M_script == val
 	this.M_script = val
 }
 
@@ -170,7 +156,6 @@ func (this *ScheduledTask) GetStartTime() int64 {
 }
 
 func (this *ScheduledTask) SetStartTime(val int64) {
-	this.NeedSave = this.M_startTime == val
 	this.M_startTime = val
 }
 
@@ -179,7 +164,6 @@ func (this *ScheduledTask) GetExpirationTime() int64 {
 }
 
 func (this *ScheduledTask) SetExpirationTime(val int64) {
-	this.NeedSave = this.M_expirationTime == val
 	this.M_expirationTime = val
 }
 
@@ -188,7 +172,6 @@ func (this *ScheduledTask) GetFrequency() int {
 }
 
 func (this *ScheduledTask) SetFrequency(val int) {
-	this.NeedSave = this.M_frequency == val
 	this.M_frequency = val
 }
 
@@ -197,7 +180,6 @@ func (this *ScheduledTask) GetFrequencyType() FrequencyType {
 }
 
 func (this *ScheduledTask) SetFrequencyType(val FrequencyType) {
-	this.NeedSave = this.M_frequencyType == val
 	this.M_frequencyType = val
 }
 
@@ -215,7 +197,6 @@ func (this *ScheduledTask) SetOffsets(val []int) {
 
 func (this *ScheduledTask) AppendOffsets(val int) {
 	this.M_offsets = append(this.M_offsets, val)
-	this.NeedSave = true
 }
 
 func (this *ScheduledTask) GetParentPtr() *Configurations {
@@ -227,8 +208,8 @@ func (this *ScheduledTask) GetParentPtr() *Configurations {
 }
 
 func (this *ScheduledTask) SetParentPtr(val *Configurations) {
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr = val.GetUuid()
+	this.setEntity(this)
 }
 
 func (this *ScheduledTask) ResetParentPtr() {

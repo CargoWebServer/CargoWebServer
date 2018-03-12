@@ -16,8 +16,6 @@ type ApplicationConfiguration struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -56,7 +54,6 @@ func (this *ApplicationConfiguration) GetUuid() string{
 	return this.UUID
 }
 func (this *ApplicationConfiguration) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -104,14 +101,6 @@ func (this *ApplicationConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *ApplicationConfiguration) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *ApplicationConfiguration) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ApplicationConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -130,7 +119,6 @@ func (this *ApplicationConfiguration) GetId()string{
 }
 
 func (this *ApplicationConfiguration) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -142,7 +130,6 @@ func (this *ApplicationConfiguration) GetIndexPage()string{
 }
 
 func (this *ApplicationConfiguration) SetIndexPage(val string){
-	this.NeedSave = this.M_indexPage== val
 	this.M_indexPage= val
 }
 
@@ -158,8 +145,8 @@ func (this *ApplicationConfiguration) GetParentPtr()*Configurations{
 }
 
 func (this *ApplicationConfiguration) SetParentPtr(val *Configurations){
-	this.NeedSave = this.M_parentPtr != val.GetUuid()
 	this.M_parentPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

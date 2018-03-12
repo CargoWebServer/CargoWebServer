@@ -526,7 +526,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				getterStr += "	for i := 0; i < len(this.M_" + attributeName + "); i++ {\n"
 				getterStr += "		entity, err := this.getEntityByUuid(this.M_" + attributeName + "[i])\n"
 				getterStr += "		if err == nil {\n"
-
 				getterStr += "			values = append( values, entity.("
 				if isPointer == true && !isInterface {
 					getterStr += "*"
@@ -573,9 +572,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		setterStr += "{\n"
 		// The setter function body here.
 		if isPrimitive || enumMap[typeName] != nil {
-			if attribute.Upper != "*" {
-				setterStr += "	this.NeedSave = this.M_" + attributeName + "== val\n"
-			}
 			setterStr += "	this.M_" + attributeName + "= val\n"
 		} else {
 			if attribute.Upper == "*" {
@@ -585,21 +581,20 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					// Set the parent infos in the child.
 					setterStr += "		val[i].SetParentUuid(this.UUID)\n"
 					setterStr += "		val[i].SetParentLnk(\"M_" + attributeName + "\")\n"
-					setterStr += "		this.setEntity(val[i])\n"
 				}
 				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
+				setterStr += "		this.setEntity(val[i])\n"
 				setterStr += "	}\n"
-				setterStr += "	this.NeedSave= true\n"
+				setterStr += "	this.setEntity(this)\n"
 			} else {
-				setterStr += "	this.NeedSave = this.M_" + attributeName + " != val.GetUuid()\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
 					setterStr += "	val.SetParentUuid(this.UUID)\n"
 					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
-					setterStr += "	this.setEntity(val)\n"
+					setterStr += "  this.setEntity(val)\n"
 				}
 				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
-
+				setterStr += "	this.setEntity(this)\n"
 			}
 
 		}
@@ -626,22 +621,20 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			// The append function body here.
 			if isPrimitive {
 				appendStr += "	this.M_" + attributeName + "=append(this.M_" + attributeName + ", val)\n"
-				appendStr += "	this.NeedSave= true\n"
 			} else {
 				appendStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
 				appendStr += "		if this.M_" + attributeName + "[i] == val.GetUuid() {\n"
 				appendStr += "			return\n"
 				appendStr += "		}\n"
 				appendStr += "	}\n"
-				appendStr += "	this.NeedSave= true\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
 					appendStr += "	val.SetParentUuid(this.UUID)\n"
 					appendStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
-					appendStr += "	this.setEntity(val)\n"
+					appendStr += "  this.setEntity(val)\n"
 				}
-
 				appendStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
+				appendStr += "	this.setEntity(this)\n"
 			}
 			appendStr += "}\n"
 		}
@@ -684,11 +677,10 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					removerStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
 					removerStr += "		if this.M_" + attributeName + "[i] != val.GetUuid() {\n"
 					removerStr += "			values = append(values, val.GetUuid())\n"
-					removerStr += "		}else{\n"
-					removerStr += "			this.NeedSave = true\n"
 					removerStr += "		}\n"
 					removerStr += "	}\n"
 					removerStr += "	this.M_" + attributeName + " = values\n"
+					removerStr += "	this.setEntity(this)\n"
 				}
 			} else {
 				if enumMap[typeName] != nil {
@@ -781,16 +773,6 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	GetChilds() []interface{}\n\n"
 
 	classStr += "	/**\n"
-	classStr += "	 * Evaluate if an entity needs to be saved.\n"
-	classStr += "	 */\n"
-	classStr += "	IsNeedSave() bool\n\n"
-
-	classStr += "	/**\n"
-	classStr += "	 * Set the need save state to false.\n"
-	classStr += "	 */\n\n"
-	classStr += "	ResetNeedSave()\n\n"
-
-	classStr += "	/**\n"
 	classStr += "	 * Set the function GetEntityByUuid as a pointer. The entity manager can't\n"
 	classStr += "	 * be access by Entities package...\n"
 	classStr += "	 */\n"
@@ -837,8 +819,6 @@ func generateGoClassCode(packageId string) {
 				classStr += "	ParentUuid string\n"
 				classStr += "	/** The relation name with the parent. **/\n"
 				classStr += "	ParentLnk string\n"
-				classStr += "	/** If the entity value has change... **/\n"
-				classStr += "	NeedSave bool\n"
 				classStr += "	/** Get entity by uuid function **/\n"
 				classStr += "	getEntityByUuid func(string)(interface{}, error)\n"
 				classStr += "	/** Use to put the entity in the cache **/\n"
@@ -891,7 +871,6 @@ func generateGoClassCode(packageId string) {
 				classStr += "}\n"
 
 				classStr += "func (this *" + className + ") SetUuid(uuid string){\n"
-				classStr += "	this.NeedSave = this.UUID == uuid\n"
 				classStr += "	this.UUID = uuid\n"
 				classStr += "}\n\n"
 
@@ -956,7 +935,38 @@ func generateGoClassCode(packageId string) {
 				classStr += "/** Return it relation with it parent, only one parent is possible by entity. **/\n"
 				classStr += "func (this *" + className + ") GetChilds() []interface{}{\n"
 				classStr += "	var childs []interface{}\n"
+
 				hasChild := false
+				for j := 0; j < len(superClasses); j++ {
+					superClass := classesMap[superClasses[j]]
+					for k := 0; k < len(superClass.Attributes); k++ {
+						attribute := superClass.Attributes[k]
+						typeName, isPrimitive, _ := getAttributeTypeName(&attribute)
+						if !isPrimitive && enumMap[typeName] == nil && !IsRef(&attribute) {
+							if !hasChild {
+								classStr += "	var child interface{}\n"
+								classStr += "	var err error\n"
+								hasChild = true
+							}
+							if attribute.Upper == "*" {
+								// Here The attribute is an array
+								classStr += "	for i:=0; i < len(this.M_" + attribute.Name + "); i++ {\n"
+								classStr += "		child, err = this.getEntityByUuid( this.M_" + attribute.Name + "[i])\n"
+								classStr += "		if err == nil {\n"
+								classStr += "			childs = append( childs, child)\n"
+								classStr += "		}\n"
+								classStr += "	}\n"
+							} else {
+								// Here the attribute is not an array....
+								classStr += "	child, err = this.getEntityByUuid( this.M_" + attribute.Name + ")\n"
+								classStr += "	if err == nil {\n"
+								classStr += "		childs = append( childs, child)\n"
+								classStr += "	}\n"
+							}
+						}
+					}
+				}
+
 				for j := 0; j < len(class.Attributes); j++ {
 					attribute := class.Attributes[j]
 					typeName, isPrimitive, _ := getAttributeTypeName(&attribute)
@@ -986,14 +996,6 @@ func generateGoClassCode(packageId string) {
 
 				classStr += "	return childs\n"
 				classStr += "}\n"
-
-				classStr += "/** Evaluate if an entity needs to be saved. **/\n"
-				classStr += "func (this *" + className + ") IsNeedSave() bool{\n"
-				classStr += "	return this.NeedSave\n"
-				classStr += "}\n"
-				classStr += "func (this *" + className + ") ResetNeedSave(){\n"
-				classStr += "	this.NeedSave=false\n"
-				classStr += "}\n\n"
 
 				classStr += "/** Give access to entity manager GetEntityByUuid function from Entities package. **/\n"
 				classStr += "func (this *" + className + ") SetEntityGetter(fct func(uuid string)(interface{}, error)){\n"

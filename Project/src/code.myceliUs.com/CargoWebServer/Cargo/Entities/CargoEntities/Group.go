@@ -16,8 +16,6 @@ type Group struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -58,7 +56,6 @@ func (this *Group) GetUuid() string{
 	return this.UUID
 }
 func (this *Group) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -106,14 +103,6 @@ func (this *Group) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *Group) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *Group) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Group) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -132,7 +121,6 @@ func (this *Group) GetId()string{
 }
 
 func (this *Group) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -144,7 +132,6 @@ func (this *Group) GetName()string{
 }
 
 func (this *Group) SetName(val string){
-	this.NeedSave = this.M_name== val
 	this.M_name= val
 }
 
@@ -166,8 +153,9 @@ func (this *Group) SetMembersRef(val []*User){
 	this.M_membersRef= make([]string,0)
 	for i:=0; i < len(val); i++{
 		this.M_membersRef=append(this.M_membersRef, val[i].GetUuid())
+		this.setEntity(val[i])
 	}
-	this.NeedSave= true
+	this.setEntity(this)
 }
 
 
@@ -177,8 +165,8 @@ func (this *Group) AppendMembersRef(val *User){
 			return
 		}
 	}
-	this.NeedSave= true
 	this.M_membersRef = append(this.M_membersRef, val.GetUuid())
+	this.setEntity(this)
 }
 
 func (this *Group) RemoveMembersRef(val *User){
@@ -186,11 +174,10 @@ func (this *Group) RemoveMembersRef(val *User){
 	for i:=0; i < len(this.M_membersRef); i++{
 		if this.M_membersRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_membersRef = values
+	this.setEntity(this)
 }
 
 
@@ -203,8 +190,8 @@ func (this *Group) GetEntitiesPtr()*Entities{
 }
 
 func (this *Group) SetEntitiesPtr(val *Entities){
-	this.NeedSave = this.M_entitiesPtr != val.GetUuid()
 	this.M_entitiesPtr= val.GetUuid()
+	this.setEntity(this)
 }
 
 

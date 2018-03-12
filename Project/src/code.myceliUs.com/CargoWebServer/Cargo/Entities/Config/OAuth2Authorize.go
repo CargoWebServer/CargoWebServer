@@ -16,8 +16,6 @@ type OAuth2Authorize struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
-	/** If the entity value has change... **/
-	NeedSave bool
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -58,7 +56,6 @@ func (this *OAuth2Authorize) GetUuid() string{
 	return this.UUID
 }
 func (this *OAuth2Authorize) SetUuid(uuid string){
-	this.NeedSave = this.UUID == uuid
 	this.UUID = uuid
 }
 
@@ -106,14 +103,6 @@ func (this *OAuth2Authorize) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
-/** Evaluate if an entity needs to be saved. **/
-func (this *OAuth2Authorize) IsNeedSave() bool{
-	return this.NeedSave
-}
-func (this *OAuth2Authorize) ResetNeedSave(){
-	this.NeedSave=false
-}
-
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Authorize) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -132,7 +121,6 @@ func (this *OAuth2Authorize) GetId()string{
 }
 
 func (this *OAuth2Authorize) SetId(val string){
-	this.NeedSave = this.M_id== val
 	this.M_id= val
 }
 
@@ -148,8 +136,8 @@ func (this *OAuth2Authorize) GetClient()*OAuth2Client{
 }
 
 func (this *OAuth2Authorize) SetClient(val *OAuth2Client){
-	this.NeedSave = this.M_client != val.GetUuid()
 	this.M_client= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -163,7 +151,6 @@ func (this *OAuth2Authorize) GetExpiresIn()int64{
 }
 
 func (this *OAuth2Authorize) SetExpiresIn(val int64){
-	this.NeedSave = this.M_expiresIn== val
 	this.M_expiresIn= val
 }
 
@@ -175,7 +162,6 @@ func (this *OAuth2Authorize) GetScope()string{
 }
 
 func (this *OAuth2Authorize) SetScope(val string){
-	this.NeedSave = this.M_scope== val
 	this.M_scope= val
 }
 
@@ -187,7 +173,6 @@ func (this *OAuth2Authorize) GetRedirectUri()string{
 }
 
 func (this *OAuth2Authorize) SetRedirectUri(val string){
-	this.NeedSave = this.M_redirectUri== val
 	this.M_redirectUri= val
 }
 
@@ -199,7 +184,6 @@ func (this *OAuth2Authorize) GetState()string{
 }
 
 func (this *OAuth2Authorize) SetState(val string){
-	this.NeedSave = this.M_state== val
 	this.M_state= val
 }
 
@@ -215,8 +199,8 @@ func (this *OAuth2Authorize) GetUserData()*OAuth2IdToken{
 }
 
 func (this *OAuth2Authorize) SetUserData(val *OAuth2IdToken){
-	this.NeedSave = this.M_userData != val.GetUuid()
 	this.M_userData= val.GetUuid()
+	this.setEntity(this)
 }
 
 
@@ -230,7 +214,6 @@ func (this *OAuth2Authorize) GetCreatedAt()int64{
 }
 
 func (this *OAuth2Authorize) SetCreatedAt(val int64){
-	this.NeedSave = this.M_createdAt== val
 	this.M_createdAt= val
 }
 
