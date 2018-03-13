@@ -117,6 +117,11 @@ func (this *DataStoreConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *DataStoreConfiguration) GetChildsUuid() []string{
+	var childs []string
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *DataStoreConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct

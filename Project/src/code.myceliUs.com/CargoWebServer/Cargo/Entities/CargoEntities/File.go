@@ -130,6 +130,12 @@ func (this *File) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *File) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_files...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *File) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -267,7 +273,7 @@ func (this *File) GetFiles()[]*File{
 func (this *File) SetFiles(val []*File){
 	this.M_files= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_files")
 		this.M_files=append(this.M_files, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -282,7 +288,7 @@ func (this *File) AppendFiles(val *File){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_files")
   this.setEntity(val)
 	this.M_files = append(this.M_files, val.GetUuid())

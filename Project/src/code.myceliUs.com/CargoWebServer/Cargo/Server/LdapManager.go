@@ -521,6 +521,9 @@ func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *C
 			computer.M_osType = CargoEntities.OsType_Unknown
 			computer.M_platformType = CargoEntities.PlatformType_Unknown
 			computer.M_ipv4 = "127.0.0.1"
+			computer.SetEntityGetter(getEntityFct)
+			computer.SetEntitySetter(setEntityFct)
+			computer.SetUuidGenerator(generateUuidFct)
 			return computer, nil
 		}
 	}

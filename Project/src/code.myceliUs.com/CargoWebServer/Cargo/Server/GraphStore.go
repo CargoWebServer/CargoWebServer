@@ -1705,9 +1705,9 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 	}
 
 	// The triples to save...
-	for i := 0; i < len(triples); i++ {
+	/*for i := 0; i < len(triples); i++ {
 		log.Println("------> save triple ", triples[i])
-	}
+	}*/
 
 	return
 }
@@ -2057,9 +2057,9 @@ func (this *GraphStore) Update(queryStr string, triples []interface{}, params []
 	}
 
 	// The triples to save...
-	for i := 0; i < len(triples); i++ {
+	/*for i := 0; i < len(triples); i++ {
 		log.Println("------> save triple ", triples[i])
-	}
+	}*/
 
 	return
 }
@@ -2151,7 +2151,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		log.Println("remove triple: ", triples[i])
+		//log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {

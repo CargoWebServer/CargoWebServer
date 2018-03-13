@@ -110,6 +110,12 @@ func (this *Log) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *Log) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_entries...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Log) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -148,7 +154,7 @@ func (this *Log) GetEntries()[]*LogEntry{
 func (this *Log) SetEntries(val []*LogEntry){
 	this.M_entries= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entries")
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -163,7 +169,7 @@ func (this *Log) AppendEntries(val *LogEntry){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_entries")
   this.setEntity(val)
 	this.M_entries = append(this.M_entries, val.GetUuid())

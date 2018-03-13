@@ -55,7 +55,7 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	// The factory is created in the BPMS package...
 	factoryStr := "type " + name + "XmlFactory struct {\n"
 	// The map of reference by id...
-	factoryStr += "	m_references map[string] interface{}\n"
+	factoryStr += "	m_references map[string] string\n"
 	// That contain, the map of owner id -> the map of properties, the list of ref id to set.
 	factoryStr += "	m_object map[string]map[string][]string\n"
 	factoryStr += "	m_getEntityByUuid func(string)(interface{}, error)\n"
@@ -100,26 +100,31 @@ func generateGoXmlFactory(rootElementId string, packName string, outputPath stri
 	factoryStr += "	if err := decoder.Decode(xmlElement); err != nil {\n"
 	factoryStr += "		return err\n"
 	factoryStr += "	}\n"
-	factoryStr += "	this.m_references = make(map[string] interface{}, 0)\n"
+	factoryStr += "	this.m_references = make(map[string] string, 0)\n"
 	factoryStr += "	this.m_object = make(map[string]map[string][]string, 0)\n"
 	// So here I will call the generate function...
 	factoryStr += "	this.Init" + strings.ToUpper(elementType[0:1]) + elementType[1:] + "(\"\", xmlElement, object)\n"
 	// Now I will set the reference inside the model...
 	factoryStr += "	for ref0, refMap := range this.m_object {\n"
-	factoryStr += "		refOwner := this.m_references[ref0]\n"
+	factoryStr += "		refOwner, _:= this.m_getEntityByUuid(this.m_references[ref0])\n"
 	factoryStr += "		if refOwner != nil {\n"
 	factoryStr += "			for ref1, _ := range refMap {\n"
 	factoryStr += "				refs := refMap[ref1]\n"
 	factoryStr += "				for i:=0; i<len(refs); i++{\n"
-	factoryStr += "					ref:= this.m_references[refs[i]]\n"
+	factoryStr += "					ref, _:= this.m_getEntityByUuid(this.m_references[refs[i]])\n"
 	factoryStr += "					if  ref != nil {\n"
-	factoryStr += "						params := make([]interface {},0)\n"
-	factoryStr += "						params = append(params,ref)\n"
-	factoryStr += "						Utility.CallMethod(refOwner, ref1, params )\n"
+	factoryStr += "						_, err := Utility.CallMethod(refOwner, ref1, []interface{}{ref})\n"
+	factoryStr += "						if err != nil {\n"
+	factoryStr += "							Utility.CallMethod(refOwner, ref1, []interface{}{this.m_references[refs[i]]})\n"
+	factoryStr += "						}\n"
+	factoryStr += "						this.m_setEntity(refOwner)\n"
 	factoryStr += "					}else{\n"
-	factoryStr += "						params := make([]interface {},0)\n"
-	factoryStr += "						params = append(params,refs[i])\n"
-	factoryStr += "						Utility.CallMethod(refOwner, ref1, params)\n"
+	factoryStr += "						ref, _:= this.m_getEntityByUuid(refs[i])\n"
+	factoryStr += "						_, err := Utility.CallMethod(refOwner, ref1, []interface{}{ref})\n"
+	factoryStr += "						if err != nil {\n"
+	factoryStr += "							Utility.CallMethod(refOwner, ref1, []interface{}{refs[i]})\n"
+	factoryStr += "						}\n"
+	factoryStr += "						this.m_setEntity(refOwner)\n"
 	factoryStr += "					}\n"
 	factoryStr += "				}\n"
 	factoryStr += "			}\n"
@@ -351,6 +356,7 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 				}
 			}
 		}
+
 		// The attributes
 		if complexElement.Attributes != nil {
 			// Now it list of complexElement...
@@ -379,16 +385,16 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 			if hasId(member) {
 				// Set the element ref by id...
 				elementParserFunctionContentStr += "	if len(object.M_id) > 0 {\n"
-				elementParserFunctionContentStr += "		this.m_references[object.M_id] = object\n"
+				elementParserFunctionContentStr += "		this.m_references[object.M_id] = object.GetUuid()\n"
 				elementParserFunctionContentStr += "	}\n"
 			} else if hasName(member) {
 				// Set the element ref by id...
 				elementParserFunctionContentStr += "	if len(object.M_name) > 0 {\n"
-				elementParserFunctionContentStr += "		this.m_references[object.M_name] = object\n"
+				elementParserFunctionContentStr += "		this.m_references[object.M_name] = object.GetUuid()\n"
 				elementParserFunctionContentStr += "	}\n"
 			} else {
 				// Set element ref by type
-				elementParserFunctionContentStr += "	this.m_references[object.GetUuid()] = object\n"
+				elementParserFunctionContentStr += "	this.m_references[object.GetUuid()] = object.GetUuid()\n"
 			}
 		}
 
@@ -726,6 +732,11 @@ func generateGoXmlFactoryElementAttribute(attribute *XML_Schemas.XSD_Attribute, 
 					attributeInitialisationStr += "\n	/** " + elementType + " **/\n"
 					if isInitialisation {
 						attributeInitialisationStr += "	object.M_" + attribute.Name + "= xmlElement." + "M_" + attribute.Name + "\n"
+						if attribute.Name == "id" {
+							attributeInitialisationStr += "	if len(object.M_" + attribute.Name + ")==0 {\n"
+							attributeInitialisationStr += "		object.Set" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + "(Utility.RandomUUID())\n"
+							attributeInitialisationStr += "	}\n"
+						}
 					} else {
 						attributeInitialisationStr += "	xmlElement.M_" + attribute.Name + "= object." + "M_" + attribute.Name + "\n"
 					}
@@ -792,22 +803,18 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		bpmnElementStr := ""
 		if isInitialisation {
 			bpmnElementStr = "	/** Init bpmnElement **/\n"
-			bpmnElementStr += "	if len(object.M_id) == 0{\n"
-			bpmnElementStr += "		this.m_references[object.GetUuid()] = object\n"
-			bpmnElementStr += "	}\n"
 			bpmnElementStr += "	if len(xmlElement.M_bpmnElement)>0{\n"
 			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id]; !ok {\n"
 			bpmnElementStr += "			this.m_object[object.M_id]=make(map[string][]string)\n"
 			bpmnElementStr += "		}\n"
 			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id][\"SetBpmnElement\"]; !ok {\n"
-			bpmnElementStr += "			this.m_object[object.M_id][\"bpmnElement\"]=make([]string,0)\n"
+			bpmnElementStr += "			this.m_object[object.M_id][\"SetBpmnElement\"]=make([]string,0)\n"
 			bpmnElementStr += "		}\n"
 			bpmnElementStr += "		this.m_object[object.M_id][\"SetBpmnElement\"] = append(this.m_object[object.M_id][\"SetBpmnElement\"], xmlElement.M_bpmnElement)\n"
-			bpmnElementStr += "		object.M_bpmnElement =  xmlElement.M_bpmnElement\n"
 			bpmnElementStr += "	}\n"
 		} else {
 			bpmnElementStr = "	/** bpmnElement **/\n"
-			bpmnElementStr += "	xmlElement.M_bpmnElement = object.M_bpmnElement.(string)\n"
+			bpmnElementStr += "	xmlElement.M_bpmnElement = object.M_bpmnElement\n"
 		}
 		return bpmnElementStr
 	}
@@ -829,7 +836,7 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		// attributeInitialisationStr += "	object.M_" + attributeName + " = xmlElement.M_" + attributeName + "\n"
 		attributeInitialisationStr += "\n	/** Init ref " + attributeName + " **/\n"
 		attributeInitialisationStr += "	if len(" + mapMemberId + ") == 0 {\n"
-		attributeInitialisationStr += "		this.m_references[object.GetUuid()] = object\n"
+		attributeInitialisationStr += "		this.m_references[object.GetUuid()] = object.GetUuid()\n"
 
 		attributeInitialisationStr += "	}\n"
 		attributeInitialisationStr += "	if _, ok:= this.m_object[" + mapMemberId + "]; !ok {\n"
@@ -1092,7 +1099,7 @@ func generateGoXmlFactoryElementSeiralizeFunction(element *XML_Schemas.XSD_Eleme
 		// A little exception here for the expression class...
 		if elementType == "Expression" || elementType == "FormalExpression" {
 			elementFunctionStr += "	/** other content **/\n"
-			elementFunctionStr += "	exprStr := object.GetOther().(string)\n"
+			elementFunctionStr += "	exprStr := object.GetOther()\n"
 			elementFunctionStr += "	xmlElement.M_other = exprStr\n"
 		}
 

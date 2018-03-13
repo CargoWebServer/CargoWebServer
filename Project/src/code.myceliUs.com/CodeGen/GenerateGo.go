@@ -579,7 +579,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				setterStr += "	for i:=0; i < len(val); i++{\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
-					setterStr += "		val[i].SetParentUuid(this.UUID)\n"
+					setterStr += "		val[i].SetParentUuid(this.GetUuid())\n"
 					setterStr += "		val[i].SetParentLnk(\"M_" + attributeName + "\")\n"
 				}
 				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
@@ -589,7 +589,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			} else {
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
-					setterStr += "	val.SetParentUuid(this.UUID)\n"
+					setterStr += "	val.SetParentUuid(this.GetUuid())\n"
 					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
 					setterStr += "  this.setEntity(val)\n"
 				}
@@ -629,7 +629,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				appendStr += "	}\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
 					// Set the parent infos in the child.
-					appendStr += "	val.SetParentUuid(this.UUID)\n"
+					appendStr += "	val.SetParentUuid(this.GetUuid())\n"
 					appendStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
 					appendStr += "  this.setEntity(val)\n"
 				}
@@ -762,6 +762,11 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	SetParentUuid(uuid string)\n\n"
 
 	classStr += "	/**\n"
+	classStr += "	 * Get an entity's parent pointer.\n"
+	classStr += "	 */\n"
+	classStr += "	 GetParent() interface{}\n\n"
+
+	classStr += "	/**\n"
 	classStr += "	 * The name of the relation with it parent.\n"
 	classStr += "	 */\n"
 	classStr += "	GetParentLnk() string\n"
@@ -771,6 +776,11 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	 * Return link to entity childs.\n"
 	classStr += "	 */\n"
 	classStr += "	GetChilds() []interface{}\n\n"
+
+	classStr += "	/**\n"
+	classStr += "	 * Return list of childs uuid.\n"
+	classStr += "	 */\n"
+	classStr += "	GetChildsUuid() []string\n\n"
 
 	classStr += "	/**\n"
 	classStr += "	 * Set the function GetEntityByUuid as a pointer. The entity manager can't\n"
@@ -990,6 +1000,44 @@ func generateGoClassCode(packageId string) {
 							classStr += "	if err == nil {\n"
 							classStr += "		childs = append( childs, child)\n"
 							classStr += "	}\n"
+						}
+					}
+				}
+
+				classStr += "	return childs\n"
+				classStr += "}\n"
+
+				classStr += "/** Return the list of all childs uuid **/\n"
+				classStr += "func (this *" + className + ") GetChildsUuid() []string{\n"
+				classStr += "	var childs []string\n"
+
+				for j := 0; j < len(superClasses); j++ {
+					superClass := classesMap[superClasses[j]]
+					for k := 0; k < len(superClass.Attributes); k++ {
+						attribute := superClass.Attributes[k]
+						typeName, isPrimitive, _ := getAttributeTypeName(&attribute)
+						if !isPrimitive && enumMap[typeName] == nil && !IsRef(&attribute) {
+							if attribute.Upper == "*" {
+								// Here The attribute is an array
+								classStr += "	childs = append( childs, this.M_" + attribute.Name + "...)\n"
+							} else {
+								// Here the attribute is not an array....
+								classStr += "	childs = append( childs, this.M_" + attribute.Name + ")\n"
+							}
+						}
+					}
+				}
+
+				for j := 0; j < len(class.Attributes); j++ {
+					attribute := class.Attributes[j]
+					typeName, isPrimitive, _ := getAttributeTypeName(&attribute)
+					if !isPrimitive && enumMap[typeName] == nil && !IsRef(&attribute) {
+						if attribute.Upper == "*" {
+							// Here The attribute is an array
+							classStr += "	childs = append( childs, this.M_" + attribute.Name + "...)\n"
+						} else {
+							// Here the attribute is not an array....
+							classStr += "	childs = append( childs, this.M_" + attribute.Name + ")\n"
 						}
 					}
 				}

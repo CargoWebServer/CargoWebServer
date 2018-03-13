@@ -18,7 +18,7 @@ var InstanceListView = function (parent, svgDiagram) {
 			break
 		}
 	}
-	console.log(bpmnProcess)
+
 	if(bpmnProcess != null){
 		server.workflowProcessor.getActiveProcessInstances(bpmnProcess.UUID, 
 		// Success callback...

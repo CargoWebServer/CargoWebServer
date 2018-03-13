@@ -112,6 +112,12 @@ func (this *ScheduledTask) GetChilds() []interface{} {
 	return childs
 }
 
+/** Return the list of all childs uuid **/
+func (this *ScheduledTask) GetChildsUuid() []string {
+	var childs []string
+	return childs
+}
+
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ScheduledTask) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
 	this.getEntityByUuid = fct

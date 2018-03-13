@@ -129,6 +129,13 @@ func (this *Account) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *Account) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_sessions...)
+	childs = append( childs, this.M_messages...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Account) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -200,7 +207,7 @@ func (this *Account) GetSessions()[]*Session{
 func (this *Account) SetSessions(val []*Session){
 	this.M_sessions= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_sessions")
 		this.M_sessions=append(this.M_sessions, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -215,7 +222,7 @@ func (this *Account) AppendSessions(val *Session){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_sessions")
   this.setEntity(val)
 	this.M_sessions = append(this.M_sessions, val.GetUuid())
@@ -248,7 +255,7 @@ func (this *Account) GetMessages()[]Message{
 func (this *Account) SetMessages(val []Message){
 	this.M_messages= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_messages")
 		this.M_messages=append(this.M_messages, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -263,7 +270,7 @@ func (this *Account) AppendMessages(val Message){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_messages")
   this.setEntity(val)
 	this.M_messages = append(this.M_messages, val.GetUuid())

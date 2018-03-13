@@ -2,7 +2,8 @@ package Utility
 
 import (
 	"errors"
-	//"log"
+	"log"
+	"os"
 	"reflect"
 	"strconv"
 )
@@ -60,6 +61,7 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 	}
 
 	in := make([]reflect.Value, len(params))
+	index := 0
 	for k, param := range params {
 		if param != nil {
 			in[k] = reflect.ValueOf(param)
@@ -67,25 +69,48 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			var nilVal interface{}
 			in[k] = reflect.ValueOf(&nilVal).Elem()
 		}
+		index++
 	}
 
 	if finalMethod.IsValid() {
-
-		results := finalMethod.Call(in)
-		if len(results) > 0 {
-			if len(results) == 1 {
-				// One result here...
-				switch goError := results[0].Interface().(type) {
-				case error:
-					return nil, goError
+		// here because the method call can cause panic I will not call
+		// it directly...
+		wait := make(chan []interface{})
+		go func(wait chan []interface{}) {
+			var results_ []interface{}
+			// In case of error.
+			defer func(wait chan []interface{}, results *[]interface{}) { //catch or finally
+				if err := recover(); err != nil { //catch
+					log.Println(os.Stderr, "Exception: %v\n", err)
+					*results = []interface{}{nil, err}
 				}
+				wait <- *results
+			}(wait, &results_)
 
-				return results[0].Interface(), nil
-			} else if len(results) == 2 {
-				// Return the result and the error after.
-				return results[0].Interface(), results[1].Interface()
+			results := finalMethod.Call(in)
+			if len(results) > 0 {
+				if len(results) == 1 {
+					// One result here...
+					switch goError := results[0].Interface().(type) {
+					case error:
+						results_ = []interface{}{nil, goError}
+						return
+					}
+					results_ = []interface{}{results[0].Interface(), nil}
+					return
+				} else if len(results) == 2 {
+					// Return the result and the error after.
+					results_ = []interface{}{results[0].Interface(), results[1].Interface()}
+					return
+				}
 			}
-		}
+			results_ = []interface{}{"", nil}
+		}(wait)
+
+		// wait for the results...
+		results := <-wait
+		return results[0], results[1]
+
 	} else {
 		return nil, errors.New("Method dosen't exist!")
 	}

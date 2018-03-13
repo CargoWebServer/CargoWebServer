@@ -70,6 +70,11 @@ type Entity interface {
 	 */
 	GetChilds() []interface{}
 
+	/**
+	 * Return the list of childs uuid's
+	 */
+	GetChildsUuid() []string
+
 	// External function linking...
 
 	/**

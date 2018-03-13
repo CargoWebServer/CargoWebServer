@@ -157,6 +157,19 @@ func (this *Configurations) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *Configurations) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_serverConfig)
+	childs = append( childs, this.M_oauth2Configuration)
+	childs = append( childs, this.M_serviceConfigs...)
+	childs = append( childs, this.M_dataStoreConfigs...)
+	childs = append( childs, this.M_smtpConfigs...)
+	childs = append( childs, this.M_ldapConfigs...)
+	childs = append( childs, this.M_applicationConfigs...)
+	childs = append( childs, this.M_scheduledTasks...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Configurations) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -212,7 +225,7 @@ func (this *Configurations) GetServerConfig()*ServerConfiguration{
 }
 
 func (this *Configurations) SetServerConfig(val *ServerConfiguration){
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_serverConfig")
   this.setEntity(val)
 	this.M_serverConfig= val.GetUuid()
@@ -234,7 +247,7 @@ func (this *Configurations) GetOauth2Configuration()*OAuth2Configuration{
 }
 
 func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_oauth2Configuration")
   this.setEntity(val)
 	this.M_oauth2Configuration= val.GetUuid()
@@ -261,7 +274,7 @@ func (this *Configurations) GetServiceConfigs()[]*ServiceConfiguration{
 func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
 	this.M_serviceConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_serviceConfigs")
 		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -276,7 +289,7 @@ func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_serviceConfigs")
   this.setEntity(val)
 	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
@@ -309,7 +322,7 @@ func (this *Configurations) GetDataStoreConfigs()[]*DataStoreConfiguration{
 func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
 	this.M_dataStoreConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_dataStoreConfigs")
 		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -324,7 +337,7 @@ func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_dataStoreConfigs")
   this.setEntity(val)
 	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
@@ -357,7 +370,7 @@ func (this *Configurations) GetSmtpConfigs()[]*SmtpConfiguration{
 func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
 	this.M_smtpConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_smtpConfigs")
 		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -372,7 +385,7 @@ func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_smtpConfigs")
   this.setEntity(val)
 	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
@@ -405,7 +418,7 @@ func (this *Configurations) GetLdapConfigs()[]*LdapConfiguration{
 func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
 	this.M_ldapConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_ldapConfigs")
 		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -420,7 +433,7 @@ func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_ldapConfigs")
   this.setEntity(val)
 	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
@@ -453,7 +466,7 @@ func (this *Configurations) GetApplicationConfigs()[]*ApplicationConfiguration{
 func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguration){
 	this.M_applicationConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_applicationConfigs")
 		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -468,7 +481,7 @@ func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfigurati
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_applicationConfigs")
   this.setEntity(val)
 	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
@@ -501,7 +514,7 @@ func (this *Configurations) GetScheduledTasks()[]*ScheduledTask{
 func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
 	this.M_scheduledTasks= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_scheduledTasks")
 		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -516,7 +529,7 @@ func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_scheduledTasks")
   this.setEntity(val)
 	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())

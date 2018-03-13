@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
@@ -49,6 +48,7 @@ var setEntityFct func(interface{})
 // Function to set the entity uuid.
 var (
 	generateUuidFct = func(entity interface{}) string {
+		// Here If the entity id's is not set I will set it...
 		uuid := generateEntityUuid(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids())
 		return uuid
 	}
@@ -62,26 +62,15 @@ func generateEntityUuid(typeName string, parentUuid string, ids []interface{}) s
 	}
 
 	var keyInfo string
+	keyInfo = typeName + ":"
+
 	if len(parentUuid) > 0 {
 		keyInfo += parentUuid + ":"
 	}
 
-	keyInfo = typeName + ":"
 	for i := 0; i < len(ids); i++ {
 		if ids[i] != nil {
-			if reflect.TypeOf(ids[i]).Kind() == reflect.String {
-				keyInfo += ids[i].(string)
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
-				keyInfo += strconv.Itoa(ids[i].(int))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
-				keyInfo += strconv.Itoa(int(ids[i].(int8)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
-				keyInfo += strconv.Itoa(int(ids[i].(int16)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
-				keyInfo += strconv.Itoa(int(ids[i].(int32)))
-			} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
-				keyInfo += strconv.Itoa(int(ids[i].(int64)))
-			}
+			keyInfo += Utility.ToString(ids[i])
 			// Append underscore for readability in case of problem...
 			if i < len(ids)-1 {
 				keyInfo += "_"
@@ -190,7 +179,7 @@ func newEntityManager() *EntityManager {
 								entities = append(entities, entity)
 							}
 						} else {
-							log.Panicln("--> go error ", err)
+							log.Println("--> go error ", entityInfo.uuid, err)
 						}
 					}
 					entityInfo.entities <- entities
@@ -726,40 +715,58 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 }
 
 func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *CargoEntities.Error {
+
 	var parent Entity
 	var cargoError *CargoEntities.Error
 	var parentPrototype *EntityPrototype
+
+	parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
+	parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
+	fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
+	if cargoError != nil {
+		return cargoError
+	}
+
 	// Get values as map[string]interface{} and also set the entity in it parent.
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
-		if cargoError != nil {
-			return cargoError
-		}
-
-		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
-		fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
-
 		if strings.HasPrefix(fieldType, "[]") {
+			childs := parent.(*DynamicEntity).getValue(entity.GetParentLnk())
+			if childs != nil {
+				for i := 0; i < len(childs.([]string)); i++ {
+					if childs.([]string)[i] == entity.GetUuid() {
+						return nil
+					}
+				}
+			}
 			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		} else {
+			child := parent.(*DynamicEntity).getValue(entity.GetParentLnk())
+			if child != nil {
+				if child.(string) == entity.GetUuid() {
+					return nil
+				}
+			}
 			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		}
 	} else {
-
-		parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
-		if cargoError != nil {
-			return cargoError
-		}
-		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
-		fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
-
 		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
 		if strings.HasPrefix(fieldType, "[]") {
+			r := reflect.ValueOf(parent)
+			f := reflect.Indirect(r).FieldByName(entity.GetParentLnk())
+			for i := 0; i < f.Len(); i++ {
+				if f.Index(i).String() == entity.GetUuid() {
+					return nil
+				}
+			}
 			setMethodName = "Append" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
 		} else {
+			r := reflect.ValueOf(parent)
+			f := reflect.Indirect(r).FieldByName(entity.GetParentLnk())
+			if f.String() == entity.GetUuid() {
+				return nil
+			}
 			setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
 		}
-
 		params := make([]interface{}, 1)
 		params[0] = entity
 		_, err_ := Utility.CallMethod(parent, setMethodName, params)
@@ -785,7 +792,6 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 	childs := entity.GetChilds()
 	// Save the childs...
 	for i := 0; i < len(childs); i++ {
-		//log.Println("----> save child ", childs[i].(Entity).GetUuid())
 		this.saveEntity(childs[i].(Entity))
 	}
 }
@@ -802,10 +808,8 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Set the uuid generator function before save
 	entity.SetUuidGenerator(generateUuidFct)
-
-	// Here I will set the uuid if is not already set
-	uuid := generateEntityUuid(typeName, parentUuid, entity.Ids())
-	entity.SetUuid(uuid)
+	entity.SetEntityGetter(getEntityFct)
+	entity.SetEntitySetter(setEntityFct)
 
 	// Set entity accessor.
 	entity.SetEntityGetter(getEntityFct)
@@ -887,6 +891,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Set the uuid generator function before save
 	entity.SetUuidGenerator(generateUuidFct)
+	entity.SetEntitySetter(setEntityFct)
+	entity.SetEntityGetter(getEntityFct)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 
 	// Here I will set the uuid if is not already set
@@ -918,8 +924,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
-	// Set it childs...
-	this.saveChilds(entity, prototype)
+		// Set it childs...
+		this.saveChilds(entity, prototype)
 
 	// Here is the triple to be saved.
 	triples := make([]interface{}, 0)
@@ -1001,10 +1007,11 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
 		}
-	}
 
-	// Send update entity event here.
-	GetServer().GetEventManager().BroadcastEvent(evt)
+		// Send update entity event here.
+		GetServer().GetEventManager().BroadcastEvent(evt)
+
+	}
 
 	return nil
 }

@@ -133,6 +133,11 @@ func (this *ServerConfiguration) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *ServerConfiguration) GetChildsUuid() []string{
+	var childs []string
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ServerConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct

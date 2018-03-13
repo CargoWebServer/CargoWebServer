@@ -116,6 +116,13 @@ func (this *Action) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *Action) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_parameters...)
+	childs = append( childs, this.M_results...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Action) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -165,7 +172,7 @@ func (this *Action) GetParameters()[]*Parameter{
 func (this *Action) SetParameters(val []*Parameter){
 	this.M_parameters= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_parameters")
 		this.M_parameters=append(this.M_parameters, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -180,7 +187,7 @@ func (this *Action) AppendParameters(val *Parameter){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_parameters")
   this.setEntity(val)
 	this.M_parameters = append(this.M_parameters, val.GetUuid())
@@ -213,7 +220,7 @@ func (this *Action) GetResults()[]*Parameter{
 func (this *Action) SetResults(val []*Parameter){
 	this.M_results= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_results")
 		this.M_results=append(this.M_results, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -228,7 +235,7 @@ func (this *Action) AppendResults(val *Parameter){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_results")
   this.setEntity(val)
 	this.M_results = append(this.M_results, val.GetUuid())

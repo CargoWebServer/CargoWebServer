@@ -129,7 +129,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 	
 	if (typeName == "BPMN20.ScriptTask") {
 		svgElement = this.drawScriptTask(diagramElement)
-	} else if (typeName == "BPMN20.Task") {
+	} else if (typeName == "BPMN20.Task_impl") {
 		svgElement = this.drawTask(diagramElement, " bpmndi_task")
 	} else if (typeName == "BPMN20.UserTask") {
 		svgElement = this.drawUserTask(diagramElement)
@@ -179,7 +179,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 		svgElement = this.drawAssociation(diagramElement)
 	} else if (typeName == "BPMN20.BoundaryEvent") {
 		svgElement = this.drawBoundaryEvent(diagramElement)
-	} else if (typeName == "BPMN20.CallActivity" || typeName == "BPMN20.SubProcess" || typeName == "BPMN20.AdHocSubProcess") {
+	} else if (typeName == "BPMN20.CallActivity" || typeName == "BPMN20.SubProcess_impl" || typeName == "BPMN20.AdHocSubProcess") {
 		svgElement = this.drawCallableActivity(diagramElement)
 	} else if (typeName == "BPMN20.Group") {
 		svgElement = this.drawCallableActivity(diagramElement)
@@ -237,7 +237,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 	}
 
 	// Set the expended property
-	if (typeName == "BPMN20.CallActivity" || typeName == "BPMN20.SubProcess" || typeName == "BPMN20.AdHocSubProcess") {
+	if (typeName == "BPMN20.CallActivity" || typeName == "BPMN20.SubProcess_impl" || typeName == "BPMN20.AdHocSubProcess") {
 		if (diagramElement.M_isExpanded) {
 			var label = diagramElement.getLabel()
 			label.element.style.display = "none"
@@ -260,7 +260,7 @@ SvgDiagram.prototype.setCollapsedElement = function () {
 
 	for (var index = 0; index < diagramElements.length; index++) {
 		var diagramElement = diagramElements[index]
-		if (bpmnElement.TYPENAME == "BPMN20.SubProcess" || bpmnElement.TYPENAME == "BPMN20.CallActivity") {
+		if (bpmnElement.TYPENAME == "BPMN20.SubProcess_impl" || bpmnElement.TYPENAME == "BPMN20.CallActivity") {
 
 			// The expension button...
 			var expandButton = diagramElement.getSvgElement().getChildById("bpmndi_expand_marker")
@@ -271,7 +271,7 @@ SvgDiagram.prototype.setCollapsedElement = function () {
 					var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
 					var bpmnElement = entities[diagramElement.M_bpmnElement]
 
-					if (bpmnElement.TYPENAME == "BPMN20.SubProcess") {
+					if (bpmnElement.TYPENAME == "BPMN20.SubProcess_impl") {
 						if (diagramElement.M_isExpanded == true) {
 							// The first child of the group must be a rect element.
 							diagramElement.getSvgElement().element.firstChild.style.fill = "white"
@@ -402,7 +402,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 	}
 
 	var position;
-	if (bpmnElement.TYPENAME == "BPMN20.SubProcess") {
+	if (bpmnElement.TYPENAME == "BPMN20.SubProcess_impl") {
 		position = {
 			seq: -21,
 			parallel: -22,
@@ -1058,9 +1058,9 @@ SvgDiagram.prototype.drawSequenceFlow = function (diagramElement) {
 		source.TYPENAME == "BPMN20.ScriptTask" ||
 		source.TYPENAME == "BPMN20.SendTask" ||
 		source.TYPENAME == "BPMN20.ServiceTask" ||
-		source.TYPENAME == "BPMN20.Task" ||
+		source.TYPENAME == "BPMN20.Task_impl" ||
 		source.TYPENAME == "BPMN20.UserTask" ||
-		source.TYPENAME == "BPMN20.SubProcess"
+		source.TYPENAME == "BPMN20.SubProcess_impl"
 
 	if (bpmnElement.M_conditionExpression != undefined && isActivityInstance) {
 		connector.element.firstElementChild.className.baseVal += " bpmndi_sequence_flow_condition"
@@ -1354,7 +1354,7 @@ SvgDiagram.prototype.drawComplexGateway = function (diagramElement) {
 SvgDiagram.prototype.drawCallableActivity = function (diagramElement) {
 	var bpmnElement = entities[diagramElement.M_bpmnElement]
 	var className = ""
-	if (bpmnElement.TYPENAME == "BPMN20.SubProcess") {
+	if (bpmnElement.TYPENAME == "BPMN20.SubProcess_impl") {
 		className += " bpmndi_sub_process"
 	} else if (bpmnElement.TYPENAME == "BPMN20.Group") {
 		className += " bpmndi_group"

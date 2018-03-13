@@ -278,7 +278,6 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	}
 
 	// The parent directory
-
 	// Retreive the perentDirEntity, put the file in it and save the parent
 	parentDirEntityId := Utility.CreateSha1Key([]byte(parentDirPath))
 	parentDir, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{parentDirEntityId})
@@ -305,6 +304,10 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	dir.SetName(dirName)
 	dir.SetPath(dirPath)
 	dir.SetFileType(CargoEntities.FileType_DiskFile)
+	// function pointer setting here.
+	dir.SetEntityGetter(getEntityFct)
+	dir.SetEntitySetter(setEntityFct)
+	dir.SetUuidGenerator(generateUuidFct)
 
 	// Set the cargo entities object.
 	entities := GetServer().GetEntityManager().getCargoEntities()
@@ -364,6 +367,9 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		file.SetId(fileId)
 		file.SetParentUuid(parentDir.GetUuid())
 		file.SetParentLnk("M_files")
+		// function pointer setting here.
+		file.SetEntityGetter(getEntityFct)
+		file.SetEntitySetter(setEntityFct)
 		file.SetUuidGenerator(generateUuidFct)
 	}
 
@@ -824,6 +830,9 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	dbFile.M_id = id
 	dbFile.M_name = name
 	dbFile.M_mime = mimeType
+	dbFile.SetEntityGetter(getEntityFct)
+	dbFile.SetEntitySetter(setEntityFct)
+	dbFile.SetUuidGenerator(generateUuidFct)
 	// Create the file.
 	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.File", id, dbFile)
 

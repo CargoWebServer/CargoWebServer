@@ -137,6 +137,15 @@ func (this *Entities) GetChilds() []interface{}{
 	}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *Entities) GetChildsUuid() []string{
+	var childs []string
+	childs = append( childs, this.M_entities...)
+	childs = append( childs, this.M_roles...)
+	childs = append( childs, this.M_permissions...)
+	childs = append( childs, this.M_actions...)
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Entities) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct
@@ -197,7 +206,7 @@ func (this *Entities) GetEntities()[]Entity{
 func (this *Entities) SetEntities(val []Entity){
 	this.M_entities= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entities")
 		this.M_entities=append(this.M_entities, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -212,7 +221,7 @@ func (this *Entities) AppendEntities(val Entity){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_entities")
   this.setEntity(val)
 	this.M_entities = append(this.M_entities, val.GetUuid())
@@ -245,7 +254,7 @@ func (this *Entities) GetRoles()[]*Role{
 func (this *Entities) SetRoles(val []*Role){
 	this.M_roles= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_roles")
 		this.M_roles=append(this.M_roles, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -260,7 +269,7 @@ func (this *Entities) AppendRoles(val *Role){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_roles")
   this.setEntity(val)
 	this.M_roles = append(this.M_roles, val.GetUuid())
@@ -293,7 +302,7 @@ func (this *Entities) GetPermissions()[]*Permission{
 func (this *Entities) SetPermissions(val []*Permission){
 	this.M_permissions= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_permissions")
 		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -308,7 +317,7 @@ func (this *Entities) AppendPermissions(val *Permission){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_permissions")
   this.setEntity(val)
 	this.M_permissions = append(this.M_permissions, val.GetUuid())
@@ -341,7 +350,7 @@ func (this *Entities) GetActions()[]*Action{
 func (this *Entities) SetActions(val []*Action){
 	this.M_actions= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetParentUuid(this.UUID)
+		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_actions")
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
 		this.setEntity(val[i])
@@ -356,7 +365,7 @@ func (this *Entities) AppendActions(val *Action){
 			return
 		}
 	}
-	val.SetParentUuid(this.UUID)
+	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_actions")
   this.setEntity(val)
 	this.M_actions = append(this.M_actions, val.GetUuid())

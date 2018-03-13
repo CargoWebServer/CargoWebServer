@@ -115,6 +115,11 @@ func (this *OAuth2IdToken) GetChilds() []interface{}{
 	var childs []interface{}
 	return childs
 }
+/** Return the list of all childs uuid **/
+func (this *OAuth2IdToken) GetChildsUuid() []string{
+	var childs []string
+	return childs
+}
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2IdToken) SetEntityGetter(fct func(uuid string)(interface{}, error)){
 	this.getEntityByUuid = fct

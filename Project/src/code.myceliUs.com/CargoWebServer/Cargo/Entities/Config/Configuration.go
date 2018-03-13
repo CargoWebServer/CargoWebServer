@@ -29,6 +29,11 @@ type Configuration interface{
 	SetParentUuid(uuid string)
 
 	/**
+	 * Get an entity's parent pointer.
+	 */
+	 GetParent() interface{}
+
+	/**
 	 * The name of the relation with it parent.
 	 */
 	GetParentLnk() string
@@ -38,6 +43,11 @@ type Configuration interface{
 	 * Return link to entity childs.
 	 */
 	GetChilds() []interface{}
+
+	/**
+	 * Return list of childs uuid.
+	 */
+	GetChildsUuid() []string
 
 	/**
 	 * Set the function GetEntityByUuid as a pointer. The entity manager can't

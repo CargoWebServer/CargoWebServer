@@ -162,6 +162,8 @@ func (this *ConfigurationManager) initialize() {
 
 		this.m_activeConfigurations = new(Config.Configurations)
 		this.m_activeConfigurations.SetUuidGenerator(generateUuidFct)
+		this.m_activeConfigurations.SetEntityGetter(getEntityFct)
+		this.m_activeConfigurations.SetEntitySetter(setEntityFct)
 		this.m_activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Cargo Default Configurations"
 		this.m_activeConfigurations.M_version = "1.0"
@@ -176,6 +178,8 @@ func (this *ConfigurationManager) initialize() {
 		var serverConfig = new(Config.ServerConfiguration)
 		serverConfig = new(Config.ServerConfiguration)
 		serverConfig.SetUuidGenerator(generateUuidFct)
+		serverConfig.SetEntityGetter(getEntityFct)
+		serverConfig.SetEntitySetter(setEntityFct)
 		serverConfig.M_id = "CARGO_DEFAULT_SERVER"
 		serverConfig.M_serverPort = 9393
 		serverConfig.M_serviceContainerPort = 9494
@@ -337,6 +341,8 @@ func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 	// Create the default service configurations
 	config := new(Config.ServiceConfiguration)
 	config.SetUuidGenerator(generateUuidFct)
+	config.SetEntityGetter(getEntityFct)
+	config.SetEntitySetter(setEntityFct)
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true

@@ -299,10 +299,11 @@ func (this *DynamicEntity) GetTypeName() string {
  */
 func (this *DynamicEntity) GetUuid() string {
 	uuid := this.getValue("UUID")
-	if uuid != nil {
-		return uuid.(string)
+	if uuid == nil {
+		this.SetUuid(this.generateUuid(this))
 	}
-	return "" // Can be an error here.
+
+	return uuid.(string) // Can be an error here.
 }
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
@@ -415,6 +416,48 @@ func (this *DynamicEntity) GetChilds() []interface{} {
 						if err != nil {
 							log.Println(err.GetBody())
 						}
+					}
+				}
+			}
+		}
+	}
+	return childs
+}
+
+/**
+ * Return the list of all it childs.
+ */
+func (this *DynamicEntity) GetChildsUuid() []string {
+	var childs []string
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(this.GetTypeName(), strings.Split(this.GetTypeName(), ".")[0])
+	for i := 0; i < len(prototype.Fields); i++ {
+		field := prototype.Fields[i]
+		if strings.HasPrefix(field, "M_") {
+			fieldType := prototype.FieldsType[i]
+			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
+				if strings.HasPrefix(fieldType, "[]") {
+					// The value is an array...
+					val := this.getValue(field)
+					if val != nil {
+						if reflect.TypeOf(val).String() == "[]interface {}" {
+							for j := 0; j < len(val.([]interface{})); j++ {
+								if Utility.IsValidEntityReferenceName(val.([]interface{})[j].(string)) {
+									childs = append(childs, val.([]interface{})[j].(string))
+								}
+							}
+						} else if reflect.TypeOf(val).String() == "[]string" {
+							for j := 0; j < len(val.([]string)); j++ {
+								if Utility.IsValidEntityReferenceName(val.([]string)[j]) {
+									childs = append(childs, val.([]string)[j])
+								}
+							}
+						}
+					}
+				} else {
+					// The value is not an array.
+					val := this.getValue(field)
+					if Utility.IsValidEntityReferenceName(val.(string)) {
+						childs = append(childs, val.(string))
 					}
 				}
 			}

@@ -72,8 +72,8 @@ func loadDocument(doc *XML_Schemas.CMOF_Document) {
 	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#double"] = "float64"
 	cmofPrimitiveTypesMap["DC.cmof#Real"] = "float64"
 	cmofPrimitiveTypesMap["Real"] = "float64"
-	cmofPrimitiveTypesMap["DI.cmof#DiagramElement-modelElement"] = "interface{}"
-	cmofPrimitiveTypesMap["http://schema.omg.org/spec/MOF/2.0/cmof.xml#Element"] = "interface{}"
+	cmofPrimitiveTypesMap["DI.cmof#DiagramElement-modelElement"] = "string"
+	cmofPrimitiveTypesMap["http://schema.omg.org/spec/MOF/2.0/cmof.xml#Element"] = "string"
 
 	pack := doc.Package
 	packagesMembers[pack.Name] = make([]string, 0)
@@ -383,7 +383,7 @@ func getAttributeTypeName(attribute *XML_Schemas.CMOF_OwnedAttribute) (string, b
 			}
 		} else if attribute.AssociationTypeRef.Type == "cmof:DataType" || attribute.AssociationTypeRef.Type == "cmof:Class" {
 			if attribute.AssociationTypeRef.Ref == "http://schema.omg.org/spec/MOF/2.0/cmof.xml#Element" {
-				typeName = "interface{}"
+				typeName = "string"
 			} else {
 				// Remove the  part...
 				tmpStr := strings.Replace(attribute.AssociationTypeRef.Ref, "cmof#", "", -1)
