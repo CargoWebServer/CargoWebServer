@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 	"unicode"
 	"unsafe"
@@ -1000,7 +1001,8 @@ func ToString(value interface{}) string {
 	} else {
 		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to string")
 	}
-	return str
+	// Remove leading space.
+	return strings.TrimSpace(str)
 }
 
 func ToInt(value interface{}) int {

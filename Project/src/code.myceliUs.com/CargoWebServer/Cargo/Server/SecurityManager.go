@@ -290,12 +290,10 @@ func (this *SecurityManager) appendAction(roleId string, actionName string) *Car
 
 	// Verify if the role doesn't already have the account
 	if !(this.hasAction(roleId, actionName)) {
-
 		role := roleEntity.(*CargoEntities.Role)
-		// Get the account entity
-		action := actionEntity.(*CargoEntities.Action)
+
 		// Set the account to the role
-		role.AppendActionsRef(action)
+		role.AppendActionsRef(actionEntity.(*CargoEntities.Action))
 
 		// Save the entities.
 		GetServer().GetEntityManager().saveEntity(roleEntity)

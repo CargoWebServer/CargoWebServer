@@ -170,8 +170,8 @@ func (this *TaskManager) start() {
 						// Stop and remove the timer from the map.
 						tasks[instancesInfos[i].TaskId].Stop()
 						delete(tasks, instancesInfos[i].TaskId)
-
 						// I will stop the vm that run that task.
+						log.Println("--> Supend the task: ", instancesInfos[i].TaskId)
 						JS.GetJsRuntimeManager().CloseSession(instancesInfos[i].TaskId,
 							func(taskId string) func() {
 								return func() {

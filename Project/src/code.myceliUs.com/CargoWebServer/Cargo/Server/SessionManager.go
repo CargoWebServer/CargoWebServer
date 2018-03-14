@@ -121,13 +121,13 @@ func (this *SessionManager) removeClosedSession() {
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {
 	// Delete the session entity
 	if !Utility.IsValidEntityReferenceName(session.GetUuid()) {
-		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.UUID+"' was not found."))
+		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.GetUuid()+"' was not found."))
 	}
 
 	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.GetUuid())
 
 	if errObj != nil {
-		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.UUID+"' was not found."))
+		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.GetUuid()+"' was not found."))
 	}
 
 	// Send session close event
@@ -296,8 +296,6 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			session = new(CargoEntities.Session)
 
 			// The connection id is the same as the session id.
-			session.UUID = "CargoEntities.Session%" + sessionId
-			session.TYPENAME = "CargoEntities.Session"
 			session.M_id = sessionId
 
 			// Initialization of fields

@@ -218,9 +218,12 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 						entity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionId})
 						if entity == nil {
 							action = new(CargoEntities.Action)
-							action.TYPENAME = "CargoEntities.Action"
 							action.SetName(actionId)
 							action.SetAccessType(CargoEntities.AccessType_Public)
+
+							action.SetEntityGetter(getEntityFct)
+							action.SetEntitySetter(setEntityFct)
+							action.SetUuidGenerator(generateUuidFct)
 
 							// Now the documentation.
 							var doc string
@@ -249,7 +252,6 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 							for l := 0; l < len(resultInfos); l++ {
 								resultInfo := resultInfos[l]
 								result := new(CargoEntities.Parameter)
-								result.UUID = Utility.RandomUUID()
 								result.SetName(resultInfo.(map[string]interface{})["name"].(string))
 								isArray, _ := strconv.ParseBool(resultInfo.(map[string]interface{})["isArray"].(string))
 								result.SetIsArray(isArray)
@@ -260,7 +262,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 
 							GetServer().GetEntityManager().saveEntity(actionEntity)
 
-							log.Println("service container action ", action.GetName(), "was created susscessfully with uuid ", action.UUID)
+							log.Println("service container action ", action.GetName(), "was created susscessfully with uuid ", action.GetUuid())
 						} else {
 							action = entity.(*CargoEntities.Action)
 							log.Println("-->Load service container action ", action.GetName(), " informations.")
@@ -347,6 +349,9 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 		if entity == nil {
 			action = new(CargoEntities.Action)
+			action.SetEntityGetter(getEntityFct)
+			action.SetEntitySetter(setEntityFct)
+			action.SetUuidGenerator(generateUuidFct)
 		} else {
 			action = entity.(*CargoEntities.Action)
 		}
@@ -786,6 +791,10 @@ func (this *ServiceManager) registerAction(methodName string, parameters []inter
 
 	action := new(CargoEntities.Action)
 	action.SetName(methodName)
+
+	action.SetEntityGetter(getEntityFct)
+	action.SetEntitySetter(setEntityFct)
+	action.SetUuidGenerator(generateUuidFct)
 
 	// The input
 	for j := 0; j < len(parameters_); j++ {

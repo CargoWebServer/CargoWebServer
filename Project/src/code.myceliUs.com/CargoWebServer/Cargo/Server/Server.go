@@ -920,7 +920,7 @@ func (this *Server) Start() {
 			// Here I will create the connection object...
 			conn, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("new Connection()")
 			if err != nil {
-				log.Println("---------> error found!", err)
+				log.Println("--> error found!", err)
 			}
 
 			// I will set the connection id.
@@ -933,7 +933,7 @@ func (this *Server) Start() {
 			//.RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
 			_, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("Connection.prototype.onopen = " + openCallback)
 			if err != nil {
-				log.Println("-----> error!", err)
+				log.Println("--> error!", err)
 			}
 
 			// Now the close callback.

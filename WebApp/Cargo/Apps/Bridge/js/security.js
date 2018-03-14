@@ -222,9 +222,10 @@ RoleManager.prototype.displayRole = function (role) {
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
         .appendElement({ "tag": "div", "id": role.M_id + "_accounts_div", "style": "display: block; width: 100%;" }).down()
 
+
     // Now i will append the accounts list.
-    for (var i = 0; i < role.M_accounts.length; i++) {
-        role["set_M_accounts_" + role.M_accounts[i] + "_ref"](
+    for (var i = 0; i < role.M_accountsRef.length; i++) {
+        role["set_M_accountsRef_" + role.M_accountsRef[i] + "_ref"](
             function (roleManager, accountsDiv, role) {
                 return function (ref) {
                     // i will append the account reference.
@@ -280,8 +281,8 @@ RoleManager.prototype.displayRole = function (role) {
         .appendElement({ "tag": "div", "id": role.M_id + "_actions_div", "style": "display: table; width: 100%;" }).down()
 
     // Now i will append the actions list.
-    for (var i = 0; i < role.M_actions.length; i++) {
-        role["set_M_actions_" + role.M_actions[i] + "_ref"](
+    for (var i = 0; i < role.M_actionsRef.length; i++) {
+        role["set_M_actionsRef_" + role.M_actionsRef[i] + "_ref"](
             function (roleManager, actionsDiv, role) {
                 return function (ref) {
                     // i will append the account reference.

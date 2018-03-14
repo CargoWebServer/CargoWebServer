@@ -1670,7 +1670,6 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 		// This will contain the value of the triple.
 		triple := triples[i].(Triple)
 		data, err := json.Marshal(&triple)
-
 		if err == nil {
 			// The triple uuid
 			uuid := Utility.GenerateUUID(string(data))
@@ -1696,11 +1695,24 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 							if err == nil {
 								po := Utility.GenerateUUID(triple.Predicate + ":" + Utility.ToString(triple.Object))
 								err = this.index(po, uuid, "PO")
+								if err != nil {
+									log.Panicln(err)
+								}
+							} else {
+								log.Panicln(err)
 							}
 						}
+					} else {
+						log.Panicln(err)
 					}
+				} else {
+					log.Panicln(err)
 				}
+			} else {
+				log.Panicln(err)
 			}
+		} else {
+			log.Panicln(err)
 		}
 	}
 
@@ -2151,7 +2163,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		//log.Println("remove triple: ", triples[i])
+		log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {

@@ -1,7 +1,6 @@
 package Server
 
 import (
-	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -381,44 +380,11 @@ func (this *DynamicEntity) GetParent() interface{} {
  */
 func (this *DynamicEntity) GetChilds() []interface{} {
 	var childs []interface{}
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(this.GetTypeName(), strings.Split(this.GetTypeName(), ".")[0])
-	for i := 0; i < len(prototype.Fields); i++ {
-		field := prototype.Fields[i]
-		if strings.HasPrefix(field, "M_") {
-			fieldType := prototype.FieldsType[i]
-			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
-				if strings.HasPrefix(fieldType, "[]") {
-					// The value is an array...
-					val := this.getValue(field)
-					if val != nil {
-						if reflect.TypeOf(val).String() == "[]interface {}" {
-							for j := 0; j < len(val.([]interface{})); j++ {
-								if Utility.IsValidEntityReferenceName(val.([]interface{})[j].(string)) {
-									child, err := GetServer().GetEntityManager().getEntityByUuid(val.([]interface{})[j].(string))
-									if child != nil {
-										childs = append(childs, child)
-									}
-									if err != nil {
-										log.Println(err.GetBody())
-									}
-								}
-							}
-						}
-					}
-				} else {
-					// The value is not an array.
-					val := this.getValue(field)
-					if Utility.IsValidEntityReferenceName(val.(string)) {
-						child, err := GetServer().GetEntityManager().getEntityByUuid(val.(string))
-						if child != nil {
-							childs = append(childs, child)
-						}
-						if err != nil {
-							log.Println(err.GetBody())
-						}
-					}
-				}
-			}
+	uuids := this.GetChildsUuid()
+	for i := 0; i < len(uuids); i++ {
+		child, _ := GetServer().GetEntityManager().getEntityByUuid(uuids[i])
+		if child != nil {
+			childs = append(childs, child)
 		}
 	}
 	return childs

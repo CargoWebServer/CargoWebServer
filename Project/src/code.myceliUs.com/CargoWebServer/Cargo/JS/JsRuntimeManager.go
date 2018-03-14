@@ -376,6 +376,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
+
 				// The vm processing loop...
 				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
 					done := false
@@ -404,14 +405,16 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						case operationInfos := <-runScript:
 							callback := operationInfos.m_returns
 							script := operationInfos.m_params["script"].(string)
-							results, err := vm.Run(script)
+							var results otto.Value
+							var err error
+							results, err = vm.Run(script)
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
+							log.Panic("----> Dont panic!")
 							if stop {
 								// Wait until the vm is stop
 								wait := make(chan string, 1)
 								timer := time.NewTimer(5 * time.Second)
-
 								// Call the interupt function on the VM.
 								vm.Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
 									return func() {

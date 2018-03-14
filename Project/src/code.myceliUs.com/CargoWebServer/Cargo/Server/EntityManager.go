@@ -218,7 +218,6 @@ func newEntityManager() *EntityManager {
 				// Remove from the cache.
 				entityManager.m_cache.Delete(entity.GetUuid())
 			case entity := <-entityManager.m_setEntityChan:
-				//log.Println("---> entity ", entity)
 				// Append in the map:
 				if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
 					var bytes, err = Utility.ToBytes(entity)
@@ -411,15 +410,19 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								for i := 0; i < len(v.([]interface{})); i++ {
 									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
 								}
+							} else {
+								log.Panicln("------> reference type fail!", reflect.TypeOf(v).String())
 							}
 						} else {
 							if reflect.TypeOf(v).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["TYPENAME"] == nil {
 									ToTriples(v.(map[string]interface{}), triples)
 								}
-							} else {
+							} else if reflect.TypeOf(v).Kind() == reflect.String {
 								// Here I will append attribute...
 								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+							} else {
+								log.Panicln("------> reference type fail!", reflect.TypeOf(v).String())
 							}
 						}
 
@@ -697,6 +700,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
+
 	if err != nil {
 		var idsStr string
 		for i := 0; i < len(ids); i++ {
@@ -705,6 +709,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 				idsStr += ", "
 			}
 		}
+		log.Println("---> fail to retrieve: ", query)
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
 		return "", errObj
 	}
@@ -792,6 +797,7 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 	childs := entity.GetChilds()
 	// Save the childs...
 	for i := 0; i < len(childs); i++ {
+		childs[i].(Entity).SetParentUuid(entity.GetUuid())
 		this.saveEntity(childs[i].(Entity))
 	}
 }
@@ -816,6 +822,9 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	entity.SetEntitySetter(setEntityFct)
 	entity.SetUuidGenerator(generateUuidFct)
 
+	// The call to get uuid will generate the uuid.
+	entity.GetUuid()
+
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
@@ -838,9 +847,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
-	// Set it childs...
-	this.saveChilds(entity, prototype)
-
 	// Now I will call the meth
 	triples := make([]interface{}, 0)
 	err = ToTriples(values, &triples)
@@ -859,6 +865,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
 	// So here I will simply append the triples in the database...
+	log.Println("----> entity created ", entity.GetUuid())
 	_, err = store.Create("", triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -884,27 +891,23 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	evt, _ := NewEvent(NewEntityEvent, EntityEvent, eventData)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
+	// Set it childs...
+	this.saveChilds(entity, prototype)
+
 	return entity, nil
 }
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
-	// Set the uuid generator function before save
-	entity.SetUuidGenerator(generateUuidFct)
-	entity.SetEntitySetter(setEntityFct)
-	entity.SetEntityGetter(getEntityFct)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
-
-	// Here I will set the uuid if is not already set
-	if len(entity.GetUuid()) == 0 {
-		uuid := generateEntityUuid(typeName, entity.GetParentUuid(), entity.Ids())
-		entity.SetUuid(uuid)
-	}
 
 	// Set the entity accessor
 	entity.SetEntityGetter(getEntityFct)
 	entity.SetEntitySetter(setEntityFct)
 	entity.SetUuidGenerator(generateUuidFct)
+
+	// The call to get uuid will generate the uuid if is not aleardy created.
+	entity.GetUuid()
 
 	var values map[string]interface{}
 	var err error
@@ -923,9 +926,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-
-		// Set it childs...
-		this.saveChilds(entity, prototype)
 
 	// Here is the triple to be saved.
 	triples := make([]interface{}, 0)
@@ -1002,6 +1002,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Save the changed/new triples.
 	if len(triples) > 0 {
+		log.Println("---> save entity ", entity.GetUuid())
+
 		_, err = store.Create("", triples)
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -1011,6 +1013,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		// Send update entity event here.
 		GetServer().GetEventManager().BroadcastEvent(evt)
 
+		// Set it childs...
+		this.saveChilds(entity, prototype)
 	}
 
 	return nil
@@ -1849,7 +1853,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
 		obj, err := Utility.InitializeStructure(values.(map[string]interface{}))
 		if err == nil {
@@ -1863,7 +1866,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 				}
 				return obj.Interface().(Entity)
 			} else {
-
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
 				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, entity)

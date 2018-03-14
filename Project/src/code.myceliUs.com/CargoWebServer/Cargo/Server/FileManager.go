@@ -202,7 +202,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				// Update the file checksum and save it if the file has change...
 				if !strings.HasPrefix(f.Name(), ".") {
 					filedata, _ := ioutil.ReadFile(this.root + filePath__)
-					this.saveFile(fileEntity.UUID, filedata, "", 128, 128, false)
+					this.saveFile(fileEntity.GetUuid(), filedata, "", 128, 128, false)
 					dirEntity.AppendFiles(fileEntity)
 				}
 			} else {
@@ -220,7 +220,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 	// I will now remove the remaining files in the map...
 	for _, fileToDelete := range toDelete {
 		// Delete the associated entity...
-		err := this.deleteFile(fileToDelete.UUID)
+		err := this.deleteFile(fileToDelete.GetUuid())
 		if err == nil {
 			log.Println("--> Delete file: ", fileToDelete.GetPath()+"/"+fileToDelete.GetName())
 		} else {
