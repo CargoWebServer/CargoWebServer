@@ -725,7 +725,12 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 	var cargoError *CargoEntities.Error
 	var parentPrototype *EntityPrototype
 
-	parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
+	// Set the parent if he is loaded in the cache.
+	parent = this.getEntity(entity.GetParentUuid())
+	if parent == nil {
+		return nil
+	}
+
 	parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 	fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
 	if cargoError != nil {
@@ -1024,37 +1029,36 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
 	if len(entity.GetParentUuid()) > 0 {
 		// I will get the parent uuid link.
-		parent, err := GetServer().GetEntityManager().getEntityByUuid(entity.GetParentUuid())
-		if err != nil {
-			return err
-		}
+		parent := this.getEntity(entity.GetParentUuid())
+		if parent != nil {
 
-		// Here I will remove it from it parent...
-		// Get values as map[string]interface{} and also set the entity in it parent.
-		if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-			parent.(*DynamicEntity).removeValue(entity.GetParentLnk(), entity.GetUuid())
-		} else {
-			parentPrototype, _ := GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
-			fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
-
-			removeMethode := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
-			if strings.HasPrefix(fieldType, "[]") {
-				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			// Here I will remove it from it parent...
+			// Get values as map[string]interface{} and also set the entity in it parent.
+			if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+				parent.(*DynamicEntity).removeValue(entity.GetParentLnk(), entity.GetUuid())
 			} else {
-				removeMethode = "Reset" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
-			}
-			params := make([]interface{}, 1)
-			params[0] = entity
-			_, err_ := Utility.CallMethod(parent, removeMethode, params)
-			if err_ != nil {
-				log.Println("fail to call method ", removeMethode, " on ", parent.GetTypeName(), parent.GetUuid())
-				cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
-				return cargoError
-			}
-		}
+				parentPrototype, _ := GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
+				fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
 
-		// Set the parent value in the cache.
-		this.m_setEntityChan <- parent
+				removeMethode := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
+				if strings.HasPrefix(fieldType, "[]") {
+					removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				} else {
+					removeMethode = "Reset" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				}
+				params := make([]interface{}, 1)
+				params[0] = entity
+				_, err_ := Utility.CallMethod(parent, removeMethode, params)
+				if err_ != nil {
+					log.Println("fail to call method ", removeMethode, " on ", parent.GetTypeName(), parent.GetUuid())
+					cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+					return cargoError
+				}
+			}
+
+			// Set the parent value in the cache.
+			this.m_setEntityChan <- parent
+		}
 	}
 
 	// remove it from the cache.
@@ -1596,8 +1600,9 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 //    )
 //}
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
-
+	var sqlStoreId string
 	if strings.Index(storeId, ".") > 0 {
+		sqlStoreId = storeId[strings.Index(storeId, ".")+1:]
 		storeId = storeId[0:strings.Index(storeId, ".")]
 	}
 
@@ -1609,6 +1614,16 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 	}
 
 	protos, err := store.GetEntityPrototypes()
+	if len(sqlStoreId) > 0 {
+		for i := 0; i < len(protos); {
+			proto := protos[i]
+			if !strings.HasPrefix(proto.TypeName, sqlStoreId) {
+				protos = append(protos[0:i], protos[i+1:]...)
+			} else {
+				i++
+			}
+		}
+	}
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("There is no prototypes in store '"+storeId+"'."))
@@ -2283,11 +2298,6 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 	}
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		if len(entity.GetUuid()) == 0 {
-			//log.Println("---> ", entity.(*DynamicEntity).getValues())
-			//log.Panicln("---> no uuid found for uuid: ", uuid)
-
-		}
 		return entity.(*DynamicEntity).getValues()
 	}
 

@@ -83,10 +83,11 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
     // create it's relavite information.
     if (storeConfig.M_dataStoreType == 1) {
         // Sql data store,
-        // prototype for sql dataStore are in the 
+        // prototype for sql dataStore are in the
         server.entityManager.getEntityPrototypes("sql_info." + storeConfig.M_id,
             // success callback.
             function (results, caller) {
+                console.log("Store: ", caller.storeId)
                 for (var i = 0; i < results.length; i++) {
                     caller.dataExplorer.generatePrototypesView(caller.storeId, results)
                 }
@@ -197,6 +198,7 @@ DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     for (var i = 0; i < prototypes.length; i++) {
         // Here I will append the prototype name...
         if (this.prototypesView[prototypes[i].TypeName] == undefined) {
+            console.log("type : ", prototypes[i].TypeName)
             this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.schemasView[storeId], prototypes[i], this.configs[storeId].M_dataStoreType)
         }
     }

@@ -115,6 +115,22 @@ var Table = function (id, parent) {
 		}(this)
 	);
 
+	/**
+	 * That function will overide default edit function. It take a value as parameter and create 
+	 * the editor that can edit it content.
+	 */
+	this.editFcts = []
+	
+	
+	// You can overide default render function by setting the rendering 
+	// function for a given type. The function must take a value as parameter and
+	// return an element.
+	// Here is an example to render the type xs.ID differently...
+	// renderFcts["xs.ID"] = function(value){
+	//	return new Element(null, {"tag":"div", "innerHtml":"Test " + value});
+	// }
+	this.renderFcts = {};
+
 	return this
 }
 
@@ -1027,12 +1043,6 @@ function formatValue(value, typeName) {
 //  The cell editor...
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * That function will overide default edit function. It take a value as parameter and create 
- * the editor that can edit it content.
- */
-var editFcts = {}
-
 var TableCellEditor = function (cell, onblur) {
 	// The parent cell.
 	this.cell = cell
@@ -1053,9 +1063,9 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 	var isArray = typeName.startsWith("[]")
 	typeName = typeName.replace("[]", "")
 
-	if (editFcts[typeName] != null) {
+	if (this.cell.row.table.editFcts[this.cell.index] != null) {
 		// Here the function will create a custom editor for a given type.
-		this.editor = editFcts[typeName](value)
+		this.editor = this.cell.row.table.editFcts[this.cell.index](value)
 		if (this.editor != null) {
 			this.editor.element.onblur = this.onblur;
 		}
@@ -1246,43 +1256,6 @@ var TableCellRenderer = function (cell) {
 	return this
 }
 
-// You can overide default render function by setting the rendering 
-// function for a given type. The function must take a value as parameter and
-// return an element.
-// Here is an example to render the type xs.ID differently...
-// renderFcts["xs.ID"] = function(value){
-//	return new Element(null, {"tag":"div", "innerHtml":"Test " + value});
-// }
-var renderFcts = {};
-
-// Exemple of special renderer...
-renderFcts["CatalogSchema.DimensionType"] = function (value) {
-	// So here I will return the string that contain the unit of measure.
-	var str = value.M_valueOf 
-	
-	if(value.M_unitOfMeasure.M_valueOf == "IN (inch)"){
-		str += '"'
-	}else if(value.M_unitOfMeasure.M_valueOf == "FT (feet)"){
-		str += "'"
-	}else{
-		str += " " + value.M_unitOfMeasure.M_valueOf
-	}
-	return new Element(null, { "tag": "div", "innerHtml": str });
-}
-
-// Special cell renderer...
-renderFcts["CatalogSchema.FiltreSorte"] = function (value) {
-	// So here I will return the string that contain the unit of measure.
-	var str = value.M_valueOf
-	return new Element(null, { "tag": "div", "innerHtml": str });
-}
-
-renderFcts["CatalogSchema.FiltreSecteur"] = function (value) {
-	// So here I will return the string that contain the unit of measure.
-	var str = value.M_valueOf
-	return new Element(null, { "tag": "div", "innerHtml": str });
-}
-
 /**
  * Fromat the content of the cell in respect of the value.
  * @param {} value The value to display in the cell.
@@ -1291,9 +1264,9 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 	// Depending of the data type I will call the appropriate formater...
 	var formatedValue = null;
 
-	if (renderFcts[fieldType] != undefined) {
+	if (this.cell.row.table.renderFcts[fieldType] != undefined) {
 		// In that case I will use the overide function to render the cell.
-		return renderFcts[fieldType](value)
+		return this.cell.row.table.renderFcts[fieldType](value)
 	}
 
 	// I will us Javasript type to determine how I will display the data...

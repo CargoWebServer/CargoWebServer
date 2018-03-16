@@ -1195,6 +1195,21 @@ func (server *Server) removeCmd(cmd *exec.Cmd) {
 	}
 }
 
+// Run a visual basic scirpt on the local server.
+// @param {string} scriptPath The path of the script to run.
+// @param {[]string} The list of command arguments.
+// @return {[]string} An array of string that can contain the error string...
+func (server *Server) ExecuteVbScript(scriptName string, args []string) []string {
+
+	// Run the given script on the server side.
+	results, err := runVbs(scriptName, args)
+	if err != nil {
+		// Push the error in the result in that case...
+		results = append(results, err.Error())
+	}
+	return results
+}
+
 // Run starts the specified command and waits for it to complete.
 // @param {string} name The name of the command to run.
 // @param {[]string} The list of command arguments.

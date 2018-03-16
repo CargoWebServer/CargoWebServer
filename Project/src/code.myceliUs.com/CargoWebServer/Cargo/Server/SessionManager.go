@@ -258,8 +258,16 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 	var session *CargoEntities.Session
 	accountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountName})
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
+		store := GetServer().GetDataManager().getDataStore("CargoEntities")
+		query := "(?, CargoEntities.Account:xs.string:M_name," + accountName + ")"
+		results, err := store.Read(query, []interface{}{}, []interface{}{})
+		if err == nil {
+			uuid := results[0][0].(string)
+			accountEntity, _ = GetServer().GetEntityManager().getEntityByUuid(uuid)
+		} else {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
 	}
 
 	// Verify if the account exists
@@ -276,11 +284,11 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 					// Create the error message
 					cargoError := NewError(Utility.FileLine(), PASSWORD_MISMATCH_ERROR, SERVER_ERROR_CODE, errors.New("The password '"+psswd+"' does not match the account name '"+accountName+"'. "))
 					GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-
 					return nil
 				}
 			}
 		} else {
+			log.Println("--> ldap ", serverId, " not found!")
 			if account.M_password != psswd {
 				// Create the error message
 				cargoError := NewError(Utility.FileLine(), PASSWORD_MISMATCH_ERROR, SERVER_ERROR_CODE, errors.New("The password '"+psswd+"' does not match the account name '"+accountName+"'. "))

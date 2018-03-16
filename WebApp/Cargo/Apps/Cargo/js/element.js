@@ -234,10 +234,7 @@ Element.prototype.appendElement = function (e) {
         e.parentElement = this
         this.childs[e.id] = e
         this.lastChild = e
-        // if (e.element.innerHTML != undefined) {
-            this.element.appendChild(e.element)
-        //}
-
+        this.element.appendChild(e.element)
     } else {
         for (var i = 0; i < arguments.length; i++) {
             var child = new Element(this, arguments[i]);

@@ -744,19 +744,16 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 
 	if err == nil {
 		var eventData []*MessageData
-
 		tableName_ := new(MessageData)
 		tableName_.Name = "tableName"
 		tableName_.Value = tableName
 		eventData = append(eventData, tableName_)
-
 		for i := 0; i < len(params); i++ {
 			id := new(MessageData)
 			id.Name = "id_" + strconv.Itoa(i)
 			id.Value = Utility.ToString(params[i])
 			eventData = append(eventData, id)
 		}
-
 		evt, _ := NewEvent(DeleteRowEvent, DataEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
@@ -795,7 +792,6 @@ func (this *SqlDataStore) SaveEntityPrototype(prototype *EntityPrototype) error 
  */
 func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	var prototypes []*EntityPrototype
-
 	var query string
 
 	fieldsType := make([]interface{}, 0)

@@ -247,15 +247,16 @@ func (this *LdapManager) search(id string, login string, psswd string, base_dn s
 
 func (this *LdapManager) authenticate(id string, login string, psswd string) bool {
 
-	ldapConfigInfo := this.getConfigsInfo()[id]
 	// Now I will try to make a simple query if it fail that's mean the user
 	// does have the permission...
+	var base_dn string = "OU=Users," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=user)"
 
 	// Test get some user...
 	var attributes []string = []string{"sAMAccountName"}
-	_, err := this.search(id, login, psswd, ldapConfigInfo.M_searchBase, filter, attributes)
+	_, err := this.search(id, login, psswd, base_dn, filter, attributes)
 	if err != nil {
+		log.Println("---> ldap authenticate fail: ", login, err)
 		return false
 	}
 

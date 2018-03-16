@@ -236,6 +236,12 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 		return errors.New("Data store " + storeName + " does not exist.")
 	}
 
+	err = store.Delete(query, params)
+	if err != nil {
+		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+		return
+	}
+
 	return
 }
 
@@ -590,11 +596,11 @@ func (this *DataManager) Update(storeName string, query string, fields []interfa
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *DataManager) Delete(storeName string, query string, parameters []interface{}, messageId string, sessionId string) {
-	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
-	}
+	}*/
 
 	err := this.deleteData(storeName, query, parameters)
 	if err != nil {

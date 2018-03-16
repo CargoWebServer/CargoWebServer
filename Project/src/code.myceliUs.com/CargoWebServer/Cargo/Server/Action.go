@@ -160,11 +160,19 @@ func (self *Action) GetServicesClientCode() map[string]string {
  * * Windows only...
  */
 func runVbs(scriptName string, args []string) ([]string, error) {
-	path := GetServer().GetConfigurationManager().GetScriptPath() + "/" + scriptName
+	var path string
+	if strings.Index(scriptName, "\\") == -1 && strings.Index(scriptName, "/") == -1 {
+		path = GetServer().GetConfigurationManager().GetScriptPath() + "/" + scriptName
+	} else {
+		path = scriptName
+	}
+
 	args_ := make([]string, 0)
 	args_ = append(args_, "/Nologo") // Remove the trademark...
 	args_ = append(args_, path)
 	args_ = append(args_, args...)
+
+	log.Println("---> run vb script: ", scriptName)
 
 	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", args_...).Output()
 	results := strings.Split(string(out), "\n")

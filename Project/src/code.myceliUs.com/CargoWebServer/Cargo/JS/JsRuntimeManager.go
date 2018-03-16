@@ -368,8 +368,14 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_createVm:
+
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
+				if jsRuntimeManager.m_sessions[sessionId] != nil {
+					callback <- []interface{}{true} // unblock the channel...
+					return                          // the session is already open!...
+				}
+
 				jsRuntimeManager.createVm(sessionId)
 				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
@@ -410,7 +416,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							results, err = vm.Run(script)
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
-							log.Panic("----> Dont panic!")
 							if stop {
 								// Wait until the vm is stop
 								wait := make(chan string, 1)
@@ -1003,7 +1008,6 @@ func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} 
  * Open a new session on the server.
  */
 func (this *JsRuntimeManager) OpenSession(sessionId string) {
-
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["sessionId"] = sessionId

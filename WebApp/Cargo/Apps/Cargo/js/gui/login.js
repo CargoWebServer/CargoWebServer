@@ -36,7 +36,8 @@ var LoginPage = function (loginCallback, serverId) {
 	// Here I will create the content...
 	this.panel = new Element(null, {
 		"tag": "div",
-		"class": "login_page",
+		"class": "login-page",
+		"id": "login_page",
 		"style": "width: 100%; height: 100%; padding-top: 0px; overflow:hidden;",
 		"id": "loginPage",
 		"draggable": "false"
@@ -148,7 +149,7 @@ var LoginPage = function (loginCallback, serverId) {
 			/* Here I will call the login... **/
 			if (password.length > 0 && userName.length > 0) {
 				server.sessionManager.login(userName, password, serverId, function (session, caller) {
-					
+
 					// Must be call after account pointer initialisation.
 					caller.successCallback = function (session) {
 						if (this.loginCallback != undefined) {
