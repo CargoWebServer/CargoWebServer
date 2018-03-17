@@ -198,7 +198,6 @@ DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     for (var i = 0; i < prototypes.length; i++) {
         // Here I will append the prototype name...
         if (this.prototypesView[prototypes[i].TypeName] == undefined) {
-            console.log("type : ", prototypes[i].TypeName)
             this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.schemasView[storeId], prototypes[i], this.configs[storeId].M_dataStoreType)
         }
     }

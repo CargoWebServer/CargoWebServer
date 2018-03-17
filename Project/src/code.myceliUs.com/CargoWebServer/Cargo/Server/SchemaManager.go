@@ -154,37 +154,10 @@ func (this *SchemaManager) initialize() {
 		}
 	}
 
-	for _, prototype := range this.prototypes {
-		// Set the super type fields...
-		// The last tow fields (childUuid and referenced) will
-		// be set a the prototype creation.
-		for i := 3; i < len(prototype.FieldsType); i++ {
-			setDefaultFieldValue(prototype, prototype.FieldsType[i])
-		}
-	}
-
-	// Before i create the prototy I will expand supertypes,
-	// that mean I will copy fields of super type into the
-	// prototype itself...
-	for _, prototype := range this.prototypes {
-		// Set the super type fields...
-		this.setSuperTypeField(prototype)
-	}
-
 	// Save entity prototypes...
-	for _, prototype := range this.prototypes {
-		// Set the field order.
-		for i := 0; i < len(prototype.Fields); i++ {
-			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
-		}
-
+	for typeName, _ := range this.prototypes {
 		// Here i will save the prototype...
-		storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
-		store := GetServer().GetDataManager().getDataStore(storeId)
-		store.CreateEntityPrototype(prototype)
-
-		// Print the list of prototypes...
-		//prototype.Print()
+		this.createEntityPrototype(typeName)
 	}
 
 	// Now I will import the xml file from the schema directory...
@@ -194,6 +167,32 @@ func (this *SchemaManager) initialize() {
 			this.importXmlFile(GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name())
 		}
 	}
+}
+
+// Recursively create entity prototypes.
+func (this *SchemaManager) createEntityPrototype(typeName string) {
+
+	prototype := this.prototypes[typeName]
+	if prototype == nil {
+		return
+	}
+
+	for i := 3; i < len(prototype.FieldsType); i++ {
+		setDefaultFieldValue(prototype, prototype.FieldsType[i])
+	}
+
+	// create the super-type...
+	for i := 0; i < len(prototype.SuperTypeNames); i++ {
+		this.createEntityPrototype(prototype.SuperTypeNames[i])
+	}
+
+	storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	store.CreateEntityPrototype(prototype)
+
+	delete(this.prototypes, typeName)
+
+	prototype.Print()
 }
 
 func setDefaultFieldValue(prototype *EntityPrototype, fieldType string) {
@@ -279,25 +278,9 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 		this.genereatePrototype(schema)
 	}
 
-	// Before i create the prototy I will expand supertypes,
-	// that mean I will copy fields of super type into the
-	// prototype itself...
-	for _, prototype := range this.prototypes {
-		// Set the super type fields...
-		this.setSuperTypeField(prototype)
-	}
-
-	// Save entity prototypes...
-	for _, prototype := range this.prototypes {
-		// Set the field order.
-		for i := 0; i < len(prototype.Fields); i++ {
-			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
-		}
+	for typeName, _ := range this.prototypes {
 		// Here i will save the prototype...
-		store.CreateEntityPrototype(prototype)
-
-		// Print the list of prototypes...
-		//prototype.Print()
+		this.createEntityPrototype(typeName)
 	}
 
 	return nil
@@ -339,20 +322,6 @@ func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path 
 
 	// Return the list of fields...
 	return fields, fieldsType, fieldsDefaultValue
-}
-
-//Append the super type fields...
-func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
-	path := make([]string, 0)
-	fields, fieldsType, fieldsDefaultValue := this.getFieldsFieldsType(prototype, &path)
-	for i := 0; i < len(fields); i++ {
-		if Utility.Contains(prototype.Fields, fields[i]) == false {
-			prototype.Fields = append(prototype.Fields, fields[i])
-			prototype.FieldsType = append(prototype.FieldsType, fieldsType[i])
-			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, fieldsDefaultValue[i])
-			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
-		}
-	}
 }
 
 /**
@@ -468,7 +437,8 @@ func (this *SchemaManager) parseAttribute(attribute *XML_Schemas.XSD_Attribute, 
 // Those element generate prototypes...
 ////////////////////////////////////////////////////////////////////////////////
 func (this *SchemaManager) parseAnnotation(annotation XML_Schemas.XSD_Annotation) string {
-	annotationStr := ""
+	annotationStr := annotation.Documentation.Source
+
 	return annotationStr
 }
 
@@ -542,6 +512,7 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 					prototype.FieldsType = append(prototype.FieldsType, prototype.TypeName)
 					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+					prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 					prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 				}
 			}
@@ -558,6 +529,7 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 					prototype.FieldsType = append(prototype.FieldsType, prototype.TypeName)
 					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+					prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 					prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 				}
 			}
@@ -725,6 +697,9 @@ func (this *SchemaManager) createPrototypeComplexType(schema *XML_Schemas.XSD_Sc
 		}
 
 		prototype.TypeName = schema.Id + "." + complexType.Name
+		for i := 0; i < len(complexType.Annotations); i++ {
+			prototype.Documentation += this.parseAnnotation(complexType.Annotations[i])
+		}
 		// Append the prototype to the map...
 		this.prototypes[prototype.TypeName] = prototype
 	}
@@ -853,6 +828,8 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XML_Schemas.XSD_Sche
 			prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+			setDefaultFieldValue(prototype, p.TypeName)
 
 		}
 	}
@@ -888,6 +865,8 @@ func (this *SchemaManager) appendPrototypeAttributeGroup(schema *XML_Schemas.XSD
 
 		parent.FieldsOrder = append(parent.FieldsOrder, len(parent.FieldsOrder))
 		parent.FieldsVisibility = append(parent.FieldsVisibility, true)
+		parent.FieldsNillable = append(parent.FieldsNillable, true)
+		setDefaultFieldValue(parent, parent.TypeName)
 	}
 }
 
@@ -957,7 +936,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 
 					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
-
+					prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+					setDefaultFieldValue(prototype, prototype.TypeName)
 					this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 				}
 				return
@@ -969,13 +949,15 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 
 						if p.TypeName == "xs.anyURI" || getRootTypeName(p.TypeName) == "xs.anyURI" || isRef {
 							prototype.FieldsType = append(prototype.FieldsType, p.TypeName+":Ref")
+							setDefaultFieldValue(prototype, p.TypeName+":Ref")
 						} else {
 							prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
+							setDefaultFieldValue(prototype, p.TypeName)
 						}
 
 						prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 						prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
-
+						prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 						this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 					}
 				} else {
@@ -1021,7 +1003,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 				prototype.FieldsType = append(prototype.FieldsType, schema.Id+"."+element.Type)
 				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 				prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
-
+				prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+				setDefaultFieldValue(prototype, schema.Id+"."+element.Type)
 				this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 			}
 		} else {
@@ -1051,6 +1034,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 				prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
 				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 				prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+				prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+				setDefaultFieldValue(prototype, p.TypeName)
 				this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 			}
 		}
@@ -1061,6 +1046,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 			prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+			setDefaultFieldValue(prototype, p.TypeName)
 			this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 		}
 	}
@@ -1166,6 +1153,8 @@ func (this *SchemaManager) appendPrototypeField(schema *XML_Schemas.XSD_Schema, 
 		prototype.FieldsType = append(prototype.FieldsType, "xs.ID")
 		prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 		prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+		prototype.FieldsNillable = append(prototype.FieldsNillable, false)
+		setDefaultFieldValue(prototype, "xs.ID")
 		prototype.Indexs = append(prototype.Indexs, "M_"+field.Id)
 	}
 
@@ -1201,6 +1190,7 @@ func (this *SchemaManager) appendPrototypeList(schema *XML_Schemas.XSD_Schema, p
 			prototype.FieldsType = append(prototype.FieldsType, "[]"+p.TypeName)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 			prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 		}
@@ -1219,6 +1209,7 @@ func (this *SchemaManager) appendPrototypeList(schema *XML_Schemas.XSD_Schema, p
 			prototype.FieldsType = append(prototype.FieldsType, "[]"+itemType)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "[]")
 			prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 		}

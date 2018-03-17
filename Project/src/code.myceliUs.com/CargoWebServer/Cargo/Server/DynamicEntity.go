@@ -47,6 +47,12 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	defer this.Unlock()
 	// Here the value is in the map.
 	this.object[field] = value
+
+	// put in the cache if UUID is set cache.
+	if len(this.object["UUID"].(string)) > 0 {
+		GetServer().GetEntityManager().m_setEntityChan <- this
+	}
+
 	return nil
 }
 
@@ -120,6 +126,10 @@ func (this *DynamicEntity) deleteValue(field string) {
 	// Remove the field itself.
 	delete(this.object, field)
 
+	// put in the cache if UUID is set cache.
+	if len(this.object["UUID"].(string)) > 0 {
+		GetServer().GetEntityManager().m_setEntityChan <- this
+	}
 }
 
 /**

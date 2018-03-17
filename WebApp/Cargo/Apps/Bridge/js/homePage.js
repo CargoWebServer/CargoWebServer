@@ -437,7 +437,12 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         reader.onload = function (file) {
                             return function (e) {
                                 // Now I will load the content of the file.
-                                server.schemaManager.importXsdSchema(file.name, e.target.result)
+                                server.schemaManager.importXsdSchema(file.name, e.target.result, 
+                                    function(results, caller){
+
+                                    }, 
+                                    function(errObj, caller){}, 
+                                    {})
                             }
                         }(f);
                         reader.readAsText(f);
@@ -494,7 +499,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         reader.onload = function (e) {
                             var text = e.target.result
                             // Now I will load the content of the file.
-                            server.dataManager.importXmlData(text,
+                            server.schemaManager.importXmlData(text,
                                 function (result, caller) {
                                     /** Nothing todo the the action will be in the event listener. */
                                 },

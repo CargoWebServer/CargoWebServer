@@ -146,7 +146,7 @@ EntityPrototype.prototype.getTitles = function () {
  * @param {object} object The object that regroup the prototype properties.
  */
 EntityPrototype.prototype.init = function (object) {
-    if (object == null || object.TypeName == undefined) {
+    if (object == null || object.TypeName == undefined || object.Fields == null) {
         return
     }
 

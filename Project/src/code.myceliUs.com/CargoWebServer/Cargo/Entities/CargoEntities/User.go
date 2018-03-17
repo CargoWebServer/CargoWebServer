@@ -2,11 +2,11 @@
 
 package CargoEntities
 
-import(
+import (
 	"encoding/xml"
 )
 
-type User struct{
+type User struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -17,7 +17,7 @@ type User struct{
 	/** The relation name with the parent. **/
 	ParentLnk string
 	/** Get entity by uuid function **/
-	getEntityByUuid func(string)(interface{}, error)
+	getEntityByUuid func(string) (interface{}, error)
 	/** Use to put the entity in the cache **/
 	setEntity func(interface{})
 	/** Generate the entity uuid **/
@@ -27,14 +27,13 @@ type User struct{
 	M_id string
 
 	/** members of User **/
-	M_firstName string
-	M_lastName string
-	M_middle string
-	M_phone string
-	M_email string
+	M_firstName   string
+	M_lastName    string
+	M_middle      string
+	M_phone       string
+	M_email       string
 	M_memberOfRef []string
-	M_accounts []string
-
+	M_accounts    []string
 
 	/** Associations **/
 	M_entitiesPtr string
@@ -42,29 +41,28 @@ type User struct{
 
 /** Xml parser for User **/
 type XsdUser struct {
-	XMLName xml.Name	`xml:"userRef"`
+	XMLName xml.Name `xml:"userRef"`
 	/** Entity **/
-	M_id	string	`xml:"id,attr"`
+	M_id string `xml:"id,attr"`
 
-
-	M_memberOfRef	[]string	`xml:"memberOfRef"`
-	M_firstName	string	`xml:"firstName,attr"`
-	M_lastName	string	`xml:"lastName,attr"`
-	M_middle	string	`xml:"middle,attr"`
-	M_email	string	`xml:"email,attr"`
-	M_phone	string	`xml:"phone,attr"`
-
+	M_memberOfRef []string `xml:"memberOfRef"`
+	M_firstName   string   `xml:"firstName,attr"`
+	M_lastName    string   `xml:"lastName,attr"`
+	M_middle      string   `xml:"middle,attr"`
+	M_email       string   `xml:"email,attr"`
+	M_phone       string   `xml:"phone,attr"`
 }
+
 /***************** Entity **************************/
 
 /** UUID **/
-func (this *User) GetUuid() string{
+func (this *User) GetUuid() string {
 	if len(this.UUID) == 0 {
 		this.SetUuid(this.generateUuid(this))
 	}
 	return this.UUID
 }
-func (this *User) SetUuid(uuid string){
+func (this *User) SetUuid(uuid string) {
 	this.UUID = uuid
 }
 
@@ -76,30 +74,30 @@ func (this *User) Ids() []interface{} {
 }
 
 /** The type name **/
-func (this *User) GetTypeName() string{
+func (this *User) GetTypeName() string {
 	this.TYPENAME = "CargoEntities.User"
 	return this.TYPENAME
 }
 
 /** Return the entity parent UUID **/
-func (this *User) GetParentUuid() string{
+func (this *User) GetParentUuid() string {
 	return this.ParentUuid
 }
 
 /** Set it parent UUID **/
-func (this *User) SetParentUuid(parentUuid string){
+func (this *User) SetParentUuid(parentUuid string) {
 	this.ParentUuid = parentUuid
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *User) GetParentLnk() string{
+func (this *User) GetParentLnk() string {
 	return this.ParentLnk
 }
-func (this *User) SetParentLnk(parentLnk string){
+func (this *User) SetParentLnk(parentLnk string) {
 	this.ParentLnk = parentLnk
 }
 
-func (this *User) GetParent() interface{}{
+func (this *User) GetParent() interface{} {
 	parent, err := this.getEntityByUuid(this.ParentUuid)
 	if err != nil {
 		return nil
@@ -108,117 +106,102 @@ func (this *User) GetParent() interface{}{
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *User) GetChilds() []interface{}{
+func (this *User) GetChilds() []interface{} {
 	var childs []interface{}
 	return childs
 }
+
 /** Return the list of all childs uuid **/
-func (this *User) GetChildsUuid() []string{
+func (this *User) GetChildsUuid() []string {
 	var childs []string
 	return childs
 }
+
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
-func (this *User) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+func (this *User) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
 	this.getEntityByUuid = fct
 }
+
 /** Use it the set the entity on the cache. **/
-func (this *User) SetEntitySetter(fct func(entity interface{})){
+func (this *User) SetEntitySetter(fct func(entity interface{})) {
 	this.setEntity = fct
 }
+
 /** Set the uuid generator function **/
-func (this *User) SetUuidGenerator(fct func(entity interface{}) string){
+func (this *User) SetUuidGenerator(fct func(entity interface{}) string) {
 	this.generateUuid = fct
 }
 
-func (this *User) GetId()string{
+func (this *User) GetId() string {
 	return this.M_id
 }
 
-func (this *User) SetId(val string){
-	this.M_id= val
+func (this *User) SetId(val string) {
+	this.M_id = val
 }
 
-
-
-
-func (this *User) GetFirstName()string{
+func (this *User) GetFirstName() string {
 	return this.M_firstName
 }
 
-func (this *User) SetFirstName(val string){
-	this.M_firstName= val
+func (this *User) SetFirstName(val string) {
+	this.M_firstName = val
 }
 
-
-
-
-func (this *User) GetLastName()string{
+func (this *User) GetLastName() string {
 	return this.M_lastName
 }
 
-func (this *User) SetLastName(val string){
-	this.M_lastName= val
+func (this *User) SetLastName(val string) {
+	this.M_lastName = val
 }
 
-
-
-
-func (this *User) GetMiddle()string{
+func (this *User) GetMiddle() string {
 	return this.M_middle
 }
 
-func (this *User) SetMiddle(val string){
-	this.M_middle= val
+func (this *User) SetMiddle(val string) {
+	this.M_middle = val
 }
 
-
-
-
-func (this *User) GetPhone()string{
+func (this *User) GetPhone() string {
 	return this.M_phone
 }
 
-func (this *User) SetPhone(val string){
-	this.M_phone= val
+func (this *User) SetPhone(val string) {
+	this.M_phone = val
 }
 
-
-
-
-func (this *User) GetEmail()string{
+func (this *User) GetEmail() string {
 	return this.M_email
 }
 
-func (this *User) SetEmail(val string){
-	this.M_email= val
+func (this *User) SetEmail(val string) {
+	this.M_email = val
 }
 
-
-
-
-func (this *User) GetMemberOfRef()[]*Group{
+func (this *User) GetMemberOfRef() []*Group {
 	values := make([]*Group, 0)
 	for i := 0; i < len(this.M_memberOfRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_memberOfRef[i])
 		if err == nil {
-			values = append( values, entity.(*Group))
+			values = append(values, entity.(*Group))
 		}
 	}
 	return values
 }
 
-func (this *User) SetMemberOfRef(val []*Group){
-	this.M_memberOfRef= make([]string,0)
-	for i:=0; i < len(val); i++{
-		this.M_memberOfRef=append(this.M_memberOfRef, val[i].GetUuid())
+func (this *User) SetMemberOfRef(val []*Group) {
+	this.M_memberOfRef = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_memberOfRef = append(this.M_memberOfRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
 }
 
-
-func (this *User) AppendMemberOfRef(val *Group){
-	for i:=0; i < len(this.M_memberOfRef); i++{
+func (this *User) AppendMemberOfRef(val *Group) {
+	for i := 0; i < len(this.M_memberOfRef); i++ {
 		if this.M_memberOfRef[i] == val.GetUuid() {
 			return
 		}
@@ -227,9 +210,9 @@ func (this *User) AppendMemberOfRef(val *Group){
 	this.setEntity(this)
 }
 
-func (this *User) RemoveMemberOfRef(val *Group){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_memberOfRef); i++{
+func (this *User) RemoveMemberOfRef(val *Group) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_memberOfRef); i++ {
 		if this.M_memberOfRef[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
 		}
@@ -238,30 +221,28 @@ func (this *User) RemoveMemberOfRef(val *Group){
 	this.setEntity(this)
 }
 
-
-func (this *User) GetAccounts()[]*Account{
+func (this *User) GetAccounts() []*Account {
 	values := make([]*Account, 0)
 	for i := 0; i < len(this.M_accounts); i++ {
 		entity, err := this.getEntityByUuid(this.M_accounts[i])
 		if err == nil {
-			values = append( values, entity.(*Account))
+			values = append(values, entity.(*Account))
 		}
 	}
 	return values
 }
 
-func (this *User) SetAccounts(val []*Account){
-	this.M_accounts= make([]string,0)
-	for i:=0; i < len(val); i++{
-		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
+func (this *User) SetAccounts(val []*Account) {
+	this.M_accounts = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_accounts = append(this.M_accounts, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
 }
 
-
-func (this *User) AppendAccounts(val *Account){
-	for i:=0; i < len(this.M_accounts); i++{
+func (this *User) AppendAccounts(val *Account) {
+	for i := 0; i < len(this.M_accounts); i++ {
 		if this.M_accounts[i] == val.GetUuid() {
 			return
 		}
@@ -270,9 +251,9 @@ func (this *User) AppendAccounts(val *Account){
 	this.setEntity(this)
 }
 
-func (this *User) RemoveAccounts(val *Account){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_accounts); i++{
+func (this *User) RemoveAccounts(val *Account) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_accounts); i++ {
 		if this.M_accounts[i] != val.GetUuid() {
 			values = append(values, val.GetUuid())
 		}
@@ -281,8 +262,7 @@ func (this *User) RemoveAccounts(val *Account){
 	this.setEntity(this)
 }
 
-
-func (this *User) GetEntitiesPtr()*Entities{
+func (this *User) GetEntitiesPtr() *Entities {
 	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
 	if err == nil {
 		return entity.(*Entities)
@@ -290,13 +270,11 @@ func (this *User) GetEntitiesPtr()*Entities{
 	return nil
 }
 
-func (this *User) SetEntitiesPtr(val *Entities){
-	this.M_entitiesPtr= val.GetUuid()
+func (this *User) SetEntitiesPtr(val *Entities) {
+	this.M_entitiesPtr = val.GetUuid()
 	this.setEntity(this)
 }
 
-
-func (this *User) ResetEntitiesPtr(){
-	this.M_entitiesPtr= ""
+func (this *User) ResetEntitiesPtr() {
+	this.M_entitiesPtr = ""
 }
-

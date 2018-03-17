@@ -217,6 +217,8 @@ func newEntityManager() *EntityManager {
 				}
 				// Remove from the cache.
 				entityManager.m_cache.Delete(entity.GetUuid())
+				log.Println("Entity was remove successfully from cache ", entity.GetUuid())
+
 			case entity := <-entityManager.m_setEntityChan:
 				// Append in the map:
 				if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
@@ -787,9 +789,6 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 		}
 	}
 
-	// Set the parent value in the cache.
-	this.m_setEntityChan <- parent
-
 	// I will also append the parent relationship...
 	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
 	*triples = append(*triples, parentLnkTriple)
@@ -1027,11 +1026,19 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
+	// First i will remove the entity childs...
+	childs := entity.GetChilds()
+	for i := 0; i < len(childs); i++ {
+		errObj := this.deleteEntity(childs[i].(Entity))
+		if errObj != nil {
+			return errObj
+		}
+	}
+
 	if len(entity.GetParentUuid()) > 0 {
 		// I will get the parent uuid link.
 		parent := this.getEntity(entity.GetParentUuid())
 		if parent != nil {
-
 			// Here I will remove it from it parent...
 			// Get values as map[string]interface{} and also set the entity in it parent.
 			if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
@@ -1055,9 +1062,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 					return cargoError
 				}
 			}
-
-			// Set the parent value in the cache.
-			this.m_setEntityChan <- parent
 		}
 	}
 
@@ -1129,9 +1133,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 					params[0] = entity
 					Utility.CallMethod(ref, removeName, params)
 				}
-
-				// Set back the ref without the deleted entity in the cache.
-				this.m_setEntityChan <- ref
 
 				// Update the reference here.
 				// TODO Send only the change...

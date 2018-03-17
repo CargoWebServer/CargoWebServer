@@ -233,17 +233,24 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 		return err
 	}
 
-	// I will save the entity prototype in a file.
-	file, err := os.Create(this.m_path + "/" + prototype.TypeName + ".gob")
-	defer file.Close()
-
-	if err == nil {
-		encoder := gob.NewEncoder(file)
-		encoder.Encode(prototype)
-	} else {
-		return err
+	if len(prototype.TypeName) == 0 {
+		// The typeName cant be nil!
+		panic(prototype)
 	}
-	this.m_prototypes[prototype.TypeName] = prototype
+
+	// I will save the entity prototype in a file.
+	if strings.HasPrefix(prototype.TypeName, this.GetId()) {
+		file, err := os.Create(this.m_path + "/" + prototype.TypeName + ".gob")
+		defer file.Close()
+
+		if err == nil {
+			encoder := gob.NewEncoder(file)
+			encoder.Encode(prototype)
+		} else {
+			return err
+		}
+		this.m_prototypes[prototype.TypeName] = prototype
+	}
 
 	return nil
 }

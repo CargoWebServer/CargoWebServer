@@ -2,7 +2,8 @@ package Server
 
 import "fmt"
 import "strings"
-import "log"
+
+//import "log"
 import "code.myceliUs.com/Utility"
 
 /**
@@ -210,6 +211,7 @@ func (this *EntityPrototype) setSuperTypeFields() {
 			if err == nil {
 				// I will merge the fields
 				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
+
 				for j := 3; j < len(superPrototype.Fields)-2; j++ {
 					if !Utility.Contains(this.Fields, superPrototype.Fields[j]) && strings.HasPrefix(superPrototype.Fields[j], "M_") {
 
@@ -268,8 +270,14 @@ func (this *EntityPrototype) setSuperTypeFields() {
 						store.SaveEntityPrototype(superPrototype)
 					}
 				}
-			} else {
-				log.Println("error ", err)
+
+				// I will also append the prototype supertype supertypes...
+				for j := 0; j < len(superPrototype.SuperTypeNames); j++ {
+					if !Utility.Contains(this.SuperTypeNames, superPrototype.SuperTypeNames[j]) {
+						// Prepend parent supertypes to it supertypes.
+						this.SuperTypeNames = append([]string{superPrototype.SuperTypeNames[j]}, this.SuperTypeNames...)
+					}
+				}
 			}
 		}
 	}
