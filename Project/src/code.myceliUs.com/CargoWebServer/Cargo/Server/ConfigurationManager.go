@@ -140,6 +140,15 @@ func newConfigurationManager() *ConfigurationManager {
 ////////////////////////////////////////////////////////////////////////////////
 // Service functions
 ////////////////////////////////////////////////////////////////////////////////
+func (this *ConfigurationManager) getActiveConfigurations() *Config.Configurations {
+	// Get the entity from the cache...
+	entity, _ := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
+	if entity != nil {
+		return entity.(*Config.Configurations)
+	}
+
+	return nil
+}
 
 /**
  * Do intialysation stuff here.
@@ -455,7 +464,7 @@ func (this *ConfigurationManager) CancelTask(uuid string, messageId string, sess
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ConfigurationManager) GetActiveConfigurations(messageId string, sessionId string) *Config.Configurations {
-	return this.m_activeConfigurations
+	return this.getActiveConfigurations()
 }
 
 // @api 1.0

@@ -1019,7 +1019,7 @@ func (this *Server) Start() {
 		}
 
 		// Now I will register actions for services container.
-		activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+		activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 
 		// Start the remote services.
 		for _, service := range GetServer().GetServiceManager().m_remoteServicesLst {

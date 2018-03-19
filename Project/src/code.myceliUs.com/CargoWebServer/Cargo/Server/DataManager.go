@@ -98,7 +98,7 @@ func (this *DataManager) initialize() {
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
-	storeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations.GetDataStoreConfigs()
+	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations().GetDataStoreConfigs()
 
 	log.Println("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
@@ -286,7 +286,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
-		configEntity := GetServer().GetConfigurationManager().m_activeConfigurations
+		configEntity := GetServer().GetConfigurationManager().getActiveConfigurations()
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
 		if err_ != nil {
 			return nil, err_
@@ -346,27 +346,19 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 	store.DeleteEntityPrototypes()
 	store.Close()
 
-	// Delete the dataStore configuration
-	dataStore, errObj := GetServer().GetEntityManager().getEntityById("Config.DataStoreConfiguration", "Config", []interface{}{storeId})
-
-	// In case of the configuration is not already deleted...
-	if errObj == nil {
-		errObj = GetServer().GetEntityManager().deleteEntity(dataStore)
-		if errObj != nil {
-			log.Println("---> err ", errObj.GetBody())
-			return errObj
-		}
-
-	} else {
-		return errObj
-	}
-
 	// Remove the storeObject from the storeMap
 	this.removeDataStore(storeId)
 
 	// Delete the directory
 	filePath := GetServer().GetConfigurationManager().GetDataPath() + "/" + storeId
 	err := os.RemoveAll(filePath)
+
+	// I will also remove it schema if there is one.
+	schemaPath := GetServer().GetConfigurationManager().GetSchemasPath() + "/" + storeId + ".xsd"
+	if Utility.Exists(schemaPath) {
+		// remove it schemas
+		os.Remove(schemaPath)
+	}
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to delete directory '"+filePath+"' with error '"+err.Error()+"'."))

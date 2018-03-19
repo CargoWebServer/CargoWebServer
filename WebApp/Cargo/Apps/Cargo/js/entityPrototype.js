@@ -286,7 +286,7 @@ EntityPrototype.prototype.generateConstructor = function () {
         return
     }
 
-    var constructorSrc = this.PackageName + " || {};\n"
+    var constructorSrc =  this.PackageName + " || {};\n"
 
     var packageName = this.PackageName
     var classNames = this.ClassName.split(".")

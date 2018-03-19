@@ -66,7 +66,7 @@ function main() {
     //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
     // entityDump("1", "employees.employees")
 
-    //entitiesDump("COLLADASchema.COLLADA")
+    // entitiesDump("COLLADASchema.COLLADA")
     // entitiesDump("DT3_informations.Department")
     // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
@@ -75,10 +75,10 @@ function main() {
 
     //testSayHello("Dave")
     // entityDump( "BPMN20", "BPMN20.Definitions")
-    server.entityManager.getEntityPrototypes("BPMN20", 
+    server.entityManager.getEntityPrototypes("COLLADASchema", 
     // success callback
     function(prototypes, caller){
-        server.entityManager.getEntityByUuid("BPMN20.Definitions%a0f982f5-e7d2-3522-9a7e-2422ae200b0a", false,
+        server.entityManager.getEntityByUuid("COLLADASchema.COLLADA%5089dfe0-8ed6-4be0-b78d-2903fb588929", false,
         // The success callback
         function(definitions, caller){
             console.log(definitions)
@@ -92,6 +92,7 @@ function main() {
     function(){
 
     })
+
 
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")

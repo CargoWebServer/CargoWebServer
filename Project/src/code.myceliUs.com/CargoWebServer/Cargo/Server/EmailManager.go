@@ -73,7 +73,7 @@ func (this *EmailManager) initialize() {
 
 	this.m_infos = make(map[string]*Config.SmtpConfiguration, 0)
 
-	activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 
 	smtpConfigurations := activeConfigurations.GetSmtpConfigs()
 

@@ -137,7 +137,7 @@ func (this *SchemaManager) initialize() {
 		store := GetServer().GetDataManager().getDataStore(schema.Id)
 		if store == nil {
 			// I will create the new store here...
-			activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+			activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 			var errObj *CargoEntities.Error
 			serverConfig := activeConfigurations.GetServerConfig()
 			hostName := serverConfig.GetHostName()
@@ -192,7 +192,6 @@ func (this *SchemaManager) createEntityPrototype(typeName string) {
 
 	delete(this.prototypes, typeName)
 
-	prototype.Print()
 }
 
 func setDefaultFieldValue(prototype *EntityPrototype, fieldType string) {
@@ -262,7 +261,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 	store := GetServer().GetDataManager().getDataStore(schema.Id)
 	if store == nil {
 		// I will create the new store here...
-		activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+		activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 		var errObj *CargoEntities.Error
 		serverConfig := activeConfigurations.GetServerConfig()
 		hostName := serverConfig.GetHostName()
@@ -1639,6 +1638,20 @@ func (this *XmlDocumentHandler) StartDocument() {
 
 }
 
+func (this *XmlDocumentHandler) EndDocument() {
+	// Here I will compact the object
+
+	// Here I will create dynamic entities for those objects.
+	for i := 0; i < len(this.globalObjects); i++ {
+		object := this.globalObjects[i]
+		compactObject(object)
+		log.Println(object)
+		entity := NewDynamicEntity()
+		entity.setObject(object)
+		GetServer().GetEntityManager().saveEntity(entity)
+	}
+}
+
 /**
  * Remove xs object and keep only there values...
  */
@@ -1650,7 +1663,9 @@ func compactObject(object map[string]interface{}) {
 				// if the type is a base type I will take it value...
 				if strings.HasPrefix(v["TYPENAME"].(string), "xs.") {
 					// Keep the value only...
-					object[key] = v["M_valueOf"]
+					if v["M_valueOf"] != nil {
+						object[key] = v["M_valueOf"]
+					}
 				} else {
 					compactObject(v)
 				}
@@ -1663,7 +1678,9 @@ func compactObject(object map[string]interface{}) {
 						// if the type is a base type I will take it value...
 						if strings.HasPrefix(v_["TYPENAME"].(string), "xs.") {
 							// Keep the value only...
-							v[i] = v_["M_valueOf"]
+							if v_["M_valueOf"] != nil {
+								v[i] = v_["M_valueOf"]
+							}
 						} else {
 							compactObject(v_)
 						}
@@ -1674,20 +1691,8 @@ func compactObject(object map[string]interface{}) {
 	}
 }
 
-func (this *XmlDocumentHandler) EndDocument() {
-	// Here I will compact the object
-
-	// Here I will create dynamic entities for those objects.
-	for i := 0; i < len(this.globalObjects); i++ {
-		object := this.globalObjects[i]
-		compactObject(object)
-		entity := NewDynamicEntity()
-		entity.setObject(object)
-		GetServer().GetEntityManager().saveEntity(entity)
-	}
-}
-
 func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, typeName string, name string, value string, isArray bool) interface{} {
+
 	// Set the object value...
 	if typeName == "xs.boolean" {
 		//////////////////////////// Boolean types ////////////////////////////
@@ -1865,7 +1870,6 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 	attributes := e.Attr
 	elementNameLocal := e.Name.Local
-	var object map[string]interface{}
 
 	// Get the element schema...
 	if SchemaId, ok := GetServer().GetSchemaManager().elementSchema[elementNameLocal]; ok {
@@ -1883,21 +1887,27 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 		}
 	}
 
+	var object map[string]interface{}
 	if len(this.SchemaId) > 0 {
 		// Get the parent of this object...
 		lastObject := this.getLastObject()
 		if lastObject != nil {
 			// The element is a member of the last object...
-			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(lastObject["TYPENAME"].(string), lastObject["TYPENAME"].(string)[0:strings.Index(lastObject["TYPENAME"].(string), ".")])
-			fieldType := GetServer().GetSchemaManager().getFieldType(prototype.TypeName, "M_"+elementNameLocal)
+			typeName := lastObject["TYPENAME"].(string)
+			storeId := lastObject["TYPENAME"].(string)[0:strings.Index(lastObject["TYPENAME"].(string), ".")]
+			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+			fieldIndex := prototype.getFieldIndex("M_" + elementNameLocal)
 			// Here I will try to
-			if len(fieldType) > 0 {
+			if fieldIndex != -1 {
+				fieldType := prototype.FieldsType[fieldIndex]
 				// The field type...
-				fieldType := strings.Replace(fieldType, "[]", "", -1)
-				fieldType = strings.Replace(fieldType, ":Ref", "", -1)
-				object = make(map[string]interface{})
-				object["TYPENAME"] = fieldType
-				this.objects.Push(object)
+				if !strings.HasSuffix(fieldType, ":Ref") {
+					fieldType = strings.Replace(fieldType, "[]", "", -1)
+					object = make(map[string]interface{})
+					object["TYPENAME"] = fieldType
+					object["UUID"] = ""
+					this.objects.Push(object)
+				}
 			} else {
 				// The element is not found with it name in the prototype...
 				// so I will try to get it from the global scope...
@@ -1907,17 +1917,19 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 					// The element can be name with it superType name in case of abstract type...
 					if len(element.SubstitutionGroup) > 0 {
 						index := prototype.getFieldIndex("M_" + element.SubstitutionGroup)
-						if index > 0 {
+						if index != -1 {
 							elementNameLocal = element.SubstitutionGroup
 							fieldType := strings.Replace(prototype.FieldsType[index], "[]", "", -1)
-							fieldType = strings.Replace(fieldType, ":Ref", "", -1)
-							object = make(map[string]interface{})
-							if len(element.Type) > 0 {
-								object["TYPENAME"] = this.SchemaId + "." + element.Type
-							} else {
-								object["TYPENAME"] = this.SchemaId + "." + element.Name
+							if !strings.HasSuffix(fieldType, ":Ref") {
+								object = make(map[string]interface{})
+								object["UUID"] = ""
+								if len(element.Type) > 0 {
+									object["TYPENAME"] = this.SchemaId + "." + element.Type
+								} else {
+									object["TYPENAME"] = this.SchemaId + "." + element.Name
+								}
+								this.objects.Push(object)
 							}
-							this.objects.Push(object)
 						} else {
 							log.Println(" 1615 -------------> Element not found ", e.Name.Local)
 						}
@@ -1928,13 +1940,16 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 					log.Println(" 1621 -------------> Element not found ", e.Name.Local)
 				}
 			}
+
 		} else {
 			// Try to get element from global element here.
 			var element *XML_Schemas.XSD_Element
 			if val, ok := GetServer().GetSchemaManager().globalElements[this.SchemaId+"."+elementNameLocal]; ok {
 				element = val
 			}
+
 			object = make(map[string]interface{})
+			object["UUID"] = ""
 			// Here the object is in the global scope so the element must no]
 			// be nil
 			if len(element.Type) > 0 {
@@ -1950,6 +1965,7 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 			// Here I will set the attributes...
 			storeId := object["TYPENAME"].(string)[0:strings.Index(object["TYPENAME"].(string), ".")]
 			prototype, err := GetServer().GetEntityManager().getEntityPrototype(object["TYPENAME"].(string), storeId)
+
 			if err != nil {
 				log.Panicln("No prototype found for class ", object["TYPENAME"].(string))
 			}
@@ -1960,38 +1976,42 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 				attrName := "M_" + attr.Name.Local
 				// I will get the index of that field to test if it exist in the
 				// prototype...
-				fieldType := GetServer().GetSchemaManager().getFieldType(prototype.TypeName, attrName)
-				if len(fieldType) > 0 {
+				fieldIndex := prototype.getFieldIndex(attrName)
+				if fieldIndex != -1 {
+					fieldType := prototype.FieldsType[fieldIndex]
 					// In that case the field is not a base type so I need to create a object of the good type and set the
 					// value of field...
 					attrObject := make(map[string]interface{})
+					attrObject["UUID"] = ""
 					attrObject["TYPENAME"] = fieldType
 					attrObject["M_valueOf"] = attr.Value
 					object[attrName] = attrObject
 				}
 			}
 
-			// Here I will set the object into the parent...
+			// Here I will set the object into it parent...
 			if lastObject != nil {
 				this.lastProperty = "M_" + elementNameLocal
 				prototype, _ := GetServer().GetEntityManager().getEntityPrototype(lastObject["TYPENAME"].(string), lastObject["TYPENAME"].(string)[0:strings.Index(lastObject["TYPENAME"].(string), ".")])
-				fieldType := GetServer().GetSchemaManager().getFieldType(prototype.TypeName, "M_"+elementNameLocal)
-				//log.Println(lastObject["TYPENAME"].(string), "-> M_"+elementNameLocal, ":", fieldType)
-				isArray := strings.Index(fieldType, "[]") > -1
-				// If the field type is tag as reference...
-				if isArray {
-					if lastObject["M_"+elementNameLocal] == nil {
-						lastObject[this.lastProperty] = make([]interface{}, 0)
+				fieldIndex := prototype.getFieldIndex("M_" + elementNameLocal)
+				if fieldIndex != -1 {
+					fieldType := prototype.FieldsType[fieldIndex]
+					isArray := strings.Index(fieldType, "[]") > -1
+					// If the field type is tag as reference...
+					if !strings.HasSuffix(fieldType, ":Ref") {
+						if isArray {
+							if lastObject[this.lastProperty] == nil {
+								lastObject[this.lastProperty] = make([]interface{}, 0)
+							}
+							lastObject[this.lastProperty] = append(lastObject[this.lastProperty].([]interface{}), object)
+						} else {
+							lastObject[this.lastProperty] = object
+						}
 					}
-					lastObject[this.lastProperty] = append(lastObject[this.lastProperty].([]interface{}), object)
-				} else {
-					lastObject[this.lastProperty] = object
 				}
 			}
 		}
-
 	} else {
-
 		log.Println("Schema not found!")
 	}
 }

@@ -107,8 +107,9 @@ func (this *ServiceManager) start() {
 	}
 
 	// Now the external services...
-	for i := 0; i < len(GetServer().GetConfigurationManager().m_servicesConfiguration); i++ {
-		config := GetServer().GetConfigurationManager().m_servicesConfiguration[i]
+	services := GetServer().GetConfigurationManager().getActiveConfigurations().GetServiceConfigs()
+	for i := 0; i < len(services); i++ {
+		config := services[i]
 		if config.GetHostName() != "localhost" || config.GetPort() == GetServer().GetConfigurationManager().GetConfigurationServicePort() {
 			this.m_remoteServicesLst[config.M_id] = config
 			config.M_start = false // In that case start means ready to listen.

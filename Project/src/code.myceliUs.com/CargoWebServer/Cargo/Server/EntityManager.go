@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -97,8 +98,9 @@ func newEntityManager() *EntityManager {
 
 	// Create prototypes for config objects and entities objects...
 	entityManager.createConfigPrototypes()
-	entityManager.createCargoEntitiesPrototypes()
 	entityManager.registerConfigObjects()
+
+	entityManager.createCargoEntitiesPrototypes()
 	entityManager.registerCargoEntitiesObjects()
 
 	// Entity prototype is a dynamic type.
@@ -744,8 +746,8 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 		if strings.HasPrefix(fieldType, "[]") {
 			childs := parent.(*DynamicEntity).getValue(entity.GetParentLnk())
 			if childs != nil {
-				for i := 0; i < len(childs.([]string)); i++ {
-					if childs.([]string)[i] == entity.GetUuid() {
+				for i := 0; i < len(childs.([]interface{})); i++ {
+					if childs.([]interface{})[i].(string) == entity.GetUuid() {
 						return nil
 					}
 				}
@@ -915,7 +917,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	var values map[string]interface{}
 	var err error
-
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		values = entity.(*DynamicEntity).getValues()
 	} else {
@@ -925,11 +926,15 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			return cargoError
 		}
 	}
+
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+
+	// Set it childs...
+	this.saveChilds(entity, prototype)
 
 	// Here is the triple to be saved.
 	triples := make([]interface{}, 0)
@@ -1007,7 +1012,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Save the changed/new triples.
 	if len(triples) > 0 {
 		log.Println("---> save entity ", entity.GetUuid())
-
 		_, err = store.Create("", triples)
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -1016,11 +1020,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 		// Send update entity event here.
 		GetServer().GetEventManager().BroadcastEvent(evt)
-
-		// Set it childs...
-		this.saveChilds(entity, prototype)
 	}
-
 	return nil
 }
 
@@ -1631,6 +1631,11 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
+
+	// Need to sort the prototype because of namespace evaluation.
+	sort.Slice(protos[:], func(i, j int) bool {
+		return protos[i].TypeName < protos[j].TypeName
+	})
 
 	return protos
 }

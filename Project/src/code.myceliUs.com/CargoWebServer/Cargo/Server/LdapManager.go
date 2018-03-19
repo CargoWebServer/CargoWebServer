@@ -56,7 +56,7 @@ func (this *LdapManager) getId() string {
 func (this *LdapManager) getConfigsInfo() map[string]*Config.LdapConfiguration {
 	configsInfo := make(map[string]*Config.LdapConfiguration, 0)
 
-	activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 	ldapConfigurations := activeConfigurations.GetLdapConfigs()
 
 	for i := 0; i < len(ldapConfigurations); i++ {

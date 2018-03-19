@@ -156,7 +156,7 @@ func (this *OAuth2Manager) getId() string {
 
 func (this *OAuth2Manager) start() {
 	log.Println("--> Start OAuth2Manager")
-	activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 
 	cfg := activeConfigurations.GetOauth2Configuration()
 
@@ -319,7 +319,7 @@ func (this *OAuth2Manager) stop() {
  * if refresh exist.
  */
 func (this *OAuth2Manager) cleanup() {
-	activeConfiguration := GetServer().GetConfigurationManager().m_activeConfigurations
+	activeConfiguration := GetServer().GetConfigurationManager().getActiveConfigurations()
 	config := activeConfiguration.GetOauth2Configuration()
 
 	// First of all I will renew the access...
@@ -494,7 +494,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		// Try to find the access...
 
 		// Get the config.
-		activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
+		activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 		config := activeConfigurations.GetOauth2Configuration()
 
 		// Get the accesses
@@ -2126,7 +2126,7 @@ func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
 		}
 
 		// Get the configuration object.
-		config := GetServer().GetConfigurationManager().m_activeConfigurations
+		config := GetServer().GetConfigurationManager().getActiveConfigurations()
 
 		// So here The refresh token is valid i will create a new authorization
 		authorizeData := new(osin.AuthorizeData)

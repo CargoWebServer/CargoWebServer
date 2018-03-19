@@ -856,7 +856,7 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	store := GetServer().GetDataManager().getDataStore("sql_info")
 	if store == nil {
 
-		serverConfig := GetServer().GetConfigurationManager().m_activeConfigurations.GetServerConfig()
+		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurations().GetServerConfig()
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()

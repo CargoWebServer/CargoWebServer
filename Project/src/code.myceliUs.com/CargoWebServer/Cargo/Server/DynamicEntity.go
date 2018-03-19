@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -82,7 +83,7 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 			if reflect.TypeOf(v).String() == "[]interface {}" {
 				if len(v.([]interface{})) > 0 {
 					if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
-						if v.([]interface{})[0].(map[string]interface{})["UUID"] != nil {
+						if v.([]interface{})[0].(map[string]interface{})["TYPENAME"] != nil {
 							childs := make([]string, 0)
 							for i := 0; i < len(v.([]interface{})); i++ {
 								// In case the uuid is not already set...
@@ -100,7 +101,7 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 					}
 				}
 			} else if reflect.TypeOf(v).String() == "map[string]interface {}" {
-				if v.(map[string]interface{})["UUID"] != nil {
+				if v.(map[string]interface{})["TYPENAME"] != nil {
 					// In case the uuid is not already set...
 					if len(v.(map[string]interface{})["UUID"].(string)) != 0 {
 						values[k] = v.(map[string]interface{})["UUID"]
@@ -215,6 +216,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 			}
 		}
 	}
+
 }
 
 /**
@@ -410,11 +412,13 @@ func (this *DynamicEntity) GetChildsUuid() []string {
 		field := prototype.Fields[i]
 		if strings.HasPrefix(field, "M_") {
 			fieldType := prototype.FieldsType[i]
+			log.Println("---> ", this.object["UUID"])
 			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
-				if strings.HasPrefix(fieldType, "[]") {
-					// The value is an array...
-					val := this.getValue(field)
-					if val != nil {
+				log.Println("---> field ", field, this.object["UUID"])
+				val := this.getValue(field)
+				if val != nil {
+					if strings.HasPrefix(fieldType, "[]") {
+						// The value is an array...
 						if reflect.TypeOf(val).String() == "[]interface {}" {
 							for j := 0; j < len(val.([]interface{})); j++ {
 								if Utility.IsValidEntityReferenceName(val.([]interface{})[j].(string)) {
@@ -428,12 +432,11 @@ func (this *DynamicEntity) GetChildsUuid() []string {
 								}
 							}
 						}
-					}
-				} else {
-					// The value is not an array.
-					val := this.getValue(field)
-					if Utility.IsValidEntityReferenceName(val.(string)) {
-						childs = append(childs, val.(string))
+					} else {
+						// The value is not an array.
+						if Utility.IsValidEntityReferenceName(val.(string)) {
+							childs = append(childs, val.(string))
+						}
 					}
 				}
 			}
