@@ -268,11 +268,6 @@ EntityPrototype.prototype.init = function (object) {
     if (object.FieldsDefaultValue != undefined) {
         this.FieldsDefaultValue = object.FieldsDefaultValue
     }
-
-    // other standard fields.
-    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.", "[]")
-    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.", "[]")
-
 }
 
 /**

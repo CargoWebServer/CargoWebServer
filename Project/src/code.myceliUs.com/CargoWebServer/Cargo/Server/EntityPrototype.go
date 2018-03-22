@@ -212,7 +212,7 @@ func (this *EntityPrototype) setSuperTypeFields() {
 				// I will merge the fields
 				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
 
-				for j := 3; j < len(superPrototype.Fields)-2; j++ {
+				for j := 3; j < len(superPrototype.Fields); j++ {
 					if !Utility.Contains(this.Fields, superPrototype.Fields[j]) && strings.HasPrefix(superPrototype.Fields[j], "M_") {
 
 						Utility.InsertStringAt(index, superPrototype.Fields[j], &this.Fields)

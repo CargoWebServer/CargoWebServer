@@ -50,8 +50,6 @@ func (this *Server) GetConfigurationManager() *ConfigurationManager {
 func newConfigurationManager() *ConfigurationManager {
 
 	configurationManager := new(ConfigurationManager)
-
-	// can be set or not...
 	cargoRoot := os.Getenv("CARGOROOT")
 
 	if len(cargoRoot) == 0 {

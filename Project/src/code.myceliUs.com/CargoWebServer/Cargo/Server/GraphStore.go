@@ -662,7 +662,8 @@ func (this *GraphStore) DeleteEntityPrototypes() error {
 						GetServer().GetEventManager().BroadcastEvent(evt)
 					}
 				}
-				GetServer().GetEntityManager().m_removeEntityChan <- entity
+
+				GetServer().GetEntityManager().removeEntity(entity)
 
 				// Send event message...
 				var eventDatas []*MessageData
@@ -2076,9 +2077,9 @@ func (this *GraphStore) Update(queryStr string, triples []interface{}, params []
 	}
 
 	// The triples to save...
-	/*for i := 0; i < len(triples); i++ {
+	for i := 0; i < len(triples); i++ {
 		log.Println("------> save triple ", triples[i])
-	}*/
+	}
 
 	return
 }

@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QMap>
 #include <QList>
-#include <QVector>
 #include "gen/rpc.pb.h"
 
 class Session : public QThread

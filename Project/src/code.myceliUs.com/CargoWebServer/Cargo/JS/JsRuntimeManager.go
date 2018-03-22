@@ -278,6 +278,27 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 		GetJsRuntimeManager().m_clearInterval <- uuid
 	})
 
+	// Suspend function execution.
+	jsRuntimeManager.appendFunction("getSuspend", func() string {
+		// The intetifier of the function.
+		uuid := Utility.RandomUUID()
+		// jsRuntimeManager.m_waits[uuid] = make(chan interface{})
+		return uuid
+	})
+
+	// Make function wait until resume is call...
+	jsRuntimeManager.appendFunction("suspend", func(uuid string) {
+		// wait after returning the uuid
+		// <-jsRuntimeManager.m_waits[uuid]
+	})
+
+	// Resume the execution...
+	jsRuntimeManager.appendFunction("resume", func(uuid string) {
+		// resume the execution.
+		// jsRuntimeManager.m_waits[uuid] <- nil
+		// delete(jsRuntimeManager.m_waits, uuid)
+	})
+
 	////////////////////////////////////////////////////////////////////////////
 	// Node.js compatibility
 	////////////////////////////////////////////////////////////////////////////
@@ -413,6 +434,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							script := operationInfos.m_params["script"].(string)
 							var results otto.Value
 							var err error
+							log.Println("---> run script ", sessionId)
 							results, err = vm.Run(script)
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
@@ -722,12 +744,11 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	if this.m_sessions[sessionId] != nil {
 		return // Nothing to do if the session already exist.
 	}
+
 	// Create a new js interpreter for the given session.
-	if sessionId == "" {
-		this.m_sessions[sessionId] = otto.New()
-	} else {
-		// Each new session will be a copy of the base session at start.
-		this.m_sessions[sessionId] = this.m_sessions[""].Copy()
+	this.m_sessions[sessionId] = otto.New()
+	if sessionId != "" {
+		this.initScripts(sessionId)
 	}
 
 	// That channel is use to interrupt vm machine, it must be created before

@@ -1,5 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-// Fichier contenant les différents test
+// Fichier contenant les différents test.
 var languageInfo = {
     "en": {
     }
@@ -66,19 +66,20 @@ function main() {
     //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
     // entityDump("1", "employees.employees")
 
-    // entitiesDump("COLLADASchema.COLLADA")
+    entitiesDump("Proactive.AnalyseResult")
     // entitiesDump("DT3_informations.Department")
     // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
-
     //entitiesDump("CargoEntities.Action")
+
+    //entitiesDump("XPDMXML.Product3DType")
 
     //testSayHello("Dave")
     // entityDump( "BPMN20", "BPMN20.Definitions")
-    server.entityManager.getEntityPrototypes("COLLADASchema", 
+    /*server.entityManager.getEntityPrototypes("COLLADASchema", 
     // success callback
     function(prototypes, caller){
-        server.entityManager.getEntityByUuid("COLLADASchema.COLLADA%5089dfe0-8ed6-4be0-b78d-2903fb588929", false,
+        server.entityManager.getEntityByUuid("COLLADASchema.COLLADA%61933735-a65e-4f35-b8d6-920da06dee7e", false,
         // The success callback
         function(definitions, caller){
             console.log(definitions)
@@ -91,10 +92,10 @@ function main() {
     // error callback.
     function(){
 
-    })
+    })*/
 
 
-    //entitiesDump("XPDMXML.ProcessStructureType")
+   // entitiesDump("XPDMXML.ProductionGeneralSystem")
     // entitiesDump("CatalogSchema.CatalogType")
 
     //testEntityQuery()

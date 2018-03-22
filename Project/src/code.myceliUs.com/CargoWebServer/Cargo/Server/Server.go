@@ -890,9 +890,11 @@ func (this *Server) Start() {
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
 		func(address string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
+
 			values := strings.Split(address, ":")
 			var host string
 			var port int
+
 			// Address can be ws://127.0.0.1:9393 or simply 127.0.0.1:9393
 			if len(values) == 3 {
 				host = strings.Replace(values[1], "//", "", -1)
@@ -914,7 +916,7 @@ func (this *Server) Start() {
 
 			subConnectionId := subConnection.GetUuid()
 
-			// I will append the connection the session.
+			// I will append the connection to the session.
 			GetServer().appendSubConnectionId(connectionId, subConnectionId)
 
 			// Here I will create the connection object...
@@ -981,13 +983,11 @@ func (this *Server) Start() {
 			}
 
 			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, caller)
-
 			go func(rqst *message) {
 				GetServer().GetProcessor().m_sendRequest <- rqst
 			}(rqst)
 
 			return conn
-
 		})
 
 	////////////////////////////////////////////////////////////////////////////

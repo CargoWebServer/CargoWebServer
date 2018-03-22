@@ -1,7 +1,7 @@
 package Server
 
 import (
-	"log"
+	//"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -49,11 +49,6 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	// Here the value is in the map.
 	this.object[field] = value
 
-	// put in the cache if UUID is set cache.
-	if len(this.object["UUID"].(string)) > 0 {
-		GetServer().GetEntityManager().m_setEntityChan <- this
-	}
-
 	return nil
 }
 
@@ -61,8 +56,8 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
  * Thread safe function
  */
 func (this *DynamicEntity) getValue(field string) interface{} {
-	this.Lock()
-	defer this.Unlock()
+	this.RLock()
+	defer this.RUnlock()
 	return this.object[field]
 }
 
@@ -73,8 +68,8 @@ func (this *DynamicEntity) getValue(field string) interface{} {
  */
 func (this *DynamicEntity) getValues() map[string]interface{} {
 	// Set child uuid's here if there is not already sets...
-	this.Lock()
-	defer this.Unlock()
+	this.RLock()
+	defer this.RUnlock()
 	values := make(map[string]interface{})
 
 	// return the values without all sub-entity values
@@ -127,18 +122,14 @@ func (this *DynamicEntity) deleteValue(field string) {
 	// Remove the field itself.
 	delete(this.object, field)
 
-	// put in the cache if UUID is set cache.
-	if len(this.object["UUID"].(string)) > 0 {
-		GetServer().GetEntityManager().m_setEntityChan <- this
-	}
 }
 
 /**
  * Set object.
  */
 func (this *DynamicEntity) setObject(obj map[string]interface{}) {
-	// this.Lock()
-	// defer this.Unlock()
+	//this.Lock()
+	//defer this.Unlock()
 	this.object = obj
 
 	if this.object["UUID"] == nil {
@@ -183,8 +174,8 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 										val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
 										child := NewDynamicEntity()
 										child.setObject(val.([]interface{})[j].(map[string]interface{}))
+										GetServer().GetEntityManager().setEntity(child)
 										// Keep it on the cache
-										GetServer().GetEntityManager().m_setEntityChan <- child
 										uuids = append(uuids, child.object["UUID"])
 									}
 								}
@@ -206,8 +197,8 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 								val.(map[string]interface{})["ParentLnk"] = field
 								child := NewDynamicEntity()
 								child.setObject(val.(map[string]interface{}))
+								GetServer().GetEntityManager().setEntity(child)
 								// Keep it on the cache
-								GetServer().GetEntityManager().m_setEntityChan <- child
 								this.object[field] = child.object["UUID"]
 							}
 						}
@@ -412,9 +403,7 @@ func (this *DynamicEntity) GetChildsUuid() []string {
 		field := prototype.Fields[i]
 		if strings.HasPrefix(field, "M_") {
 			fieldType := prototype.FieldsType[i]
-			log.Println("---> ", this.object["UUID"])
 			if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") && !strings.HasSuffix(fieldType, ":Ref") {
-				log.Println("---> field ", field, this.object["UUID"])
 				val := this.getValue(field)
 				if val != nil {
 					if strings.HasPrefix(fieldType, "[]") {
