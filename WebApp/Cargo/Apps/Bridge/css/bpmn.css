@@ -1,13 +1,10 @@
 /** The bpmn view **/
 .bpmn_explorer{
-    background-color: white;
     width: calc(100%-1px);
     padding: 2px 2px 2px 2px;
 }
 
 .bpmn_explorer_header{
-    background-color: #bbb;
-    color: white;
     padding-left: 2px;
     padding-right: 2px;
 }
@@ -16,7 +13,6 @@
     display: table; 
     width: 100%;
     transition: all .2s ease;
-    color: #657383;
 }
 
 .definitionsDiv{
@@ -49,5 +45,5 @@
 }
 
 .bpmndi_text_box span{
-    color:  rgb(51, 51, 51);
+    color:  #646464;
 }

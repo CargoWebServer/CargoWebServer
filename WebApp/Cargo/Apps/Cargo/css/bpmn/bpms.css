@@ -14,14 +14,13 @@
 	display: table;
 	width: 100%;
 	height: 100%;
-	color: #657383;
 	padding: 2px;
 	border-spacing: 2px;
     border-collapse: separate;
 }
 
 .process_wizard_content a {
-	color: #657383;
+
 }
 
 .process_wizard_content{

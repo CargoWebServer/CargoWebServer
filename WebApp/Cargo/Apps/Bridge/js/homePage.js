@@ -185,8 +185,15 @@ var HomePage = function () {
         changePropertyByClassName("color", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         setAlpha("#workingFilesDiv.scrolling", .25)
         changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
-
+        
         if (evt.dataMap.isDark) {
+
+            changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".diagramLnk", "." + evt.dataMap.themeClass)
+            
+            changePropertyByClassName("fill", ".bpmndi_task", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".bpmndi_text_box span", "." + evt.dataMap.themeClass)
+
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".contextSelector", "." + evt.dataMap.themeClass)
@@ -224,6 +231,13 @@ var HomePage = function () {
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
         } else {
+            changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".diagramLnk", "." + evt.dataMap.themeClass + " .ace_gutter")
+
+            changePropertyByClassName("fill", ".bpmndi_task", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".bpmndi_text_box span", "." + evt.dataMap.themeClass + " .ace_gutter")
+
+
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -279,6 +293,12 @@ var HomePage = function () {
         changePropertyByClassName("color", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
+        changePropertyByClassName("color", ".bpmn_explorer_header", "." + evt.dataMap.themeClass + " .ace_gutter-cell")
+        changePropertyByClassName("background-color", ".bpmn_explorer_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".bpmn_explorer", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".bpmn_explorer", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".bpmn_explorer", "." + evt.dataMap.themeClass)
 
         changePropertyByClassName("color", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")

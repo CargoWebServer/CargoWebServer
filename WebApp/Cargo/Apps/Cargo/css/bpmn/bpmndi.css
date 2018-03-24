@@ -73,27 +73,26 @@
 }
 
 .bpmndi_user_task{
-	fill: white;
 }
 
 .bpmndi_user_task div{
-	color: red;
+
 }
 
 .bpmndi_script_task{
-	fill: white;
+
 }
 
 .bpmndi_service_task{
-	fill: white;
+
 }
 
 .bpmndi_receive_task{
-	fill: white;
+
 }
 
 .bpmndi_send_task{
-	fill: white;
+
 }
 
 .bpmndi_send_enveloppe{
@@ -188,8 +187,8 @@
  * The Event section
  **************************************************/
 .bpmndi_event{
-	fill: white;
 	stroke-width: 2px;
+	fill: white;
 }
 
 .bpmndi_startEvent{
@@ -294,8 +293,8 @@
 
 /** Gateway **/
 .bpmndi_gateway{
-	fill: white;
 	stroke-width: 2.5px;
+	fill: white;
 }
 
 .bpmndi_parallel_gateway{
