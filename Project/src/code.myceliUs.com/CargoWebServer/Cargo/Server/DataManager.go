@@ -151,9 +151,6 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
  * Access Map functions...
  */
 func (this *DataManager) getDataStore(id string) DataStore {
-	if id == "DC" || id == "DI" || id == "BPMNDI" || id == "BPMN" {
-		id = "BPMN20"
-	}
 	arguments := make(map[string]interface{})
 	arguments["op"] = "getDataStore"
 	arguments["storeId"] = id

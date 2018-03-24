@@ -374,7 +374,12 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 	}
 
 	parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
-	fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
+	fieldIndex := parentPrototype.getFieldIndex(entity.GetParentLnk())
+	if fieldIndex == -1 {
+		log.Println(entity)
+		log.Panicln("---> dont panic!", parent.GetTypeName(), entity.GetUuid(), entity.GetParentLnk())
+	}
+	fieldType := parentPrototype.FieldsType[fieldIndex]
 	if cargoError != nil {
 		return cargoError
 	}
@@ -538,7 +543,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Here I will set the entity on the cache...
 	this.setEntity(entity)
-
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 
 	var values map[string]interface{}
@@ -547,6 +551,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		values = entity.(*DynamicEntity).getValues()
 	} else {
 		values, err = Utility.ToMap(entity)
+
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
@@ -595,6 +600,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Now entity are quadify I will save it in the graph store.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	existingTriples, err := store.Read(query, []interface{}{}, []interface{}{})
+
 	var evt *Event
 	if len(existingTriples) == 0 {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)

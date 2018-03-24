@@ -1306,7 +1306,18 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 		if err == nil {
 			decoder := gob.NewDecoder(file)
 			err = decoder.Decode(prototype)
+		} else {
+			file, err = os.Open(this.m_path + "/" + typeName + "_impl.gob")
+			if err == nil {
+				decoder := gob.NewDecoder(file)
+				err = decoder.Decode(prototype)
+			}
 		}
+		if err != nil {
+			//log.Panicln("---> ", typeName, err)
+			return nil, err
+		}
+
 		this.m_prototypes[typeName] = prototype
 		return prototype, err
 	}

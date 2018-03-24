@@ -95,6 +95,20 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 						values[k] = v
 					}
 				}
+			} else if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
+				if v.([]map[string]interface{})[0]["TYPENAME"] != nil {
+					childs := make([]string, 0)
+					for i := 0; i < len(v.([]map[string]interface{})); i++ {
+						// In case the uuid is not already set...
+						if len(v.([]map[string]interface{})[i]["UUID"].(string)) != 0 {
+							// In that case I will set it uuid.
+							childs = append(childs, v.([]map[string]interface{})[i]["UUID"].(string))
+						}
+					}
+					values[k] = childs
+				} else {
+					values[k] = v
+				}
 			} else if reflect.TypeOf(v).String() == "map[string]interface {}" {
 				if v.(map[string]interface{})["TYPENAME"] != nil {
 					// In case the uuid is not already set...

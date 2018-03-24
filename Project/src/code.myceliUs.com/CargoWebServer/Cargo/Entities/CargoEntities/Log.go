@@ -4,6 +4,8 @@ package CargoEntities
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
+	"strings"
 )
 
 type Log struct{
@@ -154,6 +156,17 @@ func (this *Log) GetEntries()[]*LogEntry{
 func (this *Log) SetEntries(val []*LogEntry){
 	this.M_entries= make([]string,0)
 	for i:=0; i < len(val); i++{
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
+			if parent != nil {
+				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
+				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				params := make([]interface{}, 1)
+				params[0] = val
+				Utility.CallMethod(parent, removeMethode, params)
+				this.setEntity(parent)
+			}
+		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entries")
 		this.M_entries=append(this.M_entries, val[i].GetUuid())
@@ -167,6 +180,17 @@ func (this *Log) AppendEntries(val *LogEntry){
 	for i:=0; i < len(this.M_entries); i++{
 		if this.M_entries[i] == val.GetUuid() {
 			return
+		}
+	}
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+		parent, _ := this.getEntityByUuid(val.GetParentUuid())
+		if parent != nil {
+			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
+			removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			params := make([]interface{}, 1)
+			params[0] = val
+			Utility.CallMethod(parent, removeMethode, params)
+			this.setEntity(parent)
 		}
 	}
 	val.SetParentUuid(this.GetUuid())

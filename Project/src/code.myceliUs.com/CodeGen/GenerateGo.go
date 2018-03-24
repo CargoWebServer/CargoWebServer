@@ -577,7 +577,21 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			if attribute.Upper == "*" {
 				setterStr += "	this.M_" + attributeName + "= make([]string,0)\n"
 				setterStr += "	for i:=0; i < len(val); i++{\n"
-				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
+				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
+
+					// Remove from it original parent
+					setterStr += "		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {\n"
+					setterStr += "			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())\n"
+					setterStr += "			if parent != nil {\n"
+					// In that case I will use reflexion to remove the object from it actual parent.
+					setterStr += "				removeMethode := strings.Replace(val[i].GetParentLnk(), \"M_\", \"\", -1)\n"
+					setterStr += "				removeMethode = \"Remove\" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]\n"
+					setterStr += "				params := make([]interface{}, 1)\n"
+					setterStr += "				params[0] = val\n"
+					setterStr += "				Utility.CallMethod(parent, removeMethode, params)\n"
+					setterStr += "				this.setEntity(parent)\n"
+					setterStr += "			}\n"
+					setterStr += "		}\n"
 					// Set the parent infos in the child.
 					setterStr += "		val[i].SetParentUuid(this.GetUuid())\n"
 					setterStr += "		val[i].SetParentLnk(\"M_" + attributeName + "\")\n"
@@ -587,7 +601,20 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				setterStr += "	}\n"
 				setterStr += "	this.setEntity(this)\n"
 			} else {
-				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
+				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
+					// Remove from it original parent
+					setterStr += "	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 {\n"
+					setterStr += "		parent, _:= this.getEntityByUuid(val.GetParentUuid())\n"
+					setterStr += "		if parent != nil {\n"
+					// In that case I will use reflexion to remove the object from it actual parent.
+					setterStr += "			removeMethode := strings.Replace(val.GetParentLnk(), \"M_\", \"\", -1)\n"
+					setterStr += "			removeMethode = \"Reset\" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]\n"
+					setterStr += "			params := make([]interface{}, 1)\n"
+					setterStr += "			params[0] = val\n"
+					setterStr += "			Utility.CallMethod(parent, removeMethode, params)\n"
+					setterStr += "			this.setEntity(parent)\n"
+					setterStr += "		}\n"
+					setterStr += "	}\n"
 					// Set the parent infos in the child.
 					setterStr += "	val.SetParentUuid(this.GetUuid())\n"
 					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
@@ -627,7 +654,22 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				appendStr += "			return\n"
 				appendStr += "		}\n"
 				appendStr += "	}\n"
-				if !IsRef(attribute) && enumMap[attribute.Name] == nil {
+
+				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
+					// Remove from it original parent
+					appendStr += "	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {\n"
+					appendStr += "		parent, _ := this.getEntityByUuid(val.GetParentUuid())\n"
+					appendStr += "		if parent != nil {\n"
+
+					// In that case I will use reflexion to remove the object from it actual parent.
+					appendStr += "			removeMethode := strings.Replace(val.GetParentLnk(), \"M_\", \"\", -1)\n"
+					appendStr += "			removeMethode = \"Remove\" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]\n"
+					appendStr += "			params := make([]interface{}, 1)\n"
+					appendStr += "			params[0] = val\n"
+					appendStr += "			Utility.CallMethod(parent, removeMethode, params)\n"
+					appendStr += "			this.setEntity(parent)\n"
+					appendStr += "		}\n"
+					appendStr += "	}\n"
 					// Set the parent infos in the child.
 					appendStr += "	val.SetParentUuid(this.GetUuid())\n"
 					appendStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
@@ -1083,8 +1125,14 @@ func generateGoClassCode(packageId string) {
 				}
 
 				var classStr_ = "package " + packageId + "\n\n"
-				if hasUtility[packageId+"."+class.Name] == true || hasUtility[packageId+"."+class.Name+"_impl"] == true {
+				if hasUtility[packageId+"."+class.Name] == true || hasUtility[packageId+"."+class.Name+"_impl"] == true || strings.Index(classStr, "Utility.") > 0 {
 					imports = append(imports, "code.myceliUs.com/Utility")
+				}
+
+				if !Utility.Contains(imports, "strings") {
+					if strings.Index(classStr, "strings.") > 0 {
+						imports = append(imports, "strings")
+					}
 				}
 
 				if len(imports) > 0 {

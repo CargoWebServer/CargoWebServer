@@ -4,6 +4,8 @@ package CargoEntities
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
+	"strings"
 )
 
 type Entities struct{
@@ -206,6 +208,17 @@ func (this *Entities) GetEntities()[]Entity{
 func (this *Entities) SetEntities(val []Entity){
 	this.M_entities= make([]string,0)
 	for i:=0; i < len(val); i++{
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
+			if parent != nil {
+				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
+				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				params := make([]interface{}, 1)
+				params[0] = val
+				Utility.CallMethod(parent, removeMethode, params)
+				this.setEntity(parent)
+			}
+		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entities")
 		this.M_entities=append(this.M_entities, val[i].GetUuid())
@@ -219,6 +232,17 @@ func (this *Entities) AppendEntities(val Entity){
 	for i:=0; i < len(this.M_entities); i++{
 		if this.M_entities[i] == val.GetUuid() {
 			return
+		}
+	}
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+		parent, _ := this.getEntityByUuid(val.GetParentUuid())
+		if parent != nil {
+			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
+			removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			params := make([]interface{}, 1)
+			params[0] = val
+			Utility.CallMethod(parent, removeMethode, params)
+			this.setEntity(parent)
 		}
 	}
 	val.SetParentUuid(this.GetUuid())
@@ -254,6 +278,17 @@ func (this *Entities) GetRoles()[]*Role{
 func (this *Entities) SetRoles(val []*Role){
 	this.M_roles= make([]string,0)
 	for i:=0; i < len(val); i++{
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
+			if parent != nil {
+				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
+				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				params := make([]interface{}, 1)
+				params[0] = val
+				Utility.CallMethod(parent, removeMethode, params)
+				this.setEntity(parent)
+			}
+		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_roles")
 		this.M_roles=append(this.M_roles, val[i].GetUuid())
@@ -267,6 +302,17 @@ func (this *Entities) AppendRoles(val *Role){
 	for i:=0; i < len(this.M_roles); i++{
 		if this.M_roles[i] == val.GetUuid() {
 			return
+		}
+	}
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+		parent, _ := this.getEntityByUuid(val.GetParentUuid())
+		if parent != nil {
+			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
+			removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			params := make([]interface{}, 1)
+			params[0] = val
+			Utility.CallMethod(parent, removeMethode, params)
+			this.setEntity(parent)
 		}
 	}
 	val.SetParentUuid(this.GetUuid())
@@ -302,6 +348,17 @@ func (this *Entities) GetPermissions()[]*Permission{
 func (this *Entities) SetPermissions(val []*Permission){
 	this.M_permissions= make([]string,0)
 	for i:=0; i < len(val); i++{
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
+			if parent != nil {
+				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
+				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				params := make([]interface{}, 1)
+				params[0] = val
+				Utility.CallMethod(parent, removeMethode, params)
+				this.setEntity(parent)
+			}
+		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_permissions")
 		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
@@ -315,6 +372,17 @@ func (this *Entities) AppendPermissions(val *Permission){
 	for i:=0; i < len(this.M_permissions); i++{
 		if this.M_permissions[i] == val.GetUuid() {
 			return
+		}
+	}
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+		parent, _ := this.getEntityByUuid(val.GetParentUuid())
+		if parent != nil {
+			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
+			removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			params := make([]interface{}, 1)
+			params[0] = val
+			Utility.CallMethod(parent, removeMethode, params)
+			this.setEntity(parent)
 		}
 	}
 	val.SetParentUuid(this.GetUuid())
@@ -350,6 +418,17 @@ func (this *Entities) GetActions()[]*Action{
 func (this *Entities) SetActions(val []*Action){
 	this.M_actions= make([]string,0)
 	for i:=0; i < len(val); i++{
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
+			if parent != nil {
+				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
+				removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+				params := make([]interface{}, 1)
+				params[0] = val
+				Utility.CallMethod(parent, removeMethode, params)
+				this.setEntity(parent)
+			}
+		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_actions")
 		this.M_actions=append(this.M_actions, val[i].GetUuid())
@@ -363,6 +442,17 @@ func (this *Entities) AppendActions(val *Action){
 	for i:=0; i < len(this.M_actions); i++{
 		if this.M_actions[i] == val.GetUuid() {
 			return
+		}
+	}
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+		parent, _ := this.getEntityByUuid(val.GetParentUuid())
+		if parent != nil {
+			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
+			removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+			params := make([]interface{}, 1)
+			params[0] = val
+			Utility.CallMethod(parent, removeMethode, params)
+			this.setEntity(parent)
 		}
 	}
 	val.SetParentUuid(this.GetUuid())

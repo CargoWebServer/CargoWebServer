@@ -204,10 +204,16 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 	} else {
 		// Here the type is another type...
 		if attribute.Upper == "*" {
-			memberTypeName = "[]" + packName + "." + memberTypeName
+			if strings.Index(memberTypeName, ".") == -1 {
+				memberTypeName = "[]" + packName + "." + memberTypeName
+			} else {
+				memberTypeName = "[]" + memberTypeName
+			}
 			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"[]\")\n"
 		} else {
-			memberTypeName = packName + "." + memberTypeName
+			if strings.Index(memberTypeName, ".") == -1 {
+				memberTypeName = packName + "." + memberTypeName
+			}
 			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"undefined\")\n"
 		}
 		memberStr += "	" + prototypeName + ".FieldsType = append(" + prototypeName + ".FieldsType,\"" + memberTypeName + "\")\n"
@@ -339,7 +345,7 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	// Generate the entity associations...
 	entityPrototypeStr += generateEntityAssociations(class, packageId, prototypeVar, &index)
 
-	entityPrototypeStr += "\n	store := GetServer().GetDataManager().getDataStore(" + packageId + "DB).(*GraphStore)\n"
+	entityPrototypeStr += "\n	store := GetServer().GetDataManager().getDataStore(\"" + packageId + "\").(*GraphStore)\n"
 	entityPrototypeStr += "	store.CreateEntityPrototype(&" + prototypeVar + ")\n"
 
 	entityPrototypeStr += "\n"
