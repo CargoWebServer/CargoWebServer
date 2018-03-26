@@ -940,7 +940,6 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 //        return function (e) {
 //            if (xhr.readyState === 4) {
 //                if (xhr.status === 200) {
-//                    console.log(xhr.responseText);
 //                    // Here I will create the file...
 //                    server.executeJsFunction(
 //                        "DataManagerImportJsonData", // The function to execute remotely on server
@@ -954,7 +953,6 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 //                        },
 //                        function (errMsg, caller) {
 //                            // display the message in the console.
-//                            console.log(errMsg)
 //                            // call the immediate error callback.
 //                            caller.errorCallback(errMsg, caller.caller)
 //                            // dispatch the message.

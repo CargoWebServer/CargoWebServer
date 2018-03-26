@@ -1343,7 +1343,6 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //    // Set the internal object.
 //    if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
 //        if (entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
-//            console.log("Type " + evt.dataMap["entity"].TYPENAME + " not define!")
 //            return
 //        }
 //        if (entities[evt.dataMap["entity"].UUID] == undefined) {
@@ -1859,7 +1858,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 // @src
 //EntityManager.prototype.getEntityByUuid = function (uuid, lazy, successCallback, errorCallback, caller) {
 //    if(uuid.length == 0){
-//		console.log("No uuid to found!")
 //		return
 //	  }
 //    var entity = entities[uuid]
@@ -1969,9 +1967,6 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 // @param {callback} errorCallback In case of error.
 // @src
 //EntityManager.prototype.getEntityById = function (typeName, storeId, ids, lazy, successCallback, errorCallback, caller, parent) {
-//    if (!isArray(ids)) {
-//        console.log("ids must be an array! ", ids)
-//    }
 //    // key in the server.
 //    var id = typeName + ":"
 //    for (var i = 0; i < ids.length; i++) {

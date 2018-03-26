@@ -1049,7 +1049,6 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 //        return function (e) {
 //            if (xhr.readyState === 4) {
 //                if (xhr.status === 200) {
-//                    console.log(xhr.responseText);
 //                    // Here I will create the file...
 //                    server.executeJsFunction(
 //                        "FileManagerCreateFile", // The function to execute remotely on server
@@ -1062,8 +1061,6 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 //                            caller.successCallback(result[0], caller.caller)
 //                        },
 //                        function (errMsg, caller) {
-//                            // display the message in the console.
-//                            console.log(errMsg)
 //                            // call the immediate error callback.
 //                            caller.errorCallback(errMsg, caller.caller)
 //                            // dispatch the message.
@@ -1157,7 +1154,6 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //        return function (e) {
 //            if (xhr.readyState === 4) {
 //                if (xhr.status === 200) {
-//                    console.log(xhr.responseText);
 //                    // Here I will create the file...
 //                    server.executeJsFunction(
 //                        "FileManagerSaveFile", // The function to execute remotely on server
@@ -1170,8 +1166,6 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //                            caller.successCallback(result[0], caller.caller)
 //                        },
 //                        function (errMsg, caller) {
-//                            // display the message in the console.
-//                            console.log(errMsg)
 //                            // call the immediate error callback.
 //                            caller.errorCallback(errMsg, caller.caller)
 //                            // dispatch the message.

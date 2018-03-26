@@ -1736,9 +1736,9 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 	}
 
 	// The triples to save...
-	for i := 0; i < len(triples); i++ {
-		log.Println("------> save triple ", triples[i])
-	}
+	//for i := 0; i < len(triples); i++ {
+	//log.Println("------> save triple ", triples[i])
+	//}
 
 	return
 }

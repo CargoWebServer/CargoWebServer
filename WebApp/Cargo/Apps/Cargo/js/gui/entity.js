@@ -1166,9 +1166,17 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							}
 						}
 					} else {
+
 						if (entity["M_valueOf"] != undefined) {
 							if (entity["M_valueOf"] != this.value) {
 								entity["M_valueOf"] = this.value
+								entity.NeedSave = true
+							}
+						} else {
+							// here I will create a new attribute...
+							entity[attribute] = eval("new " + fieldType + "()")
+							if (entity[attribute]["M_valueOf"] != this.value) {
+								entity[attribute]["M_valueOf"] = this.value
 								entity.NeedSave = true
 							}
 						}
@@ -1582,60 +1590,57 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	// Here I will see if the type is derived basetype...
 	if (!fieldType.startsWith("[]") && !isRef) {
 		// plain basic type.
-		if (fieldType.startsWith("xs.")) {
-			if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
-				// Here the value is an enumeration...
-				if (value.M_valueOf != undefined) {
-					for (var id in control.element.options) {
-						if (control.element.options[id].innerText == value.M_valueOf) {
-							control.element.selectedIndex = id;
-						}
-					}
-				} else if (isInt(value)) {
-					control.element.selectedIndex = parseInt(value) - 1
-				} else if (isString(value)) {
-					control.element.value = value
-				}
-			} else if (isXsString(fieldType) || fieldType == "interface{}") {
-				control.element.value = value
-			} else if (isXsNumeric(fieldType)) {
-				if (value != "") {
-					control.element.value = parseFloat(value)
-				} else {
-					control.element.value = ""
-				}
-			} else if (isXsInt(fieldType)) {
-				if (value != "") {
-					control.element.value = parseInt(value)
-				} else {
-					control.element.value = ""
-				}
-			} else if (isXsBoolean(fieldType)) {
-				control.element.checked = value
-			} else if (isXsDate(fieldType)) {
-				if (value != "") {
-					control.element.value = moment(value).format('YYYY-MM-DD');
-				} else {
-					control.element.value = ""
-				}
-			} else if (isXsTime(fieldType)) {
-				if (value != "") {
-					control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
-				} else {
-					control.element.value = ""
-				}
-			} else if (isXsId(fieldType)) {
-				control.element.value = value
-			} else if (isXsRef(fieldType)) {
-				control.element.innerHTML = value.replace("#", "")
-				control.element.href = value
-			}
-		} else {
-			// In case the 
-			if(value.M_valueOf != undefined){
-				control.element.value = value.M_valueOf
-			}
+		if (value.M_valueOf != undefined) {
+			value = value.M_valueOf;
 		}
+		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
+			// Here the value is an enumeration...
+			if (value.M_valueOf != undefined) {
+				for (var id in control.element.options) {
+					if (control.element.options[id].innerText == value.M_valueOf) {
+						control.element.selectedIndex = id;
+					}
+				}
+			} else if (isInt(value)) {
+				control.element.selectedIndex = parseInt(value) - 1
+			} else if (isString(value)) {
+				control.element.value = value
+			}
+		} else if (isXsString(fieldType) || fieldType == "interface{}") {
+			control.element.value = value
+		} else if (isXsNumeric(fieldType)) {
+			if (value != "") {
+				control.element.value = parseFloat(value)
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsInt(fieldType)) {
+			if (value != "") {
+				control.element.value = parseInt(value)
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsBoolean(fieldType)) {
+			control.element.checked = value
+		} else if (isXsDate(fieldType)) {
+			if (value != "") {
+				control.element.value = moment(value).format('YYYY-MM-DD');
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsTime(fieldType)) {
+			if (value != "") {
+				control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsId(fieldType)) {
+			control.element.value = value
+		} else if (isXsRef(fieldType)) {
+			control.element.innerHTML = value.replace("#", "")
+			control.element.href = value
+		}
+
 	} else {
 
 		if (fieldType.startsWith("[]")) {

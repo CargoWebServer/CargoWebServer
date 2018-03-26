@@ -992,6 +992,14 @@ func ToString(value interface{}) string {
 		str += strconv.Itoa(int(value.(int32)))
 	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
 		str += strconv.Itoa(int(value.(int64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint8 {
+		str += strconv.Itoa(int(value.(uint8)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint16 {
+		str += strconv.Itoa(int(value.(uint16)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint32 {
+		str += strconv.Itoa(int(value.(uint32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint64 {
+		str += strconv.Itoa(int(value.(uint64)))
 	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
 		str += strconv.FormatFloat(float64(value.(float32)), 'f', -1, 32)
 	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {

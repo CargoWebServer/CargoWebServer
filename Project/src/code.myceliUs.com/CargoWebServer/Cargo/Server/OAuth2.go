@@ -470,7 +470,6 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 //        },
 //        function (errMsg, caller) {
 //            // display the message in the console.
-//            console.log(errMsg)
 //            // call the immediate error callback.
 //            caller.errorCallback(errMsg, caller.caller)
 //            // dispatch the message.
