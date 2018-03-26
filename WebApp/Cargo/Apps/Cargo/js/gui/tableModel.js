@@ -266,7 +266,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     if (server.sessionId != undefined) {
         server.accountManager.me(server.sessionId,
             function (result, caller) {
-                if(result.M_id == "admin"){
+                if (result.M_id == "admin") {
                     for (var i = 0; i < caller.editable.length; i++) {
                         caller.editable[i] = true;
                     }
@@ -457,35 +457,33 @@ EntityTableModel.prototype.appendRow = function (values) {
         this.entities.push(values)
     }
 
-    var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
-    var prototype = values.getPrototype()
+    if (values.TYPENAME != undefined) {
+        var prototype = values.getPrototype()
 
-    for (var j = 0; j < this.titles.length; j++) {
-        var field = "M_" + this.titles[j]
-        var fieldIndex = prototype.getFieldIndex(field)
-        var fieldType = prototype.FieldsType[fieldIndex]
-        if (values[field] != undefined) {
-            objectValues[j] = values[field]
-        } else {
-            var isArray = fieldType.startsWith("[]")
-            var isRef = fieldType.endsWith(":Ref")
-            if (isArray) {
-                objectValues[j] = []
-            } else if (isRef) {
-                objectValues[j] = null
+        for (var j = 0; j < this.titles.length; j++) {
+            var field = "M_" + this.titles[j]
+            var fieldIndex = prototype.getFieldIndex(field)
+            var fieldType = prototype.FieldsType[fieldIndex]
+            if (values[field] != undefined) {
+                objectValues[j] = values[field]
             } else {
-                objectValues[j] = null
+                var isArray = fieldType.startsWith("[]")
+                var isRef = fieldType.endsWith(":Ref")
+                if (isArray) {
+                    objectValues[j] = []
+                } else if (isRef) {
+                    objectValues[j] = null
+                } else {
+                    objectValues[j] = null
+                }
+            }
+            if (j == this.titles.length - 1) {
+                this.values.push(objectValues)
             }
         }
-        if (j == this.titles.length - 1) {
-            // In that case the value is a list of base value.
-            if (isListOf_) {
-                // here I will append the values...
-                objectValues.push(values.values)
-            }
-            this.values.push(objectValues)
-        }
+    }else{
+        console.log("values not entity ", values)
     }
 
     this.table.setHeader();

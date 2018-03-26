@@ -110,9 +110,14 @@ var Element = function (parent, params, callback, appendFront) {
     this.parentElement = parent;
 
     /**
-     * @property {string} id a uuid. If the params contain id, the param id will be used.
+     * @property {string} uuid uniquely indentify an element.
      */
-    this.id = randomUUID();
+    this.uuid = randomUUID();
+
+    /**
+     * @property {string} id textual id to name an element, not necessarely unique.
+     */
+    this.id = this.uuid;
 
     /**
      * @property {Element[]} childs The map of child elements indexed by their id.

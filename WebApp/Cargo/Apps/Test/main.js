@@ -66,7 +66,7 @@ function main() {
     //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
     // entityDump("1", "employees.employees")
 
-    entitiesDump("BPMNDI.BPMNDiagram")
+    entitiesDump("COLLADASchema.COLLADA")
     
     // entitiesDump("DT3_informations.Department")
     // testServiceContainer()
@@ -244,7 +244,7 @@ function main() {
     },
     function(errMsg, caller){
     }, {})*/
-
+/*
      server.oAuth2Manager.getResource("1234", "openid profile email", "", 
      function(results, caller){
          console.log("found results: ", results)
@@ -252,7 +252,7 @@ function main() {
      function(errMsg, caller){
      }, {})
      
-    /*
+    
          var query = {}
          query.TypeName = "Proactive.AnalyseResult"
          query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
@@ -429,6 +429,7 @@ function entitiesDump(typeName) {
                 },
                 // Success callback.
                 function (results, caller) {
+                    console.log("entity: ", results)
                     var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
                     for (var i = 0; i < results.length; i++) {
                         // Initialyse entities references..

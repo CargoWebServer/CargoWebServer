@@ -74,14 +74,11 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
 		this.textElements[textId] = []
 	}
 	if (isArray(this.textElements[textId])) {
-		if (element.uuid == undefined) {
-			element.uuid = randomUUID()
-			if (this.elements[element.uuid] == undefined) {
-				this.textElements[textId].push(element)
-			}
-			// update the element in the array.
-			this.elements[element.uuid] = element
+		if (this.elements[element.uuid] == undefined) {
+			this.textElements[textId].push(element)
 		}
+		// update the element in the array.
+		this.elements[element.uuid] = element
 	}
 }
 
@@ -132,19 +129,20 @@ LanguageManager.prototype.setElementText = function (element, textId) {
 	}
 
 	this.registerElementText(element, textId)
-
-	if (this.elements[element.uuid].element != undefined) {
-		if (this.elements[element.uuid].element.tagName == "SPAN") {
-			this.elements[element.uuid].element.textContent = this.languageInfo[this.language][textId]
-		} else if (this.elements[element.uuid].element.tagName == "INPUT") {
-			if (this.elements[element.uuid].element.getAttribute("data-match-error") != null) {
-				// Set the error text here.
-				this.elements[element.uuid].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+	if (this.elements[element.uuid] != undefined) {
+		if (this.elements[element.uuid].element != undefined) {
+			if (this.elements[element.uuid].element.tagName == "SPAN") {
+				this.elements[element.uuid].element.textContent = this.languageInfo[this.language][textId]
+			} else if (this.elements[element.uuid].element.tagName == "INPUT") {
+				if (this.elements[element.uuid].element.getAttribute("data-match-error") != null) {
+					// Set the error text here.
+					this.elements[element.uuid].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+				} else {
+					this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
+				}
 			} else {
-				this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
+				this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 			}
-		} else {
-			this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 		}
 	}
 }

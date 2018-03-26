@@ -1,7 +1,7 @@
 package Server
 
 import (
-	//"log"
+	//	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -197,10 +197,28 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 							if len(uuids) > 0 {
 								this.object[field] = uuids
 							}
+						} else if reflect.TypeOf(val).String() == "[]map[string]interface {}" {
+							uuids := make([]interface{}, 0)
+							for j := 0; j < len(val.([]map[string]interface{})); j++ {
+								if reflect.TypeOf(val.([]map[string]interface{})[j]).String() == "map[string]interface {}" {
+									// Set parent information if is not already set.
+									val.([]map[string]interface{})[j]["ParentUuid"] = this.object["UUID"]
+									val.([]map[string]interface{})[j]["ParentLnk"] = field
+									child := NewDynamicEntity()
+									child.setObject(val.([]map[string]interface{})[j])
+									GetServer().GetEntityManager().setEntity(child)
+									// Keep it on the cache
+									uuids = append(uuids, child.object["UUID"])
+								}
+							}
+							if len(uuids) > 0 {
+								this.object[field] = uuids
+							}
 						}
 
 					}
 				} else {
+
 					// The value is not an array.
 					val := this.object[field]
 					if val != nil {

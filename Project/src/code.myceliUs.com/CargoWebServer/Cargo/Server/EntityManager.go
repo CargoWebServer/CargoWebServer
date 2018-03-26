@@ -541,6 +541,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 }
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
+
 	// Here I will set the entity on the cache...
 	this.setEntity(entity)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
@@ -617,6 +618,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 				triples = append(triples[0:j], triples[j+1:]...)
 				j--
 				i--
+
 				break
 			}
 		}
@@ -1598,7 +1600,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //    )
 //}
 func (this *EntityManager) SaveEntity(values interface{}, typeName string, messageId string, sessionId string) interface{} {
-
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

@@ -10,6 +10,10 @@
      right: 0px;
      background-color: transparent;
      overflow: hidden;
+     /*background-image: url("/Cargo/svg/wheel.svg");
+     background-repeat: no-repeat;
+     background-position: center center;
+     background-size: 200px 200px;*/
  }
 
  .codeEditor .ace_editor {

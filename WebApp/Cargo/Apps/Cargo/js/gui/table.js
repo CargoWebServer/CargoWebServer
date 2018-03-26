@@ -1319,6 +1319,11 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 		// create that new array.
 		var div = new Element(null, { "tag": "div" });
 		typeName = typeName.replace("[]", "")
+		var baseType = getBaseTypeExtension(typeName)
+		if(baseType.startsWith("xs.")){
+			typeName = baseType
+		}
+		
 		if (typeName.startsWith("xs.") || typeName.endsWith(":Ref")) {
 			div = new Element(null, { "tag": "div", "style": "display: table; width: 100%;" });
 			for (var i = 0; i < values.length; i++) {

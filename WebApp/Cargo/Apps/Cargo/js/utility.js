@@ -262,7 +262,7 @@ function isXsBoolean(fieldType) {
  * Helper function use to dertermine if a XS type must be considere date value.
  */
 function isXsDate(fieldType) {
-    if (fieldType.endsWith("date") || fieldType.endsWith("datetime") // XML
+    if (fieldType.endsWith("date") || fieldType.endsWith("dateTime") // XML
         || fieldType.endsWith("datetime2") || fieldType.endsWith("smalldatetime") || fieldType.endsWith("datetimeoffset") // SQL
     ) {
         return true

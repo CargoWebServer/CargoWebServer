@@ -181,7 +181,6 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 
 	// Call after the initialisation....
 	if (initCallback != undefined) {
-
 		initCallback(this)
 	}
 }
@@ -268,7 +267,6 @@ EntityPanel.prototype.setEntity = function (entity) {
 
 	// Here I will associate the panel and the entity.
 	if (this.getEntity() != null) {
-
 		server.entityManager.detach(this, NewEntityEvent)
 		server.entityManager.detach(this, UpdateEntityEvent)
 		server.entityManager.detach(this, DeleteEntityEvent)
@@ -839,8 +837,10 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// The entity label here...
 	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
-	label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", ""), "id": field.replace("M_", "") }).down()
-	server.languageManager.setElementText(label, field)
+	// Display title only of label is different than listOf and valueOf
+	if (field != "M_valueOf" && field != "M_listOf") {
+		label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", ""), "id": label.id + "_span_lbl" }).down()
+	}
 
 	// Now the entity value...
 	var valueDiv = entityDiv.appendElement({ "tag": "div" }).down()
@@ -871,7 +871,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			if (fieldPrototype != undefined) {
 				if (fieldPrototype.Restrictions != undefined) {
 					// Set the restriction here.
-					
+
 					//restrictions.concat(fieldPrototype.Restrictions)
 				}
 			}
@@ -910,7 +910,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					var prototype = getEntityPrototype(fieldType.replace("[]", ""))
 					var itemsTableModel = new EntityTableModel(prototype)
 					var itemTable = new Table(randomUUID(), valueDiv)
-
 					itemTable.setModel(itemsTableModel, function (table) {
 						return function () {
 							table.init()
@@ -1126,51 +1125,52 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 						entityPanel.setEntity(entity)
 
-					} else if( entityPanel.getEntity()[attribute].TYPENAME != undefined) {
+					} else if (entityPanel.getEntity()[attribute].TYPENAME != undefined) {
 						// Get the existing entity.
 						entity = entityPanel.getEntity()[attribute]
-					}else{
+					} else {
 						entity = entityPanel.getEntity()
 					}
 
-					/** Here it's a string **/
-					var baseType = getBaseTypeExtension(fieldType)
-					if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
-						if (entity[attribute] != this.value) {
-							entity[attribute] = this.value
-							entity.NeedSave = true
+					if (fieldType.startsWith("xs.")) {
+						if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
+							if (entity[attribute] != this.value) {
+								entity[attribute] = this.value
+								entity.NeedSave = true
+							}
+						} else if (isXsNumeric(fieldType)) {
+							if (entity[attribute] != parseFloat(this.value)) {
+								entity[attribute] = parseFloat(this.value)
+								entity.NeedSave = true
+							}
+						} else if (isXsInt(fieldType)) {
+							if (entity[attribute] != parseInt(this.value)) {
+								entity[attribute] = parseInt(this.value)
+								entity.NeedSave = true
+							}
+						} else if (isXsTime(fieldType)) {
+							var value = moment(this.value).unix()
+							if (entity[attribute] != value) {
+								entity[attribute] = value
+								entity.NeedSave = true
+							}
+						} else if (isXsBoolean(fieldType)) {
+							if (entity[attribute] != this.checked) {
+								entity[attribute] = this.checked
+								entity.NeedSave = true
+							}
+						} else if (fieldType.startsWith("enum:")) { // Cargo enum not xsd extention.
+							if (entity[attribute] != this.selectedIndex + 1) {
+								entity[attribute] = this.selectedIndex + 1
+								entity.NeedSave = true
+							}
 						}
-					} else if (isXsNumeric(fieldType)) {
-						if (entity[attribute] != parseFloat(this.value)) {
-							entity[attribute] = parseFloat(this.value)
-							entity.NeedSave = true
-						}
-					} else if (isXsInt(fieldType)) {
-						if (entity[attribute] != parseInt(this.value)) {
-							entity[attribute] = parseInt(this.value)
-							entity.NeedSave = true
-						}
-					} else if (isXsTime(fieldType)) {
-						var value = moment(this.value).unix()
-						if (entity[attribute] != value) {
-							entity[attribute] = value
-							entity.NeedSave = true
-						}
-					} else if (isXsBoolean(fieldType)) {
-						if (entity[attribute] != this.checked) {
-							entity[attribute] = this.checked
-							entity.NeedSave = true
-						}
-					} else if (fieldType.startsWith("enum:")) { // Cargo enum not xsd extention.
-						if (entity[attribute] != this.selectedIndex + 1) {
-							entity[attribute] = this.selectedIndex + 1
-							entity.NeedSave = true
-						}
-					} else if (isXsBaseType(baseType)) {
-						// The field is a reference...
-						if (entity["M_valueOf"] != this.value) {
-							entity["M_valueOf"] = this.value
-							entity.NeedSave = true
+					} else {
+						if (entity["M_valueOf"] != undefined) {
+							if (entity["M_valueOf"] != this.value) {
+								entity["M_valueOf"] = this.value
+								entity.NeedSave = true
+							}
 						}
 					}
 
@@ -1300,7 +1300,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 		itemsTable.clear()
 		for (var i = 0; i < values.length; i++) {
 			// keep information about the parent entity...
-			if(values[i] == null) {
+			if (values[i] == null) {
 				// In that case I will append the default value for the given type.
 				if (isXsId(fieldType.replace("[]", "")) || isXsString(fieldType.replace("[]", "") || isXsRef(fieldType.replace("[]", "")))) {
 					values[i] = ""
@@ -1413,7 +1413,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 	if (refName != undefined && refName.length > 0) {
 		valueDiv.element.style.width = "auto"
 		var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
-		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "class":"entity_ref_lnk", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
+		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "class": "entity_ref_lnk", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
 		ref.element.id = object.UUID
 		var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
 
@@ -1581,53 +1581,60 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 
 	// Here I will see if the type is derived basetype...
 	if (!fieldType.startsWith("[]") && !isRef) {
-		var baseType = getBaseTypeExtension(fieldType)
-		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
-			// Here the value is an enumeration...
-			if (value.M_valueOf != undefined) {
-				for(var id in control.element.options){
-					if(control.element.options[id].innerText == value.M_valueOf){
-						control.element.selectedIndex = id;
+		// plain basic type.
+		if (fieldType.startsWith("xs.")) {
+			if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
+				// Here the value is an enumeration...
+				if (value.M_valueOf != undefined) {
+					for (var id in control.element.options) {
+						if (control.element.options[id].innerText == value.M_valueOf) {
+							control.element.selectedIndex = id;
+						}
 					}
+				} else if (isInt(value)) {
+					control.element.selectedIndex = parseInt(value) - 1
+				} else if (isString(value)) {
+					control.element.value = value
 				}
-			} else if(isInt(value)) {
-				control.element.selectedIndex = parseInt(value) - 1
-			} else if(isString(value)){
+			} else if (isXsString(fieldType) || fieldType == "interface{}") {
 				control.element.value = value
+			} else if (isXsNumeric(fieldType)) {
+				if (value != "") {
+					control.element.value = parseFloat(value)
+				} else {
+					control.element.value = ""
+				}
+			} else if (isXsInt(fieldType)) {
+				if (value != "") {
+					control.element.value = parseInt(value)
+				} else {
+					control.element.value = ""
+				}
+			} else if (isXsBoolean(fieldType)) {
+				control.element.checked = value
+			} else if (isXsDate(fieldType)) {
+				if (value != "") {
+					control.element.value = moment(value).format('YYYY-MM-DD');
+				} else {
+					control.element.value = ""
+				}
+			} else if (isXsTime(fieldType)) {
+				if (value != "") {
+					control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
+				} else {
+					control.element.value = ""
+				}
+			} else if (isXsId(fieldType)) {
+				control.element.value = value
+			} else if (isXsRef(fieldType)) {
+				control.element.innerHTML = value.replace("#", "")
+				control.element.href = value
 			}
-		} else if (isXsString(baseType) || isXsString(fieldType) || fieldType == "interface{}") {
-			control.element.value = value
-		} else if (isXsNumeric(fieldType)) {
-			if (value != "") {
-				control.element.value = parseFloat(value)
-			} else {
-				control.element.value = ""
+		} else {
+			// In case the 
+			if(value.M_valueOf != undefined){
+				control.element.value = value.M_valueOf
 			}
-		} else if (isXsInt(fieldType)) {
-			if (value != "") {
-				control.element.value = parseInt(value)
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsBoolean(fieldType)) {
-			control.element.checked = value
-		} else if (isXsDate(fieldType)) {
-			if (value != "") {
-				control.element.value = moment(value).format('YYYY-MM-DD');
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsTime(fieldType)) {
-			if (value != "") {
-				control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsId(fieldType)) {
-			control.element.value = value
-		} else if (isXsRef(fieldType)) {
-			control.element.innerHTML = value.replace("#", "")
-			control.element.href = value
 		}
 	} else {
 
