@@ -413,6 +413,9 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 			}
 			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		}
+		// Set the parent in the map with it value...
+		this.setEntity(parent)
+
 	} else {
 		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
 		if strings.HasPrefix(fieldType, "[]") {
@@ -2058,6 +2061,7 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		obj := entity.(*DynamicEntity).getValues()
+		log.Println("---> 2063 ", obj)
 		return obj
 	}
 

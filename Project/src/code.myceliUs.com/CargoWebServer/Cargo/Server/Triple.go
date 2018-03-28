@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.myceliUs.com/Utility"
+	"github.com/robertkrimen/otto"
 )
 
 type Triple struct {
@@ -127,8 +128,14 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 						isIndex = Utility.Contains(prototype.Indexs, k)
 					}
 
+					// In case of otto value...
+					if reflect.TypeOf(v).String() == "otto.Value" {
+						v, _ = v.(otto.Value).Export()
+					}
+
 					if strings.HasSuffix(fieldType, ":Ref") {
 						if strings.HasPrefix(fieldType, "[]") {
+
 							if reflect.TypeOf(v).String() == "[]string" {
 								for i := 0; i < len(v.([]string)); i++ {
 									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]string)[i], isIndex})
@@ -136,6 +143,12 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 							} else if reflect.TypeOf(v).String() == "[]interface {}" {
 								for i := 0; i < len(v.([]interface{})); i++ {
 									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+								}
+							} else if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
+								for i := 0; i < len(v.([]map[string]interface{})); i++ {
+									if v.([]map[string]interface{})[i]["UUID"] != nil {
+										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
+									}
 								}
 							} else {
 								log.Panicln("------> reference type fail!", reflect.TypeOf(v).String())

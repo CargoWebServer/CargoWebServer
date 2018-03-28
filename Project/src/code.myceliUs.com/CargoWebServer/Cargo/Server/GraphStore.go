@@ -653,7 +653,7 @@ func (this *GraphStore) DeleteEntityPrototypes() error {
 						evtData.TYPENAME = "Server.MessageData"
 						evtData.Name = "entity"
 						if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
-							evtData.Value = parent.(*DynamicEntity).getObject()
+							evtData.Value = parent.(*DynamicEntity).getValues()
 						} else {
 							evtData.Value = parent
 						}
@@ -671,7 +671,7 @@ func (this *GraphStore) DeleteEntityPrototypes() error {
 				evtData.TYPENAME = "Server.MessageData"
 				evtData.Name = "entity"
 				if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-					evtData.Value = entity.(*DynamicEntity).getObject()
+					evtData.Value = entity.(*DynamicEntity).getValues()
 				} else {
 					evtData.Value = entity
 				}

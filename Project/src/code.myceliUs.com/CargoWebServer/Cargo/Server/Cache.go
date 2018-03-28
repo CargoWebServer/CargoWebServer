@@ -74,7 +74,11 @@ func newCache() *Cache {
 								entity = val.(Entity)
 							} else {
 								entity = NewDynamicEntity()
-								entity.(*DynamicEntity).setObject(val.(map[string]interface{}))
+								// Set the basic entity properties only.
+								entity.(*DynamicEntity).typeName = val.(map[string]interface{})["TYPENAME"].(string)
+								entity.(*DynamicEntity).uuid = val.(map[string]interface{})["UUID"].(string)
+								entity.(*DynamicEntity).parentUuid = val.(map[string]interface{})["ParentUuid"].(string)
+								entity.(*DynamicEntity).parentLnk = val.(map[string]interface{})["ParentLnk"].(string)
 							}
 						} else {
 							log.Println("--> go error ", uuid, err)
@@ -86,21 +90,9 @@ func newCache() *Cache {
 
 				} else if operation["name"] == "setEntity" {
 					entity := operation["entity"].(Entity)
-					// Append in the map:
+					// Append in the map: setObject set the value for DynamicEntity...
 					if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
 						var bytes, err = Utility.ToBytes(entity)
-						if err == nil {
-							// By id
-							if len(entity.Ids()) > 0 {
-								id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
-								cache.m_cache.Set(id, []byte(entity.GetUuid()))
-							}
-							// By uuid
-							cache.m_cache.Set(entity.GetUuid(), bytes)
-						}
-					} else {
-						obj := entity.(*DynamicEntity).getValues()
-						var bytes, err = Utility.ToBytes(obj)
 						if err == nil {
 							// By id
 							if len(entity.Ids()) > 0 {
@@ -121,8 +113,90 @@ func newCache() *Cache {
 					// Remove from the cache.
 					cache.m_cache.Delete(entity.GetUuid())
 					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
-				}
+				} else if operation["name"] == "getValue" {
+					uuid := operation["uuid"].(string)
+					field := operation["field"].(string)
+					getValue := operation["getValue"].(chan interface{})
+					var value interface{}
+					typeName := strings.Split(uuid, "%")[0]
+					if entry, err := cache.m_cache.Get(uuid); err == nil {
+						val, err := Utility.FromBytes(entry, typeName)
+						if err == nil {
+							value = val.(map[string]interface{})[field]
+						}
+					}
+					// Return the found values.
+					getValue <- value
 
+				} else if operation["name"] == "getValues" {
+					uuid := operation["uuid"].(string)
+					getValues := operation["getValues"].(chan map[string]interface{})
+					var values map[string]interface{}
+					typeName := strings.Split(uuid, "%")[0]
+					if entry, err := cache.m_cache.Get(uuid); err == nil {
+						val, err := Utility.FromBytes(entry, typeName)
+						if err == nil {
+							values = val.(map[string]interface{})
+						}
+					}
+					// Return the found values.
+					getValues <- values
+				} else if operation["name"] == "setValues" {
+					values := operation["values"].(map[string]interface{})
+					var bytes, err = Utility.ToBytes(values)
+					if err == nil {
+						// By id
+						if values["Ids"] != nil {
+							id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+							cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+						}
+						// By uuid
+						cache.m_cache.Set(values["UUID"].(string), bytes)
+					}
+				} else if operation["name"] == "setValue" {
+					uuid := operation["uuid"].(string)
+					field := operation["field"].(string)
+					value := operation["value"].(interface{})
+					typeName := strings.Split(uuid, "%")[0]
+					if entry, err := cache.m_cache.Get(uuid); err == nil {
+						val, err := Utility.FromBytes(entry, typeName)
+						if err == nil {
+							values := val.(map[string]interface{})
+							values[field] = value
+							var bytes, err = Utility.ToBytes(values)
+							if err == nil {
+								// By id
+								if values["ids"] != nil {
+									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+								}
+								// By uuid
+								cache.m_cache.Set(values["UUID"].(string), bytes)
+							}
+						}
+					}
+				} else if operation["name"] == "deleteValue" {
+					uuid := operation["uuid"].(string)
+					field := operation["field"].(string)
+					typeName := strings.Split(uuid, "%")[0]
+					if entry, err := cache.m_cache.Get(uuid); err == nil {
+						val, err := Utility.FromBytes(entry, typeName)
+						if err == nil {
+							values := val.(map[string]interface{})
+							delete(values, field)
+							var bytes, err = Utility.ToBytes(values)
+							if err == nil {
+								// By id
+								if values["ids"] != nil {
+									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+								}
+								// By uuid
+								cache.m_cache.Set(values["UUID"].(string), bytes)
+							}
+						}
+					}
+				}
 			}
 		}
 	}(cache)
