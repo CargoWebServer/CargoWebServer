@@ -93,6 +93,7 @@ func (h *Hub) run() {
 	for {
 		select {
 		case c := <-h.register:
+			log.Println("----> connection ", c.GetUuid())
 			h.connections[c.GetUuid()] = c
 
 			// initialyse js interpreter for the new connection.
@@ -117,4 +118,5 @@ func (h *Hub) run() {
 			}
 		}
 	}
+	log.Println("---> server web socket stop listen!")
 }

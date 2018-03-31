@@ -171,7 +171,7 @@ func (this *TaskManager) start() {
 						tasks[instancesInfos[i].TaskId].Stop()
 						delete(tasks, instancesInfos[i].TaskId)
 						// I will stop the vm that run that task.
-						log.Println("--> Supend the task: ", instancesInfos[i].TaskId)
+						log.Println("--> Suspend the task: ", instancesInfos[i].TaskId)
 						JS.GetJsRuntimeManager().CloseSession(instancesInfos[i].TaskId,
 							func(taskId string) func() {
 								return func() {
@@ -224,19 +224,6 @@ func GetTaskManager() *TaskManager {
  */
 func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 
-	// Error handler.
-	defer func() {
-		// Stahp mean the VM was kill by the admin.
-		if caught := recover(); caught != nil {
-			if caught.(error).Error() == "Stahp" {
-				// Here the task was cancel.
-				return
-			} else {
-				panic(caught) // Something else happened, repanic!
-			}
-		}
-	}()
-
 	// first of all I will test if the task is active.
 	if task.IsActive() == false {
 		return nil // Nothing to do here.
@@ -252,11 +239,13 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 			_, err := JS.GetJsRuntimeManager().RunScript(task.GetId(), string(script))
 			if err != nil {
 				log.Println("--> script error: ", err)
+				JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 				return err
 			}
 
 		} else {
 			log.Println("--> script error: ", err)
+			JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 			return err
 		}
 		if task.GetFrequencyType() != Config.FrequencyType_ONCE {
@@ -270,10 +259,13 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 		}
 	} else {
 		log.Println("--> script error: ", err.GetBody())
+		JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 		return errors.New(err.GetBody())
 	}
 
 	log.Println("--> task ", task.GetId(), "run successfully!")
+	// Remove the session...
+	JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 	return nil
 }
 

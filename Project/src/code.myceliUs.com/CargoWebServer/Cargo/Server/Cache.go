@@ -77,8 +77,12 @@ func newCache() *Cache {
 								// Set the basic entity properties only.
 								entity.(*DynamicEntity).typeName = val.(map[string]interface{})["TYPENAME"].(string)
 								entity.(*DynamicEntity).uuid = val.(map[string]interface{})["UUID"].(string)
-								entity.(*DynamicEntity).parentUuid = val.(map[string]interface{})["ParentUuid"].(string)
-								entity.(*DynamicEntity).parentLnk = val.(map[string]interface{})["ParentLnk"].(string)
+								if val.(map[string]interface{})["ParentUuid"] != nil {
+									entity.(*DynamicEntity).parentUuid = val.(map[string]interface{})["ParentUuid"].(string)
+								}
+								if val.(map[string]interface{})["ParentLnk"] != nil {
+									entity.(*DynamicEntity).parentLnk = val.(map[string]interface{})["ParentLnk"].(string)
+								}
 							}
 						} else {
 							log.Println("--> go error ", uuid, err)

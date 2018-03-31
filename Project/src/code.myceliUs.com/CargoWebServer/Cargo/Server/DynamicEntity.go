@@ -111,10 +111,11 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 	// Here I will create the entity object.
 	object := make(map[string]interface{})
-	log.Println("---> obj: ", obj)
 
 	if obj["TYPENAME"] != nil {
 		this.typeName = obj["TYPENAME"].(string)
+	} else {
+		return
 	}
 
 	if obj["UUID"] != nil {
@@ -131,8 +132,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 
 	// Set uuid
 	ids := make([]interface{}, 0)
-	typeName := obj["TYPENAME"].(string)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(this.typeName, this.typeName[0:strings.Index(this.typeName, ".")])
 	// skip The first element, the uuid
 	for i := 1; i < len(prototype.Ids); i++ {
 		ids = append(ids, obj[prototype.Ids[i]])
@@ -141,7 +141,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 
 	if len(this.uuid) == 0 {
 		// In that case I will set it uuid.
-		obj["UUID"] = generateEntityUuid(obj["TYPENAME"].(string), obj["ParentUuid"].(string), ids)
+		obj["UUID"] = generateEntityUuid(this.typeName, this.parentUuid, ids)
 		this.uuid = obj["UUID"].(string)
 	}
 

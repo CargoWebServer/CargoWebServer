@@ -265,6 +265,7 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+
 	if len(uuid) == 0 {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No uuid given!"))
 		return nil, errObj
@@ -2061,7 +2062,6 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		obj := entity.(*DynamicEntity).getValues()
-		log.Println("---> 2063 ", obj)
 		return obj
 	}
 

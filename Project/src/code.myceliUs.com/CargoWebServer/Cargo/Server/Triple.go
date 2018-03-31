@@ -49,10 +49,12 @@ func FromTriples(values [][]interface{}) map[string]interface{} {
 						if obj[propertie] == nil {
 							obj[propertie] = make([]string, 0)
 						}
+
 						if Utility.IsValidEntityReferenceName(value.(string)) {
 							obj[propertie] = append(obj[propertie].([]string), value.(string))
 						}
 					} else {
+
 						if Utility.IsValidEntityReferenceName(value.(string)) {
 							// So here I will get the value from the store.
 							if obj[propertie] == nil {

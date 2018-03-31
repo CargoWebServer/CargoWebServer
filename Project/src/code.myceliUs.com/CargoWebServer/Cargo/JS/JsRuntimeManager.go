@@ -5,7 +5,6 @@ import (
 	b64 "encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -278,27 +277,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 		GetJsRuntimeManager().m_clearInterval <- uuid
 	})
 
-	// Suspend function execution.
-	jsRuntimeManager.appendFunction("getSuspend", func() string {
-		// The intetifier of the function.
-		uuid := Utility.RandomUUID()
-		// jsRuntimeManager.m_waits[uuid] = make(chan interface{})
-		return uuid
-	})
-
-	// Make function wait until resume is call...
-	jsRuntimeManager.appendFunction("suspend", func(uuid string) {
-		// wait after returning the uuid
-		// <-jsRuntimeManager.m_waits[uuid]
-	})
-
-	// Resume the execution...
-	jsRuntimeManager.appendFunction("resume", func(uuid string) {
-		// resume the execution.
-		// jsRuntimeManager.m_waits[uuid] <- nil
-		// delete(jsRuntimeManager.m_waits, uuid)
-	})
-
 	////////////////////////////////////////////////////////////////////////////
 	// Node.js compatibility
 	////////////////////////////////////////////////////////////////////////////
@@ -382,6 +360,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				// In case the script must be run...
 				if operationInfos.m_params["run"].(bool) {
 					for _, session := range jsRuntimeManager.m_sessions {
+						log.Println(script)
 						session.Run(script)
 					}
 				}
@@ -406,8 +385,21 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 
 				// The vm processing loop...
 				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
-					done := false
-					for !done {
+					// The session was interrupt!
+					defer func() {
+						// Stahp mean the VM was kill by the admin.
+						if caught := recover(); caught != nil {
+							if caught.(error).Error() == "Stahp" {
+								// Here the task was cancel.
+								log.Println("---> session: ", sessionId, " is now closed")
+								return
+							} else {
+								panic(caught) // Something else happened, repanic!
+							}
+						}
+					}()
+
+					for {
 						select {
 						case operationInfos := <-setVariable:
 							callback := operationInfos.m_returns
@@ -439,42 +431,53 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
 							if stop {
-								// Wait until the vm is stop
-								wait := make(chan string, 1)
-								timer := time.NewTimer(5 * time.Second)
-								// Call the interupt function on the VM.
-								vm.Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
-									return func() {
-										timer.Stop()
-										// Continue the processing.
-										wait <- "--> Interrupt execution of VM with id " + sessionId
-										// The panic error will actually kill the vm
-										panic(errors.New("Stahp"))
-									}
-								}(sessionId, wait, timer)
-
-								// If nothing append for 5 second I will return.
-								go func(wait chan string, timer *time.Timer) {
-									<-timer.C
-									wait <- "--> Stop execution of VM with id " + sessionId
-								}(wait, timer)
-
-								// Synchronyse exec of interuption here.
-								log.Println(<-wait)
-								done = true
-								break // exit the loop.
+								log.Println("---> session: ", sessionId, " is now closed")
+								return // exit the processing loop.
 							}
 						}
 					}
-					jsRuntimeManager.removeVm(sessionId)
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_closeVm:
-				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
-				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
-				callback <- []interface{}{true}              // unblock the channel...
+				callback := operationInfos.m_returns
+				if jsRuntimeManager.m_sessions[sessionId] != nil {
+					callback <- []interface{}{true} // unblock the channel...
+					// here I will not wait for the session to clean before retrun.
+					go func() {
+						// Wait until the vm is stop
+						wait := make(chan string, 1)
+						timer := time.NewTimer(5 * time.Second)
+
+						// Call the interupt function on the VM.
+						jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
+							return func() {
+								timer.Stop()
+								// Continue the processing.
+								log.Println("----> call Interrupt for VM ", sessionId)
+								wait <- "--> Interrupt execution of VM with id " + sessionId
+								// The panic error will actually kill the vm
+								panic(errors.New("Stahp"))
+							}
+						}(sessionId, wait, timer)
+
+						// If nothing append for 1 second I will return.
+						go func(wait chan string, timer *time.Timer) {
+							<-timer.C
+							wait <- "--> Stop execution of VM with id " + sessionId
+							jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
+						}(wait, timer)
+
+						// Synchronyse exec of interuption here.
+						log.Println(<-wait)
+
+						jsRuntimeManager.removeVm(sessionId)
+					}()
+				} else {
+					// simply call the callback if the sesion is already close.
+					callback <- []interface{}{true} // unblock the channel...
+				}
 			}
 		}
 	}(jsRuntimeManager)
@@ -760,22 +763,59 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
  *  Close and remove VM for a given session id.
  */
 func (this *JsRuntimeManager) removeVm(sessionId string) {
-	// Remove vm ressources.
-	delete(this.m_sessions, sessionId)
-	close(this.m_executeJsFunction[sessionId])
-	delete(this.m_executeJsFunction, sessionId)
-	close(this.m_runScript[sessionId])
-	delete(this.m_runScript, sessionId)
-	close(this.m_setVariable[sessionId])
-	delete(this.m_setVariable, sessionId)
-	close(this.m_stopVm[sessionId])
-	delete(this.m_stopVm, sessionId)
-	// Remove the exports objects
-	delete(this.m_exports, sessionId)
+	if sessionId == "" {
+		return // never delete the general session
+	}
+
+	log.Println("---> remove ressource for session: ", sessionId)
 
 	// I will also clear intervals for the
 	// the session.
 	this.m_clearInterval <- sessionId
+	// Execute channel id
+	if this.m_executeJsFunction[sessionId] != nil {
+		close(this.m_executeJsFunction[sessionId])
+		delete(this.m_executeJsFunction, sessionId)
+	}
+
+	if this.m_runScript[sessionId] != nil {
+		close(this.m_runScript[sessionId])
+		delete(this.m_runScript, sessionId)
+	}
+
+	if this.m_setVariable[sessionId] != nil {
+		close(this.m_setVariable[sessionId])
+		delete(this.m_setVariable, sessionId)
+	}
+
+	if this.m_stopVm[sessionId] != nil {
+		close(this.m_stopVm[sessionId])
+		delete(this.m_stopVm, sessionId)
+	}
+
+	if this.m_setVariable[sessionId] != nil {
+		close(this.m_setVariable[sessionId])
+		delete(this.m_setVariable, sessionId)
+	}
+
+	if this.m_getVariable[sessionId] != nil {
+		close(this.m_getVariable[sessionId])
+		delete(this.m_getVariable, sessionId)
+	}
+
+	if this.m_getVariable[sessionId] != nil {
+		close(this.m_getVariable[sessionId])
+		delete(this.m_getVariable, sessionId)
+	}
+
+	if this.m_exports[sessionId] != nil {
+		delete(this.m_exports, sessionId)
+	}
+
+	if this.m_sessions[sessionId] != nil {
+		delete(this.m_sessions, sessionId)
+	}
+
 }
 
 /**
@@ -910,8 +950,8 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 
 	if results[1] != nil {
 		err = results[1].(error)
-		log.Println("---> err: ", err)
-		log.Println("--> script: ", script)
+		log.Println("--> 914 err: ", err)
+		log.Println("--> 915 script: ", script)
 	}
 
 	return value, err
@@ -950,12 +990,6 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	if this.m_executeJsFunction[sessionId] == nil {
 		return nil, errors.New("Session " + sessionId + " is closed!")
 	}
-
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Recovered in f", r)
-		}
-	}()
 
 	// Put function call information into a struct.
 	var jsFunctionInfos JsFunctionInfos
@@ -1044,6 +1078,8 @@ func (this *JsRuntimeManager) OpenSession(sessionId string) {
  * Close a given session.
  */
 func (this *JsRuntimeManager) CloseSession(sessionId string, callback func()) {
+	// Error handler.
+
 	// Send message to stop vm...
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
