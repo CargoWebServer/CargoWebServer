@@ -403,31 +403,40 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						select {
 						case operationInfos := <-setVariable:
 							callback := operationInfos.m_returns
-							varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
-							vm.Set(varInfos.m_name, varInfos.m_val)
+							if operationInfos.m_params["varInfos"] != nil {
+								varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
+								vm.Set(varInfos.m_name, varInfos.m_val)
+							}
 							callback <- []interface{}{true} // unblock the channel...
 						case operationInfos := <-getVariable:
 							callback := operationInfos.m_returns
-							varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
-							value, err := vm.Get(varInfos.m_name)
-							if err == nil {
-								varInfos.m_val = value
+							var varInfos JsVarInfos
+							if operationInfos.m_params["varInfos"] != nil {
+								varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
+								value, err := vm.Get(varInfos.m_name)
+								if err == nil {
+									varInfos.m_val = value
+								}
 							}
 							callback <- []interface{}{varInfos} // unblock the channel...
 						case operationInfos := <-executeJsFunction:
 							callback := operationInfos.m_returns
-							jsFunctionInfos := operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
-							vm.Set("messageId", jsFunctionInfos.m_messageId)
-							vm.Set("sessionId", jsFunctionInfos.m_sessionId)
-							jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+							var jsFunctionInfos JsFunctionInfos
+							if operationInfos.m_params["jsFunctionInfos"] != nil {
+								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
+								vm.Set("messageId", jsFunctionInfos.m_messageId)
+								vm.Set("sessionId", jsFunctionInfos.m_sessionId)
+								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+							}
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case operationInfos := <-runScript:
 							callback := operationInfos.m_returns
-							script := operationInfos.m_params["script"].(string)
 							var results otto.Value
 							var err error
-							log.Println("---> run script ", sessionId)
-							results, err = vm.Run(script)
+							if operationInfos.m_params["script"] != nil {
+								//log.Println("---> run script ", sessionId)
+								results, err = vm.Run(operationInfos.m_params["script"].(string))
+							}
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
 							if stop {
@@ -455,7 +464,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							return func() {
 								timer.Stop()
 								// Continue the processing.
-								log.Println("----> call Interrupt for VM ", sessionId)
 								wait <- "--> Interrupt execution of VM with id " + sessionId
 								// The panic error will actually kill the vm
 								panic(errors.New("Stahp"))

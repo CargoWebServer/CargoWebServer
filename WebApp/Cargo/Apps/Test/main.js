@@ -66,7 +66,7 @@ function main() {
     //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
     // entityDump("1", "employees.employees")
 
-    entitiesDump("CatalogSchema.CatalogType")
+    entitiesDump("COLLADASchema.COLLADA")
     
     // entitiesDump("DT3_informations.Department")
     // testServiceContainer()

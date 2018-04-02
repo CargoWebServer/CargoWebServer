@@ -19,9 +19,13 @@ function init() {
     if (cargoThemeInfos !== undefined) {
         for (var ruleName in cargoThemeInfos) {
             var rule = getCSSRule(ruleName)
+            if(rule !== undefined){
             for (var property in cargoThemeInfos[ruleName]) {
                 rule.style[property] = cargoThemeInfos[ruleName][property]
             }
+        }else{
+            console.log("no css rule found with name ", ruleName, "!")
+        }
         }
     }
 

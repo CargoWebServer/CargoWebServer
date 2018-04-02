@@ -1,1891 +1,334 @@
-/**
- * Code that display an entity.
- */
 
-/**
- * That map contain word use by the propertie panel
- * to display the name of a propertie in more readeable
- * fashion. If the name is not found in that list, the original
- * name is use instead... 
- */
-var entityPanelTextInfo = {
-	"en": {
-		"M_firstName": "First Name",
-		"M_lastName": "Last name",
-		"M_id": "Id",
-		"M_name": "Name",
-		"delete_dialog_entity_title": "Delete entity",
-	},
-	"fr": {
-		"M_firstName": "Prénom",
-		"M_lastName": "Nom",
-		"M_id": "Id",
-		"M_name": "Nom",
-		"delete_dialog_entity_title": "Supprimer",
+
+var EntityPanel = function (parent, typeName, callback) {
+	this.typeName = typeName
+
+	// The main entity panel.
+	this.panel = new Element(parent, { "tag": "div", "class": "entity_panel" })
+
+	// fields panels.
+	this.fields = {}
+
+	// Keep track of current display entity.
+	this.entityUuid = ""
+
+	// The panel header.
+	this.header = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header" }).down()
+
+	// Get the prototype from the server.
+	this.getEntityPrototype(callback)
+
+	return this;
+}
+
+EntityPanel.prototype.getEntityPrototype = function (callback) {
+	server.entityManager.getEntityPrototype(this.typeName, this.typeName.split(".")[0],
+		// success callback
+		function (prototype, caller) {
+			// Initialyse the entity panel from it content.
+			caller.entityPanel.init(prototype, caller.callback)
+		},
+		// error callbacak
+		function () {
+
+		}, { "entityPanel": this, "callback": callback }
+	)
+}
+
+EntityPanel.prototype.init = function (prototype, callback) {
+	// Now I will set the field panel.
+	var initField = function (entityPanel, prototype, index, callback) {
+		if (prototype.FieldsVisibility[index] == true) {
+			new FieldPanel(entityPanel, index,
+				function (entityPanel, prototype, index, callback) {
+					return function (fieldPanel) {
+						entityPanel.fields[prototype.Fields[index]] = fieldPanel
+						index += 1
+						if (index < prototype.Fields.length) {
+							initField(entityPanel, prototype, index, callback)
+						} else {
+							callback(entityPanel)
+						}
+					}
+				}(entityPanel, prototype, index, callback)
+			)
+		}
+	}
+
+	// The first tree field are not display.
+	var index = 3
+	if (prototype.Fields.length > 3) {
+		initField(this, prototype, index, callback)
 	}
 }
 
-// Set the language informtion here...
-server.languageManager.appendLanguageInfo(entityPanelTextInfo)
+/**
+ * Display an entity in the panel.
+ * @param {*} entity 
+ */
+EntityPanel.prototype.setEntity = function (entity) {
+	// In that case I will set the value of the field renderer.
+	var prototype = getEntityPrototype(entity.TYPENAME)
+	this.entityUuid = entity.UUID
+
+	for (var i = 3; i < prototype.Fields.length; i++) {
+		if (this.fields[prototype.Fields[i]] != undefined && entity[prototype.Fields[i]] != undefined) {
+			this.fields[prototype.Fields[i]].setValue(entity[prototype.Fields[i]])
+		}
+	}
+}
 
 /**
- * That panel i use to navigate in information.
- * @param parent The parent element where the panel will be created.
- * @param typeName The type name of the entity to display
- * @param initCallback The callback function to be call when the entity is created.
- * @param parentEntityPanel If the entity is a sub-entity there is the parent entity panel.
- * @param removeOnDelete If is set to true the panel will be remove on delete event, otherwsie it will be clear.
- * @param parentEntity this is the parent entity of the entity display by the panel.
- * @param parentLnk The name of the reference in the parent entity to the entity of the panel.
+ * Remove the entity entity from the panel.
+ * @param {*} entity 
  */
-var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, removeOnDelete, parentEntity, parentLnk) {
-	// Only know enity can have an panel.
-	if (getEntityPrototype(typeName) == undefined) {
-		return
+EntityPanel.prototype.clear = function () {
+	this.entityUuid = ""
+	for (var id in this.fields) {
+		this.fields[id].clear()
 	}
+}
 
-	// if is set to true that will remove the panel when deleteted...
-	this.removeOnDelete = removeOnDelete
+var FieldPanel = function (entityPanel, index, callback) {
+	this.panel = entityPanel.panel.appendElement({ "tag": "div", "class": "field_panel" }).down()
 
-	// The default value will be true.
-	if (this.removeOnDelete == undefined) {
-		this.removeOnDelete = true
+	this.parent = entityPanel;
+
+	this.fieldName = getEntityPrototype(entityPanel.typeName).Fields[index]
+	this.fieldType = getEntityPrototype(entityPanel.typeName).FieldsType[index]
+
+	var title = this.fieldName.replace("M_", "").replaceAll("_", " ")
+	
+	// Display label if is not valueOf or listOf...
+	if(this.fieldName != "M_valueOf" && this.fieldName != "M_listOf"){
+		this.label = this.panel.appendElement({ "tag": "div", "innerHtml": title }).down();
 	}
+	this.value = this.panel.appendElement({ "tag": "div" }).down();
 
-	// I will keep the type name
-	this.typeName = typeName
-
-	// the parent entity panel, can be undefined...
-	this.parentEntityPanel = parentEntityPanel
-
-	// the parent entity if there one.
-	this.parentEntity = parentEntity
-
-	// the parent link if there one.
-	this.parentLnk = parentLnk
-
-	// unique id
-	this.id = randomUUID()
-
-	// The panel where the entity is display.
-	this.parent = parent
-
-	// This contain a list of entity panel...
-	this.subEntityPanel = null
-
-	// The panel.
-	this.panel = parent.appendElement({ "tag": "div", "class": "panel entities_panel" }).down()
-
-	// the save button
-	this.saveBtn = null
-
-	// the save callback will be call after success
-	this.saveCallback = null
-
-	// The header serction.
-	this.header = null
-
-	// The entity display by the panel.
-	this.entity = null
-
-	// The prototype.
-	this.proto = null
-
-	// Reference to control for a given field
-	this.controls = {}
-
-	// The div here controls are display
-	this.entitiesDiv = null
-
-	// Now the navigation buttons...
-	this.spacer = null
-
-	// The navigations button (move up, move down)
-	this.moveUp = null
-	this.moveDown = null
-
-	// save button
-	this.saveBtn = null
-
-	// the delete button
-	this.deleteBtn = null
-
-	// the delete callback will be call after success
-	this.deleteCallback = null
-
-	// Keep track of the init callback.
-	this.initCallback = initCallback
-
-	// Finish the intialysation...
-	this.init(getEntityPrototype(typeName), initCallback)
-
-
-	// Update prototype event
-	server.prototypeManager.attach(this, UpdatePrototypeEvent, function (evt, entityPanel) {
-		// if the current item is the one with change I will reset it content.
-		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
-			entityPanel.init(evt.dataMap.prototype, function (entityPanel) {
-				entityPanel.maximizeBtn.element.click()
-				entityPanel.setTitle(entityPanel.typeName)
-			}) // Reinit the panel...
+	// Here I will create the field renderer.
+	this.renderer = null;
+	new FieldRenderer(this, function (callback, fieldPanel) {
+		return function (fieldRenderer) {
+			fieldPanel.renderer = fieldRenderer;
+			callback(fieldPanel)
 		}
-	})
+	}(callback, this))
 
-	// Delete prototype event.
-	server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, entityPanel) {
-		// If the current display item is deleted I will clear the panel.
-		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
-
-		}
-	})
+	this.editor = null
 
 	return this
 }
 
-/**
- * Initialyse the entity for a given prototype.
- * @param {EntityPrototype} proto The entity prototype.
- * @param {function} initCallback The function to call after the initialysation is done.
- */
-EntityPanel.prototype.init = function (proto, initCallback) {
-	this.proto = proto
-	this.controls = {}
-	if (this.proto == null) {
-		return
-	}
-
-	this.typeName = proto.TypeName
-
-	// First I will clear the current element.
-	//this.panel.removeAllChilds()
-	this.panel.element.innerHTML = ""
-	this.panel.childs = {}
-	// Also remove sub entity panel here.
-	if (this.subEntityPanel != null) {
-		this.subEntityPanel.panel.element.innerHTML = ""
-		this.subEntityPanel.panel.childs = {}
-	}
-
-	// Init the header.
-	this.initHeader()
-
-	for (var i = 0; i < proto.FieldsOrder.length; i++) {
-		var index = proto.FieldsOrder[i]
-		var field = proto.Fields[index]
-		var fieldType = proto.FieldsType[index]
-		var fieldVisibility = proto.FieldsVisibility[index]
-		if (fieldVisibility == true) {
-			this.initField(this.entitiesDiv, field, fieldType, proto.Restrictions)
-		}
-	}
-
-	// Call after the initialisation....
-	if (initCallback != undefined) {
-		initCallback(this)
+FieldPanel.prototype.setValue = function (value) {
+	this.renderer.setValue(value)
+	// clear the editor
+	if (this.editor != null) {
+		this.editor.setValue(value)
 	}
 }
 
-/**
- * Hide the panel
- */
-EntityPanel.prototype.hide = function () {
-	this.panel.element.style.display = "none"
-	if (this.subEntityPanel != null) {
-		this.subEntityPanel.hide()
+FieldPanel.prototype.clear = function () {
+	// clear the editor
+	if (this.editor != null) {
+		this.editor.clear()
 	}
+
+	// clear the renderer
+	this.renderer.clear()
 }
 
-/**
- * Show the panel
- */
-EntityPanel.prototype.show = function () {
-	if (this.subEntityPanel != null) {
-		this.subEntityPanel.show()
-	} else {
-		this.panel.element.style.display = ""
-	}
+// The field renderer.
+var FieldRenderer = function (fieldPanel, callback) {
+	this.parent = fieldPanel;
+	this.isArray = this.parent.fieldType.startsWith("[]")
+	this.isRef = this.parent.fieldType.endsWith(":Ref")
+	// Init the renderer.
+	this.init(callback)
+
+	this.renderer = null
+
+	return this;
 }
 
-/**
- * Return the entity currently display by the entity panel.
- */
-EntityPanel.prototype.getEntity = function () {
-	if (this.entity == null) {
-		return null
-	}
-	if (this.entity.UUID != undefined) {
-		if (entities[this.entity.UUID] != undefined) {
-			return entities[this.entity.UUID]
-		}
-	}
-	return this.entity
-}
-
-/**
- * Set the entity to display in the panel.
- * @param {Entity} entity The entity to display.
- */
-EntityPanel.prototype.setEntity = function (entity) {
-	// Nothing to do if no entity is defined.
-	if (entity == undefined) {
-		return
-	}
-
-	// If is not an object... nothing to do!
-	if (!isObject(entity)) {
-		return
-	}
-
-	// Point to the entities map.
-	if (entity.UUID != undefined) {
-		if (entities[entity.UUID] != undefined) {
-			entity = entities[entity.UUID]
-		}
-	}
-
-	if (this.typeName != entity.TYPENAME) {
-		server.entityManager.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
-			// success callback
-			function (proto, caller) {
-				caller.entityPanel.init(proto, function (entity) {
-					return function (entityPanel) {
-						entityPanel.setEntity(entity)
-						entityPanel.setTitle(entity.TYPENAME)
-					}
-				}(caller.entity))
-			},
-			// error callback
-			function () {
-
-			},
-			{ "entityPanel": this, "entity": entity })
-		return
-	}
-
-	// Set the panel id with the entity id.
-	this.panel.element.id = entity.UUID
-
-	// Here I will associate the panel and the entity.
-	if (this.getEntity() != null) {
-		server.entityManager.detach(this, NewEntityEvent)
-		server.entityManager.detach(this, UpdateEntityEvent)
-		server.entityManager.detach(this, DeleteEntityEvent)
-
-		this.getEntity().getPanel = null
-		this.clear()
-	}
-
-	// Set the reference to the panel inside the entity.
-	this.entity = entity
-
-	this.getEntity().getPanel = function (panel) {
-		return function () {
-			return panel
-		}
-	}(this)
-
-	if (this.substitutionGroupSelect != undefined) {
-		this.substitutionGroupSelect.element.style.display = "none"
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////
-	// Now the event listener...
-	/////////////////////////////////////////////////////////////////////////////////
-
-	// The delete entity event.
-	server.entityManager.attach(this, DeleteEntityEvent, function (evt, entityPanel) {
-		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] != undefined && entityPanel.getEntity() != null) {
-				if (evt.dataMap["entity"].UUID == entityPanel.getEntity().UUID) {
-					// so here i will remove the panel from it parent.
-					if (entityPanel.removeOnDelete) {
-						try {
-							entityPanel.panel.element.parentNode.removeChild(entityPanel.panel.element)
-						} catch (err) {
-							// Nothing to do here.
-						}
-					} else {
-						// Clear the entity value
-						entityPanel.clear()
-					}
-				}
-			}
-		}
-	})
-
-	// The new entity event.
-	server.entityManager.attach(this, NewEntityEvent, function (evt, entityPanel) {
-		// I will reinit the panel here...
-		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
-				if (entityPanel.getEntity().UUID == evt.dataMap["entity"].UUID) {
-					entityPanel.init(entityPanel.proto)
-					entityPanel.setEntity(evt.dataMap["entity"])
-				}
-			}
-		}
-	})
-
-	// The update entity event.
-	server.entityManager.attach(this, UpdateEntityEvent, function (evt, entityPanel) {
-		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
-				// I will reinit the panel here...
-				if (entityPanel.getEntity().UUID == evt.dataMap["entity"].UUID) {
-					entityPanel.setEntity(evt.dataMap["entity"])
-				}
-			}
-		}
-	})
-
-	// So here I will set the propertie of the object.
-	for (var i = 0; i < this.proto.FieldsOrder.length; i++) {
-		var index = this.proto.FieldsOrder[i]
-		var field = this.proto.Fields[index]
-		var fieldType = this.proto.FieldsType[index]
-		var fieldVisibility = this.proto.FieldsVisibility[index]
-
-		if (fieldVisibility == true) {
-			var control = this.controls[this.proto.TypeName + "_" + field]
-			var value = this.getEntity()[field]
-			if (control != null) {
-				if (control.constructor.name == "EntityPanel") {
-					// Set the newly created entity.
-					control.panel.element.style.display = ""
-					control.parentEntity = entity
-				}
-			}
-
-			if (value != null && control != null && value != "") {
-				if (control.setFieldValue == undefined) {
-					if (fieldType == "xs.base64Binary") {
-						this.setGenericFieldValue(control, field, value, entity.UUID)
-					} else {
-						this.setFieldValue(control, field, fieldType, value, entity.UUID)
-					}
-				} else {
-					// Here the control is a entity panel so i will redirect 
-					// the entity to the control.
-					if (value.TYPENAME != undefined) {
-						control.setEntity(value)
-					}
-				}
-			} else if (control == null) {
-				console.log("No control found for display value " + value + " with type name " + fieldType)
-			} else if (value == null || value == "") {
-				console.log("The value is null or empty.")
-
-			}
-		}
-
-		// Display the append ref button.
-		var plusBtn = this.panel.getChildById(this.proto.TypeName + "_" + fieldType.replace(":Ref", "").replace("[]", "") + "_" + field + "_plus_btn")
-		if (plusBtn != null) {
-			plusBtn.element.style.display = "table-cell"
-		}
-
-		var newInput = this.panel.getChildById(this.proto.TypeName + "_" + fieldType.replace(":Ref", "").replace("[]", "") + "_" + field + "_new")
-		if (newInput != null) {
-			newInput.element.style.display = "none"
-		}
-	}
-	this.saveBtn.element.id = entity.UUID + "_save_btn"
-	this.saveBtn.element.style.display = ""
-	this.deleteBtn.element.style.display = "table-cell"
-
-	// Display the panel.
-	this.show()
-}
-
-/**
- * Reset the content of the panel.
- */
-EntityPanel.prototype.clear = function () {
-	if (this.getEntity() == null) {
-		return
-	}
-
-	this.entity = null
-
-	this.init(this.proto)
-	if (this.initCallback != undefined) {
-		this.initCallback(this)
-	}
-
-	this.maximizeBtn.element.click()
-	this.saveBtn.element.style.display = ""
-	this.deleteBtn.element.style.display = "none"
-
-	if (this.substitutionGroupSelect != undefined) {
-		this.substitutionGroupSelect.element.style.display = "table-cell"
-	}
-
-}
-
-/**
- * return true if the panel not display an entity.
- */
-EntityPanel.prototype.isEmpty = function () {
-	return this.getEntity() == null
-}
-
-/**
- * This will display the entity type...
- */
-EntityPanel.prototype.initHeader = function () {
-
-	// Set the header section.
-	this.header = this.panel.appendElement({ "tag": "div", "class": "entities_panel_header" }).down()
-		.appendElement({ "tag": "div" }).down()
-
-	this.entitiesDiv = this.panel.appendElement({ "tag": "div", "class": "entity_panel" }).down()
-		.appendElement({ "tag": "div" }).down()
-
-	this.maximizeBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
-	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })
-
-	this.minimizeBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
-	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
-
-	this.maximizeBtn.element.onclick = function (entitiesDiv, minimizeBtn) {
-		return function () {
-			this.style.display = "none"
-			entitiesDiv.element.style.display = "table-row"
-			minimizeBtn.element.style.display = "table-cell"
-			fireResize()
-		}
-	}(this.entitiesDiv, this.minimizeBtn)
-
-	this.minimizeBtn.element.onclick = function (entitiesDiv, maximizeBtn) {
-		return function () {
-			this.style.display = "none"
-			entitiesDiv.element.style.display = "none"
-			maximizeBtn.element.style.display = "table-cell"
-			fireResize()
-		}
-	}(this.entitiesDiv, this.maximizeBtn)
-	this.minimizeBtn.element.click()
-
-	// The save button.
-	this.saveBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled" }).down()
-	this.saveBtn.appendElement({ "tag": "i", "class": "fa fa-save" })
-
-	this.saveBtn.element.addEventListener("click", function (entityPanel) {
-		return function () {
-			this.style.display = "none"
-			if (entityPanel.getEntity() != null) {
-				var entity = entityPanel.getEntity()
-				entity.NeedSave = true
-				entityPanel.saveBtn.element.id = entity.UUID + "_save_btn"
-				if ((entity.exist == false && entityPanel.parentEntity != null) || entity.UUID == undefined) {
-					// The parent entity is know and the entity does not exist.
-					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
-						// Success callback
-						function (entity, entityPanel) {
-							entityPanel.setEntity(entity)
-							if (entityPanel.saveCallback != undefined) {
-								entityPanel.saveCallback(entity)
-								if (entityPanel.parentEntity != null) {
-									if (entityPanel.parentEntity.getPanel != null) {
-										if (entityPanel.parentEntity.getPanel().saveCallback != undefined) {
-											entityPanel.parentEntity.getPanel().saveCallback(entityPanel.parentEntity)
-										}
-									}
-								}
-							}
-						},
-						// Error callback.
-						function (errMsg, entityPanel) {
-							var errObj = errMsg.dataMap.errorObj
-							if (errObj.M_id == "PROTOTYPE_RESTRICTIONS_ERROR") {
-								// The M_body contain a json object with the actual error information.
-								var err = JSON.parse(errObj.M_body)
-								var control = entityPanel.controls[err.field]
-								if (control.typeName != undefined) {
-									// Here the control is an entity panel.
-									for (var id in control.controls) {
-										if (id.endsWith("M_valueOf")) {
-											control.controls[id].element.style.borderColor = "red"
-											var errDisplay = control.controls[id].parentElement.prependElement({ "tag": "div", "style": "max-width: 350px;", "innerHtml": err.msg }).down()
-											control.controls[id]
-											control.controls[id].element.setSelectionRange(0, control.controls[id].element.value.length)
-											control.controls[id].element.focus() // set it he focus.
-											var errorHandler = function (errDisplay) {
-												return function () {
-													this.style.borderColor = ""
-													if (errDisplay.element.parentNode != null) {
-														errDisplay.element.parentNode.removeChild(errDisplay.element)
-													}
-													this.removeEventListener("keyup", errorHandler, true)
-												}
-											}(errDisplay)
-											control.controls[id].element.addEventListener("keyup", errorHandler, true)
-											break
-										}
-									}
-								}
-							}
-						}, entityPanel)
-				} else {
-					// Here the entity will be created of save...
-					server.entityManager.saveEntity(entity,
-						// Success callback
-						function (entity, entityPanel) {
-							if (entityPanel.saveCallback != undefined) {
-								entityPanel.saveCallback(entity)
-								if (entityPanel.parentEntity != null) {
-									if (entityPanel.parentEntity.getPanel != null) {
-										if (entityPanel.parentEntity.getPanel().saveCallback != undefined) {
-											entityPanel.parentEntity.getPanel().saveCallback(entityPanel.parentEntity)
-										}
-									}
-								}
-							}
-						},
-						// Error callback.
-						function (errMsg, caller) {
-							// Here I will get the last valid entity value and set it back on entities map
-							var entity = caller.entity
-							delete entities[entity.UUID]
-							server.entityManager.getEntityByUuid(entity.UUID, false,
-								function (entity, caller) {
-									// I will also set it value back in the panel.
-									var entityPanel = caller.entityPanel
-									var errObj = caller.errObj
-									if (errObj.M_id == "PROTOTYPE_RESTRICTIONS_ERROR") {
-										// The M_body contain a json object with the actual error information.
-										var err = JSON.parse(errObj.M_body)
-										var control = entityPanel.controls[err.field]
-										if (control.typeName != undefined) {
-											// Here the control is an entity panel.
-											for (var id in control.controls) {
-												if (id.endsWith("M_valueOf")) {
-													control.controls[id].element.style.borderColor = "red"
-													var errDisplay = control.controls[id].parentElement.prependElement({ "tag": "div", "style": "max-width: 350px;", "innerHtml": err.msg }).down()
-													control.controls[id]
-													control.controls[id].element.setSelectionRange(0, control.controls[id].element.value.length)
-													control.controls[id].element.focus() // set it he focus.
-													var errorHandler = function (errDisplay) {
-														return function () {
-															this.style.borderColor = ""
-															if (errDisplay.element.parentNode != null) {
-																errDisplay.element.parentNode.removeChild(errDisplay.element)
-															}
-															this.removeEventListener("keyup", errorHandler, true)
-														}
-													}(errDisplay)
-													control.controls[id].element.addEventListener("keyup", errorHandler, true)
-													break
-												}
-											}
-										}
-									}
-								},
-								function () {
-
-								}, { "entityPanel": caller, "errObj": errMsg.dataMap.errorObj })
-
-						}, entityPanel)
-				}
-
-			}
-		}
-	}(this))
-
-	// The remove button.
-	this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
-	this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-trash" })
-
-	this.deleteBtn.element.onclick = function (entityPanel) {
-		return function () {
-			// Here I will save the entity...
-			if (entityPanel.getEntity() != null) {
-				// Here I will ask the user if here realy want to remove the entity...
-				var confirmDialog = new Dialog(randomUUID(), undefined, true)
-				confirmDialog.div.element.style.maxWidth = "450px"
-				confirmDialog.setCentered()
-				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.getEntity().getTitles() + "?" })
-
-				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
-					return function () {
-						// I will call delete file
-						server.entityManager.removeEntity(entityPanel.getEntity().UUID,
-							// Success callback 
-							function (result, caller) {
-								/** The action will be done in the event listener */
-								if (caller.deleteCallback != undefined) {
-									caller.deleteCallback(caller.entity)
-								}
-							},
-							// Error callback
-							function (errMsg, caller) {
-
-							}, entityPanel)
-						dialog.close()
-					}
-				}(confirmDialog, entityPanel)
-			}
-		}
-	}(this)
-
-	// Set the title div, the type is the default title.
-	var typeDiv = this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
-	var titleDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-	var titleSpan = titleDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "id": this.typeName }).down()
-
-	// Now I will set the list of substitution group.
-	if (this.proto.SubstitutionGroup.length > 0) {
-		this.substitutionGroupSelect = titleDiv.appendElement({ "tag": "select", "style": "display: none;" }).down()
-
-		var substitutionGroup = this.proto.SubstitutionGroup.sort()
-		if (substitutionGroup.indexOf("") == -1) {
-			substitutionGroup.unshift("")
-		}
-
-		// Here I will append the list of substitution group in the result...
-		for (var i = 0; i < substitutionGroup.length; i++) {
-			this.substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
-		}
-
-		this.substitutionGroupSelect.element.style.display = "table-cell"
-		this.substitutionGroupSelect.element.onchange = function (entityPanel) {
-			return function () {
-				// In that case I will set the entity content with the given type.
-				server.entityManager.getEntityPrototype(this.value, this.value.split(".")[0],
-					function (proto, entityPanel) {
-						entityPanel.init(proto, function (entityPanel) {
-							entityPanel.maximizeBtn.element.click()
-							entityPanel.setTitle(proto.TypeName)
-						})
-					},
-					function () {
-
-					}, entityPanel)
-			}
-		}(this)
-
-	}
-
-	// Back to the sypertype 
-	if (this.proto.SuperTypeNames != undefined) {
-		if (this.proto.SuperTypeNames.length > 0) {
-			var backButon = titleDiv.prependElement({ "tag": "div", "class": "entities_btn heritage_btn" }).down()
-				.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left entities_header_btn", "style": "padding-bottom: 3px;" }).down()
-
-			backButon.element.onclick = function (superTypeName, entityPanel) {
-				return function () {
-					server.entityManager.getEntityPrototype(superTypeName, superTypeName.split(".")[0],
-						function (proto, entityPanel) {
-							entityPanel.init(proto, function (entityPanel) {
-								entityPanel.maximizeBtn.element.click()
-								entityPanel.setTitle(proto.TypeName)
-							})
-						},
-						function () {
-
-						}, entityPanel)
-				}
-			}(this.proto.SuperTypeNames[this.proto.SuperTypeNames.length - 1], this)
-		}
-	}
-
-	this.spacer = this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
-	this.moveUp = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
-	this.moveUp.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left entities_header_btn" })
-
-	this.moveDown = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
-	this.moveDown.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right entities_header_btn" })
-
-	if (this.parentEntityPanel != null) {
-		this.moveUp.element.className += " enabled"
-		this.moveUp.element.firstChild.style.color = "white"
-		// Now the action...
-		this.moveUp.element.onclick = function (entityPanel) {
-			return function () {
-				entityPanel.panel.element.style.display = "none"
-				entityPanel.parentEntityPanel.panel.element.style.display = ""
-			}
-		}(this)
-	}
-}
-
-/**
- * Hide the navigation button...
- */
-EntityPanel.prototype.hideNavigationButtons = function () {
-	this.spacer.element.style.display = "none"
-	this.moveUp.element.style.display = "none"
-	this.moveDown.element.style.display = "none"
-}
-
-/**
- * Show the navigation button.
- */
-EntityPanel.prototype.showNavigationButtons = function () {
-	this.spacer.element.style.display = ""
-	this.moveUp.element.style.display = ""
-	this.moveDown.element.style.display = ""
-}
-
-/**
- * Return the label for a given field name.
- */
-EntityPanel.prototype.getFieldLabel = function (fieldName) {
-	var label = this.panel.getChildById(this.proto.TypeName + "_" + fieldName + "_lbl")
-	return label
-}
-
-/**
- * Retreive a field control with a given id.
- */
-EntityPanel.prototype.getFieldControl = function (fieldName) {
-	var control = this.panel.getChildById(this.proto.TypeName + "_" + fieldName)
-	return control
-}
-
-/**
- * Set the title.
- */
-EntityPanel.prototype.setTitle = function (title) {
-	var titleDiv = this.panel.getChildById(this.typeName)
-	titleDiv.element.innerHTML = title
-}
-
-/**
- * Create a control for a XSD type.
- */
-EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType, restrictions) {
-	// Create a select box from a xs restriction.
-	function appendSelect(restrictions, id, valueDiv) {
-		for (var i = 0; i < restrictions.length; i++) {
-			var restriction = restrictions[i]
-			if (restriction.Type == 1) {
-				if (control == undefined) {
-					control = valueDiv.appendElement({ "tag": "select", "id": id }).down()
-				}
-				control.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
-			}
-		}
-		return control
-	}
-
-	var control = null
-	var isEnum = false
-	if (restrictions.length > 0) {
-		isEnum = restrictions[0].Type == 1
-	}
-
-	if (isEnum) { // The restriction represent a list of values here.
-		if (restrictions[0].Type == 1) {
-			control = appendSelect(restrictions, id, valueDiv)
-		}
-	} else {
-		if (isXsId(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
-		} else if (isXsRef(fieldType)) {
-			// Reference here... autocomplete...
-			control = valueDiv.appendElement({ "tag": "input", "id": id, "type": "url" }).down()
-		} else if (isXsInt(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
-		} else if (isXsDate(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
-		} else if (isXsTime(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "datetime-local", "id": id }).down()
-		} else if (isXsString(fieldType)) {
-			if (field == "M_description") {
-				valueDiv.element.style.verticalAlign = "top"
-				control = valueDiv.appendElement({ "tag": "textarea", "id": id }).down()
-			} else {
-				control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
-				if (field.indexOf("pwd") > -1) {
-					control.element.type = "password"
-				}
-			}
-		} else if (isXsBinary(fieldType)) {
-
-		} else if (isXsBoolean(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "checkbox", "id": id }).down()
-		} else if (isXsNumeric(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
-		} else if (isXsMoney(fieldType)) {
-			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
-		} else {
-
-		}
-	}
-	return control
-}
-
-/**
- * Initialyse the entity panel content.
- *  @param {string} parent The parent element where the panel belong to.
- *  @param {string} field The name of property 
- *  @param {string} fieldType The type name of the property
- */
-EntityPanel.prototype.initField = function (parent, field, fieldType, restrictions) {
-
-	// The entity div.
-	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
-	var id = this.proto.TypeName + "_" + field
-
-	// In case of a generic value....
-	if (fieldType == "xs.base64Binary") {
-		this.controls[id] = parent
-		return
-	}
-
-	// The entity label here...
-	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
-	// Display title only of label is different than listOf and valueOf
-	if (field != "M_valueOf" && field != "M_listOf") {
-		label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", ""), "id": label.id + "_span_lbl" }).down()
-	}
-
-	// Now the entity value...
-	var valueDiv = entityDiv.appendElement({ "tag": "div" }).down()
-	var control = null
-	var isArray = fieldType.startsWith("[]")
-	var isRef = fieldType.endsWith(":Ref")
-
-	fieldType = fieldType.replace("[]", "").replace(":Ref", "")
-	var prototype = getEntityPrototype(fieldType)
-
-	// if there is no restriction
-	if (restrictions == undefined) {
-		restrictions = []
-	}
-
-	var baseType = getBaseTypeExtension(fieldType)
-
-	// If the value is simple string...
-	if (!isArray && (isXsBaseType(baseType) || fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
-		// in case of an enum
-		if (fieldType.startsWith("enum:")) {
-			var values = fieldType.replace("enum:", "").split(":")
-			for (var i = 0; i < values.length; i++) {
-				restrictions.push({ "Type": 1, "Value": values[i] })
-			}
-		} else {
-			var fieldPrototype = getEntityPrototype(fieldType)
-			if (fieldPrototype != undefined) {
-				if (fieldPrototype.Restrictions != undefined) {
-					// Set the restriction here.
-
-					//restrictions.concat(fieldPrototype.Restrictions)
-				}
-			}
-		}
-		control = this.createXsControl(id, valueDiv, field, fieldType, restrictions)
-		if (control == null) {
-			// In that case I will create an entity panel...
-			// Here I will creat a new value...
-			if (!fieldType.startsWith("[]")) {
-				var subentityPanel = new EntityPanel(valueDiv, fieldType, function (panel) {
-					panel.maximizeBtn.element.click()
-					panel.header.element.style.display = "none"
-					panel.panel.element.style.display = "none"
-				}, undefined, true)
-				// The control will be the sub-entity panel.
-				this.subEntityPanel = subentityPanel
-				subentityPanel.parentEntityPanel = this
-				this.controls[id] = subentityPanel
-			}
-		}
-	} else if (!isArray && (fieldType == "interface{}")) {
-		// Here it can be plain text or xml text... 
-		control = valueDiv.appendElement({ "tag": "textarea", "id": id }).down()
-	} else {
-		// Here it must be a reference to other entity...
-		var newLnkButton = null
-		if (isArray) {
-			// Here I will create the add button...
-			newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
-			newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-			newLnkButton.element.style.verticalAlign = "middle"
-			if (!isRef) {
-				var itemTable = undefined
-				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
-					// I will create the entity table.
-					var prototype = getEntityPrototype(fieldType.replace("[]", ""))
-					var itemsTableModel = new EntityTableModel(prototype)
-					var itemTable = new Table(randomUUID(), valueDiv)
-					itemTable.setModel(itemsTableModel, function (table) {
-						return function () {
-							table.init()
-							table.refresh()
-						}
-					}(itemTable))
-
-				} else {
-					var tableModel = new TableModel(["index", "values"])
-					tableModel.editable[1] = true
-
-					var baseType = fieldType
-					if (!baseType.startsWith('xs.') && !baseType.startsWith('sqltypes.')) {
-						baseType = getBaseTypeExtension(fieldType)
-					}
-
-					tableModel.fields = ["xs.int", baseType.replace("[]", "")]
-					itemTable = new Table(randomUUID(), valueDiv)
-					itemTable.setModel(tableModel, function () { })
-				}
-				control = itemTable
-			} else {
-				// Simply create a div where the list of hyper link will be display.
-				control = valueDiv.appendElement({ "tag": "div", "class": "scrolltable", "id": id }).down()
-			}
-		} else {
-			if (isRef) {
-				// Here i will create the edit button.
-				newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
-				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
-				control = valueDiv.appendElement({ "tag": "div", "id": id }).down()
-			} else {
-				// Here I have a item inside another item...
-				var uuid = ""
-				if (this.getEntity() != null) {
-					uuid = this.getEntity().UUID
-				}
-				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, uuid, field)
-				// The control will be the sub-entity panel.
-				this.controls[id] = control = subentityPanel
-			}
-		}
-
-		if (newLnkButton != null) {
-			newLnkButton.element.onclick = function (entityPanel, field, fieldType, valueDiv) {
-				return function () {
-					if (isRef) {
-						// So here I will create an auto completion list panel...
-						if (entityPanel.controls[id + "_new"] != undefined) {
-							// remove from the layout
-							entityPanel.controls[id + "_new"].element.parentNode.removeChild(entityPanel.controls[id + "_new"].element)
-						}
-
-						if (isArray) {
-							entityPanel.controls[id + "_new"] = valueDiv.appendElement({ "tag": "input", "id": id + "_new" }).down()
-						} else {
-							var parentElement
-							if (valueDiv.element.firstChild.firstChild == undefined) {
-								parentElement = valueDiv.element
-							} else {
-								parentElement = valueDiv.element.firstChild.firstChild.firstChild
-							}
-
-							entityPanel.controls[id + "_new"] = new Element(parentElement, { "tag": "input", "id": id + "_new" })
-							if (parentElement.firstChild != null) {
-								parentElement.firstChild.style.display = "none"
-								entityPanel.controls[id + "_new"].element.value = parentElement.firstChild.innerHTML
-							}
-						}
-
-						// Display it
-						entityPanel.controls[id + "_new"].element.style.display = ""
-
-						// Get the pacakge prototypes...
-						var typeName = fieldType.replace("[]", "").replace(":Ref", "")
-						server.entityManager.getEntityPrototypes(typeName.split(".")[0],
-							function (result, caller) {
-
-								// Set variables...
-								var entityPanel = caller.entityPanel
-								var id = caller.id
-								var field = caller.field
-								var prototype = getEntityPrototype(caller.typeName)
-
-								// Now i will set it autocompletion list...
-								attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, prototype.getTitles(),
-									function (entityPanel, field, fieldsType) {
-										return function (value) {
-											// Here I will set the field of the entity...
-											var entity = entityPanel.getEntity()
-
-											if (entity != undefined) {
-												// Set the new object value.
-												appendObjectValue(entity, field, value)
-												if (entity.UUID != "") {
-													// Automatically saved...
-													server.entityManager.saveEntity(entity)
-												} else {
-													// Here the entity dosent exist...
-													server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
-														function (result, caller) {
-															// Set the result inside the panel.
-															entityPanel.setEntity(result)
-														},
-														function () {
-
-														}, entityPanel)
-												}
-											}
-										}
-									}(entityPanel, field))
-
-								entityPanel.controls[id + "_new"].element.focus()
-								entityPanel.controls[id + "_new"].element.select();
-							},
-							// The error callback.
-							function () {
-							}, { "entityPanel": entityPanel, "field": field, "id": id, "typeName": typeName })
-
-					} else {
-						// In that case I will create a new entity
-						if (/*prototype != undefined*/ prototype.PackageName != "xs") {
-							var item = eval("new " + prototype.TypeName + "()")
-							item.TYPENAME = prototype.TypeName
-
-							// Set the parent uuid.
-							item.ParentUuid = entityPanel.getEntity().UUID
-							item.ParentLnk = field
-
-							if (isArray) {
-								var itemTable = entityPanel.controls[id];
-								//var row = itemTable.appendRow(item, item.UUID);
-								var data = itemTable.getModel().appendRow(item)
-								row = new TableRow(itemTable, itemTable.rows.length, data, undefined)
-								row.saveBtn.element.style.visibility = "visible";
-								itemTable.header.maximizeBtn.element.click();
-								row.cells[0].setCellEditor();
-							} else {
-
-							}
-						} else {
-							// Here I will try to append a new value inside the table...
-							if (isArray) {
-								var itemTable = entityPanel.controls[id]
-								var val = ""
-								// TODO set the default value...
-								var newRow = itemTable.appendRow([entityPanel.getEntity()[field].length + 1, val], entityPanel.getEntity()[field].length)
-								newRow.saveBtn.element.style.visibility = "visible"
-
-								simulate(newRow.cells[entityPanel.getEntity()[field].length, 1].div.element, "dblclick");
-
-								newRow.deleteBtn.element.onclick = function (entity, field, row) {
-									return function () {
-										// Here I will simply remove the element 
-										// The entity must contain a list of field...
-										if (entity[field] != undefined) {
-											entity[field].splice(row.index, 1)
-											entity.NeedSave = true
-											server.entityManager.saveEntity(entity)
-										}
-									}
-								}(entityPanel.getEntity(), field, newRow)
-
-								// The save row action
-								newRow.saveBtn.element.onclick = function (entity, field, row) {
-									return function () {
-										// Point to the entities map.
-										if (entities[entity.UUID] != undefined) {
-											entity = entities[entity.UUID]
-										}
-
-										// Here I will simply remove the element 
-										// The entity must contain a list of field...
-										if (entity[field] != undefined) {
-											entity[field][row.index] = row.table.getModel().getValueAt(row.index, 1)
-											entity.NeedSave = true
-											server.entityManager.saveEntity(entity,
-												function (result, caller) {
-													caller.style.visibility = "hidden"
-												},
-												function () {
-
-												}, this)
-										}
-									}
-								}(entityPanel.getEntity(), field, newRow)
-
-								//itemTable.refresh()
-							}
-						}
-
-					}
-				}
-			}(this, field, fieldType, valueDiv)
-		}
-	}
-
-	if (control != null) {
-		this.controls[id] = control
-		if (control.element != null) {
-			// Now the change event...
-			control.element.addEventListener("change", function (entityPanel, attribute, fieldType) {
-				return function () {
-					var entity = null
-					if (entityPanel.getEntity() == null) {
-						// Here I will create a new entity.
-						var entity = eval("new " + entityPanel.typeName)
-
-						// set basic values.
-						if (entityPanel.parentEntity != null) {
-							entity.ParentUuid = entityPanel.parentEntity.UUID
-						}
-
-						entityPanel.setEntity(entity)
-
-					} else if (entityPanel.getEntity()[attribute].TYPENAME != undefined) {
-						// Get the existing entity.
-						entity = entityPanel.getEntity()[attribute]
-					} else {
-						entity = entityPanel.getEntity()
-					}
-
-					if (fieldType.startsWith("xs.")) {
-						if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
-							if (entity[attribute] != this.value) {
-								entity[attribute] = this.value
-								entity.NeedSave = true
-							}
-						} else if (isXsNumeric(fieldType)) {
-							if (entity[attribute] != parseFloat(this.value)) {
-								entity[attribute] = parseFloat(this.value)
-								entity.NeedSave = true
-							}
-						} else if (isXsInt(fieldType)) {
-							if (entity[attribute] != parseInt(this.value)) {
-								entity[attribute] = parseInt(this.value)
-								entity.NeedSave = true
-							}
-						} else if (isXsTime(fieldType)) {
-							var value = moment(this.value).unix()
-							if (entity[attribute] != value) {
-								entity[attribute] = value
-								entity.NeedSave = true
-							}
-						} else if (isXsBoolean(fieldType)) {
-							if (entity[attribute] != this.checked) {
-								entity[attribute] = this.checked
-								entity.NeedSave = true
-							}
-						} else if (fieldType.startsWith("enum:")) { // Cargo enum not xsd extention.
-							if (entity[attribute] != this.selectedIndex + 1) {
-								entity[attribute] = this.selectedIndex + 1
-								entity.NeedSave = true
-							}
-						}
-					} else {
-
-						if (entity["M_valueOf"] != undefined) {
-							if (entity["M_valueOf"] != this.value) {
-								entity["M_valueOf"] = this.value
-								entity.NeedSave = true
-							}
-						} else {
-							// here I will create a new attribute...
-							entity[attribute] = eval("new " + fieldType + "()")
-							if (entity[attribute]["M_valueOf"] != this.value) {
-								entity[attribute]["M_valueOf"] = this.value
-								entity.NeedSave = true
-							}
-						}
-					}
-
-					// Display the save button if the entity has changed.
-					if (entity.NeedSave) {
-						if (entityPanel.parentEntityPanel != null) {
-							entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
-						} else {
-							entityPanel.saveBtn.element.style.display = "table-cell"
-						}
-					}
-				}
-			}(this, field, fieldType))
-
-			// Append the listener to display the save button.
-			control.element.addEventListener("keyup", function (entityPanel, field) {
-				return function () {
-					if (entityPanel.getEntity() != null) {
-						if (this.value.length > 0) {
-							if (entityPanel.getEntity()[field] != this.value) {
-								if (entityPanel.parentEntityPanel != null) {
-									entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
-								} else {
-									entityPanel.saveBtn.element.style.display = "table-cell"
-								}
-							}
-						} else if (entityPanel.proto.Ids.indexOf(field) != -1) {
-							// reset the panel value.
-							entityPanel.clear()
-
-							// Set back to the most generic type.
-							if (entityPanel.proto.SuperTypeNames != undefined) {
-								if (entityPanel.proto.SuperTypeNames.length > 0) {
-									var typeName = entityPanel.proto.SuperTypeNames[0]
-									server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
-										// success callback
-										function (proto, caller) {
-											caller.entityPanel.init(proto, function (proto) {
-												return function (entityPanel) {
-													entityPanel.setTitle(proto.TypeName)
-												}
-											}(proto))
-										},
-										function () {
-
-										},
-										{ "entityPanel": entityPanel })
-								}
-							}
-
-						}
-					}
-				}
-			}(this, field))
-		}
-
-		// if the field is an index key i will set the auto complete on it...
-		if ((contains(this.proto.Indexs, field) || contains(this.proto.Ids, field)) && !isArray) {
-			attachAutoCompleteInput(control, this.typeName, field, this, [],
-				function (entityPanel) {
-					return function (value) {
-						var entity = value
-						if (entities[value.UUID] != undefined) {
-							entity = entities[value.UUID]
-						}
-
-						if (entityPanel.getEntity() != undefined) {
-							if (entityPanel.getEntity().UUID != entity.UUID) {
-								entityPanel.setEntity(entity)
-							}
-						} else {
-							entityPanel.setEntity(entity)
-						}
-					}
-				}(this))
-		}
-	}
-}
-
-/**
- * That function is use to display a field when there is no hint about the way to display it,
- * so introspection will be use instead of entity prototype.
- */
-EntityPanel.prototype.setGenericFieldValue = function (control, field, value, parentUuid) {
-
-	// First I will get the parent entity.
-	var parentEntity = entities[parentUuid]
-	var id = parentEntity.TYPENAME + "_" + field
-	var fieldType
-
-	if (isString(value)) {
-		// Here I will create a xs control...
-		fieldType = "xs.string"
-	} else {
-		// Here I will create a xs control to display an object reference.
-		if (!isArray(value)) {
-			fieldType = value.TYPENAME + ":Ref"
-			setRef(parentEntity, field, value, false)
-		} else {
-			for (var i = 0; i < value.length; i++) {
-				// In the case of an array...
-				if (isObject(value[i])) {
-					fieldType = "[]" + value[0].TYPENAME + ":Ref"
-					setRef(parentEntity, field, value, true)
-				} else {
-					if (isString(value[i])) {
-						// an array of string...
-						fieldType = "[]xs.string"
-					}
-					// TODO implement other field type here.
-				}
-			}
-		}
-
-	}
-
-	this.initField(control, field, fieldType, [])
-	this.setFieldValue(this.controls[id], field, fieldType, value, parentUuid)
-}
-
-/**
- * (Multiple value) If the object is a sub-object I will display a table with the value of the sub-object.
- * Composition
- */
-EntityPanel.prototype.appendObjects = function (itemsTable, values, field, fieldType, parentUuid) {
-	if (itemsTable != undefined) {
-		itemsTable.clear()
-		for (var i = 0; i < values.length; i++) {
-			// keep information about the parent entity...
-			if (values[i] == null) {
-				// In that case I will append the default value for the given type.
-				if (isXsId(fieldType.replace("[]", "")) || isXsString(fieldType.replace("[]", "") || isXsRef(fieldType.replace("[]", "")))) {
-					values[i] = ""
-				} else if (isXsNumeric(fieldType.replace("[]", ""))) {
-					values[i] = 0.0
-				} else if (isXsInt(fieldType.replace("[]", ""))) {
-					values[i] = 0
-				} else if (isXsTime(fieldType.replace("[]", ""))) {
-					values[i] = 0
-				} else if (isXsBoolean(fieldType.replace("[]", ""))) {
-					values[i] = false
-				}
-			}
-			values[i].ParentUuid = this.getEntity().UUID
-			values[i].parentLnk = field
-
-			if (values[i].UUID != undefined) {
-				var row = itemsTable.appendRow(values[i], values[i].UUID)
-			} else {
-				// Append a row with a single value inside it...
-				var row = itemsTable.appendRow([i + 1, values[i]], i)
-
-				// The delete row action...
-				row.deleteBtn.element.onclick = function (entity, field, row) {
-					return function () {
-						// Here I will simply remove the element 
-						// The entity must contain a list of field...
-						if (entities[entity.UUID] != undefined) {
-							entity = entities[entity.UUID]
-						}
-
-						if (entity[field] != undefined) {
-							entity[field].splice(row.index, 1)
-							entity.NeedSave = true
-							server.entityManager.saveEntity(entity)
-						}
-					}
-				}(entities[parentUuid], field, row)
-
-				// The save row action
-				row.saveBtn.element.onclick = function (entity, field, row) {
-					return function () {
-						// Here I will simply remove the element 
-						// The entity must contain a list of field...
-						if (entities[entity.UUID] != undefined) {
-							entity = entities[entity.UUID]
-						}
-
-						if (entity[field] != undefined) {
-							entity[field][row.index] = row.table.getModel().getValueAt(row.index, 1)
-							entity.NeedSave = true
-							if (entity.UUID != "") {
-								server.entityManager.saveEntity(entity,
-									function (result, caller) {
-										caller.style.visibility = "hidden"
-									},
-									function () {
-
-									}, this)
-							} else {
-								// Here the entity dosent exist...
-								server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
-									function (result, caller) {
-										caller.style.visibility = "hidden"
-									},
-									function () {
-
-									}, this)
-							}
-						}
-					}
-				}(entities[parentUuid], field, row)
-			}
-		}
-	}
-}
-
-/**
- * Same as appendObject for a single value.
- */
-EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldType) {
-	var subEntityPanel = new EntityPanel(valueDiv, fieldType,
-		// The init callback. 
-		function (value) {
-			return function (panel) {
-				panel.setEntity(value)
-			}
-		}(object),
-		undefined, true, object, field)
-}
-
-/**
- * If the the object is a reference I will display a link to the other oject entity panel.
- * Aggregation.
- */
-EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, fieldType) {
-
-	var prototype = getEntityPrototype(object.TYPENAME)
-	var titles = object.getTitles()
-	var refName = ""
-	for (var j = 0; j < titles.length; j++) {
-
-		refName += titles[j]
-		if (j < titles.length - 1) {
-			refName += " "
-		}
-	}
-
-	// Here the object must be init...
-	if (refName != undefined && refName.length > 0) {
-		valueDiv.element.style.width = "auto"
-		var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
-		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "class": "entity_ref_lnk", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
-		ref.element.id = object.UUID
-		var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
-
-		// Now the action...
-		ref.element.onclick = function (object, propertiePanel) {
-			return function () {
-				// so here I will get the entity value and display it on the server...
-				propertiePanel.panel.element.style.display = "none"
-
-				// In case of cyclic reference...
-				var parentEntityPanel = propertiePanel.parentEntityPanel
-				while (parentEntityPanel != undefined) {
-					if (parentEntityPanel.typeName == object.TYPENAME) {
-						break
-					} else {
-						if (parentEntityPanel != propertiePanel.parentEntityPanel) {
-							parentEntityPanel = propertiePanel.parentEntityPanel
-						} else {
-							parentEntityPanel = undefined
-						}
-					}
-				}
-
-				var subentityPanel
-				if (parentEntityPanel != undefined) {
-					subPropertiePanel = parentEntityPanel
-					parentEntityPanel.panel.element.style.display = ""
-					var entity = entities[object.UUID]
-					if (entity == undefined) {
-						entity = object
-					}
-					parentEntityPanel.setEntity(entity)
-				} else {
-					subPropertiePanel = new EntityPanel(propertiePanel.parent, object.TYPENAME, function (object) {
-						return function (panel) {
-							// Set the object.
-							var entity = entities[object.UUID]
-							if (entity == undefined) {
-								entity = object
-							}
-							panel.setEntity(entity)
-							panel.setTitle(object.TYPENAME)
-
-						}
-					}(object), propertiePanel)
-				}
-
-				if (propertiePanel.subEntityPanel != null) {
-					// Remove the existing panel here.
-					propertiePanel.subEntityPanel.parent.removeElement(propertiePanel.subEntityPanel.panel)
-				}
-
-				propertiePanel.subEntityPanel = subPropertiePanel
-
-				propertiePanel.moveDown.element.className += " enabled"
-				propertiePanel.moveDown.element.firstChild.style.color = "white"
-
-				// Now the action...
-				propertiePanel.moveDown.element.onclick = function (entityPanel) {
-					return function () {
-						entityPanel.panel.element.style.display = "none"
-						entityPanel.subEntityPanel.panel.element.style.display = ""
-					}
-				}(propertiePanel)
-
-			}
-		}(object, this)
-
-		ref.element.onmouseover = function (object) {
-			return function () {
-				var toActivated = []
-				if (document.getElementById(object.UUID) != undefined) {
-					toActivated.push(document.getElementById(object.UUID))
-				}
-
-				var toActivated_ = document.getElementsByName(object.UUID)
-				for (var i = 0; i < toActivated_.length; i++) {
-					toActivated.push(toActivated_[i])
-				}
-
-				for (var i = 0; i < toActivated.length; i++) {
-					if (toActivated[i].className.baseVal != undefined) {
-						toActivated[i].className.baseVal += " active"
-					}
-				}
-			}
-		}(object)
-
-		ref.element.onmouseout = function (object) {
-			return function () {
-
-				var toDectivated = []
-				if (document.getElementById(object.UUID) != undefined) {
-					toDectivated.push(document.getElementById(object.UUID))
-				}
-
-				var toDectivated_ = document.getElementsByName(object.UUID)
-				for (var i = 0; i < toDectivated_.length; i++) {
-					toDectivated.push(toDectivated_[i])
-				}
-
-				for (var i = 0; i < toDectivated.length; i++) {
-					if (toDectivated[i].className.baseVal != undefined) {
-						toDectivated[i].className.baseVal = toDectivated[i].className.baseVal.replace(" active", "")
-					}
-				}
-			}
-		}(object)
-
-		deleteLnkButton.element.onclick = function (entityUUID, object, field) {
-			return function () {
-				var entity = entities[entityUUID]
-				removeObjectValue(entity, field, object)
-				server.entityManager.saveEntity(entity,
-					function (result, caller) {
-						// nothing to do here.
-					},
-					function (result, caller) {
-						// nothing to here.
-					},
-					undefined)
-				// in case of local object.
-				if (entity.onChange != undefined) {
-					entity.onChange(entity)
-				}
-			}
-		}(this.getEntity().UUID, object, field)
-	}
-
-}
-
-/**
- * Exit edit mode for a given field.
- */
-EntityPanel.prototype.resetFieldValue = function (field, input) {
-	if (!isArray(this.getEntity()[field])) {
-		input.element.parentNode.firstChild.style.display = ""
-	}
-	input.element.parentNode.removeChild(input.element)
-	input.autocompleteDiv.element.parentNode.removeChild(input.autocompleteDiv.element)
-	delete this.controls[input.element.id]
-}
-
-EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value, parentUuid) {
-	if (control == undefined) {
-		return
-	}
-
-	// In case of a reference string...
-	if (fieldType == "xs.string") {
-		if (isObjectReference(value)) {
-			// In that case I will create the link object to reach the 
-			// reference...
-			fieldType = value.split("%")[0] + ":Ref"
-
-			// Here I will remove the default control and replace it by a div where the reference will be placed.
-			control.element.parentNode.removeChild(control.element)
-			control = control.parentElement.appendElement({ "tag": "div" }).down()
-		}
-	}
-
-	this.maximizeBtn.element.click()
-	// Here the entity is a reference to a complex type...
-	var isRef = fieldType.endsWith(":Ref")
-
-	// Here I will see if the type is derived basetype...
-	if (!fieldType.startsWith("[]") && !isRef) {
-		// plain basic type.
-		if (value.M_valueOf != undefined) {
-			value = value.M_valueOf;
-		}
-		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
-			// Here the value is an enumeration...
-			if (value.M_valueOf != undefined) {
-				for (var id in control.element.options) {
-					if (control.element.options[id].innerText == value.M_valueOf) {
-						control.element.selectedIndex = id;
-					}
-				}
-			} else if (isInt(value)) {
-				control.element.selectedIndex = parseInt(value) - 1
-			} else if (isString(value)) {
-				control.element.value = value
-			}
-		} else if (isXsString(fieldType) || fieldType == "interface{}") {
-			control.element.value = value
-		} else if (isXsNumeric(fieldType)) {
-			if (value != "") {
-				control.element.value = parseFloat(value)
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsInt(fieldType)) {
-			if (value != "") {
-				control.element.value = parseInt(value)
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsBoolean(fieldType)) {
-			control.element.checked = value
-		} else if (isXsDate(fieldType)) {
-			if (value != "") {
-				control.element.value = moment(value).format('YYYY-MM-DD');
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsTime(fieldType)) {
-			if (value != "") {
-				control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
-			} else {
-				control.element.value = ""
-			}
-		} else if (isXsId(fieldType)) {
-			control.element.value = value
-		} else if (isXsRef(fieldType)) {
-			control.element.innerHTML = value.replace("#", "")
-			control.element.href = value
-		}
-
-	} else {
-
-		if (fieldType.startsWith("[]")) {
-			// The propertie is an array...
-			if (value != null && value != "") {
-				// An array of reference.
-				if (isRef) {
-					// append a new container for link's...
-					for (var i = 0; i < value.length; i++) {
-						// append link's
-						// Here I will call the set entity reference function.
-						var uuid
-						if (isObject(value[i])) {
-							uuid = value[i].UUID
-						} else {
-							uuid = value[i]
-						}
-						if (uuid.length > 0 && isObjectReference(uuid)) {
-							if (this.getEntity()["set_" + field + "_" + uuid + "_ref"] == undefined) {
-								setRef(this.getEntity(), field, uuid, true)
-							}
-							this.getEntity()["set_" + field + "_" + uuid + "_ref"](
-								function (panel, control, field, fieldType) {
-									return function (ref) {
-										panel.appendObjectRef(ref, control, field, fieldType)
-									}
-								}(this, control, field, fieldType)
-							)
-						}
-					}
-				} else {
-					// I will display a table.
-					this.appendObjects(control, value, field, fieldType, parentUuid)
-				}
-			} else {
-				// Empty the table.
-				if (isRef) {
-					control.removeAllChilds() // Empty all current element...
-				} else {
-					control.clear()
-				}
-			}
-		} else {
-			if (value != null) {
-				// a single reference...
-				if (isRef) {
-					control.removeAllChilds()
-					var uuid
-					if (isObject(value)) {
-						uuid = value.UUID
-					} else {
-						uuid = value
-					}
-					if (uuid.length > 0 && isObjectReference(uuid)) {
-						if (this.getEntity()["set_" + field + "_" + uuid + "_ref"] == undefined) {
-							setRef(this.getEntity(), field, uuid, false)
-						}
-						this.getEntity()["set_" + field + "_" + uuid + "_ref"](
-							function (panel, control, field, fieldType) {
-								return function (ref) {
-									panel.appendObjectRef(ref, control, field, fieldType)
-								}
-							}(this, control, field, fieldType)
-						)
-					}
-				} else {
-					// I will display an entity panel inside the existing one.
-					if (control != undefined) {
-						if (control.removeAllChilds != undefined) {
-							control.removeAllChilds()
-							this.appendObject(value, control, field, fieldType)
-						}
-					}
-
-				}
-			}
-		}
-	}
-}
-
-/**
- * Create an autocompletion list to an input box.
- * @param input The input to attach
- * @param typeName Element in the list are object of a given type.
- * @param entityPanel the parent panel of the entity.
- * @param ids a list of ids to remove from the list of choice.
- * @param onSelect the function to call when the value change in the list.
- */
-function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSelect) {
-	var objMap = {}
-	if (ids == undefined) {
-		// must be an array...
-		ids = []
-	}
-
-	input.element.readOnly = true
-	input.element.style.cursor = "progress"
-	input.element.style.width = "auto"
-
-	// TODO use query instead of download all elements.
-
-	server.entityManager.getEntities(typeName, typeName.substring(0, typeName.indexOf(".")), null, 0, -1, [], true, false,
-		// Progress...
+FieldRenderer.prototype.init = function (callback) {
+	var typeName = this.parent.fieldType.replace("[]", "").replace(":Ref", "")
+	server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+		function (prototype, caller) {
+			// Here I will render the panel, create sub-panel render etc...
+			caller.fieldRenderer.render(prototype, caller.callback)
+		},
 		function () {
 
 		},
-		// Sucess...
-		function (results, caller) {
-			// Set local variables.
-			var input = caller.input
-			var values = caller.values
-			var objMap = caller.objMap
-			var panel = caller.panel
-			var onSelect = caller.onSelect
-			var entityPanel = caller.entityPanel
-			var ids = caller.ids
-			var field = caller.field
-			var lst = []
+		{ "fieldRenderer": this, "callback": callback }
+	)
+}
 
-			input.element.readOnly = false
-			input.element.style.cursor = "default"
+/**
+ * Create html element to render the entity value.
+ * @param {*} prototype 
+ */
+FieldRenderer.prototype.render = function (prototype, callback) {
+	if (this.isArray) {
+		// Array value use a table to display the entity.
+		this.renderer = new Table(randomUUID(), this.parent.value)
+		var model = undefined
+		if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
+			model = new EntityTableModel(prototype)
+		} else {
+			model = new TableModel(["index", "values"])
+			model.fields = ["xs.int", this.parent.fieldType.replace("[]", "")]
+		}
+		this.renderer.setModel(model,
+			function (table, callback, fieldRenderer) {
+				return function () {
+					table.init()
+					table.refresh()
+					callback(fieldRenderer)
+				}
+			}(this.renderer, callback, this))
+	} else {
+		if (this.isRef) {
+			// Render a reference....
+			this.renderer = this.parent.value
+		} else {
+			// simply set the value of parent field panel.
+			if (this.parent.fieldType.startsWith("xs.")) {
+				this.renderer = this.parent.value
+				callback(this)
+			} else {
+				new EntityPanel(this.parent.value, prototype.TypeName,
+					function (callback, fieldRenderer) {
+						return function (entityPanel) {
+							fieldRenderer.renderer = entityPanel
+							callback(fieldRenderer)
+						}
+					}(callback, this))
+			}
+		}
+	}
+}
 
-			if (results.length > 0) {
-				var prototype = getEntityPrototype(results[0].TYPENAME)
-				// get title display a readable name for the end user
-				// or the first entity id.
-				for (var i = 0; i < results.length; i++) {
-					var result = results[i]
-					if (result.getTitles != undefined) {
-						var titles = result.getTitles()
-						for (var j = 0; j < titles.length; j++) {
-							if (ids.indexOf(titles[j]) == -1) {
-								objMap[titles[j]] = result
-								if (lst.indexOf(titles[j]) == -1) {
-									lst.push(titles[j])
+FieldRenderer.prototype.setValue = function (value) {
+	//console.log("---> 209", value)
+	if (this.renderer != null) {
+		if (this.isArray) {
+			if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
+				// Here we got an array of entities
+				for (var i = 0; i < value.length; i++) {
+					var data = this.renderer.getModel().appendRow(value[i])
+					var row = new TableRow(this.renderer, this.renderer.rows.length, data, undefined)
+					row.saveBtn.element.style.visibility = "visible";
+					this.renderer.header.maximizeBtn.element.click();
+				}
+			} else {
+				// Here we got an array of basic types.
+				for (var i = 0; i < value.length; i++) {
+					// simply append the values with there index in that case.
+					var row = this.renderer.appendRow([i + 1, value[i]], i)
+
+					// The delete row action...
+					row.deleteBtn.element.onclick = function (uuid, field, row) {
+						return function () {
+							// Here I will simply remove the element 
+							// The entity must contain a list of field...
+							if (entities[uuid] != undefined) {
+								entity = entities[uuid]
+							}
+
+							if (entity[field] != undefined) {
+								entity[field].splice(row.index, 1)
+								entity.NeedSave = true
+								server.entityManager.saveEntity(entity)
+							}
+						}
+					}(this.parent.parent.entityUuid, this.parent.fieldName, row)
+
+					// The save row action
+					row.saveBtn.element.onclick = function (uuid, field, row) {
+						return function () {
+							// Here I will simply remove the element 
+							// The entity must contain a list of field...
+							if (entities[uuid] != undefined) {
+								entity = entities[uuid]
+							}
+
+							if (entity[field] != undefined) {
+								entity[field][row.index] = row.table.getModel().getValueAt(row.index, 1)
+								entity.NeedSave = true
+								if (entity.UUID != "") {
+									server.entityManager.saveEntity(entity,
+										function (result, caller) {
+											caller.style.visibility = "hidden"
+										},
+										function () {
+
+										}, this)
+								} else {
+									// Here the entity dosent exist...
+									server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
+										function (result, caller) {
+											caller.style.visibility = "hidden"
+										},
+										function () {
+
+										}, this)
 								}
 							}
 						}
-					}
+					}(this.parent.parent.entityUuid, this.parent.fieldName, row)
 				}
 			}
+		} else {
+			// not array...
+			var fieldType = this.parent.fieldType
+			if (fieldType.startsWith("xs.")) {
+				if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
+					this.parent.value.element.innerHTML = value
+				} else if (isXsNumeric(fieldType)) {
+					this.parent.value.element.innerHTML = parseFloat(value)
+				} else if (isXsInt(fieldType)) {
+					this.parent.value.element.innerHTML = parseInt(value)
+				} else if (isXsTime(fieldType)) {
+					var value = moment(value).unix()
+				} else if (isXsBoolean(fieldType)) {
+					this.parent.value.element.innerHTML = value
+				} else if (fieldType.startsWith("enum:")) { // Cargo enum not xsd extention.
 
-			attachAutoComplete(input, lst, false)
-			if (entityPanel != undefined) {
-				input.element.addEventListener("keyup", function (entityPanel, field, input, objMap) {
-					return function (e) {
-						// If the key is escape...
-						if (e.keyCode === 27) {
-							entityPanel.resetFieldValue(field, input)
-						}
-						// Only Ids selection will erase the panel if the input is empty.
-						if (entityPanel.proto != undefined) {
-							if (/*entityPanel.proto.Indexs.indexOf(field) > -1 ||*/ entityPanel.proto.Ids.indexOf(field) > -1) {
-								if (this.value.length == 0) {
-									entityPanel.clear()
-									this.focus()
-									this.select()
-								}
-							}
-						}
-					}
-				}(entityPanel, field, input, objMap))
-
-				input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
-					return function (evt) {
-						var value = objMap[this.value]
-						if (value != undefined) {
-							var entity = entities[value.UUID]
-							onSelect(entity)
-						}
-					}
-				}(objMap, values, entityPanel, onSelect)
+				}
+			} else if (value.TYPENAME != undefined) {
+				// In that case I got a subpanel....
+				this.renderer.setEntity(value)
+			} else {
+				this.parent.value.element.innerHTML = value
 			}
-		},
-		function (errMsg, caller) {
-			// here there's no indexation... so what!
-			var input = caller.input
-			input.element.readOnly = false
-			input.element.style.cursor = "default"
-		},
-		{ "input": input, "field": field, "objMap": objMap, "values": this.values, "entityPanel": entityPanel, "onSelect": onSelect, "ids": ids })
-
-	// If a new entity is created related to the autocomplete type I need to append it into the list of choice.
-	server.entityManager.attach({ "input": input, "field": field, "objMap": objMap, "values": this.values, "entityPanel": entityPanel, "onSelect": onSelect, "ids": ids }, NewEntityEvent, function (evt, caller) {
-		if (caller.entityPanel == undefined) {
-			// No panel is defined yet...
-			return
 		}
-
-		// I will reinit the panel here...
-		if (evt.dataMap["entity"].TYPENAME == caller.entityPanel.typeName) {
-			var entity = entities[evt.dataMap["entity"].UUID]
-			var entityPanel = caller.entityPanel
-			var titles = entity.getTitles()
-			var ids = caller.ids
-			var lst = []
-			var objMap = caller.objMap
-			var input = caller.input
-			var field = caller.field
-			var onselect = caller.onSelect
-			var values = caller.values
-
-			for (var j = 0; j < titles.length; j++) {
-				if (ids.indexOf(titles[j]) == -1) {
-					objMap[titles[j]] = entity
-					if (lst.indexOf(titles[j]) == -1) {
-						lst.push(titles[j])
-					}
+	} else {
+		// In that case the renderer was not completely initialysed so I will intialyse it and set it value 
+		// after.
+		this.renderer = this.render(getEntityPrototype(this.parent.fieldType.replace("[]", "").replace(":Ref", "")),
+			function (value, fieldRenderer) {
+				return function () {
+					fieldRenderer.setValue(value)
 				}
-			}
+			}(value, this))
+	}
+}
 
-			input.element.readOnly = false
-			input.element.style.cursor = "default"
+FieldRenderer.prototype.clear = function () {
 
-			attachAutoComplete(input, lst, false)
+}
 
-			input.element.addEventListener("keyup", function (entityPanel, field, input, objMap) {
-				return function (e) {
-					// If the key is escape...
-					if (e.keyCode === 27) {
-						entityPanel.resetFieldValue(field, input)
-					}
-					// Only index selection will erase the panel if the input is empty.
-					if (entityPanel.proto != undefined) {
-						if (entityPanel.proto.Indexs.indexOf(field) > -1 || entityPanel.proto.Ids.indexOf(field) > -1) {
-							if (this.value.length == 0) {
-								entityPanel.clear()
-								this.focus()
-								this.select()
-							}
-						}
-					}
-				}
-			}(entityPanel, field, input, objMap))
+// The field editor.
+var FieldEditor = function (fieldPanel, field, callback) {
 
-			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
-				return function (evt) {
-					var value = objMap[this.value]
-					if (value != undefined) {
-						var entity = entities[value.UUID]
-						onSelect(entity)
-					}
-				}
-			}(objMap, values, entityPanel, onSelect)
-		}
-	})
+	return this;
+}
+
+FieldEditor.prototype.setValue = function (value) {
+
+}
+
+FieldEditor.prototype.clear = function () {
 
 }

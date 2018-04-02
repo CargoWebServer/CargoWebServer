@@ -1,201 +1,25 @@
-/**
- * Contain the code for the entity view(s)
- /** The panel **/
-.panel{
-	height: auto;
-	display: table;
-	border-spacing:2px 2px;
-	background-color: transparent;
-}
 
 /** The entity panel **/
 .entity_panel{
-	width: 100%;
-	color: #657383;
-	display: table-row; 
-	box-sizing: content-box;
-	border: none;
-	-webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none;   /* Chrome/Safari/Opera */
-    -khtml-user-select: none;    /* Konqueror */
-    -moz-user-select: none;      /* Firefox */
-    -ms-user-select: none;       /* Internet Explorer/Edge */
-    user-select: none;           /* Non-prefixed version, currently
-								 not supported by any browser */
-	 background-color: transparent;
+    display: grid;
+    grid-template-columns: 1fr;
+    /*grid-template-rows: 100vh;*/
 }
 
-.row_button .fa-trash-o{
-	padding-left: 4px;
+/** The entity panel header **/
+.entity_panel_header{
+
 }
 
-/** The entity type display **/
-.entity_type{
-	display: table-cell;
-	vertical-align: middle;
-	font-size: 1em;
+/** The field panel **/
+.field_panel{
+    display: grid;
+    /*Tow column*/
+    grid-template-columns: 1fr 4fr;
+    /** One row */
+    grid-template-rows: 1fr;
 }
 
-.entity_type div {
-	display: table-cell;
-}
+.field_renderer{
 
-.entity {
-	display: table-row;
-	font-size: 10pt;
-	transition: all .2s ease;
-}
-
-.entity > div:first-child {
-	vertical-align: top;
-	display: table-cell;
-}
-
-.entity > div {
-	vertical-align: middle;
-	text-align: left;
-	display: table-cell;
-}
-
-.entity  span {
-	display: table-cell;
-	vertical-align: middle;
-	padding-right: 4px;
-}
-
-.entity  input {
-	border: 1px solid transparent;
-	transition: all .2s ease;
-	width: 20em;
-	text-align: left;
-	min-width: 20em;
-	max-width: 95%;
-	background-color: transparent;
-}
-
-.entity input[type="checkbox"]  {
-	width: auto;
-	min-width: auto;
-	max-width: auto;
-}
-
-.entity  textarea {
-	border: 1px solid transparent;
-	transition: all .2s ease;
-	max-width: 300px;
-	max-height: 50px;
-	width: 20em;
-	background-color: transparent;
-}
-
-.entity select  {
-	background-color: transparent;
-	border: 1px solid transparent;
-	transition: all .2s ease;
-}
-
-.entity option  {
-	border: 1px solid transparent;
-	transition: all .2s ease;
-}
-
-.entity input:hover{
-	border: 1px solid;
-}
-
-.entity select:hover{
-	border: 1px solid;
-	cursor: pointer;
-}
-
-.entity a{
-	font-size: 1em;
-}
-
-.entity a:hover {
-	color: #428bca;
-	cursor: pointer;
-}
-
-.entity.scrolltable {
-	display:table; 
-	width: 100%; 
-	min-width: 200px;
-}
-
-.entities_panel_header{
-	position: relative;
-	display: table-row;
-	background-color:#bbb; 
-	color:white;
-	transition: all .2s ease;
-}
-.entities_panel_header > div:first-child {
-    width:100%; 
-	height:100%; 
-	overflow-y:auto;
-	display: table;
-}
-
-.entities_header_btn {
-	color: lightgray;
-	text-align: center;
-	display: none;
-	vertical-align: middle;
-	padding-left: 2px;
-	padding-right: 2px;
-}
-
-.entities_header_btn i{
-	font-size: .8em;
-	transition: all .2s ease;
-	padding: 2px;
-}
-
-.entities_header_btn.enabled {
-	color: darkgray;
-}
-
-
-.entities_header_btn.enabled:hover {
-	cursor: pointer;
-}
-
-.entities_header_btn.enabled i:hover {
-	color: #428bca;
-}
-
-.entities_btn{
-	display: table-cell;
-	vertical-align: middle;
-}
-
-.entities_btn i {
- 	color: lightgrey;
-	margin-left: 8px;
-}
-
-.entities_btn_container {
-	display: table-row;
-}
-
-.entities_btn_container div {
-	vertical-align: middle;
-}
-
-.entities_btn_container > div:first-child{
-	display: table-cell;
-}
-
-.entities_btn i:hover {
-	color: #428bca;
-	cursor: pointer;
-}
-
-.entities_btn > div:first-child {
-	display:table;
-}
-
-.sub_entity .entities_panel_header{
-	display: none;
 }
