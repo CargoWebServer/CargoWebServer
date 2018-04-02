@@ -118,7 +118,7 @@
 .field_panel{
     display: grid;
     /*Tow column*/
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
     /** One row */
     grid-template-rows: 1fr;
 }

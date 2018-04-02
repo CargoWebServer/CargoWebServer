@@ -132,8 +132,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
             return function (contentView) {
                 // Always set the value after the panel was initialysed.
                 contentView.setEntity(content)
-                //contentView.setTitle(title)
-                //contentView.hideNavigationButtons()
+                contentView.header.display()
 
                 contentView.saveCallback = function (contentView) {
                     return function (entity) {
@@ -476,9 +475,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                     // The script button must be hidden...
                     content.getPanel().fields["M_script"].panel.element.style.display = "none"
-                    content.getPanel().fields["M_script_edit"] = {"panel" : content.getPanel().fields["M_script"].parent.panel.appendElement({ "tag": "div", "class": "field_panel", "style": "" }).down() }
-                    content.getPanel().fields["M_script_edit"].label = new Element(content.getPanel().fields["M_script_edit"].panel, { "tag": "div", "innerHtml":"edit script" })
-                    content.getPanel().fields["M_script_edit"].value = new Element(content.getPanel().fields["M_script_edit"].panel, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
+                             
+                    var editBtn = new Element(content.getPanel().header.panel, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
 
                     // The save bnt...
                     content.getPanel().saveCallback = function () {
@@ -496,7 +494,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }
                     }()
 
-                    content.getPanel().fields["M_script_edit"].value.element.onclick = function (ScheduledTask_M_script, entityPanel) {
+                    editBtn.element.onclick = function (ScheduledTask_M_script, entityPanel) {
                         return function () {
                             var entity = entityPanel.entity
                             if (entity.UUID != undefined) {
