@@ -1,21 +1,124 @@
+/** The entity type display **/
+.entity_type{
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1em;
+}
+
+.entity {
+	font-size: 10pt;
+	transition: all .2s ease;
+}
+
+.entity  span {
+	vertical-align: middle;
+	padding-right: 4px;
+}
+
+.entity  input {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	width: 20em;
+	text-align: left;
+	min-width: 20em;
+	max-width: 95%;
+	background-color: transparent;
+}
+
+.entity input[type="checkbox"]  {
+	width: auto;
+	min-width: auto;
+	max-width: auto;
+}
+
+.entity  textarea {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	max-width: 300px;
+	max-height: 50px;
+	width: 20em;
+	background-color: transparent;
+}
+
+.entity select  {
+	background-color: transparent;
+	border: 1px solid transparent;
+	transition: all .2s ease;
+}
+
+.entity option  {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+}
+
+.entity input:hover{
+	border: 1px solid;
+}
+
+.entity select:hover{
+	border: 1px solid;
+	cursor: pointer;
+}
+
+.entity a{
+	font-size: 1em;
+}
+
+.entity a:hover {
+	color: #428bca;
+	cursor: pointer;
+}
+
+.entity.scrolltable {
+	display:table; 
+	width: 100%; 
+	min-width: 200px;
+}
 
 /** The entity panel **/
 .entity_panel{
     display: grid;
     grid-template-columns: 1fr;
-    /*grid-template-rows: 100vh;*/
+}
+
+.entity_panel div{
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+.entity_panel .fa-download{
+    display: none;
+}
+
+.entity_panel .fa-floppy-o{
+    display: none;
 }
 
 /** The entity panel header **/
 .entity_panel_header{
+    display: flex;
+    flex-direction: row;
+}
 
+.entity_panel_header_button{
+}
+
+.entity_panel_header_button i:hover {
+    color: steelblue;
+    cursor: pointer;
+    transition: all .2s ease; 
+}
+.entity_panel_header_title{
+    flex-grow: 1;
+    text-align: center;
 }
 
 /** The field panel **/
 .field_panel{
     display: grid;
     /*Tow column*/
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr 2fr;
     /** One row */
     grid-template-rows: 1fr;
 }

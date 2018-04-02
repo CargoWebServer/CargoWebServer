@@ -67,7 +67,7 @@ function main() {
     // entityDump("1", "employees.employees")
 
     entitiesDump("COLLADASchema.COLLADA")
-    
+
     // entitiesDump("DT3_informations.Department")
     // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
@@ -96,7 +96,7 @@ function main() {
     })*/
 
 
-   // entitiesDump("XPDMXML.ProductionGeneralSystem")
+    // entitiesDump("XPDMXML.ProductionGeneralSystem")
     // entitiesDump("CatalogSchema.CatalogType")
 
     //testEntityQuery()
@@ -244,28 +244,28 @@ function main() {
     },
     function(errMsg, caller){
     }, {})*/
-/*
-     server.oAuth2Manager.getResource("1234", "openid profile email", "", 
-     function(results, caller){
-         console.log("found results: ", results)
-     },
-     function(errMsg, caller){
-     }, {})
-     
-    
-         var query = {}
-         query.TypeName = "Proactive.AnalyseResult"
-         query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
-         query.Query = ''
-     
-         server.dataManager.read("Proactive", JSON.stringify(query), [], [],
-         function(){},
-         function (results, caller) {
-             console.log("-------> results: ", results)
-         }, function (errMsg, caller) {
-    
-         }, undefined)
-         */
+    /*
+         server.oAuth2Manager.getResource("1234", "openid profile email", "", 
+         function(results, caller){
+             console.log("found results: ", results)
+         },
+         function(errMsg, caller){
+         }, {})
+         
+        
+             var query = {}
+             query.TypeName = "Proactive.AnalyseResult"
+             query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
+             query.Query = ''
+         
+             server.dataManager.read("Proactive", JSON.stringify(query), [], [],
+             function(){},
+             function (results, caller) {
+                 console.log("-------> results: ", results)
+             }, function (errMsg, caller) {
+        
+             }, undefined)
+             */
 }
 
 function testServiceContainer() {
@@ -291,7 +291,7 @@ function testServiceContainer() {
                         /* Windows path */
                         // var datapath = "C:\\Users\\mm006819\\Documents\\xapian\\xapian-docsprint-master\\data\\100-objects-v1.csv"
                         //var dbpath = "C:\\Temp\\toto.glass";
-                        
+
                         /*xapian.indexCsv(
                             datapath,
                             dbpath,
@@ -305,7 +305,7 @@ function testServiceContainer() {
                             function () {
 
                             }, {})*/
-                            
+
                         // Search for results...
                         xapian.search(
                             dbpath,
@@ -409,6 +409,7 @@ function entityDump(id, typeName) {
                     new EntityPanel(parent, typeName, function (entity) {
                         return function (panel) {
                             panel.setEntity(entity)
+                            panel.header.display()
                         }
                     }(result), undefined, false, result, "")
                 },
@@ -435,6 +436,7 @@ function entitiesDump(typeName) {
                         // Initialyse entities references..
                         new EntityPanel(parent, typeName, function (entity) {
                             return function (panel) {
+                                panel.header.display()
                                 panel.setEntity(entity)
                             }
                         }(results[i]), undefined, false, results[i], "")

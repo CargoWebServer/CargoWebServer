@@ -15,7 +15,7 @@ var BpmnExplorer = function (parent) {
         .appendElement({ "tag": "div", "style": "display: table-cell; width:100%;" })
 
     // Now the definitions upload button...
-    this.uploadDefintionsBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
+    this.uploadDefintionsBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
     this.uploadDefintionsBtn.appendElement({ "tag": "i", "class": "fa fa-folder" })
     var fileExplorer = this.uploadDefintionsBtn.appendElement({ "tag": "input", "type": "file", "accept": ".bpmn, .BPMN", "multiple": "", "style": "display: none;" }).down()
 

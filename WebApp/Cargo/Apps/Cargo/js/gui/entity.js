@@ -4,7 +4,7 @@ var EntityPanel = function (parent, typeName, callback) {
 	this.typeName = typeName
 
 	// The main entity panel.
-	this.panel = new Element(parent, { "tag": "div", "class": "entity_panel" })
+	this.panel = new Element(parent, { "tag": "div", "class": "entity entity_panel" })
 
 	// fields panels.
 	this.fields = {}
@@ -13,7 +13,7 @@ var EntityPanel = function (parent, typeName, callback) {
 	this.entityUuid = ""
 
 	// The panel header.
-	this.header = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header" }).down()
+	this.header = null
 
 	// Get the prototype from the server.
 	this.getEntityPrototype(callback)
@@ -38,23 +38,33 @@ EntityPanel.prototype.getEntityPrototype = function (callback) {
 EntityPanel.prototype.init = function (prototype, callback) {
 	// Now I will set the field panel.
 	var initField = function (entityPanel, prototype, index, callback) {
-		if (prototype.FieldsVisibility[index] == true) {
-			new FieldPanel(entityPanel, index,
-				function (entityPanel, prototype, index, callback) {
-					return function (fieldPanel) {
-						entityPanel.fields[prototype.Fields[index]] = fieldPanel
-						index += 1
+
+		new FieldPanel(entityPanel, index,
+			function (entityPanel, prototype, index, callback) {
+				return function (fieldPanel) {
+					if (prototype.TypeName == "Config.DataStoreConfiguration") {
+						console.log("----> ", prototype.TypeName, prototype.Fields[index])
+					}
+					entityPanel.fields[prototype.Fields[index]] = fieldPanel
+					index += 1
+					if (index < prototype.Fields.length) {
+						if (prototype.FieldsVisibility[index] == false) {
+							index += 1
+						}
 						if (index < prototype.Fields.length) {
 							initField(entityPanel, prototype, index, callback)
 						} else {
+							entityPanel.header = new EntityPanelHeader(entityPanel)
 							callback(entityPanel)
 						}
+					} else {
+						entityPanel.header = new EntityPanelHeader(entityPanel)
+						callback(entityPanel)
 					}
-				}(entityPanel, prototype, index, callback)
-			)
-		}
+				}
+			}(entityPanel, prototype, index, callback)
+		)
 	}
-
 	// The first tree field are not display.
 	var index = 3
 	if (prototype.Fields.length > 3) {
@@ -70,12 +80,24 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// In that case I will set the value of the field renderer.
 	var prototype = getEntityPrototype(entity.TYPENAME)
 	this.entityUuid = entity.UUID
+	this.entity = entity // use it as read only...
+	if (entity.getTitles().length > 0) {
+		this.header.setTitle(entity.getTitles())
+	} else {
+		this.header.setTitle([entity.TYPENAME])
+	}
 
 	for (var i = 3; i < prototype.Fields.length; i++) {
 		if (this.fields[prototype.Fields[i]] != undefined && entity[prototype.Fields[i]] != undefined) {
 			this.fields[prototype.Fields[i]].setValue(entity[prototype.Fields[i]])
 		}
 	}
+
+	entity.getPanel = function (entityPanel) {
+		return function () {
+			return entityPanel
+		}
+	}(this)
 }
 
 /**
@@ -89,34 +111,87 @@ EntityPanel.prototype.clear = function () {
 	}
 }
 
+var EntityPanelHeader = function (parent) {
+	this.panel = parent.panel.prependElement({ "tag": "div", "class": "entity_panel_header", "style": "display: none;" }).down()
+	this.expandBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "display: none;" }).down()
+	this.expandBtn.appendElement({ "tag": "i", "class": "fa fa-caret-right" }).down()
+	this.shrinkBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
+	this.shrinkBtn.appendElement({ "tag": "i", "class": "fa fa-caret-down" }).down()
+	this.title = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_title" }).down()
+
+	// Now the event...
+	this.expandBtn.element.onclick = function (header, entityPanel) {
+		return function () {
+			header.expandBtn.element.style.display = "none"
+			header.shrinkBtn.element.style.display = ""
+			for (var field in entityPanel.fields) {
+				entityPanel.fields[field].panel.element.style.display = ""
+			}
+		}
+	}(this, parent)
+
+	this.shrinkBtn.element.onclick = function (header, entityPanel) {
+		return function () {
+			header.expandBtn.element.style.display = ""
+			header.shrinkBtn.element.style.display = "none"
+			for (var field in entityPanel.fields) {
+				entityPanel.fields[field].panel.element.style.display = "none"
+			}
+		}
+	}(this, parent)
+
+	return this;
+}
+
+EntityPanelHeader.prototype.display = function () {
+	this.panel.element.style.display = ""
+	this.shrinkBtn.element.click()
+}
+
+EntityPanelHeader.prototype.setTitle = function (titles) {
+	var title = ""
+	for (var i = 0; i < titles.length; i++) {
+		title += titles[i]
+		if (i < titles.length - 1) {
+			title += " "
+		}
+	}
+	this.title.element.innerHTML = title
+}
+
 var FieldPanel = function (entityPanel, index, callback) {
-	this.panel = entityPanel.panel.appendElement({ "tag": "div", "class": "field_panel" }).down()
-
+	this.panel = entityPanel.panel.appendElement({ "tag": "div", "class": "field_panel", "style": "" }).down()
 	this.parent = entityPanel;
-
+	this.storeId = getEntityPrototype(entityPanel.typeName).PackageName
 	this.fieldName = getEntityPrototype(entityPanel.typeName).Fields[index]
 	this.fieldType = getEntityPrototype(entityPanel.typeName).FieldsType[index]
-
-	var title = this.fieldName.replace("M_", "").replaceAll("_", " ")
 	
+	var title = this.fieldName.replace("M_", "").replaceAll("_", " ")
+
 	// Display label if is not valueOf or listOf...
-	if(this.fieldName != "M_valueOf" && this.fieldName != "M_listOf"){
-		this.label = this.panel.appendElement({ "tag": "div", "innerHtml": title }).down();
+	if (this.fieldName != "M_valueOf" && this.fieldName != "M_listOf") {
+		this.label = this.panel.appendElement({ "tag": "div", "innerHtml": title, "style": "min-width: 100px;" }).down();
 	}
 	this.value = this.panel.appendElement({ "tag": "div" }).down();
 
 	// Here I will create the field renderer.
 	this.renderer = null;
+
+	// init the renderer
+	this.init(callback)
+
+	this.editor = null
+
+	return this
+}
+
+FieldPanel.prototype.init = function (callback) {
 	new FieldRenderer(this, function (callback, fieldPanel) {
 		return function (fieldRenderer) {
 			fieldPanel.renderer = fieldRenderer;
 			callback(fieldPanel)
 		}
 	}(callback, this))
-
-	this.editor = null
-
-	return this
 }
 
 FieldPanel.prototype.setValue = function (value) {
@@ -142,26 +217,31 @@ var FieldRenderer = function (fieldPanel, callback) {
 	this.parent = fieldPanel;
 	this.isArray = this.parent.fieldType.startsWith("[]")
 	this.isRef = this.parent.fieldType.endsWith(":Ref")
+	this.renderer = null
+
 	// Init the renderer.
 	this.init(callback)
-
-	this.renderer = null
 
 	return this;
 }
 
 FieldRenderer.prototype.init = function (callback) {
 	var typeName = this.parent.fieldType.replace("[]", "").replace(":Ref", "")
-	server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
-		function (prototype, caller) {
-			// Here I will render the panel, create sub-panel render etc...
-			caller.fieldRenderer.render(prototype, caller.callback)
-		},
-		function () {
+	if (typeName.startsWith("enum:")) {
+		this.renderer = this.parent.value
+		callback(this)
+	} else {
+		server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+			function (prototype, caller) {
+				// Here I will render the panel, create sub-panel render etc...
+				caller.fieldRenderer.render(prototype, caller.callback)
+			},
+			function () {
 
-		},
-		{ "fieldRenderer": this, "callback": callback }
-	)
+			},
+			{ "fieldRenderer": this, "callback": callback }
+		)
+	}
 }
 
 /**
@@ -191,6 +271,7 @@ FieldRenderer.prototype.render = function (prototype, callback) {
 		if (this.isRef) {
 			// Render a reference....
 			this.renderer = this.parent.value
+			callback(this)
 		} else {
 			// simply set the value of parent field panel.
 			if (this.parent.fieldType.startsWith("xs.")) {
@@ -210,7 +291,6 @@ FieldRenderer.prototype.render = function (prototype, callback) {
 }
 
 FieldRenderer.prototype.setValue = function (value) {
-	//console.log("---> 209", value)
 	if (this.renderer != null) {
 		if (this.isArray) {
 			if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
@@ -299,6 +379,11 @@ FieldRenderer.prototype.setValue = function (value) {
 			} else if (value.TYPENAME != undefined) {
 				// In that case I got a subpanel....
 				this.renderer.setEntity(value)
+			} else if (fieldType.startsWith("enum:")) {
+				var values = fieldType.replace("enum:", "").split(":")
+				if (value - 1 > 0) {
+					this.parent.value.element.innerHTML = values[value - 1].substring(values[value - 1].indexOf("_") + 1)
+				}
 			} else {
 				this.parent.value.element.innerHTML = value
 			}

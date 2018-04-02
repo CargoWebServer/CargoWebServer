@@ -1279,9 +1279,8 @@ TableCellRenderer.prototype.renderEntity = function (value, typeName) {
 		var panel = new EntityPanel(valueDiv, typeName.replace("[]", "").replace(":Ref", ""),
 			// The init callback. 
 			function (entity) {
-				return function (panel) {
-					panel.setEntity(entity)
-					panel.header.element.style.display = "none";
+				return function (entityPanel) {
+					entityPanel.setEntity(entity)
 				}
 			}(value),
 			undefined, true, undefined, "")
