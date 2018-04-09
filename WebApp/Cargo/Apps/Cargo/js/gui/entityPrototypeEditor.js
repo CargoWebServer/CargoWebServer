@@ -26,13 +26,13 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     // The typeName input...
     this.panel.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
         .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "id": "save_entity_prototype", "class": "entities_btn", "style": "display: none; margin-left: 8px;" }).down()
+        .appendElement({ "tag": "div", "id": "save_entity_prototype", "class": "entity_panel_header_button", "style": "display: none; margin-left: 8px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).up()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
         .appendElement({ "tag": "div", "style": "display: inline-block; padding-right: 5px;", "innerHtml": "Type Name" })
         .appendElement({ "tag": "div", "style": "display: inline-block" }).down()
         .appendElement({ "tag": "input", "id": "dynamicItemName", "style": "display: inline-block; width: 250px;" }).up().up()
-        .appendElement({ "tag": "div", "id": "delete_entity_prototype", "class": "entities_btn", "style": "display: none; margin-left: 8px;" }).down()
+        .appendElement({ "tag": "div", "id": "delete_entity_prototype", "class": "entity_panel_header_button", "style": "display: none; margin-left: 8px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-trash-o" })
 
     this.saveBtn = this.panel.getChildById("save_entity_prototype")
@@ -55,7 +55,7 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
         .appendElement({ "tag": "div", "style": "display: none;", "id": "append_restriction_panel" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
         .appendElement({ "tag": "span", "innerHtml": "Restrictions" }).up()
-        .appendElement({ "tag": "div", "class": "entities_btn", "style": "diplay: table-cell;" }).down()
+        .appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "diplay: table-cell;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus", "id": "append_restiction_btn" }).up()
         .appendElement({ "tag": "div", "style": "display: table;", "id": "restriction_edit_panel" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
@@ -384,7 +384,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                     }(superTypeNames[i], editor)
                 }
 
-                var removeSupertypeBtn = superType.appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
+                var removeSupertypeBtn = superType.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "text-align: right;" }).down()
                     .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
                 if (superTypeNames[i] == editor.baseType) {
@@ -426,7 +426,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                             if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
                                 var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
                                 var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
-                                    .appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                    .appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
                                     .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 
                                 // Here I will append a new supertype to the prototype.
@@ -553,7 +553,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
     // The title.
     this.properties.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
         .appendElement({ "tag": "div" }).down()
-        .appendElement({ "tag": "div", "class": "entities_btn", "style": "display: table-cell" }).down()
+        .appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "display: table-cell" }).down()
         .appendElement({ "tag": "i", "id": "new_prototype_propertie_" + prototype.TypeName + "_btn", "class": "fa fa-plus" }).up()
         .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": prototype.TypeName })
 
@@ -659,8 +659,8 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
 EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype, propertieName, propertieTypeName, parent, isEditable, index) {
 
     var propertieRow = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": prototype.TypeName + "_" + propertieName + "_row" }).down()
-    var saveBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;" }).down().appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
-    var editBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "vertical-align: text-top;" }).down().appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
+    var saveBtn = propertieRow.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "display: none;" }).down().appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
+    var editBtn = propertieRow.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "vertical-align: text-top;" }).down().appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 
     // The propertie name
     var nameDiv = propertieRow.appendElement({ "tag": "div", "style": "display: table-cell" }).down()
@@ -782,7 +782,7 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
     }(this, index)
 
     // Edit attributes.
-    var deleteBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
+    var deleteBtn = propertieRow.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down().appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
     if (isEditable == false) {
         editBtn.element.style.display = "none"
@@ -961,7 +961,7 @@ EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototy
                 var removeRestrictionBtn = restrictionPanel
                     .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restriction.Value })
                     .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restrictionType })
-                    .appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
+                    .appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "text-align: right;" }).down()
                     .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
                 // The remove restriction button.
@@ -1013,10 +1013,10 @@ EntityPrototypeEditor.prototype.appendRestriction = function () {
         // Now the buttons.
         var restrictionBtns = this.restrictionEditPanel.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
 
-        var appendRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+        var appendRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
             .appendElement({ "tag": "i", "class": "fa fa-check" }).down()
 
-        var cancelRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+        var cancelRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
             .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
 

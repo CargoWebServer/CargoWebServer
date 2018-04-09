@@ -466,10 +466,10 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 /**
  * Create an new entity.
  */
-func (this *EntityManager) createEntity(parentUuid string, attributeName string, typeName string, objectId string, entity Entity) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) createEntity(parentUuid string, attributeName string, entity Entity) (Entity, *CargoEntities.Error) {
 
 	// Set the entity values here.
-	entity.GetTypeName() // Set the type name if not already set...
+	typeName := entity.GetTypeName() // Set the type name if not already set...
 	entity.SetParentLnk(attributeName)
 	entity.SetParentUuid(parentUuid)
 
@@ -677,8 +677,9 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		if parent != nil {
 			// Here I will remove it from it parent...
 			// Get values as map[string]interface{} and also set the entity in it parent.
-			if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+			if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
 				parent.(*DynamicEntity).removeValue(entity.GetParentLnk(), entity.GetUuid())
+				this.setEntity(parent)
 			} else {
 				parentPrototype, _ := GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 				fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
@@ -1456,8 +1457,6 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 // That function is use to create a new entity of a given type..
 // @param {string} parentUuid The uuid of the parent entity if there is one, null otherwise.
 // @param {string} attributeName The attribute name is the name of the new entity in his parent. (parent.attributeName = this)
-// @param {string} typeName The type name of the new entity.
-// @param {string} objectId The id of the new entity. There is no restriction on the value entered.
 // @param {interface{}} values the entity to be save, it can be nil.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
@@ -1466,13 +1465,11 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.createEntity = function (parentUuid, attributeName, typeName, id, entity, successCallback, errorCallback, caller) {
+//EntityManager.prototype.createEntity = function (parentUuid, attributeName, entity, successCallback, errorCallback, caller) {
 //    // server is the client side singleton.
 //    var params = []
 //    params.push(createRpcData(parentUuid, "STRING", "parentUuid"))
 //    params.push(createRpcData(attributeName, "STRING", "attributeName"))
-//    params.push(createRpcData(typeName, "STRING", "typeName"))
-//    params.push(createRpcData(id, "STRING", "id"))
 //    params.push(createRpcData(entity, "JSON_STR", "entity"))
 //    // Call it on the server.
 //    server.executeJsFunction(
@@ -1503,7 +1500,7 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
 //    )
 //}
-func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
+func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, values interface{}, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1516,7 +1513,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.
 			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
-				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, obj.Interface().(Entity))
+				_, errObj = this.createEntity(parentUuid, attributeName, obj.Interface().(Entity))
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1525,7 +1522,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			} else {
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
-				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, entity)
+				_, errObj = this.createEntity(parentUuid, attributeName, entity)
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1538,7 +1535,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			return nil
 		}
 	} else {
-		result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values.(Entity))
+		result, errObj := this.createEntity(parentUuid, attributeName, values.(Entity))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil

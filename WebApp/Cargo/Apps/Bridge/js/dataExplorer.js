@@ -87,7 +87,6 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
         server.entityManager.getEntityPrototypes("sql_info." + storeConfig.M_id,
             // success callback.
             function (results, caller) {
-                console.log("Store: ", caller.storeId)
                 for (var i = 0; i < results.length; i++) {
                     caller.dataExplorer.generatePrototypesView(caller.storeId, results)
                 }

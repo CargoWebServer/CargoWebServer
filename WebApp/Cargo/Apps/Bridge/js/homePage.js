@@ -229,7 +229,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
-            changePropertyByClassName("color", ".entity_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass)
         } else {
             changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".diagramLnk", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -268,7 +268,7 @@ var HomePage = function () {
             changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
-
+            changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass)
         }
 
         changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
@@ -281,8 +281,6 @@ var HomePage = function () {
         changePropertyByClassName("background-color", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("color", ".severConfiguration", "." + evt.dataMap.themeClass + " .ace_gutter")
-        changePropertyByClassName("background-color", ".entity_header_btn", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-        changePropertyByClassName("background", ".entity_header_btn", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
 
         changePropertyByClassName("background-color", ".entity_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".entity_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -405,17 +403,16 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.headerDiv = this.panel.appendElement({ "tag": "div", "class": "header" }).down()
 
     /////////////////////////////////// Menu section ///////////////////////////////////
-    var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 30px; display: table-row" }).down()
+    this.mainMenuDiv = this.headerDiv.appendElement({ "tag": "div", "id": "mainMenuDiv" }).down()
 
     // The toolbar file grid...
     this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv" }).down()
 
     // This is where the menu grid will be put...
-    this.menuContentDiv = menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell;" }).down()
-        .appendElement({ "tag": "div", "style": "width:100%; display: table; height: 0px;" }).down()
+    this.menuContentDiv = this.headerDiv.appendElement({ "tag": "div", "style": "" }).down()
 
     // Now I will create the session panel...
-    this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:30px" }).down(), sessionInfo)
+    this.sessionPanel = new SessionPanel(this.headerDiv.appendElement({ "tag": "div", "style": "" }).down(), sessionInfo)
 
     // Create a new Entity Query File.
 
@@ -847,7 +844,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     var dataMenuItem = new MenuItem("data_menu", "Data", { "import_menu_item": importMenuItem, "export_menu_item": exportMenuItem, "queries_data_menu_item": queriesMenuItem }, 0)
 
     // The main menu will be display in the body element, so nothing will be over it.
-    this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, dataMenuItem, editMenuItem])
+    this.mainMenu = new VerticalMenu(this.mainMenuDiv , [fileMenuItem, dataMenuItem, editMenuItem])
 
 
     /////////////////////////////////// workspace section  ///////////////////////////////////

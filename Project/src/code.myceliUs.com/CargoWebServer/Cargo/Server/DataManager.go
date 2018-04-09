@@ -284,7 +284,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
 		configEntity := GetServer().GetConfigurationManager().getActiveConfigurations()
-		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
+		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", storeConfig)
 		if err_ != nil {
 			return nil, err_
 		}

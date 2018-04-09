@@ -346,7 +346,7 @@ func (this *Configurations) RemoveServiceConfigs(val *ServiceConfiguration){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_serviceConfigs); i++{
 		if this.M_serviceConfigs[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_serviceConfigs[i])
 		}
 	}
 	this.M_serviceConfigs = values
@@ -416,7 +416,7 @@ func (this *Configurations) RemoveDataStoreConfigs(val *DataStoreConfiguration){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_dataStoreConfigs); i++{
 		if this.M_dataStoreConfigs[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_dataStoreConfigs[i])
 		}
 	}
 	this.M_dataStoreConfigs = values
@@ -486,7 +486,7 @@ func (this *Configurations) RemoveSmtpConfigs(val *SmtpConfiguration){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_smtpConfigs); i++{
 		if this.M_smtpConfigs[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_smtpConfigs[i])
 		}
 	}
 	this.M_smtpConfigs = values
@@ -556,7 +556,7 @@ func (this *Configurations) RemoveLdapConfigs(val *LdapConfiguration){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_ldapConfigs); i++{
 		if this.M_ldapConfigs[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_ldapConfigs[i])
 		}
 	}
 	this.M_ldapConfigs = values
@@ -626,7 +626,7 @@ func (this *Configurations) RemoveApplicationConfigs(val *ApplicationConfigurati
 	values := make([]string,0)
 	for i:=0; i < len(this.M_applicationConfigs); i++{
 		if this.M_applicationConfigs[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_applicationConfigs[i])
 		}
 	}
 	this.M_applicationConfigs = values
@@ -696,7 +696,7 @@ func (this *Configurations) RemoveScheduledTasks(val *ScheduledTask){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_scheduledTasks); i++{
 		if this.M_scheduledTasks[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_scheduledTasks[i])
 		}
 	}
 	this.M_scheduledTasks = values

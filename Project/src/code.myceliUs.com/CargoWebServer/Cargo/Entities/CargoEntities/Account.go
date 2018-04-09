@@ -257,7 +257,7 @@ func (this *Account) RemoveSessions(val *Session){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_sessions); i++{
 		if this.M_sessions[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_sessions[i])
 		}
 	}
 	this.M_sessions = values
@@ -327,7 +327,7 @@ func (this *Account) RemoveMessages(val Message){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_messages); i++{
 		if this.M_messages[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_messages[i])
 		}
 	}
 	this.M_messages = values
@@ -389,7 +389,7 @@ func (this *Account) RemoveRolesRef(val *Role){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_rolesRef); i++{
 		if this.M_rolesRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_rolesRef[i])
 		}
 	}
 	this.M_rolesRef = values
@@ -432,7 +432,7 @@ func (this *Account) RemovePermissionsRef(val *Permission){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_permissionsRef); i++{
 		if this.M_permissionsRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_permissionsRef[i])
 		}
 	}
 	this.M_permissionsRef = values

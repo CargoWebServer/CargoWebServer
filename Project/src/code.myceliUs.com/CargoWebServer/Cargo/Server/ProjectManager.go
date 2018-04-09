@@ -78,7 +78,7 @@ func (this *ProjectManager) synchronize() {
 					project.SetId(f.Name())
 
 					// first of all i will see if the project exist...
-					projectEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Project", f.Name(), project)
+					projectEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", project)
 
 					// Here I will synchronyse the project...
 					if err == nil {

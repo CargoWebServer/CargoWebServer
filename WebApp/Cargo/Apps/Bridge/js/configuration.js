@@ -194,11 +194,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     server.eventHandler.broadcastLocalEvent(evt)
 
                     // Here I will append the connection button...
-                    contentView.connectBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+                    contentView.connectBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button"}).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
                     // Here I will append in case of sql datasotre the synchornize button.
-                    contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+                    contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
                     contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
 
                     // Now If the connection is activated...
@@ -232,7 +232,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         // Here the data store can be reach so I will try to connect.
                                         caller.connectBtn.style.color = "#4CAF50"
                                         caller.connectBtn.status = "connected"
-                                        caller.refreshBtn.element.style.display = "table-cell"
+                                        //caller.refreshBtn.element.style.display = "table-cell"
                                         homePage.dataExplorer.showPanel(caller.entity.M_id)
 
                                     },
@@ -476,7 +476,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // The script button must be hidden...
                     content.getPanel().fields["M_script"].panel.element.style.display = "none"
                              
-                    var editBtn = new Element(content.getPanel().header.panel, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
+                    var editBtn = content.getPanel().header.panel.appendElement({"tag":"div", "class":"entity_panel_header_button"}).down()
+                    editBtn.appendElement({ "tag": "i", "title": "Edit task script.", "class": "fa fa-edit", "style":"padding-top: 2px;" })
 
                     // The save bnt...
                     content.getPanel().saveCallback = function () {
@@ -527,7 +528,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     },  { "entity": entity })
                             } else {
                                 // In that case the script must be save...
-                                server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
+                                server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.ParentLnk, entity,
                                     function (entity, caller) {
                                         // Set the entity.
                                         console.log("Task entity:", entity)
@@ -544,7 +545,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
-                    contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+                    contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
                     contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
 
                     // The refresh action.
@@ -576,21 +577,21 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
     contentView.parentEntity = this.activeConfiguration
     if (contentView.entity != null) {
         if (contentView.entity.TYPENAME == "Config.DataStoreConfiguration") {
-            contentView.parentLnk = "M_dataStoreConfigs"
+            contentView.ParentLnk = "M_dataStoreConfigs"
         } else if (contentView.entity.TYPENAME == "Config.ServerConfiguration") {
-            contentView.parentLnk = "M_serverConfig"
+            contentView.ParentLnk = "M_serverConfig"
         } else if (contentView.entity.TYPENAME == "Config.ServiceConfiguration") {
-            contentView.parentLnk = "M_serviceConfigs"
+            contentView.ParentLnk = "M_serviceConfigs"
         } else if (contentView.entity.TYPENAME == "Config.SmtpConfiguration") {
-            contentView.parentLnk = "M_smtpConfigs"
+            contentView.ParentLnk = "M_smtpConfigs"
         } else if (contentView.entity.TYPENAME == "Config.LdapConfiguration") {
-            contentView.parentLnk = "M_ldapConfigs"
+            contentView.ParentLnk = "M_ldapConfigs"
         } else if (contentView.entity.TYPENAME == "Config.ApplicationConfiguration") {
-            contentView.parentLnk = "M_applicationConfigs"
+            contentView.ParentLnk = "M_applicationConfigs"
         } else if (contentView.entity.TYPENAME == "Config.OAuth2Configuration") {
-            contentView.parentLnk = "M_oauth2Configuration"
+            contentView.ParentLnk = "M_oauth2Configuration"
         } else if (contentView.entity.TYPENAME == "Config.ScheduledTask") {
-            contentView.parentLnk = "M_scheduledTasks"
+            contentView.ParentLnk = "M_scheduledTasks"
         }
     }
 
@@ -608,9 +609,8 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
     // So here I will create the configuration selector...
     this.header = this.panel.appendElement({ "tag": "div", "class": "panel entity" }).down()
     this.configurationSelect = this.header
-        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
-        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
-        .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
+        .appendElement({ "tag": "div", "innerHtml": "Configurations" })
+        .appendElement({ "tag": "select", "style": "margin-left: 5px; flex-grow: 1;" }).down()
 
     for (var i = 0; i < configurations.length; i++) {
         if (i == 0) {
@@ -658,16 +658,16 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             }
 
             // The new configuration button.
-            this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+            this.header.appendElement({ "tag": "div", "class": "entity_panel_header" })
 
-            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
             this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
 
             // I will append the navigation button i that case...
-            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn", "style": "display: table-cell;" }).down()
+            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
             this.previousConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left" })
 
-            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn", "style": "display: table-cell;" }).down()
+            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
             this.nextConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right" })
 
             if (content.length > 1) {
@@ -698,19 +698,19 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
 
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
-                            configurationPanel.nextConfigBtn.element.className = "entity_header_btn"
+                            configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                         } else {
-                            configurationPanel.nextConfigBtn.element.className = "entity_header_btn enabled"
+                            configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                         }
 
-                        configurationPanel.previousConfigBtn.element.className = "entity_header_btn enabled"
+                        configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                     }
                     if (configurationPanel.contentViews.length <= 1) {
                         // disable the next button
-                        configurationPanel.nextConfigBtn.element.className = "entity_header_btn"
+                        configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
 
                         // disable the previous button.
-                        configurationPanel.previousConfigBtn.element.className = "entity_header_btn"
+                        configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                     }
 
                 }
@@ -731,17 +731,17 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
 
                         if (configurationPanel.currentIndex == 0) {
-                            configurationPanel.previousConfigBtn.element.className = "entity_header_btn"
+                            configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                         } else {
-                            configurationPanel.previousConfigBtn.element.className = "entity_header_btn enabled"
+                            configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                         }
-                        configurationPanel.nextConfigBtn.element.className = "entity_header_btn enabled"
+                        configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                     }
                     if (configurationPanel.contentViews.length <= 1) {
                         // disable the next button
-                        configurationPanel.nextConfigBtn.element.className = "entity_header_btn"
+                        configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                         // disable the previous button.
-                        configurationPanel.previousConfigBtn.element.className = "entity_header_btn"
+                        configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                     }
                 }
             }(this)
@@ -752,7 +752,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         } else {
             if (content != undefined) {
                 if (this.contentViews[0] == null) {
-                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
                     this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
 
                     // Set the new configuration click handler.

@@ -124,7 +124,7 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
 		role.SetId(id)
 
 		// Create the role.
-		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_roles", "CargoEntities.Role", id, role)
+		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_roles", role)
 	} else {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_ID_ALEADY_EXISTS_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+id+"' is already attibuted to an existing role entity."))
@@ -531,7 +531,7 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType i
 			permission.SetTypes(permissionType)
 
 			// Set the uuid
-			entity, errObj := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
+			entity, errObj := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_permissions", permission)
 			if errObj != nil {
 				return errObj
 			}

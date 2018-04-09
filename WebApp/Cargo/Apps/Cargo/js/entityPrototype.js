@@ -481,6 +481,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "}\n\n"
 
     // Set the function.
+    console.log(constructorSrc)
     eval(constructorSrc)
     //console.log(constructorSrc)
 }

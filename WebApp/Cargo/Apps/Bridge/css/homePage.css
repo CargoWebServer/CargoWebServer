@@ -60,15 +60,15 @@
 }
 
 .header{
-	display: table-row;
-	height: 60px;
-	width: 100%;
+	display: flex;
+	padding-top: 4px;
+	justify-content: center;
+	flex-direction: row;
 }
 
 .panel{
-	display: table;
+	display: flex;
 }
-
 
 /** The home page **/
 .home_page{

@@ -1,0 +1,10 @@
+<chart caption="Customer Satisfaction Score" subcaption="Last week" lowerlimit="0" upperlimit="100" theme="fint">
+    <colorrange>
+        <color minvalue="0" maxvalue="50" code="#e44a00" />
+        <color minvalue="50" maxvalue="75" code="#f8bd19" />
+        <color minvalue="75" maxvalue="100" code="#6baa01" />
+    </colorrange>
+    <dials>
+        <dial value="67" />
+    </dials>
+</chart>

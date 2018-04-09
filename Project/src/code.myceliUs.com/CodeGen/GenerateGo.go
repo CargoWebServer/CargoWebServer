@@ -718,7 +718,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					removerStr += "	values := make([]string,0)\n"
 					removerStr += "	for i:=0; i < len(this.M_" + attributeName + "); i++{\n"
 					removerStr += "		if this.M_" + attributeName + "[i] != val.GetUuid() {\n"
-					removerStr += "			values = append(values, val.GetUuid())\n"
+					removerStr += "			values = append(values, this.M_" + attributeName + "[i])\n"
 					removerStr += "		}\n"
 					removerStr += "	}\n"
 					removerStr += "	this.M_" + attributeName + " = values\n"

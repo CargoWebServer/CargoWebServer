@@ -256,7 +256,7 @@ func (this *Entities) RemoveEntities(val Entity){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_entities); i++{
 		if this.M_entities[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_entities[i])
 		}
 	}
 	this.M_entities = values
@@ -326,7 +326,7 @@ func (this *Entities) RemoveRoles(val *Role){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_roles); i++{
 		if this.M_roles[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_roles[i])
 		}
 	}
 	this.M_roles = values
@@ -396,7 +396,7 @@ func (this *Entities) RemovePermissions(val *Permission){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_permissions); i++{
 		if this.M_permissions[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_permissions[i])
 		}
 	}
 	this.M_permissions = values
@@ -466,7 +466,7 @@ func (this *Entities) RemoveActions(val *Action){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_actions); i++{
 		if this.M_actions[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_actions[i])
 		}
 	}
 	this.M_actions = values

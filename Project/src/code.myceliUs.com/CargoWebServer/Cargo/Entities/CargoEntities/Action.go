@@ -222,7 +222,7 @@ func (this *Action) RemoveParameters(val *Parameter){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_parameters); i++{
 		if this.M_parameters[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_parameters[i])
 		}
 	}
 	this.M_parameters = values
@@ -292,7 +292,7 @@ func (this *Action) RemoveResults(val *Parameter){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_results); i++{
 		if this.M_results[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_results[i])
 		}
 	}
 	this.M_results = values

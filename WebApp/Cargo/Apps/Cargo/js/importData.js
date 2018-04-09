@@ -4,15 +4,15 @@
  * @param {*} typeName The type name of the entity to initialyse
  * @param {*} mappings The mappings between the entity fields and the csv column
  * @param {*} parentEntity The parent entity (at root only)
- * @param {*} parentLnk The attribute name with it parent.
+ * @param {*} ParentLnk The attribute name with it parent.
  */
-function importEntityFromCSV(filePath, mappings, parentEntity, parentLnk) {
+function importEntityFromCSV(filePath, mappings, parentEntity, ParentLnk) {
     // Read the csv data.
     var importInfos = new ImportInfos(filePath)
     function createMapping(typeName, mapping) {
         var prototype = getEntityPrototype(typeName)
         var mappingInfo = new MappingInfos(typeName, mapping.isValid,
-            parentEntity, parentLnk)
+            parentEntity, ParentLnk)
         if (prototype != null) {
             // I will create the mapping for each field
             for (var key in mapping) {
@@ -96,12 +96,12 @@ ImportInfos.prototype.import = function () {
                                                 server.entityManager.saveEntity(importInfos.mappingInfos[i].object)
                                             } else {
                                                 var parentUuid = importInfos.mappingInfos[i].parentEntity.UUID
-                                                var parentLnk = importInfos.mappingInfos[i].parentLnk
+                                                var ParentLnk = importInfos.mappingInfos[i].ParentLnk
                                                 var entity = importInfos.mappingInfos[i].object
                                                 entity.ParentUuid = parentUuid
-                                                entity.ParentLnk = parentLnk
+                                                entity.ParentLnk = ParentLnk
                                                 
-                                                server.entityManager.createEntity(parentUuid, parentLnk, entity.TYPENAME, "", entity,
+                                                server.entityManager.createEntity(parentUuid, ParentLnk, entity,
                                                 // success callback
                                                 function(entity){
                                                     console.log(entity)
@@ -125,13 +125,13 @@ ImportInfos.prototype.import = function () {
     }
 }
 
-var MappingInfos = function (typeName, isValid, parentEntity, parentLnk) {
+var MappingInfos = function (typeName, isValid, parentEntity, ParentLnk) {
 
     // If there is a parent entity.
     this.parentEntity = parentEntity
 
     // The lnk in it's parent.
-    this.parentLnk = parentLnk
+    this.ParentLnk = ParentLnk
 
     // Is valid is a function to be evaluated to dermine if
     // the data represent the type. The paremeter is the array

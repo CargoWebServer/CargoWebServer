@@ -62,6 +62,19 @@ TableModel.prototype.init = function (successCallback, progressCallback, errorCa
     if (successCallback != undefined) {
         successCallback(undefined, caller)
     }
+
+    // The append row table button action for generic table...
+    // TODO the table is one dimension, make it n dimensions...
+    this.table.appendRowBtn.element.onclick = function (table, model) {
+        return function () {
+            var index = model.values.length
+            model.appendRow([index+1, ""],index )
+            var row = new TableRow(table, index, [index + 1, ""], undefined)
+            row.table = table
+            table.rows.push(row)
+            simulate(row.cells[index, 1].div.element, "dblclick");
+        }
+    }(this.table, this)
 }
 
 /**
@@ -117,7 +130,7 @@ TableModel.prototype.getColumnClass = function (column) {
  * @param {int} column The column index
  */
 TableModel.prototype.isCellEditable = function (column) {
-    return this.editable[column]
+    return true // Test only ...// this.editable[column]
 }
 
 TableModel.prototype.setIsCellEditable = function (column, val) {
@@ -133,6 +146,9 @@ TableModel.prototype.setIsCellEditable = function (column, val) {
 TableModel.prototype.setValueAt = function (value, row, column) {
     // Must be implemented in the derived class.
     this.values[row][column] = value
+
+    // save the value.
+    this.saveValue(this.table.rows[row])
 }
 
 TableModel.prototype.appendRow = function (values) {
@@ -141,11 +157,18 @@ TableModel.prototype.appendRow = function (values) {
 }
 
 TableModel.prototype.removeRow = function (rowIndex) {
-
+    this.values.splice(rowIndex, 1)
+    
+    // save the value.
+    this.saveValue(this.table.rows[rowIndex])
 }
 
 TableModel.prototype.removeAllValues = function (rowIndex) {
     this.values = []
+}
+
+TableModel.prototype.saveValue = function (row) {
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -201,7 +224,7 @@ var EntityTableModel = function (proto, query) {
     /**
      * If the it's a propertie of a parent entity
      */
-    this.parentLnk = null
+    this.ParentLnk = proto.ParentLnk
 
     return this
 }
@@ -261,6 +284,23 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             server.languageManager.setLanguage()
         }
     }
+
+    // Now the append row button.
+    this.table.appendRowBtn.element.onclick = function (table, model) {
+        return function () {
+            var entity = eval("new " + model.proto.TypeName + "()")
+            entity.ParentLnk = model.ParentLnk
+            entity.ParentUuid = model.ParentUuid;
+
+            var data = model.appendRow(entity)
+
+            // The row is not append in the table rows collection, but display.
+            var lastRowIndex = table.rows.length
+            var row = new TableRow(table, lastRowIndex, data, undefined)
+            table.rows.push(row)
+            simulate(row.cells[lastRowIndex, 0].div.element, "dblclick");
+        }
+    }(this.table, this)
 
     // Now the edit permission...
     if (server.sessionId != undefined) {
@@ -342,9 +382,19 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                 if (entity.TYPENAME == model.proto.TypeName || model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
                     // If the object does not exist in the array.
                     if (!objectPropInArray(model.entities, "UUID", entity.UUID)) {
-                        model.entities.push(entity)
-                        var row = model.table.appendRow(entity, entity.UUID)
-                        model.table.refresh()
+                        var exist = false
+                        for (var i = 0; i < model.entities.length; i++) {
+                            if (model.entities[i].UUID == undefined) {
+                                model.entities.splice(i, 1)
+                            }else if(model.entities[i].UUID == entity.UUID){
+                                exist = true
+                            }
+                        }
+                        if(!exist){
+                            // model.entities.push(entity)
+                            var row = model.table.appendRow(entity, entity.UUID)
+                            model.table.refresh()
+                        }
                     }
                 }
             }
@@ -364,7 +414,6 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                                 model.entities[i] = entity;
                                 // Replace the value of the existing row with the entity value.
                                 var row = model.table.appendRow(entity, entity.UUID)
-                                row.saveBtn.element.style.visibility = "hidden";
                                 break;
                             }
                         }
@@ -482,7 +531,7 @@ EntityTableModel.prototype.appendRow = function (values) {
                 this.values.push(objectValues)
             }
         }
-    }else{
+    } else {
         console.log("values not entity ", values)
     }
 
@@ -552,6 +601,9 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
             entity[field] = value
         }
     }
+
+    // save the value.
+    this.saveValue(this.table.rows[row])
 }
 
 /**
@@ -559,7 +611,6 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
  */
 EntityTableModel.prototype.saveValue = function (row) {
     var entity = row.table.getModel().entities[row.index]
-
     // Here I will save the entity...
     if (entity != null) {
         // Always use the entity from the enities map it contain
@@ -572,11 +623,12 @@ EntityTableModel.prototype.saveValue = function (row) {
         if (entity.exist == false) {
             // I must remove the temporary object it will be recreated when the NewEntity event will be received.
             this.entities.pop(row.index)
-
-            server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
+            row.table.rows.pop(row.index)
+            row.div.element.parentNode.removeChild(row.div.element)
+            server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
                 // Success callback
                 function (entity, row) {
-
+                    
                 },
                 // Error callback.
                 function (result, caller) {

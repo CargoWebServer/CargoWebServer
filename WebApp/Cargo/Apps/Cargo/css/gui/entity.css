@@ -18,7 +18,7 @@
 .entity  input {
 	border: 1px solid transparent;
 	transition: all .2s ease;
-	width: 20em;
+	width: auto;
 	text-align: left;
 	min-width: 20em;
 	max-width: 95%;
@@ -78,7 +78,7 @@
 /** The entity panel **/
 .entity_panel{
     display: grid;
-    grid-template-columns: 1fr;
+	grid-template-columns: 1fr;
 }
 
 .entity_panel div{
@@ -91,17 +91,23 @@
     display: none;
 }
 
-.entity_panel .fa-floppy-o{
+/*.entity_panel .fa-floppy-o{
     display: none;
-}
+}*/
 
 /** The entity panel header **/
 .entity_panel_header{
     display: flex;
-    flex-direction: row;
+	flex-direction: row;
+	justify-content: center;
+	text-align: center;
 }
 
 .entity_panel_header_button{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10pt;
 }
 
 .entity_panel_header_button i:hover {

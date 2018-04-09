@@ -315,7 +315,7 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 
 	if parentDir != nil {
 		// That will set the uuid
-		dirEntity, _ := GetServer().GetEntityManager().createEntity(parentDir.GetUuid(), "M_files", "CargoEntities.File", dir.GetId(), dir)
+		dirEntity, _ := GetServer().GetEntityManager().createEntity(parentDir.GetUuid(), "M_files", dir)
 		dir = dirEntity.(*CargoEntities.File)
 		dir.SetParentDirPtr(parentDir.(*CargoEntities.File))
 		dir.SetEntitiesPtr(entities)
@@ -498,7 +498,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 
 	// Create the file if is new, genereate it uuid...
 	if isNew {
-		fileEntity, _ := GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", "CargoEntities.File", fileId, file)
+		fileEntity, _ := GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", file)
 		file = fileEntity.(*CargoEntities.File) // cast...
 	}
 
@@ -834,7 +834,7 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	dbFile.SetEntitySetter(setEntityFct)
 	dbFile.SetUuidGenerator(generateUuidFct)
 	// Create the file.
-	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.File", id, dbFile)
+	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", dbFile)
 
 	return dbFile
 }

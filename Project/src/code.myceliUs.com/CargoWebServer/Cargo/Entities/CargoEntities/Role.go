@@ -162,7 +162,7 @@ func (this *Role) RemoveAccountsRef(val *Account){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_accountsRef); i++{
 		if this.M_accountsRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_accountsRef[i])
 		}
 	}
 	this.M_accountsRef = values
@@ -205,7 +205,7 @@ func (this *Role) RemoveActionsRef(val *Action){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_actionsRef); i++{
 		if this.M_actionsRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_actionsRef[i])
 		}
 	}
 	this.M_actionsRef = values

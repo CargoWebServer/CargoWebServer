@@ -204,7 +204,7 @@ func (this *Log) RemoveEntries(val *LogEntry){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_entries); i++{
 		if this.M_entries[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_entries[i])
 		}
 	}
 	this.M_entries = values

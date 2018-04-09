@@ -231,7 +231,7 @@ func (this *User) RemoveMemberOfRef(val *Group){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_memberOfRef); i++{
 		if this.M_memberOfRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_memberOfRef[i])
 		}
 	}
 	this.M_memberOfRef = values
@@ -274,7 +274,7 @@ func (this *User) RemoveAccounts(val *Account){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_accounts); i++{
 		if this.M_accounts[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_accounts[i])
 		}
 	}
 	this.M_accounts = values

@@ -224,7 +224,7 @@ func (this *OAuth2Manager) start() {
 		cfg.SetPrivateKey(fileName)
 
 		// Create the new configuration entity.
-		GetServer().GetEntityManager().createEntity(activeConfigurations.GetUuid(), "M_oauth2Configuration", "Config.OAuth2Configuration", cfg.GetId(), cfg)
+		GetServer().GetEntityManager().createEntity(activeConfigurations.GetUuid(), "M_oauth2Configuration", cfg)
 
 	} else {
 		sconfig = osin.NewServerConfig()
@@ -758,7 +758,7 @@ func addExpireAtData(code string, expireAt time.Time) error {
 		expire.SetId(code)
 
 		// append to config.
-		expireEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_expire", "Config.OAuth2Expires", expire.GetId(), expire)
+		expireEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_expire", expire)
 
 	} else {
 		expire = expireEntity.(*Config.OAuth2Expires)
@@ -818,7 +818,7 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 				access.SetId(jr["access_token"].(string))
 
 				// set the access uuid
-				accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", "Config.OAuth2Access", access.GetId(), access)
+				accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", access)
 
 				// Set the creation time.
 				access.SetCreatedAt(time.Now().Unix())
@@ -871,7 +871,7 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 					refresh.SetAccess(access)
 
 					// Set into it parent.
-					GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", "Config.OAuth2Refresh", refresh.GetId(), refresh)
+					GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", refresh)
 
 					// Set the access
 					access.SetRefreshToken(refresh)
@@ -1798,7 +1798,7 @@ func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
 	c.M_redirectUri = client.GetRedirectUri()
 
 	// append a new client.
-	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_client", "Config.OAuth2Client", c.GetId(), c)
+	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_client", c)
 
 	return nil
 }
@@ -1840,7 +1840,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	}
 
 	// append a new Authorize.
-	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_authorize", "Config.OAuth2Authorize", a.GetId(), a)
+	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_authorize", a)
 
 	// Add expire data.
 	if err := addExpireAtData(data.Code, data.ExpireAt()); err != nil {
@@ -1978,7 +1978,7 @@ func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
 		idToken.SetName(data.Name)
 		idToken.SetNonce(data.Nonce)
 		// Save into the config.
-		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_ids", "Config.OAuth2IdToken", idToken.GetId(), idToken)
+		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_ids", idToken)
 	}
 	return idToken
 }
@@ -1995,7 +1995,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 		access = new(Config.OAuth2Access)
 		access.SetId(data.AccessToken)
 		// Set the uuid.
-		entity, _ := GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", "Config.OAuth2Access", access.GetId(), access)
+		entity, _ := GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", access)
 		access = entity.(*Config.OAuth2Access)
 	} else {
 		access = accessEntity.(*Config.OAuth2Access)
@@ -2061,7 +2061,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 			refresh := new(Config.OAuth2Refresh)
 			refresh.SetId(data.RefreshToken)
 			// save the access.
-			refreshEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", "Config.OAuth2Refresh", refresh.GetId(), refresh)
+			refreshEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", refresh)
 		}
 
 		// Here the refresh token dosent exist so i will create it.

@@ -8,15 +8,13 @@ var BpmnExplorer = function (parent) {
     // Contain the list of defintion.
     this.definitions = {}
 
-    this.header = this.panel.appendElement({ "tag": "div", "class": "bpmn_explorer_header" }).down()
-
-    this.header.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
-        .appendElement({ "tag": "div", "style": "display: inline;", "innerHtml": "BPMN" }).up()
-        .appendElement({ "tag": "div", "style": "display: table-cell; width:100%;" })
-
+    this.header = this.panel.appendElement({ "tag": "div", "class": "bpmn_explorer_header", "style":"text-align: left;" }).down()
+    // this.header = this.panel.appendElement({ "tag": "div","innerHtml":"definitions" }).down()
+    
     // Now the definitions upload button...
-    this.uploadDefintionsBtn = this.header.appendElement({ "tag": "div", "class": "entity_header_btn enabled", "style": "display: table-cell;" }).down()
+    this.uploadDefintionsBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style":"width: 20px;" }).down()
     this.uploadDefintionsBtn.appendElement({ "tag": "i", "class": "fa fa-folder" })
+
     var fileExplorer = this.uploadDefintionsBtn.appendElement({ "tag": "input", "type": "file", "accept": ".bpmn, .BPMN", "multiple": "", "style": "display: none;" }).down()
 
     fileExplorer.element.onchange = function (bpmnExplorer) {

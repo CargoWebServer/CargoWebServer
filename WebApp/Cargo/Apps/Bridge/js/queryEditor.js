@@ -126,8 +126,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
     this.queryToolBar = new Element(homePage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.UUID + "_toolbar" })
 
     // The datasource selection.
-    this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()
-        .appendElement({ "tag": "select" }).down()
+    this.dataSelect = this.queryToolBar.appendElement({ "tag": "select" }).down()
 
     for (var configId in this.dataConfigs) {
         this.dataSelect.appendElement({ "tag": "option", "innerHtml": configId, "value": configId })

@@ -54,7 +54,7 @@ func (this *AccountManager) initialize() {
 		account.M_password = "adminadmin"
 		account.M_name = "admin"
 		account.M_email = ""
-		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "admin", account)
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", account)
 		if err != nil {
 			log.Panicln("--> create account admin: ", err)
 		}
@@ -69,7 +69,7 @@ func (this *AccountManager) initialize() {
 		account.M_password = "guest"
 		account.M_name = "guest"
 		account.M_email = ""
-		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "guest", account)
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", account)
 		if err != nil {
 			log.Panicln("--> create account admin: ", err)
 		}
@@ -135,7 +135,7 @@ func (this *AccountManager) Register(name string, password string, email string,
 		account.M_email = email
 
 		// Append the newly create account into the cargo entities
-		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", name, account, "", "")
+		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", account, "", "")
 		return account
 	} else {
 		// Create the error message

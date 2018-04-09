@@ -328,7 +328,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			// Set the account ptr.
 			session.SetAccountPtr(account)
 
-			GetServer().GetEntityManager().createEntity(account.GetUuid(), "M_sessions", "CargoEntities.Session", session.GetId(), session)
+			GetServer().GetEntityManager().createEntity(account.GetUuid(), "M_sessions", session)
 
 			// Send session close event
 			eventData := make([]*MessageData, 2)

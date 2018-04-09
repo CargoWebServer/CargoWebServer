@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    <title>Etat des Machines</title>
+    <meta http-equiv="refresh" content="30">
+    <script type="text/javascript" src="fusioncharts/fusioncharts.js"></script>
+    <script type="text/javascript" src="fusioncharts/js/fusioncharts.theme.fint.js"></script>
+    <script type="text/javascript">
+        FusionCharts.ready(  function  () { 
+            var  csatGauge =   new  FusionCharts({
+                "type" :  "angulargauge",
+                "renderAt" :  "chart-container",
+                "width" :  "400",
+                "height" :  "250",
+                "dataFormat" :  "json",
+                "dataSource" :  {
+                    "chart" :  {
+                        "caption" :  "PROFILEUSE 1 ",
+                        "subcaption" :  "Last week",
+                        "lowerLimit" :  "0",
+                        "upperLimit" :  "100",
+                        "theme" :  "fint"
+                    },
+                    "colorRange" :  {
+                        "color" :  [{
+                                "minValue" :  "0",
+                                "maxValue" :  "33",
+                                "code" :  "E72F1D"
+                            },
+                            {
+                                "minValue" :  "33",
+                                "maxValue" :  "66",
+                                "code" :  "FFE933"
+                            },
+                            {
+                                "minValue" :  "66",
+                                "maxValue" :  "100",
+                                "code" :  "42FF33"
+                            }
+                        ]
+                    },
+                    "dials" :  {
+                        "dial" :  [{
+                            "value" :  "45"
+                        }]
+                    }
+                }
+            });
+
+            csatGauge.render();
+        });
+    </script>
+</head>
+
+<body>
+    <div id="chart-container">An angular gauge will load here!</div>
+</body>
+
+</html>

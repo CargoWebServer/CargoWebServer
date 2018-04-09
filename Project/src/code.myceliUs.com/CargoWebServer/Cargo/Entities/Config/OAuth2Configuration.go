@@ -379,7 +379,7 @@ func (this *OAuth2Configuration) RemoveClients(val *OAuth2Client){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_clients); i++{
 		if this.M_clients[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_clients[i])
 		}
 	}
 	this.M_clients = values
@@ -449,7 +449,7 @@ func (this *OAuth2Configuration) RemoveAuthorize(val *OAuth2Authorize){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_authorize); i++{
 		if this.M_authorize[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_authorize[i])
 		}
 	}
 	this.M_authorize = values
@@ -519,7 +519,7 @@ func (this *OAuth2Configuration) RemoveAccess(val *OAuth2Access){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_access); i++{
 		if this.M_access[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_access[i])
 		}
 	}
 	this.M_access = values
@@ -589,7 +589,7 @@ func (this *OAuth2Configuration) RemoveIds(val *OAuth2IdToken){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_ids); i++{
 		if this.M_ids[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_ids[i])
 		}
 	}
 	this.M_ids = values
@@ -659,7 +659,7 @@ func (this *OAuth2Configuration) RemoveRefresh(val *OAuth2Refresh){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_refresh); i++{
 		if this.M_refresh[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_refresh[i])
 		}
 	}
 	this.M_refresh = values
@@ -729,7 +729,7 @@ func (this *OAuth2Configuration) RemoveExpire(val *OAuth2Expires){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_expire); i++{
 		if this.M_expire[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_expire[i])
 		}
 	}
 	this.M_expire = values

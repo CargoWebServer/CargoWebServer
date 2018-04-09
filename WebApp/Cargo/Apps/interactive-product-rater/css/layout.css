@@ -1,0 +1,118 @@
+body {
+    box-sizing: border-box;
+}
+.heading-table, .heading-chart {
+    font-size: 13px;
+    font-family: "HelveticaNeue-Medium", "Helvetica Neue Medium", "Helvetica Neue", Helvetica, Arial, Verdana;
+    text-align: center;
+}
+.heading-table {
+    margin: 10px 0;
+    font-weight: bold;
+}
+.heading-chart {
+    margin-bottom: 20px;
+}
+.recent-investor-monitor-heading {
+    font-size: 13px;
+    font-family: "HelveticaNeue-Medium", "Helvetica Neue Medium", "Helvetica Neue", Helvetica, Arial, Verdana;
+    text-align: center;
+    padding: 20px 0 6px;
+}
+.header {
+    border-bottom: 1px solid #979797;
+    padding: 0 0 10px;
+    overflow: hidden;
+}
+.logo {
+    float: left;
+}
+.download-code-link {
+    background-color: #594883;
+    border-radius: 2px;
+    color: #fff;
+    float: right;
+    font-size: 13px;
+    margin: 5px 0;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+#wrapper {
+    width: 768px;
+    margin: 0 auto;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, Verdana;
+    font-size: 14px;
+    padding: 5px;
+}
+#container {
+    border: 1px solid;
+    border-color: #979797;
+    font-size: 0;
+    background-color: #fff;
+}
+/* Rating criteria section begin */
+
+.rate-us-block {
+    background-color: #f8f8f8;
+    font-size: 14px;
+    padding: 20px 18px;
+    border-right: 1px solid #979797;
+    width: 284px;
+    height: 480px;
+    display: inline-block;
+}
+.rate-us-heading {
+    font-family: Verdana;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 0 15px 0;
+}
+.product-quality-container, .features-container, .documentation-container, .support-container {
+    border-bottom: 1px dashed #aaa;
+    padding-bottom: 6px;
+    width: 260px;
+}
+.product-quality-wrapper, .features-wrapper, .documentation-wrapper, .support-wrapper {
+    padding: 16px 0 0;
+}
+.support-container {
+    border-bottom: none;
+}
+/* Rating criteria section end */
+
+/* Overall Rating section begin */
+
+.overall-rating-block {
+    display: inline-block;
+    font-size: 14px;
+    padding: 20px 0px;
+    width: 444px;
+    text-align: center;
+    vertical-align: top;
+}
+.overall-rating-heading {
+    font-family: Verdana;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 0 15px 0;
+    text-align: center;
+}
+.overall-rating-value {
+    font-family: Verdana;
+    font-size: 36px;
+    font-weight: bold;
+}
+/* Overall Rating section end */
+
+.footer {
+    padding: 15px 0;
+    font-family: Verdana;
+    font-size: 10px;
+    color: #666666;
+    line-height: 15px;
+}
+.footer a {
+    text-decoration: none;
+    color: #333333;
+    border-bottom: 1px solid #333333;
+}

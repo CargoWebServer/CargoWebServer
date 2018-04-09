@@ -178,7 +178,7 @@ func (this *Project) RemoveFilesRef(val *File){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_filesRef); i++{
 		if this.M_filesRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_filesRef[i])
 		}
 	}
 	this.M_filesRef = values

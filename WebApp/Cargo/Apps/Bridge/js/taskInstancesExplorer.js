@@ -137,7 +137,7 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
     var row = this.panel.appendElement({ "id": instanceInfos.UUID + "_task_instance", "tag": "div", "style": "display: table-row; width: 100%;", "class": "entity" }).down();
     row.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;", "innerHtml": instanceInfos.TaskId })
     var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px 2px 2px 10px; width: 100%;" }).down()
-    var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+    var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
     countdown.element.innerHTML = instanceInfos.Status

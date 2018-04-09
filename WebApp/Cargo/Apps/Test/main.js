@@ -436,7 +436,7 @@ function entitiesDump(typeName) {
                         // Initialyse entities references..
                         new EntityPanel(parent, typeName, function (entity) {
                             return function (panel) {
-                                panel.header.display()
+                                //panel.header.display()
                                 panel.setEntity(entity)
                             }
                         }(results[i]), undefined, false, results[i], "")

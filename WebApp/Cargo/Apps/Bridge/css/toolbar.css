@@ -6,8 +6,7 @@
 
 /** Toolbar **/
 .toolbar{
-    display: table;
-    height: 100%;
+    display: flex;
 }
 
 .toolbar select{
@@ -23,9 +22,6 @@
 
 /** Toolbar button **/
 .toolbarButton{
-    height: 25px;
-    width: 25px;
-    display: table-cell;
     border: 1px solid transparent;
     vertical-align: middle;
     text-align: center;

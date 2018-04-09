@@ -323,7 +323,7 @@ func (this *File) RemoveFiles(val *File){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_files); i++{
 		if this.M_files[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_files[i])
 		}
 	}
 	this.M_files = values

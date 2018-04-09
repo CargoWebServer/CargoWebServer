@@ -729,7 +729,7 @@ var Base64 = {
         var i = 0;
 
         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        if(input.indexOf(",") > -1){
+        if (input.indexOf(",") > -1) {
             // If the input is an url...
             input = input.substr(input.indexOf(","))
         }
@@ -833,7 +833,7 @@ function encode64(input) {
  * @results {string} the string containing the original value.
  */
 function decode64(input) {
-    
+
     return Base64.decode(input);
 }
 
@@ -947,15 +947,15 @@ String.prototype.capitalizeFirstLetter = function () {
  * A quick snippet to grab all the indexes of a substring within a string
  * @param {*} string The string we looking for.
  */
-String.prototype.indices = function(string){
-	var returns = [];
-	var position = 0;
-	while(this.indexOf(string, position) > -1){
-		var index = this.indexOf(string, position);
-		returns.push(index);
-		position = index + string.length;
-	}
-	return returns;
+String.prototype.indices = function (string) {
+    var returns = [];
+    var position = 0;
+    while (this.indexOf(string, position) > -1) {
+        var index = this.indexOf(string, position);
+        returns.push(index);
+        position = index + string.length;
+    }
+    return returns;
 }
 
 /**
@@ -1220,7 +1220,7 @@ function contains(arr, obj) {
  */
 function objectPropInArray(list, prop, val) {
     if (list.length > 0) {
-        for (var i =0; i < list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
             if (list[i][prop] === val) {
                 return true;
             }
@@ -1622,17 +1622,17 @@ function exportToCsv(filename, rows) {
  * @param {format} format A string containing the format to apply, YYYY-MM-DD HH:mm:ss is the default.
  */
 function formatDate(value) {
-	// Try to convert from a unix time.
-	var date = new Date(value * 1000)
-	if ((date instanceof Date && !isNaN(date.valueOf()))) {
-		value = date
-	}
+    // Try to convert from a unix time.
+    var date = new Date(value * 1000)
+    if ((date instanceof Date && !isNaN(date.valueOf()))) {
+        value = date
+    }
 
-	// Here I will use the browser 
-	var format = 'YYYY-MM-DD HH:mm:ss';
+    // Here I will use the browser 
+    var format = 'YYYY-MM-DD HH:mm:ss';
 
-	value = moment(value).format(format);
-	return value
+    value = moment(value).format(format);
+    return value
 }
 
 /**
@@ -1641,11 +1641,11 @@ function formatDate(value) {
  * @param {int} digits The number of digits after the point.
  */
 function formatReal(value, digits) {
-	if (digits == undefined) {
-		digits = 2
-	}
-	value = parseFloat(value).toFixed(digits);
-	return value
+    if (digits == undefined) {
+        digits = 2
+    }
+    value = parseFloat(value).toFixed(digits);
+    return value
 }
 
 /**
@@ -1653,13 +1653,13 @@ function formatReal(value, digits) {
  * @param {string} value The string to format.
  */
 function formatString(value) {
-	if (value == null) {
-		return ""
-	}
-	if (value.replace != undefined) {
-		value = value.replace(/\r\n|\r|\n/g, "<br />")
-	}
-	return value
+    if (value == null) {
+        return ""
+    }
+    if (value.replace != undefined) {
+        value = value.replace(/\r\n|\r|\n/g, "<br />")
+    }
+    return value
 }
 
 /**
@@ -1667,53 +1667,58 @@ function formatString(value) {
  * @param {*} value 
  */
 function formatBoolean(value) {
-	if (value == 1) {
-		return "true";
-	} else if (value == 0) {
-		return "false";
-	}
-	return value.toString();
+    if (value == 1) {
+        return "true";
+    } else if (value == 0) {
+        return "false";
+    }
+    return value.toString();
 }
 
 // Format the value
 function formatValue(value, typeName) {
-	// Here I will display basic types.
-	if (isString(value)) {
-		// remove empty values.
-		if (value.startsWith("data:image/")) {
-			// In that case I got a picture so I will create an image from it.
-			var img = new Element(null, { "tag": "img", "src": value })
-			return img;
-		}
-		formatedValue = formatString(value);
+    // get the base type name.
+    if(getBaseTypeExtension(typeName).length > 0){
+        typeName = getBaseTypeExtension(typeName)
+    }
+    
+    // Here I will display basic types.
+    if (isXsString(typeName)) {
+        formatedValue = formatString(value);
+    }else if (isBoolean(value)) {
+        formatedValue = formatBoolean(value);
+    } else if (isXsDate(typeName) || isXsTime(typeName)) {
+        formatedValue = formatDate(value);
+    } else if (isNumeric(value)) {
+        if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
+            formatedValue = formatReal(value, 2)
+        } else if (isXsInt(typeName)) {
+            // In case of a date.
+                if (typeName.startsWith("enum:")) {
+                    // In that case I will create a select box.
+                    // enum:FileType_DbFile:FileType_DiskFile
+                    formatedValue = typeName.split(":")[value].split("_")[1]
+                } else {
+                    // Int are numeric value with 0 digit.
+                    formatedValue = formatReal(value, 0);
+                }
+        } else {
+            formatedValue = formatReal(value, 3)
+        }
+    } else if (isObject(value)) {
+        if (value.M_valueOf != null) {
+            formatedValue = value.M_valueOf
+        }
+    } else if (isString(value)) {
+        // remove empty values.
+        if (value.startsWith("data:image/")) {
+            // In that case I got a picture so I will create an image from it.
+            var img = new Element(null, { "tag": "img", "src": value })
+            return img;
+        }
+        formatedValue = formatString(value);
 
-	} else if (isBoolean(value)) {
-		formatedValue = formatBoolean(value);
-	} else if (isInt(value)) {
-		// In case of a date.
-		if (isXsDate(typeName)) {
-			formatedValue = formatDate(value);
-		} else {
-			if (typeName.startsWith("enum:")) {
-				// In that case I will create a select box.
-				// enum:FileType_DbFile:FileType_DiskFile
-				formatedValue = typeName.split(":")[value].split("_")[1]
-			} else {
-				// Int are numeric value with 0 digit.
-				formatedValue = formatReal(value, 0);
-			}
-		}
-	} else if (isNumeric(value)) {
-		if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
-			formatedValue = formatReal(value, 2)
-		} else {
-			formatedValue = formatReal(value, 3)
-		}
-	} else if (isObject(value)) {
-		if (value.M_valueOf != null) {
-			formatedValue = value.M_valueOf
-		}
-	}
+    }
 
-	return formatedValue
+    return formatedValue
 }

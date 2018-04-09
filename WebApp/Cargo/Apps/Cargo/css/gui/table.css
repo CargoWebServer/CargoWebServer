@@ -3,6 +3,8 @@
     border-collapse:collapse;
     margin-top: 2px;
     margin-bottom: 2px;
+    margin-left: 5px;
+    position: relative;
 }
 
 .table_body{

@@ -178,7 +178,7 @@ func (this *Group) RemoveMembersRef(val *User){
 	values := make([]string,0)
 	for i:=0; i < len(this.M_membersRef); i++{
 		if this.M_membersRef[i] != val.GetUuid() {
-			values = append(values, val.GetUuid())
+			values = append(values, this.M_membersRef[i])
 		}
 	}
 	this.M_membersRef = values
