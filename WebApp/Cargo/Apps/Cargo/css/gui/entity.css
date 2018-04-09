@@ -81,19 +81,9 @@
 	grid-template-columns: 1fr;
 }
 
-.entity_panel div{
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 1px;
-    padding-bottom: 1px;
-}
 .entity_panel .fa-download{
     display: none;
 }
-
-/*.entity_panel .fa-floppy-o{
-    display: none;
-}*/
 
 /** The entity panel header **/
 .entity_panel_header{
@@ -122,11 +112,13 @@
 
 /** The field panel **/
 .field_panel{
+	/* margin: 2px; */
     display: grid;
     /*Tow column*/
     grid-template-columns: 1fr 1fr;
     /** One row */
-    grid-template-rows: 1fr;
+	grid-template-rows: 1fr;
+	min-height: 1em;
 }
 
 .field_renderer{

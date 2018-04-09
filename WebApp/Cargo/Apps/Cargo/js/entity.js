@@ -629,6 +629,12 @@ function setObjectValues(object, values, lazy) {
                             } else {
                                 caller.parent[caller.subObject.property] = entity
                             }
+                            // Get parent function.
+                            entity.getParent = function(parent){
+                                return function(){
+                                    return parent
+                                }
+                            }(caller.parent)
                             if (subObjects.length == 0) {
                                 caller.callback(caller.parent)
                             } else {

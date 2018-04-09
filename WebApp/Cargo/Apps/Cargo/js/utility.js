@@ -187,6 +187,9 @@ function objectEquals(x, y) {
  * Dertermine if the value is a base type.
  */
 function isXsBaseType(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     return isXsId(fieldType) || isXsRef(fieldType) || isXsInt(fieldType) || isXsString(fieldType) || isXsBinary(fieldType) || isXsNumeric(fieldType) || isXsBoolean(fieldType) || isXsDate(fieldType) || isXsTime(fieldType) || isXsMoney(fieldType)
 }
 
@@ -194,6 +197,9 @@ function isXsBaseType(fieldType) {
  * Helper function use to dertermine if a XS type must be considere integer.
  */
 function isXsInt(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("byte") || fieldType.endsWith("long") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
         || fieldType.endsWith("unsignedInt") || fieldType.endsWith("unsignedBtype") || fieldType.endsWith("unsignedShort") || fieldType.endsWith("unsignedLong")  // XML
         || fieldType.endsWith("negativeInteger") || fieldType.endsWith("nonNegativeInteger") || fieldType.endsWith("nonPositiveInteger") || fieldType.endsWith("positiveInteger") // XML
@@ -208,6 +214,9 @@ function isXsInt(fieldType) {
  * Helper function use to dertermine if a XS type must be considere String.
  */
 function isXsString(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("string")
         || fieldType.endsWith("Name") || fieldType.endsWith("QName") || fieldType.endsWith("NMTOKEN")  // XML
         || fieldType.endsWith("gDay") || fieldType.endsWith("gMonth") || fieldType.endsWith("gMonthDay") || fieldType.endsWith("gYear") // XML
@@ -225,6 +234,9 @@ function isXsString(fieldType) {
  * Helper function use to dertermine if a XS type must be considere binary value.
  */
 function isXsBinary(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("base64Binary") // XML
         || fieldType.endsWith("varbinary") || fieldType.endsWith("binary") // SQL
         || fieldType.endsWith("image") // SQL
@@ -238,6 +250,9 @@ function isXsBinary(fieldType) {
  * Helper function use to dertermine if a XS type must be considere numeric value.
  */
 function isXsNumeric(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("double") || fieldType.endsWith("decimal") || fieldType.endsWith("float") // XML
         || fieldType.endsWith("numeric") || fieldType.endsWith("real") // SQL
     ) {
@@ -250,6 +265,9 @@ function isXsNumeric(fieldType) {
  * Helper function use to dertermine if a XS type must be considere boolean value.
  */
 function isXsBoolean(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("boolean") // XML
         || fieldType.endsWith("bit")  // SQL
     ) {
@@ -262,6 +280,9 @@ function isXsBoolean(fieldType) {
  * Helper function use to dertermine if a XS type must be considere date value.
  */
 function isXsDate(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("date") || fieldType.endsWith("dateTime") // XML
         || fieldType.endsWith("datetime2") || fieldType.endsWith("smalldatetime") || fieldType.endsWith("datetimeoffset") // SQL
     ) {
@@ -274,6 +295,9 @@ function isXsDate(fieldType) {
  * Helper function use to dertermine if a XS type must be considere time value.
  */
 function isXsTime(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (fieldType.endsWith("time") // XML
         || fieldType.endsWith("timestampNumeric") || fieldType.endsWith("timestamp") // SQL
     ) {
@@ -286,6 +310,9 @@ function isXsTime(fieldType) {
  * Helper function use to dertermine if a XS type must be considere money value.
  */
 function isXsMoney(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (
         fieldType.endsWith("money") || fieldType.endsWith("smallmoney") // SQL
     ) {
@@ -298,6 +325,9 @@ function isXsMoney(fieldType) {
  * Helper function use to dertermine if a XS type must be considere id value.
  */
 function isXsId(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (
         fieldType.endsWith("ID") || fieldType.endsWith("NCName") // XML
         || fieldType.endsWith("uniqueidentifier") // SQL
@@ -311,6 +341,9 @@ function isXsId(fieldType) {
  * Helper function use to dertermine if a XS type must be considere id value.
  */
 function isXsRef(fieldType) {
+    if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
+        return false
+    }
     if (
         fieldType.endsWith("anyURI") || fieldType.endsWith("IDREF") // XML
     ) {

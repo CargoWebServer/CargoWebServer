@@ -117,6 +117,10 @@ func newCache() *Cache {
 					// Remove from the cache.
 					cache.m_cache.Delete(entity.GetUuid())
 					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
+				} else if operation["name"] == "remove" {
+					uuid := operation["uuid"].(string)
+					// Remove from the cache.
+					cache.m_cache.Delete(uuid)
 				} else if operation["name"] == "getValue" {
 					uuid := operation["uuid"].(string)
 					field := operation["field"].(string)

@@ -661,6 +661,11 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 }
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
+	uuid := entity.GetUuid()
+	typeName := entity.GetTypeName()
+
+	// remove it from the cache.
+	this.removeEntity(entity)
 
 	// First i will remove the entity childs...
 	childs := entity.GetChilds()
@@ -675,41 +680,17 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		// I will get the parent uuid link.
 		parent := this.getEntity(entity.GetParentUuid())
 		if parent != nil {
-			// Here I will remove it from it parent...
-			// Get values as map[string]interface{} and also set the entity in it parent.
-			if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
-				parent.(*DynamicEntity).removeValue(entity.GetParentLnk(), entity.GetUuid())
-				this.setEntity(parent)
-			} else {
-				parentPrototype, _ := GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
-				fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
-
-				removeMethode := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
-				if strings.HasPrefix(fieldType, "[]") {
-					removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
-				} else {
-					removeMethode = "Reset" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
-				}
-				params := make([]interface{}, 1)
-				params[0] = entity
-				_, err_ := Utility.CallMethod(parent, removeMethode, params)
-				if err_ != nil {
-					log.Println("fail to call method ", removeMethode, " on ", parent.GetTypeName(), parent.GetUuid())
-					cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
-					return cargoError
-				}
-			}
+			// clear it form the cache...
+			this.removeEntity(parent)
 		}
 	}
-
-	// remove it from the cache.
-	this.removeEntity(entity)
 
 	var values map[string]interface{}
 	var err error
 
 	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
 		values = entity.(*DynamicEntity).getValues()
+		log.Println("---> delete entity event: ", values)
 	} else {
 		values, err = Utility.ToMap(entity)
 		if err != nil {
@@ -730,6 +711,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
 	// Now I will clear other references...
 	query := "(?,?, " + entity.GetUuid() + ")"
+
 	// Now entity are quadify I will save it in the graph store.
 	references, err_ := store.Read(query, []interface{}{}, []interface{}{})
 
@@ -737,40 +719,16 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
 		for i := 0; i < len(references); i++ {
 			// Remove the reference from the entity loaded in the cache.
-			ref := this.getEntity(references[i][0].(string))
-			if ref != nil {
-				field := strings.Split(references[i][1].(string), ":")[2]
-				typeName := strings.Split(references[i][0].(string), "%")[0]
-				prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
-				fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
-				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
-					refs_ := ref.(*DynamicEntity).getValue(field)
-					if refs_ != nil {
-						if reflect.TypeOf(refs_).String() == "[]string" { // Array of references.
-							refs := make([]string, 0)
-							for j := 0; j < len(refs_.([]string)); j++ {
-								if refs_.([]string)[j] != entity.GetUuid() {
-									refs = append(refs, refs_.([]string)[j])
-								}
-							}
-							ref.(*DynamicEntity).setValue(field, refs)
-						} else if reflect.TypeOf(refs_).Kind() == reflect.String {
-							ref.(*DynamicEntity).setValue(field, "") // single ref.
-						} else {
-							ref.(*DynamicEntity).removeValue(field, refs_) // childs
-						}
-					}
-				} else {
-					removeName := strings.Replace(field, "M_", "", -1)
-					removeName = "Remove" + strings.ToUpper(removeName[0:1]) + removeName[1:]
-					if strings.HasSuffix(fieldType, ":Ref") {
-						removeName += "Ref"
-					}
-					params := make([]interface{}, 1)
-					params[0] = entity
-					Utility.CallMethod(ref, removeName, params)
-				}
 
+			infos := make(map[string]interface{})
+			infos["name"] = "remove"
+			infos["uuid"] = references[i][0].(string)
+
+			// set the entity
+			this.m_cache.m_operations <- infos
+			ref := this.getEntity(references[i][0].(string))
+
+			if ref != nil {
 				// Update the reference here.
 				// TODO Send only the change...
 				var eventDatas []*MessageData
@@ -803,11 +761,9 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	evtData := new(MessageData)
 	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "entity"
-	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		evtData.Value = values
-	} else {
-		evtData.Value = entity
-	}
+	// I will send only necessary entity properties.
+	evtData.Value = map[string]interface{}{"UUID": uuid, "TYPENAME": typeName}
+
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -1542,14 +1498,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		}
 		return result
 	}
-
-	/*
-		result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values.(Entity))
-		if errObj != nil {
-			GetServer().reportErrorMessage(messageId, sessionId, errObj)
-			return nil
-		}
-	*/
 
 }
 

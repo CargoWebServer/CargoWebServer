@@ -581,7 +581,3 @@ function TestWebRtc2() {
         alert("Sorry, your browser does not support getUserMedia.");
     }
 }
-
-
-
-

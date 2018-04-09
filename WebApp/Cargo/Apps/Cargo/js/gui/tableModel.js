@@ -289,6 +289,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     this.table.appendRowBtn.element.onclick = function (table, model) {
         return function () {
             var entity = eval("new " + model.proto.TypeName + "()")
+
             entity.ParentLnk = model.ParentLnk
             entity.ParentUuid = model.ParentUuid;
 
@@ -297,6 +298,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             // The row is not append in the table rows collection, but display.
             var lastRowIndex = table.rows.length
             var row = new TableRow(table, lastRowIndex, data, undefined)
+
             table.rows.push(row)
             simulate(row.cells[lastRowIndex, 0].div.element, "dblclick");
         }
@@ -315,8 +317,6 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
 
             }, this)
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Event listener connection here.

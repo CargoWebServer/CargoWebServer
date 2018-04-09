@@ -1,5 +1,4 @@
 
-
 var EntityPanel = function (parent, typeName, callback) {
 	this.typeName = typeName
 
@@ -62,9 +61,11 @@ EntityPanel.prototype.init = function (prototype, callback) {
 		)
 	}
 	// The first tree field are not display.
-	var index = 3
-	if (prototype.Fields.length > 3) {
-		initField(this, prototype, index, callback)
+	if (prototype != undefined) {
+		var index = 3
+		if (prototype.Fields.length > 3) {
+			initField(this, prototype, index, callback)
+		}
 	}
 }
 
@@ -647,28 +648,35 @@ var FieldEditor = function (fieldPanel, callback) {
 
 				// Now I will modify the value in the local entity.
 				var entity = entities[fieldPanel.parent.entityUuid]
-				entity[fieldPanel.fieldName] = value
+				if (entity == undefined) {
+					// newly created entity not alread
+					entity = fieldPanel.parent.entity
+					entity[fieldPanel.fieldName] = value
+					if (entity.getParent != undefined) {
+						entity = entity.getParent()
+					}
+				} else {
+					entity[fieldPanel.fieldName] = value
 
+				}
 				// Remove the editor
 				try {
 					this.parentNode.removeChild(this)
 				} catch (error) {
 
 				}
-
 				fieldPanel.editor = null // remove the edior.
 				fieldPanel.value.element.style.display = ""
 
-
 				// In that case I will save the entity directly.
-				server.entityManager.saveEntity(entity,
+				/*server.entityManager.saveEntity(entity,
 					function (result, caller) {
-						caller.fieldPanel.parent.setEntity(result)
 					},
 					// error callback
 					function () {
 
-					}, { "fieldPanel": fieldPanel })
+					}, {})*/
+
 
 			}
 		}(fieldPanel)

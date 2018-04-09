@@ -286,7 +286,7 @@ EntityPrototype.prototype.generateConstructor = function () {
         return
     }
 
-    var constructorSrc =  this.PackageName + " || {};\n"
+    var constructorSrc = this.PackageName + " || {};\n"
 
     var packageName = this.PackageName
     var classNames = this.ClassName.split(".")
@@ -354,7 +354,23 @@ EntityPrototype.prototype.generateConstructor = function () {
                 } else if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " this." + fieldName + " = 1\n"
                 } else {
-                    constructorSrc += " this." + fieldName + " = null\n"
+                    if (this.FieldsType[i].endsWith(":Ref")) {
+                        constructorSrc += " this." + fieldName + " = null\n"
+                    } else {
+
+                        if (this.FieldsNillable[i] == false) {
+                            constructorSrc += " this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                        } else {
+                            constructorSrc += " if(getBaseTypeExtension(\"" +  this.FieldsType[i] +"\").startsWith(\"xs.\")){\n"
+                            constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                            constructorSrc += "     this." + fieldName + ".getParent = function(parent){\n"
+                            constructorSrc += "         return function(){return parent}\n"
+                            constructorSrc += "     }(this)\n"
+                            constructorSrc += " }else{\n"
+                            constructorSrc += "     this." + fieldName + " = null\n"
+                            constructorSrc += " }\n"
+                        }
+                    }
                 }
             }
         } else if (this.FieldsType[i].startsWith("[]")) {
@@ -377,7 +393,11 @@ EntityPrototype.prototype.generateConstructor = function () {
                 if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " this." + fieldName + " = 0\n"
                 } else {
-                    constructorSrc += " this." + fieldName + " = null\n"
+                    if (this.isNillable[i]) {
+                        constructorSrc += " this." + fieldName + " = null\n"
+                    } else {
+                        constructorSrc += " this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                    }
                 }
             }
         }
@@ -481,9 +501,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "}\n\n"
 
     // Set the function.
-    console.log(constructorSrc)
     eval(constructorSrc)
-    //console.log(constructorSrc)
 }
 
 /**

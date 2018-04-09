@@ -77,7 +77,7 @@ var Table = function (id, parent) {
 	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id: id }).down()
 
 	this.appendRowBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "position: absolute; top: 2px; left: -12px; font-size: 10pt;" }).down()
-	.appendElement({ "tag": "i", "class": "fa fa-plus" });
+		.appendElement({ "tag": "i", "class": "fa fa-plus" });
 
 	// The header...
 	this.header = null
@@ -647,7 +647,7 @@ TableCell.prototype.getValue = function () {
  * @param {} value The value to set.
  */
 TableCell.prototype.setValue = function (value) {
-	if (this.valueDiv == undefined && value == null) {
+	if (this.valueDiv == null /* && value == null*/) {
 		return
 	}
 
@@ -709,7 +709,9 @@ TableCell.prototype.setCellEditor = function (index) {
 		this.editor.edit(this.getValue(), this.getType());
 
 		// Hide the cell renderer div...
-		this.valueDiv.element.style.display = "none"
+		if (this.valueDiv != undefined) {
+			this.valueDiv.element.style.display = "none"
+		}
 		// Append the editor...
 		this.div.appendElement(this.editor.editor);
 	} else {
@@ -771,9 +773,10 @@ var TableCellEditor = function (cell, onblur) {
 }
 
 TableCellEditor.prototype.edit = function (value, typeName, onblur) {
-	if (this.editor != null) {
+	if (this.editor != null || value == null) {
 		return;
 	}
+
 	var isArray = typeName.startsWith("[]")
 	typeName = typeName.replace("[]", "")
 
@@ -924,36 +927,26 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 				this.editor.element.value = value;
 			}
 		}
+	} else if (value.TYPENAME != undefined) {
+		if (!isArray) {
+			this.editor = new Element(null, { "tag": "div" })
+			var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
+				// The init callback. 
+				function (entity) {
+					return function (panel) {
+						panel.setEntity(entity)
+						panel.header.panel.element.style.display = "none";
+					}
+				}(value),
+				undefined, true, undefined, "")
+		}
+		return;
+
 	} else if (isNumeric(value)) {
 		if (this.editor == null) {
 			this.editor = new Element(null, { "tag": "input", "type": "number", "step": "0.01" });
 		}
 		this.editor.element.value = value;
-	} else if (isObject(value)) {
-		if (value.TYPENAME != undefined) {
-			if (!isArray) {
-				this.editor = new Element(null, { "tag": "div" })
-				var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
-					// The init callback. 
-					function (entity) {
-						return function (panel) {
-							panel.setEntity(entity)
-							panel.header.element.style.display = "none";
-
-						}
-					}(value),
-					undefined, true, undefined, "")
-
-				// Here on mouse leave I will set the value.
-				this.editor.element.onmouseleave = function (panel, cell, editor) {
-					return function () {
-						// In that case I will set the value of the renderer.
-						cell.setValue(panel.entity)
-					}
-				}(panel, this.cell, this.editor)
-			}
-			return;
-		}
 	}
 
 	// Set the on blur event.
@@ -1079,7 +1072,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				return function (row) {
 					var values = row.table.getModel().values
 					entity[fieldName] = []
-					for(var i=0; i <values.length; i++){
+					for (var i = 0; i < values.length; i++) {
 						entity[fieldName][i] = row.table.getModel().getValueAt(i, 1)
 					}
 					server.entityManager.saveEntity(entity,
@@ -1132,7 +1125,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				/** The error callva */
 				function (errObj, caller) {
 					// Here the div contain a table of values.
-				}, { "div": talbeDiv, "cell": this.cell, "values": values, "entity":entity, "fieldName":fieldName})
+				}, { "div": talbeDiv, "cell": this.cell, "values": values, "entity": entity, "fieldName": fieldName })
 		}
 		return div;
 	} else {
