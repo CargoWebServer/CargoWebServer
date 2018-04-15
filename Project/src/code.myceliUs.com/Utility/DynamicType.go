@@ -306,12 +306,25 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 						v.Elem().FieldByName(name).Set(reflect.ValueOf(value))
 					}
 				}
-			default:
-				// Convert is use to enumeration type who are int and must be convert to
-				// it const type representation.
-				fv := initializeBaseTypeValue(ft.Type, value).Convert(ft.Type)
+			case reflect.Map:
+				fv, _ := InitializeStructure(value.(map[string]interface{}))
 				if fv.IsValid() {
-					v.Elem().FieldByName(name).Set(fv)
+					v.Elem().FieldByName(name).Set(fv.Elem())
+				}
+
+			default:
+				if reflect.TypeOf(value).String() == "map[string]interface {}" {
+					fv, _ := InitializeStructure(value.(map[string]interface{}))
+					if fv.IsValid() {
+						v.Elem().FieldByName(name).Set(fv.Elem())
+					}
+				} else {
+					// Convert is use to enumeration type who are int and must be convert to
+					// it const type representation.
+					fv := initializeBaseTypeValue(ft.Type, value).Convert(ft.Type)
+					if fv.IsValid() {
+						v.Elem().FieldByName(name).Set(fv)
+					}
 				}
 			}
 		}

@@ -97,7 +97,6 @@ func (this *DataManager) initialize() {
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
-
 	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations().GetDataStoreConfigs()
 
 	log.Println("--> initialyze DataManager")
@@ -132,7 +131,12 @@ func (this *DataManager) stop() {
 
 func (this *DataManager) openConnections() {
 	for i := 0; i < len(this.getDataStores()); i++ {
-		this.getDataStores()[i].Connect()
+		err := this.getDataStores()[i].Connect()
+		if err == nil {
+			log.Println("--> connection ", this.getDataStores()[i].GetId(), " is opened!")
+		} else {
+			log.Println("--> fail to open connection ", this.getDataStores()[i].GetId())
+		}
 	}
 }
 
@@ -143,7 +147,6 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 	}
 
 	this.setDataStore(store)
-
 	store.Connect()
 }
 
@@ -209,7 +212,6 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
-	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
 	if store == nil {
@@ -306,21 +308,13 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 
 	// Create the store here.
 	store, err := NewDataStore(storeConfig)
-	if err == nil {
-		// Append the new dataStore configuration.
-		this.setDataStore(store)
-		err := store.Connect()
-
-		// Create entity prototypes.
-		if err == nil {
-			store.GetEntityPrototypes()
-		} else {
-			log.Println("---> fail to connect to ", hostName, err)
-		}
-	} else {
-		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create dataStore with id '"+storeId+"' and with error '"+err.Error()+"'."))
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
 		return nil, cargoError
 	}
+
+	// Set the newly created datastore on the map.
+	this.setDataStore(store)
 
 	return store, nil
 }
@@ -445,7 +439,7 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 
 	store := this.getDataStore(storeName)
 	if store == nil {
-		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return
 	}
@@ -456,9 +450,6 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return
 	}
-
-	// I will get it entity prototypes.
-	store.GetEntityPrototypes()
 }
 
 // @api 1.0
@@ -807,20 +798,16 @@ func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sess
 		return
 	}
 
-	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
-		store = this.getDataStore("sql_info")
-	} else {
-		hasDataStore := this.HasDataStore(infos.DataStoreConfig.M_id, messageId, sessionId)
-		if !hasDataStore {
-			// Here I will create the new data store.
-			var cargoError *CargoEntities.Error
-			store, cargoError = this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
-			if cargoError != nil {
-				GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-			}
-		} else {
-			store = this.getDataStore(infos.DataStoreConfig.M_id)
+	hasDataStore := this.HasDataStore(infos.DataStoreConfig.M_id, messageId, sessionId)
+	if !hasDataStore {
+		// Here I will create the new data store.
+		var cargoError *CargoEntities.Error
+		store, cargoError = this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
+		if cargoError != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		}
+	} else {
+		store = this.getDataStore(infos.DataStoreConfig.M_id)
 	}
 
 	// Prototypes will be create only if they dosent exist.
@@ -1028,17 +1015,13 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		return
 	}
 
-	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
-		store = this.getDataStore("sql_info")
-	} else {
-		store = this.getDataStore(infos.DataStoreConfig.M_id)
-		if store == nil {
-			var cargoError *CargoEntities.Error
-			store, cargoError = this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
-			if cargoError != nil {
-				GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-				return
-			}
+	store = this.getDataStore(infos.DataStoreConfig.M_id)
+	if store == nil {
+		var cargoError *CargoEntities.Error
+		store, cargoError = this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
+		if cargoError != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			return
 		}
 	}
 

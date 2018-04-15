@@ -256,11 +256,14 @@ QString ServiceContainer::GetServicesClientCode(){
                 for(QJsonArray::const_iterator it_=parameters.constBegin(); it_ != parameters.constEnd(); ++it_){
                     isArray = (*it_).toObject()["isArray"].toBool();
                 }
-
                 if(isArray){
                     clientCode +=  "        caller.successCallback(results, caller.caller)\n";
                 }else{
-                    clientCode +=  "        caller.successCallback(results[0], caller.caller)\n";
+                    clientCode +=  "        if(results != undefined){\n";
+                    clientCode +=  "            caller.successCallback(results[0], caller.caller)\n";
+                    clientCode +=  "        } else {\n";
+                    clientCode +=  "            caller.successCallback(undefined, caller.caller)\n";
+                    clientCode +=  "        }\n";
                 }
                 clientCode +=  "     }\n";
             }else{

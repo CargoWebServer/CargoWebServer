@@ -378,7 +378,7 @@ QueryEditor.prototype.runQuery = function () {
         // Now I will retreive the prototypes from prototypes names and exectute the query...
         for (var prototype in prototypes) {
             // In that case the prototype contain the schema id and table id.
-            server.entityManager.getEntityPrototype(prototype, "sql_info",
+            server.entityManager.getEntityPrototype(prototype, prototype.TypeName.split(".")[0],
                 // success callback
                 function (result, caller) {
                     //console.log(result)

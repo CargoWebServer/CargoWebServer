@@ -37,6 +37,7 @@
 }
 
 .body_cell{
+    position: relative;
     color: #212529;
     vertical-align: top;
     text-align: left;

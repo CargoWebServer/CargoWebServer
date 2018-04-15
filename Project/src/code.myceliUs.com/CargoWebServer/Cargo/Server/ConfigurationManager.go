@@ -118,17 +118,6 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
-	// The sql info data store.
-	sqlInfoDB := new(Config.DataStoreConfiguration)
-	sqlInfoDB.M_id = "sql_info"
-	sqlInfoDB.M_storeName = "sql_info"
-	sqlInfoDB.M_hostName = hostName
-	sqlInfoDB.M_ipv4 = ipv4
-	sqlInfoDB.M_port = port
-	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
-	sqlInfoDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
-	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
-
 	// Create the default configurations
 	configurationManager.setServiceConfiguration(configurationManager.getId(), -1)
 

@@ -49,11 +49,15 @@ EntityPanel.prototype.init = function (prototype, callback) {
 						if (index < prototype.Fields.length) {
 							initField(entityPanel, prototype, index, callback)
 						} else {
-							entityPanel.header = new EntityPanelHeader(entityPanel)
+							if (entityPanel.header == null) {
+								entityPanel.header = new EntityPanelHeader(entityPanel)
+							}
 							callback(entityPanel)
 						}
 					} else {
-						entityPanel.header = new EntityPanelHeader(entityPanel)
+						if (entityPanel.header == null) {
+							entityPanel.header = new EntityPanelHeader(entityPanel)
+						}
 						callback(entityPanel)
 					}
 				}
@@ -76,13 +80,23 @@ EntityPanel.prototype.init = function (prototype, callback) {
 EntityPanel.prototype.setEntity = function (entity) {
 
 	// Here I will associate the panel and the entity.
+	var displayHeader = this.header.panel.element.style.display == ""
 	if (this.getEntity != null) {
 		server.entityManager.detach(this, NewEntityEvent)
 		server.entityManager.detach(this, UpdateEntityEvent)
 		server.entityManager.detach(this, DeleteEntityEvent)
-
 		this.getEntity().getPanel = null
 		this.clear()
+
+		// If the entity is a new one I will remove all it nodes except the header.
+		if (this.getEntity().UUID == undefined) {
+			for (var childId in this.panel.childs) {
+				var child = this.panel.childs[childId]
+				if (child.element.className != "entity_panel_header") {
+					this.panel.removeElement(child)
+				}
+			}
+		}
 	}
 
 	// In that case I will set the value of the field renderer.
@@ -127,6 +141,11 @@ EntityPanel.prototype.setEntity = function (entity) {
 				}
 			}
 		}
+	}
+
+	if (displayHeader) {
+		this.header.display()
+		this.header.expandBtn.element.click()
 	}
 
 	entity.getPanel = function (entityPanel) {
@@ -200,10 +219,11 @@ EntityPanel.prototype.clear = function () {
 		return
 	}
 
-	this.entity = null
+	// remove the function.
+	this.entity.getPanel = undefined
 
-	// Remove actual panel element befor reinit it.
-	this.panel.removeAllChilds()
+	// set the entity to nill
+	this.entity = null
 
 	this.init(getEntityPrototype(this.typeName),
 		// init callback.
@@ -221,6 +241,8 @@ var EntityPanelHeader = function (parent) {
 	this.shrinkBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
 	this.shrinkBtn.appendElement({ "tag": "i", "class": "fa fa-caret-down" }).down()
 	this.title = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_title" }).down()
+	this.deleteBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button enabled"/*, "style": "display: none;"*/ }).down()
+	this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-trash" })
 
 	// Now the event...
 	this.expandBtn.element.onclick = function (header, entityPanel) {
@@ -244,6 +266,39 @@ var EntityPanelHeader = function (parent) {
 			}
 		}
 	}(this, parent)
+
+	this.deleteBtn.element.onclick = function (entityPanel) {
+		return function () {
+			// Here I will save the entity...
+			if (entityPanel.getEntity() != null) {
+				// Here I will ask the user if here realy want to remove the entity...
+				var confirmDialog = new Dialog(randomUUID(), undefined, true)
+				confirmDialog.div.element.style.maxWidth = "450px"
+				confirmDialog.setCentered()
+				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
+				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.getEntity().getTitles() + "?" })
+
+				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
+					return function () {
+						// I will call delete file
+						server.entityManager.removeEntity(entityPanel.getEntity().UUID,
+							// Success callback 
+							function (result, caller) {
+								/** The action will be done in the event listener */
+								if (caller.deleteCallback != undefined) {
+									caller.deleteCallback(caller.getEntity())
+								}
+							},
+							// Error callback
+							function (errMsg, caller) {
+
+							}, entityPanel)
+						dialog.close()
+					}
+				}(confirmDialog, entityPanel)
+			}
+		}
+	}(parent)
 
 	return this;
 }
@@ -293,7 +348,7 @@ var FieldPanel = function (entityPanel, index, callback) {
 			if (fieldPanel.editor != null || fieldPanel.fieldType.startsWith("[]")) {
 				return // editor already exist
 			}
-
+			var entity = fieldPanel.parent.getEntity()
 			new FieldEditor(fieldPanel, function (value) {
 				return function (fieldPanel, editor) {
 					if (editor.editor != null) {
@@ -303,7 +358,7 @@ var FieldPanel = function (entityPanel, index, callback) {
 						fieldPanel.editor.setValue(value)
 					}
 				}
-			}(this.innerText))
+			}(entity[fieldPanel.fieldName]))
 		}
 	}(this)
 
@@ -357,6 +412,9 @@ FieldPanel.prototype.clear = function () {
 
 	// clear the renderer
 	this.renderer.clear()
+
+	// Remove the panel.
+	this.value.removeAllChilds()
 }
 
 // The field renderer.
@@ -367,8 +425,11 @@ var FieldRenderer = function (fieldPanel, callback) {
 	this.renderer = null
 
 	// Init the renderer.
-	this.init(callback)
-
+	if (this.renderer == null) {
+		this.init(callback)
+	} else {
+		callback(this)
+	}
 	return this;
 }
 
@@ -405,8 +466,8 @@ FieldRenderer.prototype.render = function (prototype, callback) {
 		if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
 			model = new EntityTableModel(prototype)
 		} else {
-			model = new TableModel(["index", "values"])
-			model.fields = ["xs.int", this.parent.fieldType.replace("[]", "")]
+			model = new TableModel(["values"])
+			model.fields = [this.parent.fieldType.replace("[]", "")]
 		}
 
 		this.renderer.setModel(model,
@@ -474,44 +535,7 @@ FieldRenderer.prototype.setValue = function (value) {
 				function setValue(value, index, fieldRenderer) {
 					// simply append the values with there index in that case.
 					var v = formatValue(value, fieldRenderer.parent.fieldType.replace("[]", ""))
-					var row = fieldRenderer.renderer.appendRow([index + 1, v], index)
-					var model = fieldRenderer.renderer.getModel()
-
-					// set the save value function for the row.
-					model.saveValue = function (uuid, field) {
-						return function (row) {
-							// Here I will simply remove the element 
-							// The entity must contain a list of field...
-							if (entities[uuid] != undefined) {
-								entity = entities[uuid]
-							}
-
-							if (entity[field] != undefined) {
-								var values = row.table.getModel().values
-								entity[field] = []
-								for (var i = 0; i < values.length; i++) {
-									entity[field][i] = row.table.getModel().getValueAt(i, 1)
-								}
-
-								if (entity.UUID != "") {
-									server.entityManager.saveEntity(entity,
-										function (result, caller) {
-										},
-										function () {
-
-										}, this)
-								} else {
-									// Here the entity dosent exist...
-									server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
-										function (result, caller) {
-										},
-										function () {
-
-										}, this)
-								}
-							}
-						}
-					}(fieldRenderer.parent.parent.entityUuid, fieldRenderer.parent.fieldName)
+					var row = fieldRenderer.renderer.appendRow([v], index)
 				}
 				// Here we got an array of basic types.
 				if (isArray(value)) {
@@ -525,7 +549,32 @@ FieldRenderer.prototype.setValue = function (value) {
 		} else {
 			// not array...
 			var fieldType = this.parent.fieldType
-			if (fieldType.startsWith("xs.")) {
+			var enumarations = []
+			var entity = this.parent.parent.getEntity()
+			if (entity != undefined) {
+				prototype = getEntityPrototype(entity.TYPENAME)
+				if (prototype.Restrictions != undefined) {
+					for (var i = 0; i < prototype.Restrictions.length; i++) {
+						if (prototype.Restrictions[i].Type == 1) {
+							enumarations.push(prototype.Restrictions[i].Value)
+						}
+					}
+				}
+			}
+
+			if (fieldType.startsWith("enum:") || enumarations.length > 0) {
+				if (enumarations.length > 0) {
+					this.parent.value.element.value = value
+					this.parent.value.element.innerText = enumarations[value - 1]
+				} else {
+					var values = fieldType.replace("enum:", "").split(":")
+					if (value - 1 >= 0) {
+						// keep the value in the element.
+						this.parent.value.element.value = value
+						this.parent.value.element.innerText = values[value - 1].substring(values[value - 1].indexOf("_") + 1).replace("_", " ")
+					}
+				}
+			} else if (fieldType.startsWith("xs.")) {
 				if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
 					this.parent.value.element.innerText = value
 				} else if (isXsNumeric(fieldType)) {
@@ -533,20 +582,19 @@ FieldRenderer.prototype.setValue = function (value) {
 				} else if (isXsInt(fieldType)) {
 					this.parent.value.element.innerText = parseInt(value)
 				} else if (isXsTime(fieldType)) {
-					var value = moment(value).unix()
+					var date
+					if (isString(value)) {
+						date = new Date(value)
+					} else {
+						date = new Date(value * 1000)
+					}
+					this.parent.value.element.innerText = date.toLocaleDateString() + " " + date.toLocaleTimeString()
 				} else if (isXsBoolean(fieldType)) {
 					this.parent.value.element.innerText = value
 				}
 			} else if (value.TYPENAME != undefined) {
 				// In that case I got a subpanel....
 				this.renderer.setEntity(value)
-			} else if (fieldType.startsWith("enum:")) {
-				var values = fieldType.replace("enum:", "").split(":")
-				if (value - 1 >= 0) {
-					// keep the value in the element.
-					this.parent.value.element.value = value
-					this.parent.value.element.innerText = values[value - 1].substring(values[value - 1].indexOf("_") + 1).replace("_", " ")
-				}
 			} else {
 				this.parent.value.element.innerText = value
 			}
@@ -564,7 +612,13 @@ FieldRenderer.prototype.setValue = function (value) {
 }
 
 FieldRenderer.prototype.clear = function () {
-
+	if (this.renderer != null) {
+		if (this.renderer.removeAllChilds != undefined) {
+			this.renderer.removeAllChilds() // clear it content.
+		} else if (this.renderer.clear != undefined) {
+			this.renderer.clear() // table
+		}
+	}
 }
 
 // The field editor.
@@ -573,8 +627,38 @@ var FieldEditor = function (fieldPanel, callback) {
 	this.editor = null
 	this.parent = fieldPanel
 	var id = this.parent.parent.entityUuid + "_" + this.parent.fieldName
+	var entity = this.parent.parent.getEntity()
 
-	if (fieldType.startsWith("xs.")) {
+	// Now the restrictions...
+	var enumarations = []
+
+	if (entity != undefined) {
+		prototype = getEntityPrototype(entity.TYPENAME)
+		if (prototype.Restrictions != undefined) {
+			for (var i = 0; i < prototype.Restrictions.length; i++) {
+				if (prototype.Restrictions[i].Type == 1) {
+					enumarations.push(prototype.Restrictions[i].Value)
+				}
+			}
+		}
+	}
+
+	if (fieldType.startsWith("enum:") || enumarations.length > 0) {
+		this.editor = this.parent.panel.appendElement({ "tag": "select", "id": id }).down()
+
+		if (enumarations.length > 0) {
+			for (var i = 0; i < enumarations.length; i++) {
+				this.editor.appendElement({ "tag": "option", "innerHtml": enumarations[i], "value": enumarations[i] })
+			}
+		} else {
+			var values = fieldType.replace("enum:", "").split(":")
+			// keep the value in the element.
+			for (var i = 0; i < values.length; i++) {
+				var text = values[i].substring(values[i].indexOf("_") + 1).replace("_", " ")
+				this.editor.appendElement({ "tag": "option", "innerHtml": text, "value": text })
+			}
+		}
+	} else if (fieldType.startsWith("xs.")) {
 		if (isXsId(fieldType)) {
 			this.editor = this.parent.panel.appendElement({ "tag": "input", "id": id }).down()
 		} else if (isXsRef(fieldType)) {
@@ -582,10 +666,10 @@ var FieldEditor = function (fieldPanel, callback) {
 			this.editor = this.parent.panel.appendElement({ "tag": "input", "id": id, "type": "url" }).down()
 		} else if (isXsInt(fieldType)) {
 			this.editor = this.parent.panel.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
-		} else if (isXsDate(fieldType)) {
-			this.editor = this.parent.panel.appendElement({ "tag": "input", "type": "date", "id": id }).down()
 		} else if (isXsTime(fieldType)) {
 			this.editor = this.parent.panel.appendElement({ "tag": "input", "type": "datetime-local", "id": id }).down()
+		} else if (isXsDate(fieldType)) {
+			this.editor = this.parent.panel.appendElement({ "tag": "input", "type": "date", "id": id }).down()
 		} else if (isXsString(fieldType)) {
 			if (this.parent.fieldName == "M_description") {
 				this.parent.panel.element.style.verticalAlign = "top"
@@ -619,15 +703,6 @@ var FieldEditor = function (fieldPanel, callback) {
 				}
 			}
 		}(fieldPanel)
-	} else if (fieldType.startsWith("enum:")) {
-		this.editor = this.parent.panel.appendElement({ "tag": "select", "id": id }).down()
-		var values = fieldType.replace("enum:", "").split(":")
-
-		// keep the value in the element.
-		for (var i = 0; i < values.length; i++) {
-			var text = values[i].substring(values[i].indexOf("_") + 1).replace("_", " ")
-			this.editor.appendElement({ "tag": "option", "innerHtml": text, "value": text })
-		}
 	}
 
 	if (this.editor != null) {
@@ -640,42 +715,65 @@ var FieldEditor = function (fieldPanel, callback) {
 				if (this.type == "checkbox") {
 					value = this.checked
 				} else if (this.tagName == "SELECT") {
-
 					value = this.selectedIndex + 1
 				} else {
 					value = this.value
 				}
 
+				// In case of date i need to transform the value into a unix time.
+				if (isXsTime(fieldPanel.fieldType) || isXsDate(fieldPanel.fieldType)) {
+					value = moment(value).unix()
+				}
+
 				// Now I will modify the value in the local entity.
 				var entity = entities[fieldPanel.parent.entityUuid]
 				if (entity == undefined) {
-					// newly created entity not alread
+					// The entity not already exist on the sever side.
 					entity = fieldPanel.parent.entity
 					entity[fieldPanel.fieldName] = value
+					// if it has a parent, the parent will be save in that case.
 					if (entity.getParent != undefined) {
 						entity = entity.getParent()
 					}
+
+					if (entity.getPanel != undefined) {
+						var panel = entity.getPanel()
+						// If the panel is a table row...
+						if (panel.table != undefined) {
+							panel.table.getModel().saveValue(panel.index)
+						}
+					} else {
+						// In that case the entity does not exist and are not in a table.
+						server.entityManager.createEntity(fieldPanel.parent.entity.ParentUuid, fieldPanel.parent.entity.ParentLnk, fieldPanel.parent.entity,
+							function (result, caller) {
+							},
+							// error callback
+							function () {
+
+							}, {})
+
+					}
 				} else {
+					// Here the entity exist and the entity panel is use to edit it values.
 					entity[fieldPanel.fieldName] = value
+					// Remove the editor
+					try {
+						this.parentNode.removeChild(this)
+					} catch (error) {
 
+					}
+					fieldPanel.editor = null // remove the edior.
+					fieldPanel.value.element.style.display = ""
+
+					// In that case I will save the entity directly.
+					server.entityManager.saveEntity(entity,
+						function (result, caller) {
+						},
+						// error callback
+						function () {
+
+						}, {})
 				}
-				// Remove the editor
-				try {
-					this.parentNode.removeChild(this)
-				} catch (error) {
-
-				}
-				fieldPanel.editor = null // remove the edior.
-				fieldPanel.value.element.style.display = ""
-
-				// In that case I will save the entity directly.
-				/*server.entityManager.saveEntity(entity,
-					function (result, caller) {
-					},
-					// error callback
-					function () {
-
-					}, {})*/
 
 
 			}
@@ -696,11 +794,24 @@ FieldEditor.prototype.setValue = function (value) {
 			} else {
 				this.editor.element.checked = false
 			}
+		} else if (this.editor.element.type == "date" || this.editor.element.type == "datetime-local") {
+			if (isXsTime(this.parent.fieldType)) {
+				if (isString(value)) {
+					value = moment(value).unix()
+				}
+				this.editor.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
+
+			} else if (isXsDate(this.parent.fieldType)) {
+				if (isString(value)) {
+					value = moment(value).unix()
+				}
+				this.editor.element.value = moment(value).format('YYYY-MM-DD');
+			}
 		} else {
 			this.editor.element.value = value
 		}
 	} else if (this.editor.element.tagName == "SELECT") {
-		this.editor.element.value = value
+		this.editor.element.selectedIndex = value - 1
 	}
 }
 

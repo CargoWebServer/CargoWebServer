@@ -185,7 +185,7 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
             var namespaces = []
             for (var i = 0; i < results.M_dataStoreConfigs.length; i++) {
                 // Sql entities are not part of the heritage system.
-                if (results.M_dataStoreConfigs[i].M_dataStoreType == 2 && results.M_dataStoreConfigs[i].M_id != "sql_info") {
+                if (results.M_dataStoreConfigs[i].M_dataStoreType == 2) {
                     namespaces.push(results.M_dataStoreConfigs[i].M_id)
                 }
             }

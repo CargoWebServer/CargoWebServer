@@ -95,11 +95,24 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
 
                 // Set the new configuration.
                 var contentView = configurationPanel.setConfiguration(configurationContent, entity)
-                var idField = contentView.getFieldControl("M_id")
+                contentView.header.display()
             }
         }
     })
 
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, configurationPanel) {
+        if (evt.dataMap["entity"] !== undefined) {
+            if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
+                // Hide all data panel.
+                for (var i = 0; i < configurationPanel.contentViews.length; i++) {
+                    if (configurationPanel.contentViews[i].entity.UUID == evt.dataMap["entity"].UUID) {
+                        // display the header.
+                        configurationPanel.contentViews[i].header.display()
+                    }
+                }
+            }
+        }
+    })
 
     return this
 }
@@ -134,48 +147,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 contentView.setEntity(content)
                 contentView.header.display()
 
-                contentView.saveCallback = function (contentView) {
-                    return function (entity) {
-                        // So here I will create the new dataStore.
-                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            server.dataManager.createDataStore(entity.M_id, entity.M_storeName, entity.M_hostName, entity.M_ipv4, entity.M_port, entity.M_dataStoreType, entity.M_dataStoreVendor,
-                                // Success callback
-                                function (success, caller) {
-                                    // Init the schema informations.
-                                    homePage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
-                                        return function () {
-                                            // display the imports information here...
-                                            contentView.connectBtn.element.status = "disconnected"
-                                            contentView.connectBtn.element.click()
-                                        }
-                                    }(caller))
-                                },
-                                // Error callback
-                                function (errObj, caller) {
-                                }, contentView)
-                        } else if (entity.TYPENAME == "Config.ServiceConfiguration") {
-                            console.log("------> service configuration! ", entity)
-                        }
-                    }
-                }(contentView)
-
-                contentView.deleteCallback = function (entity) {
-                    // Here I will remove the folder if the entity is 
-                    // a database...
-                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                        // also remove the data store.
-                        server.dataManager.deleteDataStore(entity.M_id,
-                            // success callback
-                            function () {
-
-                            },
-                            // error callback.
-                            function () {
-
-                            }, this)
-
-                    }
-                }
+                // The data store configuration.
                 if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
                     // Here I have a service configuration.
@@ -194,21 +166,18 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     server.eventHandler.broadcastLocalEvent(evt)
 
                     // Here I will append the connection button...
-                    contentView.connectBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button"}).down()
+                    contentView.connectBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
-
-                    // Here I will append in case of sql datasotre the synchornize button.
-                    contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
-                    contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
 
                     // Now If the connection is activated...
                     contentView.connectBtn.element.onclick = function (contentView) {
                         return function () {
                             var entity = entities[contentView.entity.UUID]
-
                             if (this.status == "error") {
                                 this.status = "disconnected"
+                                this.style.color = "#8B0000"
                             }
+
                             // Here I will try to open or close the connection...
                             if (this.status == "connected") {
                                 server.dataManager.close(entity.M_id,
@@ -217,55 +186,83 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         caller.connectBtn.style.color = "lightgrey"
                                         caller.connectBtn.status = "disconnected"
                                         homePage.dataExplorer.hidePanel(caller.entity.M_id)
-                                        caller.refreshBtn.element.style.display = "none"
                                     },
                                     function (errMsg, caller) {
                                         // Fail to disconnect
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
-                                        caller.refreshBtn.element.style.display = "none"
                                         homePage.dataExplorer.hidePanel(caller.entity.M_id)
-                                    }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
+                                    }, { "connectBtn": this, "entity": entity })
+
                             } else if (this.status == "disconnected") {
                                 server.dataManager.connect(entity.M_id,
                                     function (result, caller) {
                                         // Here the data store can be reach so I will try to connect.
                                         caller.connectBtn.style.color = "#4CAF50"
                                         caller.connectBtn.status = "connected"
-                                        //caller.refreshBtn.element.style.display = "table-cell"
                                         homePage.dataExplorer.showPanel(caller.entity.M_id)
-
                                     },
                                     function (errMsg, caller) {
                                         // fail to connect...
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
-                                        caller.refreshBtn.element.style.display = "none"
                                         homePage.dataExplorer.hidePanel(caller.entity.M_id)
-                                    }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
+                                        if (errMsg.dataMap.errorObj.M_id == "DATASTORE_DOESNT_EXIST_ERROR") {
+                                            var entity = caller.entity
+                                            var contentView = caller.contentView
+                                            // In that case I will try to create the data store...
+                                            server.dataManager.createDataStore(entity.M_id, entity.M_storeName, entity.M_hostName, entity.M_ipv4, entity.M_port, entity.M_dataStoreType, entity.M_dataStoreVendor,
+                                                // Success callback
+                                                function (success, caller) {
+                                                    // Init the schema informations.
+                                                    server.dataManager.connect(entity.M_id,
+                                                        // success callback.
+                                                        function (result, caller) {
+                                                            // Here the data store can be reach so I will try to connect.
+                                                            caller.connectBtn.element.style.color = "#4CAF50"
+                                                            caller.connectBtn.element.status = "connected"
+                                                            homePage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
+                                                                return function () {
+                                                                    // display the imports information here...
+                                                                    contentView.connectBtn.element.status = "disconnected"
+                                                                    contentView.connectBtn.element.click()
+                                                                }
+                                                            }(caller))
+                                                        },
+                                                        // error callback
+                                                        function (errObj, caller) { 
+                                                            caller.connectBtn.element.status = "error"
+                                                            caller.connectBtn.element.style.color = "#8B0000"
+                                                        }, caller)
+                                                },
+                                                // Error callback
+                                                function (errObj, caller) {
+                                                }, contentView)
+                                        }
+                                    }, { "connectBtn": this, "entity": entity, "contentView": contentView })
                             }
 
                         }
                     }(contentView)
 
-                    // The refresh action.
-                    contentView.refreshBtn.element.onclick = function (contentView) {
-                        return function () {
-                            var entity = entities[contentView.entity.UUID]
-                            this.style.color = "#428bca"
-                            server.dataManager.synchronize(entity.M_id,
+                    // The delete callback function.
+                    contentView.deleteCallback = function (entity) {
+                        // Here I will remove the folder if the entity is 
+                        // a database...
+                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            // also remove the data store.
+                            server.dataManager.deleteDataStore(entity.M_id,
                                 // success callback
-                                function (results, caller) {
-                                    console.log("synchronization success!")
-                                    caller.refreshBtn.element.style.color = "#4CAF50"
+                                function () {
+    
                                 },
-                                // error callback
-                                function (errObj, caller) {
-                                    console.log("synchronization fail!", error)
-                                    caller.refreshBtn.element.style.color = "#8B0000"
-                                }, { "refreshBtn": contentView.refreshBtn })
+                                // error callback.
+                                function () {
+    
+                                }, this)
+    
                         }
-                    }(contentView)
+                    }
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,
@@ -475,9 +472,9 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                     // The script button must be hidden...
                     content.getPanel().fields["M_script"].panel.element.style.display = "none"
-                             
-                    var editBtn = content.getPanel().header.panel.appendElement({"tag":"div", "class":"entity_panel_header_button"}).down()
-                    editBtn.appendElement({ "tag": "i", "title": "Edit task script.", "class": "fa fa-edit", "style":"padding-top: 2px;" })
+
+                    var editBtn = content.getPanel().header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
+                    editBtn.appendElement({ "tag": "i", "title": "Edit task script.", "class": "fa fa-edit", "style": "padding-top: 2px;" })
 
                     // The save bnt...
                     content.getPanel().saveCallback = function () {
@@ -525,13 +522,12 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                             function () {
 
                                             }, caller)
-                                    },  { "entity": entity })
+                                    }, { "entity": entity })
                             } else {
                                 // In that case the script must be save...
                                 server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.ParentLnk, entity,
                                     function (entity, caller) {
                                         // Set the entity.
-                                        console.log("Task entity:", entity)
                                         entityPanel.setEntity(entity)
                                         caller.editBtn.click()
                                     },
@@ -623,31 +619,43 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         var configurationContent = this.panel.appendElement({ "tag": "div", "id": "configurationContent" }).down()
         var content = configuration["M_" + this.propertyName]
         var prototype = configuration.getPrototype()
-        var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
+        var fieldName = "M_" + this.propertyName
+        var fieldType = prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 
-        var newConfiguration = function (configurationPanel, configurationContent, configuration) {
+        var newConfiguration = function (configurationPanel, configurationContent, configuration, fieldType, fieldName) {
             return function () {
                 // Here I will create a new entity...
                 var entity = eval("new " + configurationPanel.typeName + "()")
                 entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
+                entity.ParentUuid = configuration.UUID
+                entity.ParentLnk = fieldName
+
+                // Return the parent link...
+                entity.getParent = function (parent) {
+                    return function () {
+                        return parent
+                    }
+                }(configuration)
 
                 // Set the entity content.
                 var configurationContent = configurationPanel.panel.getChildById("configurationContent")
 
                 // Set the new configuration.
                 var contentView = configurationPanel.setConfiguration(configurationContent, entity)
+                contentView.header.expandBtn.element.click()
 
-                var idField = contentView.getFieldControl("M_id")
+                var idField = contentView.fields["M_id"]
 
                 // Hide the data explorer panel.
                 homePage.dataExplorer.hidePanels()
 
                 // Set focus to the id field.
-                idField.element.focus()
-                idField.element.setSelectionRange(0, idField.element.value.length)
+                idField.renderer.renderer.element.click()
+                idField.renderer.renderer.element.focus()
+                idField.editor.editor.element.setSelectionRange(0, idField.editor.editor.element.value.length)
 
             }
-        }(this, configurationContent, configuration)
+        }(this, configurationContent, configuration, fieldType, fieldName)
 
         // In case of multiple configurations element..
         if (fieldType.startsWith("[]")) {

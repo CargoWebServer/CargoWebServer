@@ -17,6 +17,7 @@
 .horizontal_menu{
     color: #657383;
     font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    z-index: 100;
 }
 
 /** The popup menu **/
@@ -25,7 +26,7 @@
     font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
     display: block; 
     position: relative;
-    z-index: 10;
+    z-index: 100;
 
     /** min-height: 150px; **/
     min-width: 150px;
@@ -42,7 +43,7 @@
     display: inline; 
     position: relative; 
     padding: 2px 4px 2px 4px;
-    z-index: 10;
+    z-index: 100;
     font-size: 11pt;
 }
 
@@ -54,6 +55,7 @@
 .vertical_submenu_items {
     display: none; 
     position: absolute;
+    z-index: 100;
     left: 0px;
     margin-left: 2px;
     margin-top: 2px;
@@ -65,6 +67,7 @@
 .vertical_submenu {
     display: block; 
     position: relative; 
+    z-index: 100;
     padding: 2px 4px 2px 4px;
     margin: 1px;
     min-width: 250px;

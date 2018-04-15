@@ -7,7 +7,7 @@ var DataExplorer = function (parent) {
     // Keep reference to the parent.
     this.parent = parent
     this.panel = parent.appendElement({ "tag": "div", "class": "data_explorer" }).down()
-    
+
     this.panel.element.onscroll = function (header) {
         return function () {
             if (this.scrollTop > 0) {
@@ -66,9 +66,9 @@ DataExplorer.prototype.resize = function () {
  */
 DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
     // init one time.
-    if (this.configs[storeConfig.M_id] != undefined) {
+    /*if (this.configs[storeConfig.M_id] != undefined) {
         return
-    }
+    }*/
 
     this.storeId = storeConfig.M_id
     this.configs[storeConfig.M_id] = storeConfig
@@ -84,7 +84,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
     if (storeConfig.M_dataStoreType == 1) {
         // Sql data store,
         // prototype for sql dataStore are in the
-        server.entityManager.getEntityPrototypes("sql_info." + storeConfig.M_id,
+        server.entityManager.getEntityPrototypes(storeConfig.M_id,
             // success callback.
             function (results, caller) {
                 for (var i = 0; i < results.length; i++) {
@@ -102,18 +102,17 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
 
     } else if (storeConfig.M_dataStoreType == 2) {
         // Entity data store.
-        if (storeConfig.M_id != "sql_info") {
-            server.entityManager.getEntityPrototypes(storeConfig.M_id,
-                // success callback.
-                function (results, caller) {
-                    caller.dataExplorer.generatePrototypesView(caller.storeId, results)
-                },
-                // error callback.
-                function (errMsg, caller) {
+        server.entityManager.getEntityPrototypes(storeConfig.M_id,
+            // success callback.
+            function (results, caller) {
+                caller.dataExplorer.generatePrototypesView(caller.storeId, results)
+            },
+            // error callback.
+            function (errMsg, caller) {
 
-                },
-                { "dataExplorer": this, "storeId": storeConfig.M_id })
-        }
+            },
+            { "dataExplorer": this, "storeId": storeConfig.M_id })
+
     }
 }
 
@@ -234,7 +233,9 @@ DataExplorer.prototype.hidePanels = function (storeId) {
  */
 DataExplorer.prototype.hidePanel = function (storeId) {
     // here I will calculate the height...
-    this.schemasView[storeId].element.style.display = "none"
+    if (this.schemasView[storeId] != undefined) {
+        this.schemasView[storeId].element.style.display = "none"
+    }
 }
 
 /**
@@ -429,7 +430,7 @@ var PrototypeTreeView = function (parent, prototype, storeType) {
             }(prototype, storeType), "fa fa-search")
 
             // The main menu will be display in the body element, so nothing will be over it.
-            if (storeType == 2 && !prototype.TypeName.startsWith("xs.") && !prototype.TypeName.startsWith("Config.") && !prototype.TypeName.startsWith("CargoEntities.") && !prototype.TypeName.startsWith("sqltypes.") && !prototype.TypeName.startsWith("XMI_types.") && !prototype.TypeName.startsWith("sql_info.")) {
+            if (storeType == 2 && !prototype.TypeName.startsWith("xs.") && !prototype.TypeName.startsWith("Config.") && !prototype.TypeName.startsWith("CargoEntities.") && !prototype.TypeName.startsWith("sqltypes.") && !prototype.TypeName.startsWith("XMI_types.")) {
                 var contextMenu = new PopUpMenu(editLnk, [dumpDataMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
             } else {
                 var contextMenu = new PopUpMenu(editLnk, [dumpDataMenuItem], evt)
@@ -457,7 +458,7 @@ var PrototypeTreeView = function (parent, prototype, storeType) {
     }(this)
 
     // Now the fields.
-    for (var i = 0; i < prototype.Fields.length ; i++) {
+    for (var i = 0; i < prototype.Fields.length; i++) {
         if (prototype.Fields[i].startsWith("M_")) {
             this.fieldsView[prototype.Fields[i]] = new PrototypeTreeViewField(this.fieldsPanel, prototype, prototype.Fields[i], prototype.FieldsType[i], prototype.FieldsVisibility[i], prototype.FieldsNillable[i])
         }
@@ -470,7 +471,7 @@ var PrototypeTreeView = function (parent, prototype, storeType) {
             prototypeTreeView.fieldsView = {}
             prototypeTreeView.fieldsPanel.removeAllChilds()
             prototypeTreeView.prototype = evt.dataMap.prototype // Set the updated prototype version.
-            for (var i = 0; i < prototypeTreeView.prototype.Fields.length ; i++) {
+            for (var i = 0; i < prototypeTreeView.prototype.Fields.length; i++) {
                 if (prototypeTreeView.prototype.Fields[i].startsWith("M_")) {
                     prototypeTreeView.fieldsView[prototypeTreeView.prototype.Fields[i]] = new PrototypeTreeViewField(prototypeTreeView.fieldsPanel, prototypeTreeView.prototype, prototypeTreeView.prototype.Fields[i], prototypeTreeView.prototype.FieldsType[i], prototypeTreeView.prototype.FieldsVisibility[i], prototypeTreeView.prototype.FieldsNillable[i])
                 }

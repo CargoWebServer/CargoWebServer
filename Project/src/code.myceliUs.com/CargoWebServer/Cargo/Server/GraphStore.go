@@ -1295,6 +1295,7 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 
 		return nil, results.(error) // return an error message instead.
 	}
+
 	if this.m_prototypes[typeName] != nil {
 		return this.m_prototypes[typeName], nil
 	} else {

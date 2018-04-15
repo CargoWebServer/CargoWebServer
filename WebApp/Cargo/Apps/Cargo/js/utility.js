@@ -221,7 +221,7 @@ function isXsString(fieldType) {
         || fieldType.endsWith("Name") || fieldType.endsWith("QName") || fieldType.endsWith("NMTOKEN")  // XML
         || fieldType.endsWith("gDay") || fieldType.endsWith("gMonth") || fieldType.endsWith("gMonthDay") || fieldType.endsWith("gYear") // XML
         || fieldType.endsWith("gYearMonth") || fieldType.endsWith("token") || fieldType.endsWith("normalizedString") || fieldType.endsWith("hexBinary") // XML
-        || fieldType.endsWith("language") || fieldType.endsWith("NMTOKENS") || fieldType.endsWith("NOTATION")  // XML
+        || fieldType.endsWith("language") || fieldType.endsWith("NMTOKENS") || fieldType.endsWith("NOTATION")|| fieldType.endsWith("token")  // XML
         || fieldType.endsWith("char") || fieldType.endsWith("nchar") || fieldType.endsWith("varchar") // SQL
         || fieldType.endsWith("nvarchar") || fieldType.endsWith("text") || fieldType.endsWith("ntext") // SQL
     ) {
@@ -298,7 +298,7 @@ function isXsTime(fieldType) {
     if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
         return false
     }
-    if (fieldType.endsWith("time") // XML
+    if (fieldType.endsWith("time") || fieldType.endsWith("Time")  // XML
         || fieldType.endsWith("timestampNumeric") || fieldType.endsWith("timestamp") // SQL
     ) {
         return true
@@ -1716,29 +1716,27 @@ function formatValue(value, typeName) {
     }
     
     // Here I will display basic types.
-    if (isXsString(typeName)) {
+    if (isXsString(typeName) || isXsId(typeName)) {
         formatedValue = formatString(value);
-    }else if (isBoolean(value)) {
+    }else if (isXsBoolean(typeName)) {
         formatedValue = formatBoolean(value);
     } else if (isXsDate(typeName) || isXsTime(typeName)) {
         formatedValue = formatDate(value);
-    } else if (isNumeric(value)) {
-        if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
-            formatedValue = formatReal(value, 2)
-        } else if (isXsInt(typeName)) {
-            // In case of a date.
-                if (typeName.startsWith("enum:")) {
-                    // In that case I will create a select box.
-                    // enum:FileType_DbFile:FileType_DiskFile
-                    formatedValue = typeName.split(":")[value].split("_")[1]
-                } else {
-                    // Int are numeric value with 0 digit.
-                    formatedValue = formatReal(value, 0);
-                }
-        } else {
-            formatedValue = formatReal(value, 3)
-        }
-    } else if (isObject(value)) {
+    } else if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
+        formatedValue = formatReal(value, 2)
+    } else if (isXsInt(typeName)) {
+        // In case of a date.
+            if (typeName.startsWith("enum:")) {
+                // In that case I will create a select box.
+                // enum:FileType_DbFile:FileType_DiskFile
+                formatedValue = typeName.split(":")[value].split("_")[1]
+            } else {
+                // Int are numeric value with 0 digit.
+                formatedValue = formatReal(value, 0);
+            }
+    }else if (isXsNumeric(typeName)) {
+        formatedValue = formatReal(value, 3)
+    }else if (isObject(value)) {
         if (value.M_valueOf != null) {
             formatedValue = value.M_valueOf
         }
@@ -1749,9 +1747,11 @@ function formatValue(value, typeName) {
             var img = new Element(null, { "tag": "img", "src": value })
             return img;
         }
-        formatedValue = formatString(value);
+
+        formatedValue = null;
 
     }
+
 
     return formatedValue
 }

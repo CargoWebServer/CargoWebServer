@@ -92,27 +92,19 @@ function load() {
                             // The session listener.
                             server.entityManager.getEntityPrototypes("Config", function (result, caller) {
                                 server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
-                                    server.entityManager.getEntityPrototypes("sql_info",
-                                        // success callback.
-                                        function (results, caller) {
-                                            /** Here I will set the list of available data source... */
-                                            server.configurationManager.getActiveConfigurations(
-                                                function (activeConfigurations) {
-                                                    // Get the active configuration.
-                                                    server.activeConfigurations = activeConfigurations
-                                                    if (main != null) {
-                                                        // Here I will connect a listener to keep entities up to date.
-                                                        main()
-                                                    }
-                                                },
-                                                function () {
+                                    /** Here I will set the list of available data source... */
+                                    server.configurationManager.getActiveConfigurations(
+                                        function (activeConfigurations) {
+                                            // Get the active configuration.
+                                            server.activeConfigurations = activeConfigurations
+                                            if (main != null) {
+                                                // Here I will connect a listener to keep entities up to date.
+                                                main()
+                                            }
+                                        },
+                                        function () {
 
-                                                }, {})
-                                        },
-                                        // error callback.
-                                        function (errMsg, caller) {
-                                        },
-                                        {})
+                                        }, {})
 
                                 }, function () {/* Error callback */ }, null)
                             }, function () {/* Error callback */ }, {})

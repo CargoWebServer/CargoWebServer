@@ -377,8 +377,8 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 	parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 	fieldIndex := parentPrototype.getFieldIndex(entity.GetParentLnk())
 	if fieldIndex == -1 {
-		log.Println(entity)
-		log.Panicln("---> dont panic!", parent.GetTypeName(), entity.GetUuid(), entity.GetParentLnk())
+		// It happen when the parent is reattributed...
+		return nil // Nothing todo here
 	}
 	fieldType := parentPrototype.FieldsType[fieldIndex]
 	if cargoError != nil {
@@ -664,9 +664,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	uuid := entity.GetUuid()
 	typeName := entity.GetTypeName()
 
-	// remove it from the cache.
-	this.removeEntity(entity)
-
 	// First i will remove the entity childs...
 	childs := entity.GetChilds()
 	for i := 0; i < len(childs); i++ {
@@ -676,13 +673,12 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		}
 	}
 
+	// remove the actual parent information from the cache.
 	if len(entity.GetParentUuid()) > 0 {
-		// I will get the parent uuid link.
-		parent := this.getEntity(entity.GetParentUuid())
-		if parent != nil {
-			// clear it form the cache...
-			this.removeEntity(parent)
-		}
+		infos := make(map[string]interface{})
+		infos["name"] = "remove"
+		infos["uuid"] = entity.GetParentUuid()
+		this.m_cache.m_operations <- infos
 	}
 
 	var values map[string]interface{}
@@ -755,6 +751,13 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
 	}
+
+	// Delete the entity from the cache.
+	infos := make(map[string]interface{})
+	infos["name"] = "remove"
+	infos["uuid"] = uuid
+	// set the entity
+	this.m_cache.m_operations <- infos
 
 	// Send event message...
 	var eventDatas []*MessageData
@@ -1050,7 +1053,7 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 
 	oldName := prototype.(*EntityPrototype).TypeName
 	// Those types can not be rename.
-	if strings.HasPrefix(oldName, "xs.") || strings.HasPrefix(oldName, "sqltypes.") || strings.HasPrefix(oldName, "XMI_types.") || strings.HasPrefix(oldName, "Config.") || strings.HasPrefix(oldName, "CargoEntities.") || strings.HasPrefix(oldName, "sql_infos.") {
+	if strings.HasPrefix(oldName, "xs.") || strings.HasPrefix(oldName, "sqltypes.") || strings.HasPrefix(oldName, "XMI_types.") || strings.HasPrefix(oldName, "Config.") || strings.HasPrefix(oldName, "CargoEntities.") || strings.HasPrefix(oldName, this.m_id) {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_UPDATE_ERROR, SERVER_ERROR_CODE, errors.New("Prototype "+oldName+" cannot be rename!"))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
@@ -1194,11 +1197,6 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 //    )
 //}
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
-	var sqlStoreId string
-	if strings.Index(storeId, ".") > 0 {
-		sqlStoreId = storeId[strings.Index(storeId, ".")+1:]
-		storeId = storeId[0:strings.Index(storeId, ".")]
-	}
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	if store == nil {
@@ -1208,16 +1206,6 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 	}
 
 	protos, err := store.GetEntityPrototypes()
-	if len(sqlStoreId) > 0 {
-		for i := 0; i < len(protos); {
-			proto := protos[i]
-			if !strings.HasPrefix(proto.TypeName, sqlStoreId) {
-				protos = append(protos[0:i], protos[i+1:]...)
-			} else {
-				i++
-			}
-		}
-	}
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("There is no prototypes in store '"+storeId+"'."))
@@ -1515,7 +1503,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //    // server is the client side singleton.
 //    var params = []
 //    params.push(createRpcData(entity, "JSON_STR", "entity"))
-//    params.push(createRpcData(entity.TYPENAME, "STRING", "typeName"))
 //    // Call it on the server.
 //    server.executeJsFunction(
 //        "EntityManagerSaveEntity", // The function to execute remotely on server
@@ -1547,7 +1534,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
 //    )
 //}
-func (this *EntityManager) SaveEntity(values interface{}, typeName string, messageId string, sessionId string) interface{} {
+func (this *EntityManager) SaveEntity(values interface{}, messageId string, sessionId string) interface{} {
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

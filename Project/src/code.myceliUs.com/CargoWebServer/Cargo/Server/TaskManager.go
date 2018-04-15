@@ -264,8 +264,7 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 	}
 
 	log.Println("--> task ", task.GetId(), "run successfully!")
-	// Remove the session...
-	JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
+
 	return nil
 }
 

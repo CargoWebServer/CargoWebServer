@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
-	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
 
 	_ "github.com/alexbrainman/odbc"
@@ -251,14 +250,6 @@ func (this *SqlDataStore) Connect() error {
 		return err
 	}
 
-	// Generate js class definitions.
-	prototypes, err := this.GetEntityPrototypes()
-
-	if err == nil {
-		for i := 0; i < len(prototypes); i++ {
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), true)
-		}
-	}
 	return err
 }
 
@@ -775,16 +766,16 @@ func (this *SqlDataStore) Close() error {
  * Create a new entity prototype.
  */
 func (this *SqlDataStore) CreateEntityPrototype(prototype *EntityPrototype) error {
-	store_ := GetServer().GetDataManager().getDataStore("sql_info")
-	return store_.CreateEntityPrototype(prototype)
+	/** Nothing to do here prototype are generated each time **/
+	return nil
 }
 
 /**
  * Save entity prototype.
  */
 func (this *SqlDataStore) SaveEntityPrototype(prototype *EntityPrototype) error {
-	store_ := GetServer().GetDataManager().getDataStore("sql_info")
-	return store_.SaveEntityPrototype(prototype)
+	/** Nothing to do here, prototype are generated each time **/
+	return nil
 }
 
 /**
@@ -850,22 +841,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	schemaId, err = this.getSchemaId(id)
 	if err != nil {
 		return nil, err
-	}
-
-	// If the data store is not found.
-	store := GetServer().GetDataManager().getDataStore("sql_info")
-	if store == nil {
-
-		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurations().GetServerConfig()
-		hostName := serverConfig.GetHostName()
-		ipv4 := serverConfig.GetIpv4()
-		port := serverConfig.GetServerPort()
-		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CARGO)
-	} else {
-		prototype, err = store.GetEntityPrototype(schemaId + "." + id)
-		if err == nil {
-			return prototype, nil
-		}
 	}
 
 	// Here remove space and dash symbol...
@@ -952,11 +927,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 			}
 		}
 	}
-
-	// Create the new prototype in sql_info store.
-	store_ := GetServer().GetDataManager().getDataStore("sql_info")
-	store_.CreateEntityPrototype(prototype)
-
 	return prototype, err
 }
 
@@ -1037,9 +1007,6 @@ func appendField(prototype *EntityPrototype, fieldName string, fieldType string)
 
 		// Now default value.
 		setDefaultFieldValue(prototype, fieldName)
-
-		// Save it back.
-		GetServer().GetDataManager().getDataStore("sql_info").(*GraphStore).SaveEntityPrototype(prototype)
 	}
 }
 
@@ -1240,13 +1207,13 @@ func (this *SqlDataStore) setRefs() error {
 			// Target.
 			targetTableName := values[i][4].(string)
 
-			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_name+"."+schemasName+sourceTableName, "sql_info")
+			src, err := GetServer().GetEntityManager().getEntityPrototype(sourceTableName, this.m_name)
 			if err != nil {
 				log.Println("----------------> src not found: ", err)
 				return err
 			}
 
-			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_name+"."+schemasName+targetTableName, "sql_info")
+			trg, err := GetServer().GetEntityManager().getEntityPrototype(targetTableName, this.m_name)
 			if err != nil {
 				log.Println("----------------> trg not found: ", err)
 				return err
@@ -1306,7 +1273,7 @@ func (this *SqlDataStore) setRefs() error {
 		associations_ := associations[associativeTable.TypeName]
 		for i := 0; i < len(associations_); i++ {
 			refName := associations_[i][0].(string)
-			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, "sql_info")
+			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, this.m_id)
 			log.Println("---> ", trg)
 			if !Utility.Contains(associativeTable.Fields, "M_"+refName) {
 				fieldType := trg.TypeName
@@ -1319,7 +1286,7 @@ func (this *SqlDataStore) setRefs() error {
 			// Associative table must contain tow value.
 			for j := 0; j < len(associations_); j++ {
 				if j != i {
-					trg1, err := GetServer().GetEntityManager().getEntityPrototype(associations_[j][1].(*EntityPrototype).TypeName, "sql_info")
+					trg1, err := GetServer().GetEntityManager().getEntityPrototype(associations_[j][1].(*EntityPrototype).TypeName, this.m_id)
 					if err != nil {
 						return err
 					}
@@ -1354,11 +1321,7 @@ func (this *SqlDataStore) getSqlTypePrototype(typeName string) (*EntityPrototype
  */
 func (this *SqlDataStore) DeleteEntityPrototype(id string) error {
 
-	store := GetServer().GetDataManager().getDataStore("sql_info")
-	if store != nil {
-		return store.DeleteEntityPrototype(id)
-	}
-	return errors.New("Store with id sql_info dosen't exist!")
+	return nil /** prototype are generated object not saved **/
 }
 
 /**
@@ -1420,7 +1383,7 @@ func createEntityFromInfo(key string, info map[string]interface{}, infos map[str
 }
 
 /**
- * synchronize the content of database with sql_info content. Only key's will be
+ * synchronize the content of database content. Only key's will be
  * save, the other field will be retreive as needed via sql querie's.
  */
 func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
@@ -1429,7 +1392,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	entityInfos := make(map[string]map[string]map[string]interface{}, 0)
 	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
-		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, this.m_id)
 		// Associative table object are not needed...
 		if len(prototype.Ids) > 1 {
 			query := "SELECT "
@@ -1529,7 +1492,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	// Set the parent realationship here.
 	for i := 0; i < len(prototypes); i++ {
 		if !this.isAssociative(prototypes[i]) { // Associative table have no parent...
-			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, this.m_id)
 			for _, info := range entityInfos[prototypes[i].TypeName] {
 				for j := 0; j < len(prototype.FieldsType); j++ {
 					if !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && strings.HasSuffix(prototype.FieldsType[j], ":Ref") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
@@ -1538,7 +1501,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 							ids := make([]string, 0)
 							// Here If the other side or the relation is not a reference that's mean
 							// it is he's parent.
-							prototype_, _ := GetServer().GetEntityManager().getEntityPrototype(strings.Replace(strings.Replace(prototype.FieldsType[j], "[]", "", -1), ":Ref", "", -1), "sql_info")
+							prototype_, _ := GetServer().GetEntityManager().getEntityPrototype(strings.Replace(strings.Replace(prototype.FieldsType[j], "[]", "", -1), ":Ref", "", -1), this.m_id)
 							index := prototype_.getFieldIndex(prototype.Fields[j])
 							for k := 0; k < len(refInfos); k++ {
 								if info["M_"+refInfos[k][1]] != nil {
@@ -1568,39 +1531,12 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 		}
 	}
 
-	// Now I will create the entity to save.
-	toSave := make(map[string]Entity, 0)
-
-	// I will generate ParentUuid and UUID for the infos.
-	for i := 0; i < len(prototypes); i++ {
-		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-		for key, info := range entityInfos[prototype.TypeName] {
-			uuid := generateUuid(key, info, entityInfos)
-			// Generate the uuid and the parentUuid for a given entity.
-			if toSave[uuid] == nil {
-				if !GetServer().GetEntityManager().isEntityExist(uuid) {
-					entity := createEntityFromInfo(key, info, entityInfos)
-					toSave[uuid] = entity
-				} else {
-					entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
-					toSave[uuid] = entity
-				}
-			}
-		}
-	}
-
 	// Release memory.
 	entityInfos = make(map[string]map[string]map[string]interface{}, 0)
 
 	// Note that relationship are not part of the object data itself but
 	// are initialysed at runtime by the enity manager each time an entity
 	// backed by sql is use.
-
-	// Save changed entity.
-	for id, entity := range toSave {
-		GetServer().GetEntityManager().saveEntity(entity)
-		delete(toSave, id)
-	}
 
 	return nil
 }

@@ -67,12 +67,43 @@ TableModel.prototype.init = function (successCallback, progressCallback, errorCa
     // TODO the table is one dimension, make it n dimensions...
     this.table.appendRowBtn.element.onclick = function (table, model) {
         return function () {
+            // The value to append.
+            var values = []
             var index = model.values.length
-            model.appendRow([index+1, ""],index )
-            var row = new TableRow(table, index, [index + 1, ""], undefined)
+
+            for (var i = 0; i < model.fields.length; i++) {
+                var fieldType = model.fields[i]
+                if (model.ParentLnk == "M_listOf") {
+                    var baseType = getBaseTypeExtension(fieldType)
+                    if (baseType.startsWith("xs.")) {
+                        fieldType = baseType
+                    }
+                }
+
+                // Now the value to append.
+                if (isXsString(fieldType)) {
+                    values.push("")
+                } else if (isXsInt(fieldType)) {
+                    values.push(0)
+                } else if (isXsNumeric(fieldType)) {
+                    values.push(0.0)
+                }
+            }
+
+
+            model.appendRow(values, index)
+
+            var row = new TableRow(table, index, values, index)
             row.table = table
             table.rows.push(row)
-            simulate(row.cells[index, 1].div.element, "dblclick");
+            if (table.rows.length == 1) {
+                table.setHeader()
+            }
+            
+            // So here I will append the new value in the table. Values are created in 
+            // respect of the predefined types.
+
+            simulate(row.cells[index, 0].div.element, "dblclick");
         }
     }(this.table, this)
 }
@@ -145,10 +176,11 @@ TableModel.prototype.setIsCellEditable = function (column, val) {
  */
 TableModel.prototype.setValueAt = function (value, row, column) {
     // Must be implemented in the derived class.
-    this.values[row][column] = value
-
-    // save the value.
-    this.saveValue(this.table.rows[row])
+    if (this.values[row][column] != value) {
+        this.values[row][column] = value
+        // save the value.
+        this.saveValue(row)
+    }
 }
 
 TableModel.prototype.appendRow = function (values) {
@@ -158,17 +190,40 @@ TableModel.prototype.appendRow = function (values) {
 
 TableModel.prototype.removeRow = function (rowIndex) {
     this.values.splice(rowIndex, 1)
-    
+
     // save the value.
-    this.saveValue(this.table.rows[rowIndex])
+    this.saveValue(rowIndex)
 }
 
 TableModel.prototype.removeAllValues = function (rowIndex) {
     this.values = []
 }
 
-TableModel.prototype.saveValue = function (row) {
+TableModel.prototype.saveValue = function (rowIndex) {
 
+    // Set the save value function.
+    var fieldName = this.ParentLnk
+    var entity = entities[this.ParentUuid]
+    if (entity != undefined) {
+        var values = []
+        // In case of M_listOf the values will be one dimensional array
+        if(fieldName=="M_listOf"){
+            for(var i=0; i < this.values.length; i++){
+                values.push(this.values[i][0])
+            }
+        }else{
+            // Tow dimensional array here.
+            values = this.values
+        }
+        entity[fieldName] = values
+        server.entityManager.saveEntity(entity,
+            // success callback
+            function () { },
+            // error callback
+            function () { },
+            // caller
+            {})
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -298,8 +353,16 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             // The row is not append in the table rows collection, but display.
             var lastRowIndex = table.rows.length
             var row = new TableRow(table, lastRowIndex, data, undefined)
-
             table.rows.push(row)
+
+            // In that case the interface use to edit entity properties is the 
+            // row.
+            entity.getPanel = function (row) {
+                return function () {
+                    return row
+                }
+            }(row)
+
             simulate(row.cells[lastRowIndex, 0].div.element, "dblclick");
         }
     }(this.table, this)
@@ -386,12 +449,11 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                         for (var i = 0; i < model.entities.length; i++) {
                             if (model.entities[i].UUID == undefined) {
                                 model.entities.splice(i, 1)
-                            }else if(model.entities[i].UUID == entity.UUID){
+                            } else if (model.entities[i].UUID == entity.UUID) {
                                 exist = true
                             }
                         }
-                        if(!exist){
-                            // model.entities.push(entity)
+                        if (!exist && model.ParentUuid == entity.ParentUuid) {
                             var row = model.table.appendRow(entity, entity.UUID)
                             model.table.refresh()
                         }
@@ -603,32 +665,32 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
     }
 
     // save the value.
-    this.saveValue(this.table.rows[row])
+    this.saveValue(row)
 }
 
 /**
  * Save the value contain at a given row.
  */
-EntityTableModel.prototype.saveValue = function (row) {
-    var entity = row.table.getModel().entities[row.index]
+EntityTableModel.prototype.saveValue = function (rowIndex) {
+    var entity = this.entities[rowIndex]
     // Here I will save the entity...
     if (entity != null) {
         // Always use the entity from the enities map it contain
         // the valid data of the entity.
         if (entities[entity.UUID] != null) {
-            entity = row.table.getModel().entities[row.index] = entities[entity.UUID]
+            entity = this.entities[rowIndex] = entities[entity.UUID]
         }
 
-        entity.NeedSave = true
         if (entity.exist == false) {
             // I must remove the temporary object it will be recreated when the NewEntity event will be received.
-            this.entities.pop(row.index)
-            row.table.rows.pop(row.index)
+            this.entities.pop(rowIndex)
+            var row = this.table.rows.pop(rowIndex)
             row.div.element.parentNode.removeChild(row.div.element)
+
             server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
                 // Success callback
                 function (entity, row) {
-                    
+
                 },
                 // Error callback.
                 function (result, caller) {
