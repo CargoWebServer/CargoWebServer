@@ -76,7 +76,7 @@ var Table = function (id, parent) {
 	// The div...
 	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id: id }).down()
 
-	this.appendRowBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "position: absolute; top: 2px; left: -12px; font-size: 10pt;" }).down()
+	this.appendRowBtn = parent.prependElement({ "tag": "div", "class": "row_button", "style": "/*position: absolute; top: 2px; left: -12px;*/ font-size: 10pt;" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-plus" });
 
 	// The header...
@@ -187,13 +187,10 @@ Table.prototype.getModel = function () {
 Table.prototype.init = function () {
 	this.clear()
 
-	if (this.rowGroup == null) {
-		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
-	}
-
 	for (var i = 0; i < this.getModel().getRowCount(); i++) {
 		var data = []
 		for (var j = 0; j < this.getModel().getColumnCount(); j++) {
+
 			if (i == 0 && j == 0) {
 				this.setHeader()
 				this.header.numberOfRowLabel.element.innerHTML = this.getModel().getRowCount();
@@ -405,6 +402,10 @@ var TableHeader = function (table) {
 	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
 
 	this.numberOfRowLabel = this.buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label" }).down()
+
+	if (this.table.rowGroup == null) {
+		this.table.rowGroup = this.table.div.appendElement({ "tag": "div", "class": "table_body" }).down()
+	}
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
 		return function (evt) {

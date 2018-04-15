@@ -2,6 +2,9 @@
 var EntityPanel = function (parent, typeName, callback) {
 	this.typeName = typeName
 
+	// The parent div.
+	this.parent = parent
+
 	// The main entity panel.
 	this.panel = new Element(parent, { "tag": "div", "class": "entity entity_panel" })
 
@@ -78,6 +81,8 @@ EntityPanel.prototype.init = function (prototype, callback) {
  * @param {*} entity 
  */
 EntityPanel.prototype.setEntity = function (entity) {
+	// In that case I will set the value of the field renderer.
+	var prototype = getEntityPrototype(entity.TYPENAME)
 
 	// Here I will associate the panel and the entity.
 	var displayHeader = this.header.panel.element.style.display == ""
@@ -86,21 +91,8 @@ EntityPanel.prototype.setEntity = function (entity) {
 		server.entityManager.detach(this, UpdateEntityEvent)
 		server.entityManager.detach(this, DeleteEntityEvent)
 		this.getEntity().getPanel = null
-		this.clear()
-
-		// If the entity is a new one I will remove all it nodes except the header.
-		if (this.getEntity().UUID == undefined) {
-			for (var childId in this.panel.childs) {
-				var child = this.panel.childs[childId]
-				if (child.element.className != "entity_panel_header") {
-					this.panel.removeElement(child)
-				}
-			}
-		}
 	}
 
-	// In that case I will set the value of the field renderer.
-	var prototype = getEntityPrototype(entity.TYPENAME)
 	this.entityUuid = entity.UUID
 	this.entity = entity // use it as read only...
 
@@ -164,15 +156,15 @@ EntityPanel.prototype.setEntity = function (entity) {
 			if (evt.dataMap["entity"] != undefined && entityPanel.getEntity() != null) {
 				if (evt.dataMap["entity"].UUID == entityPanel.getEntity().UUID) {
 					// so here i will remove the panel from it parent.
-					if (entityPanel.removeOnDelete) {
-						try {
-							entityPanel.panel.element.parentNode.removeChild(entityPanel.panel.element)
-						} catch (err) {
-							// Nothing to do here.
-						}
-					} else {
-						// Clear the entity value
-						entityPanel.clear()
+					try {
+						var panel = document.getElementById(entityPanel.getEntity().UUID + "_panel")
+						panel.parentNode.removeChild(panel)
+						var deleteBtn = document.getElementById(entityPanel.getEntity().UUID + "_delete_btn")
+						var createBtn = document.getElementById(entityPanel.getEntity().UUID + "_create_btn")
+						deleteBtn.style.display = "none"
+						createBtn.style.display = "inline"
+					} catch (err) {
+						// Nothing to do here.
 					}
 				}
 			}
@@ -182,12 +174,12 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// The new entity event.
 	server.entityManager.attach(this, NewEntityEvent, function (evt, entityPanel) {
 		// I will reinit the panel here...
-		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
-				if (entityPanel.getEntity().UUID == evt.dataMap["entity"].UUID) {
-					entityPanel.init(entityPanel.proto)
-					entityPanel.setEntity(evt.dataMap["entity"])
-				}
+		if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
+			if (entityPanel.getEntity().UUID == evt.dataMap["entity"].ParentUuid) {
+				var parent = entities[entityPanel.getEntity().UUID]
+				parent[evt.dataMap["entity"].ParentLnk] = entities[evt.dataMap["entity"].UUID]
+				entityPanel.fields[evt.dataMap["entity"].ParentLnk].value.element.appendChild(entityPanel.fields[evt.dataMap["entity"].ParentLnk].renderer.renderer.panel.element)
+				entityPanel.setEntity(parent)
 			}
 		}
 	})
@@ -203,35 +195,6 @@ EntityPanel.prototype.setEntity = function (entity) {
 			}
 		}
 	})
-}
-
-/**
- * Remove the entity entity from the panel.
- * @param {*} entity 
- */
-EntityPanel.prototype.clear = function () {
-	this.entityUuid = ""
-	for (var id in this.fields) {
-		this.fields[id].clear()
-	}
-
-	if (this.getEntity() == null) {
-		return
-	}
-
-	// remove the function.
-	this.entity.getPanel = undefined
-
-	// set the entity to nill
-	this.entity = null
-
-	this.init(getEntityPrototype(this.typeName),
-		// init callback.
-		function () {
-		})
-	if (this.initCallback != undefined) {
-		this.initCallback(this)
-	}
 }
 
 var EntityPanelHeader = function (parent) {
@@ -325,42 +288,112 @@ var FieldPanel = function (entityPanel, index, callback) {
 	this.storeId = getEntityPrototype(entityPanel.typeName).PackageName
 	this.fieldName = getEntityPrototype(entityPanel.typeName).Fields[index]
 	this.fieldType = getEntityPrototype(entityPanel.typeName).FieldsType[index]
-
+	this.isNillable = getEntityPrototype(entityPanel.typeName).FieldsNillable[index]
 	var title = this.fieldName.replace("M_", "").replaceAll("_", " ")
+
+	// The create entity button in case of entity can be null
+	this.createBtn = null;
+	this.deleteBtn = null;
 
 	// Display label if is not valueOf or listOf...
 	if (this.fieldName != "M_valueOf" && this.fieldName != "M_listOf") {
+		//this.isNillable = false
 		this.label = this.panel.appendElement({ "tag": "div", "innerHtml": title, "style": "min-width: 100px;" }).down();
+		if (!this.fieldType.startsWith("xs.")) {
+			if (!this.fieldType.startsWith("[]") && this.isNillable && getBaseTypeExtension(this.fieldType).length == 0) {
+
+				this.createBtn = this.label.appendElement({ "tag": "div", "class": "row_button", "style": "font-size: 10pt; padding-left: 5px; display: inline;" }).down()
+					.appendElement({ "tag": "i", "class": "fa fa-plus" });
+
+				this.deleteBtn = this.label.appendElement({ "tag": "div", "class": "row_button", "style": "font-size: 10pt; padding-left: 5px; display: none;" }).down()
+					.appendElement({ "tag": "i", "class": "fa fa-trash" });
+
+				// The button to append a new entity inside a cell.
+				this.createBtn.element.onclick = function (fieldName, fieldType, entityPanel) {
+					return function () {
+						var parent = entityPanel.getEntity()
+						// Here I will create a new entity
+						var entity = eval("new " + fieldType + "()")
+						entity.ParentUuid = parent.UUID
+						entity.ParentLnk = fieldName
+						server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
+							function (results, caller) {
+
+							},
+							function (errObj, caller) {
+
+							}, {})
+					}
+				}(this.fieldName, this.fieldType, entityPanel)
+
+				// Now the create and delete action...
+				this.deleteBtn.element.onclick = function (entityPanel, fieldName) {
+					return function () {
+						// Here I will save the entity...
+						if (entityPanel.getEntity() != null) {
+							var entity = entityPanel.getEntity()[fieldName]
+							// Here I will ask the user if here realy want to remove the entity...
+							var confirmDialog = new Dialog(randomUUID(), undefined, true)
+							confirmDialog.div.element.style.maxWidth = "450px"
+							confirmDialog.setCentered()
+							server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
+							confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entity.getTitles() + "?" })
+							confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
+								return function () {
+									// I will call delete file
+									server.entityManager.removeEntity(entity.UUID,
+										// Success callback 
+										function (result, caller) {
+										},
+										// Error callback
+										function (errMsg, caller) {
+
+										}, entity)
+									dialog.close()
+								}
+							}(confirmDialog, entity)
+						}
+					}
+				}(entityPanel, this.fieldName)
+			}
+		}
 	}
+
+	// The value div contain the renderer and the editor.
 	this.value = this.panel.appendElement({ "tag": "div", "class": "field_panel_value" }).down();
 
 	// Here I will create the field renderer.
 	this.renderer = null;
-
-	// init the renderer
-	this.init(callback)
-
+	// The editor is always null at start.
 	this.editor = null
 
-	this.value.element.onclick = function (fieldPanel) {
-		return function (evt) {
-			evt.stopPropagation(true)
-			if (fieldPanel.editor != null || fieldPanel.fieldType.startsWith("[]")) {
-				return // editor already exist
-			}
-			var entity = fieldPanel.parent.getEntity()
-			new FieldEditor(fieldPanel, function (value) {
-				return function (fieldPanel, editor) {
-					if (editor.editor != null) {
-						// clear the content.
-						fieldPanel.value.element.style.display = "none"
-						fieldPanel.editor = editor
-						fieldPanel.editor.setValue(value)
-					}
+	// init the renderer
+	if (this.createElement == undefined) {
+		this.init(callback)
+		this.value.element.onclick = function (fieldPanel) {
+			return function (evt) {
+				evt.stopPropagation(true)
+				if (fieldPanel.editor != null || fieldPanel.fieldType.startsWith("[]")) {
+					return // editor already exist
 				}
-			}(entity[fieldPanel.fieldName]))
-		}
-	}(this)
+				var entity = fieldPanel.parent.getEntity()
+				new FieldEditor(fieldPanel, function (value) {
+					return function (fieldPanel, editor) {
+						if (editor.editor != null) {
+							// clear the content.
+							fieldPanel.value.element.style.display = "none"
+							fieldPanel.editor = editor
+							fieldPanel.editor.setValue(value)
+						}
+					}
+				}(entity[fieldPanel.fieldName]))
+			}
+		}(this)
+	} else {
+		// here the value is null at start.
+		callback(this)
+	}
+
 
 	return this
 }
@@ -375,6 +408,7 @@ FieldPanel.prototype.init = function (callback) {
 }
 
 FieldPanel.prototype.setValue = function (value) {
+
 	// If the value is an entity reference... or an array of entity
 	// and the type is not a reference I will try to get it value 
 	// from the entitie map.
@@ -393,28 +427,21 @@ FieldPanel.prototype.setValue = function (value) {
 			if (isObjectReference(value)) {
 				value = entities[value]
 			}
+			if(value.UUID != undefined){
+				this.value.element.id = value.UUID + "_panel"
+			}
 		}
 	}
 
 	this.value.element.style.display = ""
-	this.renderer.setValue(value)
+	if (this.renderer != null) {
+		this.renderer.setValue(value)
+	}
+
 	// clear the editor
 	if (this.editor != null) {
 		this.editor.setValue(value)
 	}
-}
-
-FieldPanel.prototype.clear = function () {
-	// clear the editor
-	if (this.editor != null) {
-		this.editor.clear()
-	}
-
-	// clear the renderer
-	this.renderer.clear()
-
-	// Remove the panel.
-	this.value.removeAllChilds()
 }
 
 // The field renderer.
@@ -525,6 +552,7 @@ FieldRenderer.prototype.setValue = function (value) {
 					fieldRenderer.renderer.header.maximizeBtn.element.click();
 				}
 				if (isArray(value)) {
+					//this.renderer.clear() // remove all the values...
 					for (var i = 0; i < value.length; i++) {
 						setValue(value[i], this)
 					}
@@ -539,6 +567,7 @@ FieldRenderer.prototype.setValue = function (value) {
 				}
 				// Here we got an array of basic types.
 				if (isArray(value)) {
+					this.renderer.clear() // remove all the values...
 					for (var i = 0; i < value.length; i++) {
 						setValue(value[i], i, this)
 					}
@@ -565,7 +594,7 @@ FieldRenderer.prototype.setValue = function (value) {
 			if (fieldType.startsWith("enum:") || enumarations.length > 0) {
 				if (enumarations.length > 0) {
 					this.parent.value.element.value = value
-					this.parent.value.element.innerText = enumarations[value - 1]
+					this.parent.value.element.innerText = value
 				} else {
 					var values = fieldType.replace("enum:", "").split(":")
 					if (value - 1 >= 0) {
@@ -595,6 +624,13 @@ FieldRenderer.prototype.setValue = function (value) {
 			} else if (value.TYPENAME != undefined) {
 				// In that case I got a subpanel....
 				this.renderer.setEntity(value)
+				// Now I can hide the createEntity button
+				if (this.parent.createBtn != undefined) {
+					this.parent.createBtn.element.id = value.UUID + "_create_btn"
+					this.parent.createBtn.element.style.display = "none"
+					this.parent.deleteBtn.element.style.display = "inline"
+					this.parent.deleteBtn.element.id = value.UUID + "_delete_btn"
+				}
 			} else {
 				this.parent.value.element.innerText = value
 			}
@@ -608,16 +644,6 @@ FieldRenderer.prototype.setValue = function (value) {
 					fieldRenderer.setValue(value)
 				}
 			}(value, this))
-	}
-}
-
-FieldRenderer.prototype.clear = function () {
-	if (this.renderer != null) {
-		if (this.renderer.removeAllChilds != undefined) {
-			this.renderer.removeAllChilds() // clear it content.
-		} else if (this.renderer.clear != undefined) {
-			this.renderer.clear() // table
-		}
 	}
 }
 
@@ -709,15 +735,15 @@ var FieldEditor = function (fieldPanel, callback) {
 		// Now the event...
 		this.editor.element.onblur = function (fieldPanel) {
 			return function (evt) {
-				var value
+				var value = this.value
 				fieldPanel.value.element.innerText = this.value
 
 				if (this.type == "checkbox") {
 					value = this.checked
-				} else if (this.tagName == "SELECT") {
-					value = this.selectedIndex + 1
-				} else {
-					value = this.value
+				} else if (this.nodeName == "SELECT") {
+					if (fieldPanel.fieldType.startsWith("enum:")) {
+						value = this.selectedIndex + 1
+					}
 				}
 
 				// In case of date i need to transform the value into a unix time.
@@ -811,10 +837,10 @@ FieldEditor.prototype.setValue = function (value) {
 			this.editor.element.value = value
 		}
 	} else if (this.editor.element.tagName == "SELECT") {
-		this.editor.element.selectedIndex = value - 1
+		if (this.parent.fieldType.startsWith("enum:")) {
+			this.editor.element.selectedIndex = value - 1
+		} else {
+			this.editor.element.value = value
+		}
 	}
-}
-
-FieldEditor.prototype.clear = function () {
-
 }
