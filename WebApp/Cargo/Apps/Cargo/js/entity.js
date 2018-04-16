@@ -74,6 +74,43 @@ var Restriction = function () {
 }
 
 /**
+ * Return the entity title (ids string from it uuid)
+ */
+function getEntityIdsFromUuid(uuid, callback) {
+    var prototype = getEntityPrototype(uuid.split("%")[0])
+    // Here I will use the ids of an entity as titile.
+    var ids = []
+    if (entities[uuid] != undefined) {
+        var entity = entities[uuid]
+        for (var i = 1; i < prototype.Ids.length; i++) {
+            ids.push(entity[prototype.Ids[i]])
+        }
+        callback(ids)
+    } else {
+        // In that case I will get the ids with the data manager.
+        var query = {}
+        query.TypeName = prototype.TypeName
+        query.Fields = prototype.Ids
+        query.Query = prototype.TypeName + '.UUID == "' + uuid + '"'
+        server.dataManager.read(prototype.TypeName.split(".")[0], JSON.stringify(query), [], [],
+            // success callback
+            function (results, caller) {
+                // return the results.
+                caller(results[0][0])
+            },
+            // progress callback
+            function (index, total, caller) {
+
+            },
+            // error callback
+            function (errObj, caller) {
+
+            },
+            callback)
+    }
+}
+
+/**
  * Append a new object value into an entity.
  */
 function appendObjectValue(object, field, value) {
@@ -589,21 +626,21 @@ function setObjectValues(object, values, lazy) {
                                 if (isRef) {
                                     setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    if(!lazy){
+                                    if (!lazy) {
                                         subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
                                     }
                                 }
                             }
-                            if(lazy){
+                            if (lazy) {
                                 object[property] = values[property]
                             }
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
-                                if(!lazy){
+                                if (!lazy) {
                                     subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
-                                }else{
+                                } else {
                                     object[property] = values[property]
                                 }
                             }
@@ -630,8 +667,8 @@ function setObjectValues(object, values, lazy) {
                                 caller.parent[caller.subObject.property] = entity
                             }
                             // Get parent function.
-                            entity.getParent = function(parent){
-                                return function(){
+                            entity.getParent = function (parent) {
+                                return function () {
                                     return parent
                                 }
                             }(caller.parent)
@@ -648,19 +685,19 @@ function setObjectValues(object, values, lazy) {
                 } else {
                     setSubObject(parent, subObjects, callback)
                     if (subObjects.length == 0) {
-                        if(callback != undefined){
+                        if (callback != undefined) {
                             callback(parent)
                         }
-                    } 
+                    }
                 }
             } else if (isObject(subObject)) {
                 // skip to the next object.
                 setSubObject(parent, subObjects, callback)
                 if (subObjects.length == 0) {
-                    if(callback != undefined){
+                    if (callback != undefined) {
                         callback(parent)
                     }
-                } 
+                }
             }
         }
     }

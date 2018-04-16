@@ -1054,24 +1054,7 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 	} else {
 		if (fieldType.endsWith(":Ref")) {
 			// Here the value represent an object reference.
-			var lnk = new Element(null, { "tag": "a", "href": "#", "class": fieldType.replaceAll(".", "_") });
-			server.entityManager.getEntityByUuid(value, false,
-				function (entity, caller) {
-					var titles = entity.getTitles();
-					if (titles.length > 0) {
-						caller.element.innerHTML = titles[0]
-						caller.element.onclick = function (entity) {
-							return function (evt) {
-								evt.stopPropagation();
-							}
-						}(entity)
-					}
-				},
-				function (errObj, lnk) {
-
-				}, lnk)
-
-			return lnk;
+			console.log("----> 1057")
 		} else {
 			// In the case of object uuid and not a reference I will try to get the entity from 
 			// the local map.
@@ -1095,6 +1078,78 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 	return null;
 }
 
+/**
+ * Render a reference with help of the entity panel.
+ * @param {*} div 
+ * @param {*} ref 
+ * @param {*} callback 
+ */
+function renderRef(div, ref, callback) {
+	var refDiv = div.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
+	var typeName = ref.split("%")[0]
+	new EntityPanel(refDiv, typeName,
+		function (ref, callback) {
+			return function (entityPanel) {
+				// I will use the entity panel but I will modify it a little to 
+				// keep track of entity reference instead of entity.
+				entityPanel.header.display()
+				entityPanel.header.shrinkBtn.element.click()
+				var ids = getEntityIdsFromUuid(ref, function (entityPanel, callback) {
+					return function (ids) {
+						var title = ""
+						for (var i = 0; i < ids.length; i++) {
+							if (!isObjectReference(ids[i])) {
+								title += ids[i]
+								if (i < ids.length - 1) {
+									title += " "
+								}
+							}
+						}
+
+						// Now I will set it title.
+						entityPanel.header.title.element.style.textAlign = "left"
+						entityPanel.header.title.element.innerText = title
+
+						// I will also change overide the expand action to get the entity 
+						// and display it inside the panel when it first click.
+						entityPanel.header.expandBtn.element.addEventListener("click", function (entityPanel, ref) {
+							return function () {
+								if (entityPanel.getEntity == undefined) {
+									// In that case I will set the entity.
+									server.entityManager.getEntityByUuid(ref, true,
+										// success callback
+										function (entity, entityPanel) {
+											entityPanel.setEntity(entity)
+										},
+										// error callback
+										function () {
+
+										}, entityPanel)
+								}
+							}
+						}(entityPanel, ref), true)
+
+						callback()
+					}
+				}(entityPanel, callback))
+			}
+		}(ref, callback))
+}
+
+/**
+ * Redender and array of entity references.
+ * @param {*} div 
+ * @param {*} values 
+ */
+function renderRefArray(div, values) {
+	// array of reference.
+	for (var i = 0; i < values.length; i++) {
+		var ref = values[i]
+		renderRef(div, ref, function () { })
+	}
+	//var ref = values[0]
+
+}
 /**
  * Render array.
  */
@@ -1140,8 +1195,8 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 			}(table))
 
 	} else if (typeName.endsWith(":Ref")) {
-		// array of reference.
-
+		this.cell.valueDiv = this.cell.div.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+		renderRefArray(this.cell.valueDiv, values)
 	} else {
 		// Here I will asynchronously get all items of that types.
 		server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],

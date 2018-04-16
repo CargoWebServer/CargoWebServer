@@ -198,6 +198,8 @@ EntityPanel.prototype.setEntity = function (entity) {
 }
 
 var EntityPanelHeader = function (parent) {
+	// Keep the parent panel.
+	this.parent = parent
 	this.panel = parent.panel.prependElement({ "tag": "div", "class": "entity_panel_header", "style": "display: none;" }).down()
 	this.expandBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style": "display: none;" }).down()
 	this.expandBtn.appendElement({ "tag": "i", "class": "fa fa-caret-right" }).down()
@@ -427,7 +429,7 @@ FieldPanel.prototype.setValue = function (value) {
 			if (isObjectReference(value)) {
 				value = entities[value]
 			}
-			if(value.UUID != undefined){
+			if (value.UUID != undefined) {
 				this.value.element.id = value.UUID + "_panel"
 			}
 		}
@@ -486,26 +488,30 @@ FieldRenderer.prototype.init = function (callback) {
 FieldRenderer.prototype.render = function (prototype, callback) {
 	if (this.isArray) {
 		// Array value use a table to display the entity.
-		var div = this.parent.value.appendElement({ "tag": "div", "style": "display: flex; justify-content: left; align-items: flex-start;" }).down()
-		this.renderer = new Table(randomUUID(), div)
+		if (!this.parent.fieldType.endsWith(":Ref")) {
+			var div = this.parent.value.appendElement({ "tag": "div", "style": "display: flex; justify-content: left; align-items: flex-start;" }).down()
+			this.renderer = new Table(randomUUID(), div)
 
-		var model = undefined
-		if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
-			model = new EntityTableModel(prototype)
+			var model = undefined
+			if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
+				model = new EntityTableModel(prototype)
+			} else {
+				model = new TableModel(["values"])
+				model.fields = [this.parent.fieldType.replace("[]", "")]
+			}
+
+			this.renderer.setModel(model,
+				function (table, callback, fieldRenderer) {
+					return function () {
+						table.init()
+						table.refresh()
+						callback(fieldRenderer)
+					}
+				}(this.renderer, callback, this))
 		} else {
-			model = new TableModel(["values"])
-			model.fields = [this.parent.fieldType.replace("[]", "")]
+			this.renderer = this.parent.value.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+			callback(this)
 		}
-
-		this.renderer.setModel(model,
-			function (table, callback, fieldRenderer) {
-				return function () {
-					table.init()
-					table.refresh()
-					callback(fieldRenderer)
-				}
-			}(this.renderer, callback, this))
-
 	} else {
 		if (this.isRef) {
 			// Render a reference....
@@ -532,7 +538,7 @@ FieldRenderer.prototype.render = function (prototype, callback) {
 FieldRenderer.prototype.setValue = function (value) {
 	if (this.renderer != null) {
 		if (this.isArray) {
-			if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.")) {
+			if (this.parent.fieldName != "M_listOf" && !this.parent.fieldType.startsWith("[]xs.") && !this.parent.fieldType.endsWith(":Ref")) {
 				// Here we got an array of entities
 				function setValue(value, fieldRenderer) {
 					var row = fieldRenderer.renderer.appendRow(value, value.UUID)
@@ -559,6 +565,8 @@ FieldRenderer.prototype.setValue = function (value) {
 				} else {
 					setValue(value, this)
 				}
+			} else if (this.parent.fieldType.endsWith(":Ref")) {
+				renderRefArray(this.renderer, value)
 			} else {
 				function setValue(value, index, fieldRenderer) {
 					// simply append the values with there index in that case.
