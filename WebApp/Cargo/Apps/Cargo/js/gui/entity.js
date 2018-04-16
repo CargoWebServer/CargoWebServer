@@ -157,7 +157,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 				if (evt.dataMap["entity"].UUID == entityPanel.getEntity().UUID) {
 					// so here i will remove the panel from it parent.
 					try {
-						var panel = document.getElementById(entityPanel.getEntity().UUID + "_panel")
+						var panel = entityPanel.panel.element
 						panel.parentNode.removeChild(panel)
 						var deleteBtn = document.getElementById(entityPanel.getEntity().UUID + "_delete_btn")
 						var createBtn = document.getElementById(entityPanel.getEntity().UUID + "_create_btn")

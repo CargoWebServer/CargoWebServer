@@ -107,7 +107,8 @@
 }
 .entity_panel_header_title{
     flex-grow: 1;
-    text-align: center;
+	text-align: center;
+	padding: 2px;
 }
 
 /** The field panel **/

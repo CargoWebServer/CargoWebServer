@@ -627,6 +627,57 @@ var TableCell = function (row, index, value) {
 }
 
 /**
+ * Set the append entity button. (only usefull for entity model.)
+ * If an entity in the cell is null, that button will allow the creation of
+ * entity.
+ */
+TableCell.prototype.setAppendEntityBtn = function () {
+	// If the entity is nillable...
+	var model = this.row.table.getModel()
+	if (model.entities == undefined) {
+		return
+	}
+	var parent = model.entities[this.row.index]
+	var fieldName = "M_" + model.titles[this.index]
+	var parentPrototype = getEntityPrototype(parent.TYPENAME)
+	var fieldIndex = parentPrototype.getFieldIndex(fieldName)
+	var fieldType = parentPrototype.FieldsType[fieldIndex]
+	var isNillable = parentPrototype.FieldsNillable[fieldIndex]
+
+	if (isNillable) {
+		// Create an entity from a pointer.
+		var appendBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "position: absolute; top: 2px; left: 2px; font-size: 10pt;" }).down()
+			.appendElement({ "tag": "i", "class": "fa fa-plus" });
+
+		// The button to append a new entity inside a cell.
+		appendBtn.element.onclick = function (fieldName, fieldType, parent) {
+			return function () {
+				// Here I will create a new entity
+				var entity = eval("new " + fieldType + "()")
+				entity.ParentUuid = parent.UUID
+				entity.ParentLnk = fieldName
+				server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
+					function (results, caller) {
+
+					},
+					function (errObj, caller) {
+
+					}, {})
+			}
+		}(fieldName, fieldType, parent)
+
+		// Now the events...
+		server.entityManager.attach({ "parent": parent, "cell": this, "fieldType": fieldType, "fieldName": fieldName, "model": model }, NewEntityEvent, function (evt, caller) {
+			var parent = caller.parent
+			if (parent.UUID == evt.dataMap["entity"].ParentUuid && caller.fieldName == evt.dataMap["entity"].ParentLnk) {
+				caller.cell.div.element.id = evt.dataMap["entity"].UUID + "_cell_div"
+				caller.cell.valueDiv = caller.cell.div.appendElement(caller.cell.renderer.render(entities[evt.dataMap["entity"].UUID], caller.fieldType)).down()
+				caller.model.table.refresh()
+			}
+		})
+	}
+}
+/**
  * Return the data type of the cell.
  * @returns {string} The data type.
  */
@@ -981,14 +1032,13 @@ var TableCellRenderer = function (cell) {
  * @param {} value The value to display in the cell.
  */
 TableCellRenderer.prototype.render = function (value, fieldType) {
-	// Depending of the data type I will call the appropriate formater...
-	var formatedValue = null;
 
 	if (this.cell.row.table.renderFcts[fieldType] != undefined) {
 		// In that case I will use the overide function to render the cell.
 		return this.cell.row.table.renderFcts[fieldType](value)
 	}
 
+	// If the value can be null.
 	// I will us Javasript type to determine how I will display the data...
 	if (fieldType.startsWith("[]")) {
 		// Format array create it own element.
@@ -998,76 +1048,49 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 		var div = this.renderArray(value, fieldType);
 		return div;
 	} else if (isObject(value)) {
-		return this.renderEntity(value, fieldType);
+		if (value.TYPENAME != undefined) {
+			return this.renderEntity(value, fieldType);
+		}
 	} else {
-		formatedValue = formatValue(value, fieldType);
+		if (fieldType.endsWith(":Ref")) {
+			// Here the value represent an object reference.
+			var lnk = new Element(null, { "tag": "a", "href": "#", "class": fieldType.replaceAll(".", "_") });
+			server.entityManager.getEntityByUuid(value, false,
+				function (entity, caller) {
+					var titles = entity.getTitles();
+					if (titles.length > 0) {
+						caller.element.innerHTML = titles[0]
+						caller.element.onclick = function (entity) {
+							return function (evt) {
+								evt.stopPropagation();
+							}
+						}(entity)
+					}
+				},
+				function (errObj, lnk) {
 
-		// In that case I will display the append button...
-		if (formatedValue == null) {
-			var appendBtn = this.cell.div.appendElement({ "tag": "div", "class": "row_button", "style": "position: absolute; top: 2px; left: 2px; font-size: 10pt;" }).down()
-				.appendElement({ "tag": "i", "class": "fa fa-plus" });
+				}, lnk)
 
-			var model = this.cell.row.table.getModel()
-			var fieldName = "M_" + model.titles[this.cell.index]
-			var parent = model.entities[this.cell.row.index]
-
-			// The button to append a new entity inside a cell.
-			appendBtn.element.onclick = function (fieldName, fieldType, parent) {
-				return function () {
-					// Here I will create a new entity
-					var entity = eval("new " + fieldType + "()")
-					entity.ParentUuid = parent.UUID
-					entity.ParentLnk = fieldName
-					server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
-						function (results, caller) {
-
-						},
-						function (errObj, caller) {
-
-						}, {})
-				}
-			}(fieldName, fieldType, parent)
-
-			// Now the events...
-			server.entityManager.attach({ "parent": parent, "renderer": this, "fieldType": fieldType, "fieldName": fieldName, "model": model }, NewEntityEvent, function (evt, caller) {
-				var parent = caller.parent
-				if (parent.UUID == evt.dataMap["entity"].ParentUuid && caller.fieldName == evt.dataMap["entity"].ParentLnk) {
-					var renderer = caller.renderer
-					renderer.cell.div.removeAllChilds()
-					renderer.cell.valueDiv = renderer.cell.div.appendElement(renderer.render(evt.dataMap["entity"], caller.fieldType)).down()
-					caller.model.table.refresh()
-				}
-			})
-
+			return lnk;
 		} else {
-			if (isObjectReference(formatedValue)) {
-				// Here the value represent an object reference.
-				var lnk = new Element(null, { "tag": "a", "href": "#", "class": fieldType.replaceAll(".", "_") });
-				server.entityManager.getEntityByUuid(formatedValue, false,
-					function (entity, caller) {
-						var titles = entity.getTitles();
-						if (titles.length > 0) {
-							caller.element.innerHTML = titles[0]
-							caller.element.onclick = function (entity) {
-								return function (evt) {
-									evt.stopPropagation();
-								}
-							}(entity)
-						}
-					},
-					function (errObj, lnk) {
-
-					}, lnk)
-
-				return lnk;
+			// In the case of object uuid and not a reference I will try to get the entity from 
+			// the local map.
+			if (isObjectReference(value)) {
+				var entity = entities[value]
+				if (entity != undefined) {
+					return this.renderEntity(value, entity.TypeName);
+				}
 			} else {
 				// Here I will create the 
+				var formatedValue = formatValue(value, fieldType);
 				if (formatedValue != null) {
 					return new Element(null, { "tag": "div", "class": fieldType.replaceAll(".", "_"), "innerHtml": formatedValue });
 				}
 			}
 		}
 	}
+
+	this.cell.setAppendEntityBtn()
 
 	return null;
 }
@@ -1100,9 +1123,8 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 		model.ParentLnk = fieldName
 
 		var table = new Table(randomUUID(), talbeDiv)
-
 		for (var i = 0; i < values.length; i++) {
-			var v = formatValue(values[i], typeName.replace("[]", ""))
+			var v = formatValue(values[i], typeName)
 			model.appendRow(v, i)
 		}
 
@@ -1111,7 +1133,9 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				return function () {
 					table.init()
 					table.refresh()
-					table.header.maximizeBtn.element.click()
+					if (table.header != undefined) {
+						table.header.maximizeBtn.element.click()
+					}
 				}
 			}(table))
 
@@ -1153,14 +1177,34 @@ TableCellRenderer.prototype.renderEntity = function (value, typeName) {
 	// So here I will render an entity.
 	if (value.TYPENAME != undefined) {
 		var valueDiv = new Element(null, { "tag": "div" })
-
+		this.cell.div.element.id = value.UUID + "_cell_div"
 		var panel = new EntityPanel(valueDiv, typeName.replace("[]", "").replace(":Ref", ""),
 			// The init callback. 
-			function (entity) {
+			function (entity, cell) {
 				return function (entityPanel) {
 					entityPanel.setEntity(entity)
+					var isNillable = false
+					if (entity.ParentUuid.length > 0) {
+						var prototype = getEntityPrototype(entity.ParentUuid.split("%")[0])
+						var fieldIndex = prototype.getFieldIndex(entity.ParentLnk)
+						if (fieldIndex != -1) {
+							isNillable = prototype.FieldsNillable[fieldIndex]
+							if (isNillable) {
+								if (this.getBaseTypeExtension(entity.TYPENAME).length == 0) {
+									entityPanel.header.display()
+									entityPanel.header.expandBtn.element.click()
+									entityPanel.deleteCallback = function (cell) {
+										return function (entity) {
+											// simply refresh the table... to redisplay the appendBtn.
+											cell.row.table.refresh()
+										}
+									}(cell)
+								}
+							}
+						}
+					}
 				}
-			}(value),
+			}(value, this.cell),
 			undefined, true, undefined, "")
 
 		return valueDiv;

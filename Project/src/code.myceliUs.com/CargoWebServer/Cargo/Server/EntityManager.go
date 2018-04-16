@@ -649,7 +649,10 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
 		}
+	}
 
+	// Send save event if something has change.
+	if len(triples) > 0 || len(existingTriples) > 0 {
 		// Send update entity event here.
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}

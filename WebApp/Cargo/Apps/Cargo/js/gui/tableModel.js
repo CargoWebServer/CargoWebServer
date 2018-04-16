@@ -90,19 +90,18 @@ TableModel.prototype.init = function (successCallback, progressCallback, errorCa
                 }
             }
 
-
             model.appendRow(values, index)
+            if (table.rows.length == 0) {
+                table.setHeader()
+                table.header.maximizeBtn.element.click()
+            }
 
             var row = new TableRow(table, index, values, index)
             row.table = table
             table.rows.push(row)
-            if (table.rows.length == 1) {
-                table.setHeader()
-            }
             
             // So here I will append the new value in the table. Values are created in 
             // respect of the predefined types.
-
             simulate(row.cells[index, 0].div.element, "dblclick");
         }
     }(this.table, this)
@@ -184,7 +183,12 @@ TableModel.prototype.setValueAt = function (value, row, column) {
 }
 
 TableModel.prototype.appendRow = function (values) {
-    this.values.push(values)
+    if(isArray(values)){
+        this.values.push(values)
+    }else{
+        this.values.push([values])
+    }
+    
     return values
 }
 
@@ -218,11 +222,13 @@ TableModel.prototype.saveValue = function (rowIndex) {
         entity[fieldName] = values
         server.entityManager.saveEntity(entity,
             // success callback
-            function () { },
+            function (results, caller) { 
+                caller.table.header.maximizeBtn.element.click()
+            },
             // error callback
             function () { },
             // caller
-            {})
+            this)
     }
 }
 
