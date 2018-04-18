@@ -1991,6 +1991,43 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 				return nil, err
 			}
 			return searchResult, nil
+		} else {
+			// There is no query so i will use the typename to find fields...
+			q := "( ?, TYPENAME, " + query.TypeName + " )"
+			results_, err := this.Read(q, []interface{}{}, []interface{}{})
+			if err == nil {
+				// if there is not fields specified i will return the list of uuid's
+				if len(query.Fields) == 0 {
+					return results_, nil
+				}
+				// I will append the fields...
+				for i := 0; i < len(results_); i++ {
+					// I will get all value from the
+					q := "( " + results_[i][0].(string) + ", ?, ?)"
+					results__, err := this.Read(q, []interface{}{}, []interface{}{})
+					if err == nil {
+						// Now I got the results...
+						results___ := make([]interface{}, 0)
+						for j := 0; j < len(query.Fields); j++ {
+							for k := 0; k < len(results__); k++ {
+								if strings.HasSuffix(results__[k][1].(string), query.Fields[j]) {
+									// append the object found.
+									results___ = append(results___, results__[k][2])
+									break
+								}
+							}
+							if len(results___) == len(query.Fields) {
+								results = append(results, results___)
+								break
+							}
+						}
+					} else {
+						return nil, err
+					}
+				}
+			} else {
+				return nil, err
+			}
 		}
 	}
 	return

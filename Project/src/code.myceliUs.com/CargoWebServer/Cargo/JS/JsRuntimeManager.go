@@ -368,84 +368,85 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_createVm:
-
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
-				if jsRuntimeManager.m_sessions[sessionId] != nil {
-					callback <- []interface{}{true} // unblock the channel...
-					return                          // the session is already open!...
-				}
+				if jsRuntimeManager.m_sessions[sessionId] == nil {
+					jsRuntimeManager.createVm(sessionId)
+					jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
+					jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
+					jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
+					jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
+					jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 
-				jsRuntimeManager.createVm(sessionId)
-				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
-				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
-				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
-				jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
-				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
-
-				// The vm processing loop...
-				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
-					// The session was interrupt!
-					defer func() {
-						// Stahp mean the VM was kill by the admin.
-						if caught := recover(); caught != nil {
-							if caught.(error).Error() == "Stahp" {
-								// Here the task was cancel.
-								log.Println("---> session: ", sessionId, " is now closed")
-								return
-							} else {
-								panic(caught) // Something else happened, repanic!
-							}
-						}
-					}()
-
-					for {
-						select {
-						case operationInfos := <-setVariable:
-							callback := operationInfos.m_returns
-							if operationInfos.m_params["varInfos"] != nil {
-								varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
-								vm.Set(varInfos.m_name, varInfos.m_val)
-							}
-							callback <- []interface{}{true} // unblock the channel...
-						case operationInfos := <-getVariable:
-							callback := operationInfos.m_returns
-							var varInfos JsVarInfos
-							if operationInfos.m_params["varInfos"] != nil {
-								varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
-								value, err := vm.Get(varInfos.m_name)
-								if err == nil {
-									varInfos.m_val = value
+					// The vm processing loop...
+					go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
+						// The session was interrupt!
+						defer func() {
+							// Stahp mean the VM was kill by the admin.
+							if caught := recover(); caught != nil {
+								if caught.(error).Error() == "Stahp" {
+									// Here the task was cancel.
+									log.Println("---> session: ", sessionId, " is now closed")
+									return
+								} else {
+									panic(caught) // Something else happened, repanic!
 								}
 							}
-							callback <- []interface{}{varInfos} // unblock the channel...
-						case operationInfos := <-executeJsFunction:
-							callback := operationInfos.m_returns
-							var jsFunctionInfos JsFunctionInfos
-							if operationInfos.m_params["jsFunctionInfos"] != nil {
-								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
-								vm.Set("messageId", jsFunctionInfos.m_messageId)
-								vm.Set("sessionId", jsFunctionInfos.m_sessionId)
-								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
-							}
-							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
-						case operationInfos := <-runScript:
-							callback := operationInfos.m_returns
-							var results otto.Value
-							var err error
-							if operationInfos.m_params["script"] != nil {
-								//log.Println("---> run script ", sessionId)
-								results, err = vm.Run(operationInfos.m_params["script"].(string))
-							}
-							callback <- []interface{}{results, err} // unblock the channel...
-						case stop := <-stopVm:
-							if stop {
-								log.Println("---> session: ", sessionId, " is now closed")
-								return // exit the processing loop.
+						}()
+
+					process:
+						for {
+							select {
+							case operationInfos := <-setVariable:
+								callback := operationInfos.m_returns
+								if operationInfos.m_params["varInfos"] != nil {
+									varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
+									vm.Set(varInfos.m_name, varInfos.m_val)
+								}
+								callback <- []interface{}{true} // unblock the channel...
+							case operationInfos := <-getVariable:
+								callback := operationInfos.m_returns
+								var varInfos JsVarInfos
+								if operationInfos.m_params["varInfos"] != nil {
+									varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
+									value, err := vm.Get(varInfos.m_name)
+									if err == nil {
+										varInfos.m_val = value
+									}
+								}
+								callback <- []interface{}{varInfos} // unblock the channel...
+							case operationInfos := <-executeJsFunction:
+								callback := operationInfos.m_returns
+								var jsFunctionInfos JsFunctionInfos
+								if operationInfos.m_params["jsFunctionInfos"] != nil {
+									jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
+									vm.Set("messageId", jsFunctionInfos.m_messageId)
+									vm.Set("sessionId", jsFunctionInfos.m_sessionId)
+									jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+								}
+								callback <- []interface{}{jsFunctionInfos} // unblock the channel...
+							case operationInfos := <-runScript:
+								callback := operationInfos.m_returns
+								var results otto.Value
+								var err error
+								if operationInfos.m_params["script"] != nil {
+									log.Println("---> run script ", sessionId)
+									results, err = vm.Run(operationInfos.m_params["script"].(string))
+									log.Println("---> finish run script ", sessionId)
+								}
+								callback <- []interface{}{results, err} // unblock the channel...
+							case stop := <-stopVm:
+								if stop {
+									log.Println("---> session: ", sessionId, " is now closed")
+									break process // exit the processing loop.
+								}
 							}
 						}
-					}
-				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
+
+						log.Println("---> stop processing loop for ", sessionId)
+					}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
+				}
+				// Close vm callback...
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_closeVm:

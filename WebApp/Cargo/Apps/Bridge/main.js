@@ -19,13 +19,13 @@ function init() {
     if (cargoThemeInfos !== undefined) {
         for (var ruleName in cargoThemeInfos) {
             var rule = getCSSRule(ruleName)
-            if(rule !== undefined){
-            for (var property in cargoThemeInfos[ruleName]) {
-                rule.style[property] = cargoThemeInfos[ruleName][property]
+            if (rule !== undefined) {
+                for (var property in cargoThemeInfos[ruleName]) {
+                    rule.style[property] = cargoThemeInfos[ruleName][property]
+                }
+            } else {
+                console.log("no css rule found with name ", ruleName, "!")
             }
-        }else{
-            console.log("no css rule found with name ", ruleName, "!")
-        }
         }
     }
 
@@ -57,8 +57,10 @@ function init() {
  * That is a connection with the service container.
  */
 var service = new Server("localhost", "127.0.0.1", 9494)
-//var service = new Server("mon176", "10.67.44.31", 9494)
+//var service = new Server("mon-util-01", "10.2.128.70", 9494)
 //var service = new Server("mon104", "10.67.44.73", 9494)
+var service = new Server("mon176", "10.67.44.31", 9494)
+
 var xapian = null
 
 /**
@@ -128,7 +130,7 @@ function main() {
                                                                             function (results, caller) {
                                                                                 // eval in that case contain the code to use the service.
                                                                                 eval(results)
-                                                                                
+
                                                                                 // Xapian test...
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service)
 

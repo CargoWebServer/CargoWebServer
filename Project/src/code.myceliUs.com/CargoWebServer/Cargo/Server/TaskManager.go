@@ -62,6 +62,7 @@ func (this *TaskManager) start() {
 
 	// Keep timers by task id to be able to cancel it latter.
 	tasks := make(map[string]*time.Timer, 0)
+
 	// Keep info of task instances since the server started.
 	instancesInfos := make([]*TaskInstanceInfo, 0)
 
@@ -264,7 +265,7 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 	}
 
 	log.Println("--> task ", task.GetId(), "run successfully!")
-
+	//JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 	return nil
 }
 

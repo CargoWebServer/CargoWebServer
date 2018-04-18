@@ -5,6 +5,8 @@
     margin-bottom: 2px;
     margin-left: 5px;
     position: relative;
+    /*height: 1em;*/
+    min-width: 100px;
 }
 
 .table_body{
@@ -50,6 +52,12 @@
     padding: 2px 5px 2px 5px;
     min-height: 20px;
     font: 16px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+}
+
+.scrolltable .scrolltable .body_cell{
+    border-right: 1px transparent;
+    border-left: 1px transparent;
+    border-bottom: 1px transparent;
 }
 
 .body_cell input{
@@ -254,6 +262,12 @@
 
 .row_button i {
     color: lightgrey;
+}
+
+.append_row_btn {
+    display: none; 
+    font-size: 10pt;
+    vertical-align: top;
 }
 
 .entity_ref_lnk{

@@ -76,8 +76,20 @@ var Table = function (id, parent) {
 	// The div...
 	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id: id }).down()
 
-	this.appendRowBtn = parent.prependElement({ "tag": "div", "class": "row_button", "style": "/*position: absolute; top: 2px; left: -12px;*/ font-size: 10pt;" }).down()
+	this.appendRowBtn = parent.prependElement({ "tag": "div", "class": "row_button append_row_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-plus" });
+
+	this.parent.element.onmouseover = function (appendRowBtn) {
+		return function () {
+			appendRowBtn.element.style.display = "table-cell"
+		}
+	}(this.appendRowBtn)
+
+	this.parent.element.onmouseleave = function (appendRowBtn) {
+		return function () {
+			appendRowBtn.element.style.display = "none"
+		}
+	}(this.appendRowBtn)
 
 	// The header...
 	this.header = null
@@ -512,6 +524,7 @@ var TableRow = function (table, index, data, id) {
 	this.cells = []
 	this.id = id
 	this.deleteBtn = null
+	this.saveBtn = null
 
 	if (this.id == undefined) {
 		if (table.getModel().entities != undefined) {
@@ -524,7 +537,9 @@ var TableRow = function (table, index, data, id) {
 	}
 
 	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
-	this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button" }).down()
+
+	// empty space to keep rows align with it header.
+	this.saveBtn = this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button" }).down()
 
 	// I will create the header cell...
 	for (var i = 0; i < data.length; i++) {
@@ -590,7 +605,12 @@ var TableCell = function (row, index, value) {
 	this.editor = new TableCellEditor(this, function (cell) {
 		return function () {
 			// Here I will remove the cell editor from the cell div.
-			cell.div.element.removeChild(cell.editor.editor.element);
+			try {
+				cell.editor.editor.element.parentNode.removeChild(cell.editor.editor.element);
+			} catch (err){
+				// Nothing to catch here.
+			}
+
 			cell.valueDiv.element.style.display = "";
 			var value = cell.editor.getValue();
 			// In case of select box the value return is convert to string by default.
@@ -602,7 +622,6 @@ var TableCell = function (row, index, value) {
 		}
 	}(this));
 
-
 	// get the formated value
 	var fieldType = this.row.table.getModel().getColumnClass(this.index);
 	var formatedValue = this.renderer.render(value, fieldType);
@@ -612,7 +631,6 @@ var TableCell = function (row, index, value) {
 		}
 		this.valueDiv = this.div.appendElement(formatedValue).down()
 	}
-
 
 	// The click event is use to edit array ...
 	if (!this.getType().startsWith("[]")) {
@@ -658,11 +676,12 @@ TableCell.prototype.setAppendEntityBtn = function () {
 				entity.ParentLnk = fieldName
 				server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
 					function (results, caller) {
-
+						// hide the button.
+						caller.style.display = "none"
 					},
 					function (errObj, caller) {
 
-					}, {})
+					}, this)
 			}
 		}(fieldName, fieldType, parent)
 
@@ -1001,6 +1020,17 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 		} else {
 			this.editor.element.onblur = this.onblur;
 		}
+
+		if (this.editor.element.tagName == "INPUT") {
+			this.editor.element.onkeyup = function (e) {
+				e.stopPropagation(true)
+				if (e.keyCode === 27) {
+					this.onblur()
+				} else if (e.keyCode === 13) {
+					this.onblur()
+				}
+			}
+		}
 	}
 }
 
@@ -1032,7 +1062,6 @@ var TableCellRenderer = function (cell) {
  * @param {} value The value to display in the cell.
  */
 TableCellRenderer.prototype.render = function (value, fieldType) {
-
 	if (this.cell.row.table.renderFcts[fieldType] != undefined) {
 		// In that case I will use the overide function to render the cell.
 		return this.cell.row.table.renderFcts[fieldType](value)
@@ -1054,7 +1083,20 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 	} else {
 		if (fieldType.endsWith(":Ref")) {
 			// Here the value represent an object reference.
-			console.log("----> 1057")
+			var parentModel = this.cell.row.table.getModel()
+			var refOwner = parentModel.entities[this.cell.row.index]
+			var fieldName = "M_" + parentModel.titles[this.cell.index]
+			var div = new Element(null, { "tag": "div" })
+			// render the reference.
+			if (isObjectReference(value)) {
+				renderRef(div, value, fieldName, refOwner)
+			} else {
+				// the value is not a reference.
+				this.cell.div.removeAllChilds()
+				// Here I will create the append reference button...
+				createAppendRefBtn(div, fieldName, fieldType, refOwner)
+			}
+			return div
 		} else {
 			// In the case of object uuid and not a reference I will try to get the entity from 
 			// the local map.
@@ -1082,19 +1124,18 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
  * Render a reference with help of the entity panel.
  * @param {*} div 
  * @param {*} ref 
- * @param {*} callback 
  */
-function renderRef(div, ref, callback) {
-	var refDiv = div.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
+function renderRef(div, ref, fieldName, refOwner) {
+	var refDiv = div.appendElement({ "tag": "div", "style": "width: 100%;" }).down()
 	var typeName = ref.split("%")[0]
 	new EntityPanel(refDiv, typeName,
-		function (ref, callback) {
+		function (ref, fieldName, refOwner) {
 			return function (entityPanel) {
 				// I will use the entity panel but I will modify it a little to 
 				// keep track of entity reference instead of entity.
 				entityPanel.header.display()
 				entityPanel.header.shrinkBtn.element.click()
-				var ids = getEntityIdsFromUuid(ref, function (entityPanel, callback) {
+				var ids = getEntityIdsFromUuid(ref, function (entityPanel, fieldName, refOwner) {
 					return function (ids) {
 						var title = ""
 						for (var i = 0; i < ids.length; i++) {
@@ -1109,6 +1150,7 @@ function renderRef(div, ref, callback) {
 						// Now I will set it title.
 						entityPanel.header.title.element.style.textAlign = "left"
 						entityPanel.header.title.element.innerText = title
+						entityPanel.entityUuid = ref
 
 						// I will also change overide the expand action to get the entity 
 						// and display it inside the panel when it first click.
@@ -1129,11 +1171,140 @@ function renderRef(div, ref, callback) {
 							}
 						}(entityPanel, ref), true)
 
-						callback()
+						// Now the delete btn here I dont want to delete the entity itself but it reference in it parent.
+						entityPanel.header.deleteBtn.element.onclick = function (fieldName, refOwner, ref) {
+							return function () {
+								var index = refOwner[fieldName].indexOf(ref);    // <-- Not supported in <IE9
+								if (index !== -1) {
+									// remove it from it ref owner.
+									if (isArray(refOwner[fieldName])) {
+										refOwner[fieldName].splice(index, 1);
+									} else {
+										refOwner[fieldName] = null
+									}
+									// save the ref owner.
+									server.entityManager.saveEntity(refOwner,
+										// succes callback
+										function () {
+
+										},
+										// error callback
+										function () {
+
+										}, {})
+								}
+							}
+						}(fieldName, refOwner, ref)
 					}
-				}(entityPanel, callback))
+				}(entityPanel, fieldName, refOwner))
 			}
-		}(ref, callback))
+		}(ref, fieldName, refOwner))
+}
+
+/**
+ * Create the append reference button. It can be use for array of reference
+ * or single reference.
+ * @param {} div 
+ */
+function createAppendRefBtn(parent, fieldName, fieldType, refOwner) {
+	var edtior = parent.prependElement({ "tag": "div", "style": "display: flex; flex-direction: row; padding: 1px;" }).down()
+
+	var appendRefBtn = edtior.appendElement({ "tag": "div", "class": "row_button append_row_btn" }).down()
+		.appendElement({ "tag": "i", "class": "fa fa-plus" });
+
+	var refSelector = edtior.appendElement({ "tag": "input", "style": "flex-grow: 1; border: none; display: none;" }).down()
+
+	refSelector.element.onblur = function (refOwner) {
+		return function () {
+			this.style.display = "none"
+		}
+	}(refOwner)
+
+	// Append a new reference action...
+	appendRefBtn.element.onclick = function (refSelector) {
+		return function () {
+			this.style.display = "none";
+			refSelector.element.style.display = ""
+			refSelector.element.focus()
+		}
+	}(refSelector)
+
+	parent.element.onmouseenter = function (appendRefBtn, refSelector) {
+		return function () {
+			if (refSelector.element.style.display == "none") {
+				appendRefBtn.element.style.display = "table-cell"
+			}
+		}
+	}(appendRefBtn, refSelector)
+
+	parent.element.onmouseleave = function (appendRefBtn) {
+		return function () {
+			appendRefBtn.element.style.display = "none"
+		}
+	}(appendRefBtn)
+
+	// Now I will decorate the input type to display autocompletion.
+	var callback = function (refSelector, refOwner, fieldName) {
+		return function (ids) {
+			var existing = refOwner[fieldName]
+			var lst = []
+			var uuidByIds = {}
+			for (var i = 0; i < ids.length; i++) {
+				var uuid = ids[i][0]
+				for (var j = 1; j < ids[i].length; j++) {
+					if (existing.indexOf(uuid) == -1) {
+						lst.push(ids[i][j]) // append only value that dosen't already exist.
+						uuidByIds[ids[i][j]] = uuid
+					}
+				}
+			}
+
+			// true means no other value than auto complete can be set...
+			attachAutoComplete(refSelector, lst, true,
+				function (uuidByIds, refOwner, fieldName, refSelector) {
+					return function (id) {
+						// Now I will set the new reference.
+						var uuid = uuidByIds[id]
+						if (isArray(refOwner[fieldName])) {
+							refOwner[fieldName].push(uuid)
+						} else {
+							refOwner[fieldName] = uuid
+						}
+						// So here if the value has change in the reference owner it will be saved.
+						server.entityManager.saveEntity(refOwner,
+							function () {
+
+							},
+							function () {
+
+							}, {})
+						refSelector.element.blur()
+					}
+				}(uuidByIds, refOwner, fieldName, refSelector)
+			)
+		}
+	}(refSelector, refOwner, fieldName)
+
+	// Here I will use the datamanager to get the list of ids for that type.
+	var query = {}
+	var prototype = getEntityPrototype(fieldType.replace(":Ref", "").replace("[]", ""))
+	query.TypeName = prototype.TypeName
+	query.Fields = prototype.Ids
+	//query.Query = ""
+	server.dataManager.read(prototype.TypeName.split(".")[0], JSON.stringify(query), query.Fields, [],
+		// success callback
+		function (results, caller) {
+			// return the results.
+			caller(results[0])
+		},
+		// progress callback
+		function (index, total, caller) {
+
+		},
+		// error callback
+		function (errObj, caller) {
+
+		}, callback)
 }
 
 /**
@@ -1141,15 +1312,17 @@ function renderRef(div, ref, callback) {
  * @param {*} div 
  * @param {*} values 
  */
-function renderRefArray(div, values) {
+function renderRefArray(div, values, fieldName, fieldType, refOwner) {
+	// Here I will create the new ref editor.
+	createAppendRefBtn(div, fieldName, fieldType, refOwner)
+
 	// array of reference.
 	for (var i = 0; i < values.length; i++) {
 		var ref = values[i]
-		renderRef(div, ref, function () { })
+		renderRef(div, ref, fieldName, refOwner)
 	}
-	//var ref = values[0]
-
 }
+
 /**
  * Render array.
  */
@@ -1157,71 +1330,78 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 
 	// I will use the first element of the array to determine how i will 
 	// create that new array.
-	var div = new Element(null, { "tag": "div" });
 	typeName = typeName.replace("[]", "")
 	var baseType = getBaseTypeExtension(typeName)
 	if (baseType.startsWith("xs.")) {
 		typeName = baseType
 	}
 
-	//div = new Element(null, { "tag": "div", "style": "display: table; width: 100%;" });
-	var talbeDiv = div.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
-
 	// here I will got the parent entity propertie for that cell...
 	var parentModel = this.cell.row.table.getModel()
 	var entity = parentModel.entities[this.cell.row.index]
 	var fieldName = "M_" + parentModel.titles[this.cell.index]
-	if (typeName.startsWith("xs.")) {
-		var model = new TableModel(["values"])
-		model.fields = [typeName.replace("[]", "")]
-		model.ParentUuid = entity.UUID
-		model.ParentLnk = fieldName
 
-		var table = new Table(randomUUID(), talbeDiv)
-		for (var i = 0; i < values.length; i++) {
-			var v = formatValue(values[i], typeName)
-			model.appendRow(v, i)
-		}
-
-		table.setModel(model,
-			function (table) {
-				return function () {
-					table.init()
-					table.refresh()
-					if (table.header != undefined) {
-						table.header.maximizeBtn.element.click()
-					}
-				}
-			}(table))
-
-	} else if (typeName.endsWith(":Ref")) {
-		this.cell.valueDiv = this.cell.div.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
-		renderRefArray(this.cell.valueDiv, values)
+	if (typeName.endsWith(":Ref")) {
+		//this.cell.valueDiv = this.cell.div.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+		var div = new Element(null, { "tag": "div" });
+		renderRefArray(div, values, fieldName, typeName, entity)
 	} else {
-		// Here I will asynchronously get all items of that types.
-		server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
-			/** The success callback */
-			function (prototype, caller) {
-				// Here I got an array of entities.
-				var model = null;
-				model = new EntityTableModel(prototype);
-				model.ParentUuid = caller.entity.UUID
-				model.ParentLnk = caller.fieldName
-				model.entities = caller.values;
-				caller.div.element.className = "entity_sub-table";
-				var table = new Table(randomUUID(), caller.div)
-				table.setModel(model, function (table) {
+		var div = new Element(null, { "tag": "div" });
+		var talbeDiv = div.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
+		if (typeName.startsWith("xs.")) {
+			var model = new TableModel(["values"])
+			model.fields = [typeName.replace("[]", "")]
+			model.ParentUuid = entity.UUID
+			model.ParentLnk = fieldName
+
+			var table = new Table(randomUUID(), talbeDiv)
+			for (var i = 0; i < values.length; i++) {
+				var v = formatValue(values[i], typeName)
+				model.appendRow(v, i)
+			}
+
+			table.setModel(model,
+				function (table) {
 					return function () {
-						// init the table.
 						table.init()
+						table.refresh()
+						if (table.header != undefined) {
+							table.header.maximizeBtn.element.click()
+							// do not display the inner table header.
+							table.header.div.element.style.display = "none"
+						}
 					}
 				}(table))
-			},
-			/** The error callva */
-			function (errObj, caller) {
-				// Here the div contain a table of values.
-			}, { "div": talbeDiv, "cell": this.cell, "values": values, "entity": entity, "fieldName": fieldName })
+
+		} else {
+			// Here I will asynchronously get all items of that types.
+			server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+				/** The success callback */
+				function (prototype, caller) {
+					// Here I got an array of entities.
+					var model = null;
+					model = new EntityTableModel(prototype);
+					model.ParentUuid = caller.entity.UUID
+					model.ParentLnk = caller.fieldName
+					model.entities = caller.values;
+					caller.div.element.className = "entity_sub-table";
+					var table = new Table(randomUUID(), caller.div)
+					table.setModel(model, function (table) {
+						return function () {
+							// init the table.
+							table.init()
+							// do not display the inner table header.
+							table.refresh()
+						}
+					}(table))
+				},
+				/** The error callva */
+				function (errObj, caller) {
+					// Here the div contain a table of values.
+				}, { "div": talbeDiv, "cell": this.cell, "values": values, "entity": entity, "fieldName": fieldName })
+		}
 	}
+
 	return div;
 }
 

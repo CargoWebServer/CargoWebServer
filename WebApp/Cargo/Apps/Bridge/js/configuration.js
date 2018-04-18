@@ -230,7 +230,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                                             }(caller))
                                                         },
                                                         // error callback
-                                                        function (errObj, caller) { 
+                                                        function (errObj, caller) {
                                                             caller.connectBtn.element.status = "error"
                                                             caller.connectBtn.element.style.color = "#8B0000"
                                                         }, caller)
@@ -254,13 +254,13 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             server.dataManager.deleteDataStore(entity.M_id,
                                 // success callback
                                 function () {
-    
+
                                 },
                                 // error callback.
                                 function () {
-    
+
                                 }, this)
-    
+
                         }
                     }
 
@@ -477,20 +477,24 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     editBtn.appendElement({ "tag": "i", "title": "Edit task script.", "class": "fa fa-edit", "style": "padding-top: 2px;" })
 
                     // The save bnt...
-                    content.getPanel().saveCallback = function () {
+                    content.getPanel().saveCallback = function (panel) {
                         return function (task) {
                             // Now I will schedule the task.
                             server.configurationManager.scheduleTask(task,
                                 // Success Callback
-                                function (results, caller) {
-                                    /** Nothing to do here */
+                                function (entity, caller) {
+                                    // set the title and expand the panel.
+                                    if (caller != undefined) {
+                                        caller.header.title.element.innerText = caller.entity.M_id
+                                        caller.header.expandBtn.element.click()
+                                    }
                                 },
                                 // Error Callback
                                 function (errObj, caller) {
                                     console.log(errObj)
-                                }, {})
+                                }, panel)
                         }
-                    }()
+                    }(content.getPanel())
 
                     editBtn.element.onclick = function (ScheduledTask_M_script, entityPanel) {
                         return function () {

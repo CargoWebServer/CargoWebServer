@@ -87,6 +87,8 @@ TableModel.prototype.init = function (successCallback, progressCallback, errorCa
                     values.push(0)
                 } else if (isXsNumeric(fieldType)) {
                     values.push(0.0)
+                } else if( isXsBoolean(fieldType)){
+                    values.push(false)
                 }
             }
 

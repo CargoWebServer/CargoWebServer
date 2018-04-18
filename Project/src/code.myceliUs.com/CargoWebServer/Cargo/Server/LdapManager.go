@@ -472,8 +472,9 @@ func (this *LdapManager) getComputerByName(name string) (*CargoEntities.Computer
 
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
-	query.Indexs = append(query.Indexs, "M_name="+name)
-	query.Fields = append(query.Fields, "UUID")
+	query.Query = "CargoEntities.Computer.M_name==\"" + name + "\""
+	query.Fields = append(query.Fields, "M_id")
+
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -490,9 +491,17 @@ func (this *LdapManager) getComputerByName(name string) (*CargoEntities.Computer
 	}
 
 	// Get the computer with it name...
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(results[0][0].(string))
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Computer", "CargoEntities", results[0])
 	if errObj == nil {
 		computer := computerEntity.(*CargoEntities.Computer)
+		addrs, err := net.LookupIP(computer.GetName())
+		if err == nil {
+			for _, addr := range addrs {
+				if ipv4 := addr.To4(); ipv4 != nil {
+					computer.SetIpv4(ipv4.String())
+				}
+			}
+		}
 		return computer, errObj
 	}
 
@@ -559,7 +568,6 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 			if attributes[j] == "distinguishedName" {
 				// First of all I will retreive the group itself...
 				values := strings.Split(row[j].(string), ",")
-
 				for k := 0; k < len(values); k++ {
 					value := values[k][strings.Index(values[k], "=")+1:]
 					if k == 0 {
@@ -599,7 +607,7 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 
 		computerEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Computer", "CargoEntities", []interface{}{computer.GetId()})
 		if computerEntity == nil {
-			/*addrs, err := net.LookupIP(computer.GetName())
+			addrs, err := net.LookupIP(computer.GetName())
 			for _, addr := range addrs {
 				if ipv4 := addr.To4(); ipv4 != nil {
 					computer.SetIpv4(ipv4.String())
@@ -609,21 +617,28 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 				log.Println("Adress not found!", computer.GetName())
 			} else {
 				log.Println("Save computer", computer.GetName(), computer.GetIpv4())
-			}*/
-
+			}
 			computerEntity, _ = GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", computer)
 			if computerEntity != nil {
 				computer = computerEntity.(*CargoEntities.Computer)
 			}
 			log.Println("----> create computer ", computer.GetId())
-		} else {
+		} /*else {
+			addrs, err := net.LookupIP(computer.GetName())
+			if err == nil {
+				for _, addr := range addrs {
+					if ipv4 := addr.To4(); ipv4 != nil {
+						computer.SetIpv4(ipv4.String())
+					}
+				}
+			}
 			// Call save on Entities...
 			computer.UUID = computerEntity.GetUuid()
 			computer.ParentUuid = computerEntity.GetParentUuid()
 			computer.ParentLnk = computerEntity.GetParentLnk()
 			GetServer().GetEntityManager().saveEntity(computer)
-			// log.Println("----> save computer ", computer.GetId())
-		}
+			log.Println("----> save computer ", computer.GetName(), computer.GetIpv4())
+		}*/
 	}
 
 	return nil

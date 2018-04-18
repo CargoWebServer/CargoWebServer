@@ -1700,6 +1700,10 @@ function formatString(value) {
  * @param {*} value 
  */
 function formatBoolean(value) {
+    if(value == undefined){
+        value = 0
+    }
+    
     if (value == 1) {
         return "true";
     } else if (value == 0) {

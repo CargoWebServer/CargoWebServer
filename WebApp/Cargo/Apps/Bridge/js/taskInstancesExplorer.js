@@ -119,7 +119,11 @@ TaskInstancesExplorer.prototype.setTaskTimer = function(instanceInfos, row, coun
         clearInterval(intervals[index]);
         intervals = intervals.splice(index, 1)
         delete intervalsMap[instanceInfos.TaskId]
-        row.element.parentNode.removeChild(row.element)
+        try{
+            row.element.parentNode.removeChild(row.element)
+        }catch(err){
+            // nothing to do here.
+        }
         // Set it back with it new status and delete callback.
         instanceInfos.EndTime = new Date().getTime() / 1000;
         this.setTask(instanceInfos, intervals, intervalsMap, intervals.length)
