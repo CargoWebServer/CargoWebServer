@@ -1713,7 +1713,7 @@ function formatBoolean(value) {
 }
 
 // Format the value
-function formatValue(value, typeName) {
+function formatValue(value, typeName, callback) {
     
     // get the base type name.
     if(getBaseTypeExtension(typeName).length > 0){
@@ -1741,11 +1741,22 @@ function formatValue(value, typeName) {
             }
     }else if (isXsNumeric(typeName)) {
         formatedValue = formatReal(value, 3)
+    }else if (typeName.endsWith(":Ref")) {
+        if(callback !=undefined){
+            getEntityIdsFromUuid(value, callback)
+        }
     }else if (isObject(value)) {
         if (value.M_valueOf != null) {
             formatedValue = value.M_valueOf
         }else if(value.toString != undefined){
             formatedValue = value.toString() // that function can be use to display object as string.
+        }else if(value.getTitles != undefined){
+            for(var i=0; i < value.getTitles(); i++){
+                formatedValue += value.getTitles()[i]
+                if(i < value.getTitles().length - 1){
+                    formatedValue += " "
+                }
+            }
         }
     } else if (isString(value)) {
         // remove empty values.
@@ -1754,11 +1765,8 @@ function formatValue(value, typeName) {
             var img = new Element(null, { "tag": "img", "src": value })
             return img;
         }
-
         formatedValue = null;
-
     }
-
 
     return formatedValue
 }

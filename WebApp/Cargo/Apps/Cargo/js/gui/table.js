@@ -1676,7 +1676,7 @@ var ColumnFilter = function (index, table) {
 		return function (evt) {
 			var val = this.value;
 
-			if(evt.keyCode == 13){
+			if (evt.keyCode == 13) {
 				columnFilter.okBtn.element.click()
 			}
 
@@ -1705,16 +1705,16 @@ var ColumnFilter = function (index, table) {
 			// Now I will apply the val to each row of the filter...
 			for (var i = 1; i < columnFilter.checkboxs.length; i++) {
 				var checkbox = columnFilter.checkboxs[i]
-				var id = checkbox.element.id
-				if(matchRuleShort(id.toUpperCase(), val) || id.toUpperCase().includes(val.toUpperCase())){
-					if(!checkbox.element.checked){
+				var id = checkbox.element.name // the value to test...
+				if (matchRuleShort(id.toUpperCase(), val) || id.toUpperCase().includes(val.toUpperCase())) {
+					if (!checkbox.element.checked) {
 						checkbox.element.checked = true
 					}
 					columnFilter.checkboxs[0].element.checked = false
-				}else if(checkbox.element.checked){
+				} else if (checkbox.element.checked) {
 					checkbox.element.checked = false
 				}
-				if(this.value.length == 0){
+				if (this.value.length == 0) {
 					columnFilter.checkboxs[0].element.checked = true
 				}
 			}
@@ -1839,14 +1839,14 @@ ColumnFilter.prototype.isActive = function () {
  * Get the list of different values.
  * @returns The list of different value.
  */
-ColumnFilter.prototype.getValues = function () {
+ColumnFilter.prototype.getValues = function (callback) {
 	var values = new Array()
 	for (var i = 0; i < this.table.getModel().getRowCount(); i++) {
 		// single value
 		if (!this.type.startsWith("[]")) {
 			// Get unique value...
 			var value = this.table.getModel().getValueAt(i, this.index)
-			value = formatValue(value, this.type)
+			value = formatValue(value, this.type, callback)
 			var j = 0
 			for (j = 0; j < values.length; j++) {
 				if (values[j] == value) {
@@ -1859,7 +1859,7 @@ ColumnFilter.prototype.getValues = function () {
 			// multiple values
 			var values_ = this.table.getModel().getValueAt(i, this.index)
 			for (var j = 0; j < values_.length; j++) {
-				value = formatValue(values_[j], this.type.replace("[]", ""))
+				value = formatValue(values_[j], this.type.replace("[]", ""), callback)
 				var k = 0
 				for (k = 0; k < values.length; k++) {
 					if (values[k] == value) {
@@ -1879,7 +1879,10 @@ ColumnFilter.prototype.getValues = function () {
 			values.sort()
 		}
 	}
-
+	// return the values in the callback.
+	if (callback != undefined) {
+		callback(values)
+	}
 	return values
 }
 
@@ -1892,14 +1895,30 @@ ColumnFilter.prototype.initFilterPanel = function () {
 	var type = this.table.getModel().getColumnClass(this.index)
 
 	if (!isXsDate(this.type)) {
-		var values = this.getValues()
-		// So here I will create the list of values with checkbox...
-		for (var i = 0; i < values.length; i++) {
-			// I will append all the value independently...
-			if (values[i] != null) {
-				this.appendFilter(values[i].toString())
+		if (this.type.endsWith(":Ref")) {
+			this.getValues(function(columnFilter){
+				return function(ids){
+					// So here I will create the list of values with checkbox...
+					// the first element is the uuid so i will not display it.
+					for (var i = 1; i < ids.length; i++) {
+						// I will append all the value independently...
+						if (ids[i] != null) {
+							columnFilter.appendFilter(ids[i].toString(), ids[0])
+						}
+					}
+				}
+			}(this))
+		} else {
+			var values = this.getValues()
+			// So here I will create the list of values with checkbox...
+			for (var i = 0; i < values.length; i++) {
+				// I will append all the value independently...
+				if (values[i] != null) {
+					this.appendFilter(values[i].toString())
+				}
 			}
 		}
+
 	} else {
 
 		var years = {} // map of years... 
@@ -2062,13 +2081,23 @@ ColumnFilter.prototype.initFilterPanel = function () {
  * Append new filter value.
  * @param value the filter value.
  */
-ColumnFilter.prototype.appendFilter = function (value) {
+ColumnFilter.prototype.appendFilter = function (value, id) {
+	value = value.trim()
+
 	// if it already exist.
 	if (value != "" && value != undefined) {
-		var id = randomUUID()
-		var line = this.filterPanel.appendElement({ "tag": "div", "id": id }).down()
-		var checkbox = line.appendElement({ "tag": "input", "type": "checkbox", "id":value, "name": value, "checked": "true" }).down()
-		var label = line.appendElement({ "tag": "label", "for": id, "name": value, "innerHtml": value.toString() })
+		if(id == undefined){
+			id = value
+		}
+		// only one checbox for a given id.
+		for(var i=0; i < this.checkboxs.length; i++){
+			if(this.checkboxs[i].id == id + "_checkbox"){
+				return this.checkboxs[i]
+			}
+		}
+		var line = this.filterPanel.appendElement({ "tag": "div", "id": id + "_filter_panel" }).down()
+		var checkbox = line.appendElement({ "tag": "input", "type": "checkbox", "id": id + "_checkbox", "name": value, "checked": "true" }).down()
+		var label = line.appendElement({ "tag": "label", "for": id + "_checkbox", "name": value, "innerHtml": value.toString() })
 		this.checkboxs.push(checkbox) // Keep reference to the checkbox...
 		this.filters[value] = checkbox
 		checkbox.element.onclick = function (filter) {
@@ -2150,13 +2179,13 @@ ColumnFilter.prototype.filterValues = function () {
 			for (var filter in this.filters) {
 				if (isArray(cellValue)) {
 					for (var j = 0; j < cellValue.length; j++) {
-						if (filter == cellValue[j]) {
+						if (filter == cellValue[j] || this.filters[filter].id.startsWith(cellValue[j])) {
 							isShow = true
 							break
 						}
 					}
 				} else {
-					if (filter == cellValue) {
+					if (filter == cellValue || this.filters[filter].id.startsWith(cellValue)) {
 						isShow = true
 						break
 					}

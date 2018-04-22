@@ -222,6 +222,10 @@
     border: 1px solid gray;
 }
 
+.filter_panel_buttons input{
+    background-color: white;
+}
+
 .filter_panel_buttons div{
     display: table-cell;
     width: 50%;
