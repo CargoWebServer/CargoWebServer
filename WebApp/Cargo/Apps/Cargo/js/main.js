@@ -25,10 +25,10 @@
  * This global object represent a reference to the distant server.
  * @see Server
  */
-//var server = new Server("localhost", "127.0.0.1", 9393)
+var server = new Server("localhost", "127.0.0.1", 9393)
 //var server = new Server("mon104", "10.67.44.73", 9393)
 //var server = new Server("mon-util-01", "10.2.128.70", 9393)
-var server = new Server("mon176", "10.67.44.31", 9393)
+//var server = new Server("mon176", "10.67.44.31", 9393)
 
 // Amazon ec2 sever...
 //var server = new Server("www.cargowebserver.com", "54.218.110.52", 9393)

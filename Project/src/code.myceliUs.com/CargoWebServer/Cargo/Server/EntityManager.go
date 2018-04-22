@@ -687,7 +687,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	var values map[string]interface{}
 	var err error
 
-	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		values = entity.(*DynamicEntity).getValues()
 		log.Println("---> delete entity event: ", values)
 	} else {

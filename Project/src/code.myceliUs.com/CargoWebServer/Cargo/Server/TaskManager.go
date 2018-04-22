@@ -67,20 +67,37 @@ func (this *TaskManager) start() {
 	instancesInfos := make([]*TaskInstanceInfo, 0)
 
 	for {
+
 		select {
 		// set the task.
 		case task := <-this.m_setScheduledTasksChan:
 
 			// Only one instance at time can running at any time...
+			isRunning := false
 			for i := 0; i < len(instancesInfos); i++ {
 				if task.GetId() == instancesInfos[i].TaskId {
-					if tasks[instancesInfos[i].TaskId] != nil {
-						if instancesInfos[i].Status != "Completed" && instancesInfos[i].Status != "Failed" {
+					if instancesInfos[i].Status == "Running" {
+						// I will not planned the task if is running.
+						// The task will be planned when it instance if completed.
+						isRunning = true
+						break // exsit that scheduled task...
+					}
+				}
+			}
+
+			// Planned the next instance if is not already running.
+			if !isRunning {
+				// Remove previously planned task.
+				for i := 0; i < len(instancesInfos); i++ {
+					if task.GetId() == instancesInfos[i].TaskId {
+						if instancesInfos[i].Status == "Scheduled" {
 							// Stop and remove the timer from the map.
 							instancesInfos[i].CancelTime = time.Now().Unix()
 							instancesInfos[i].Status = "Canceled"
-							tasks[instancesInfos[i].TaskId].Stop()
-							delete(tasks, instancesInfos[i].TaskId)
+							if tasks[instancesInfos[i].TaskId] != nil {
+								tasks[instancesInfos[i].TaskId].Stop()
+								delete(tasks, instancesInfos[i].TaskId)
+							}
 
 							// Send event message...
 							var eventDatas []*MessageData
@@ -95,72 +112,71 @@ func (this *TaskManager) start() {
 						}
 					}
 				}
-			}
 
-			// Set the timer.
-			var instanceInfos *TaskInstanceInfo
+				// Set the timer.
+				var instanceInfos *TaskInstanceInfo
 
-			// Plan the next instance.
-			startTime := time.Unix(task.GetStartTime(), 0)
-			delay := startTime.Sub(time.Now())
-			timer := time.NewTimer(delay)
-			tasks[task.GetId()] = timer
+				// Plan the next instance.
+				startTime := time.Unix(task.GetStartTime(), 0)
+				delay := startTime.Sub(time.Now())
+				timer := time.NewTimer(delay)
+				tasks[task.GetId()] = timer
 
-			// Keep task info here.
-			instanceInfos = new(TaskInstanceInfo)
-			instanceInfos.UUID = Utility.RandomUUID()
-			instanceInfos.CreationTime = time.Now().Unix() // Time of task creation.
-			// append to the list of task.
-			instancesInfos = append(instancesInfos, instanceInfos)
+				// Keep task info here.
+				instanceInfos = new(TaskInstanceInfo)
+				instanceInfos.UUID = Utility.RandomUUID()
+				instanceInfos.CreationTime = time.Now().Unix() // Time of task creation.
+				// append to the list of task.
+				instancesInfos = append(instancesInfos, instanceInfos)
 
-			instanceInfos.TYPENAME = "Server.TaskInstanceInfo"
-			instanceInfos.TaskId = task.GetId()
-			instanceInfos.StartTime = task.GetStartTime() // When the task is planed to start
+				instanceInfos.TYPENAME = "Server.TaskInstanceInfo"
+				instanceInfos.TaskId = task.GetId()
+				instanceInfos.StartTime = task.GetStartTime() // When the task is planed to start
 
-			// Run the task.
-			runTask := func() {
-				err := GetTaskManager().runTask(task) // run the task.
-				instanceInfos.EndTime = time.Now().Unix()
-				if err != nil {
-					instanceInfos.Status = "Failed"
-					instanceInfos.Error = err.Error()
+				// Run the task.
+				runTask := func() {
+					err := GetTaskManager().runTask(task) // run the task.
+					instanceInfos.EndTime = time.Now().Unix()
+					if err != nil {
+						instanceInfos.Status = "Failed"
+						instanceInfos.Error = err.Error()
+					}
+					if instanceInfos.Status != "Failed" && instanceInfos.Status != "Canceled" {
+						instanceInfos.Status = "Completed"
+					}
+					// Send event message...
+					var eventDatas []*MessageData
+					evtData := new(MessageData)
+					evtData.TYPENAME = "Server.MessageData"
+					evtData.Name = "taskInfos"
+					evtData.Value = instanceInfos
+					eventDatas = append(eventDatas, evtData)
+					evt, _ := NewEvent(UpdateTaskEvent, ConfigurationEvent, eventDatas)
+					GetServer().GetEventManager().BroadcastEvent(evt)
 				}
-				if instanceInfos.Status != "Failed" && instanceInfos.Status != "Canceled" {
-					instanceInfos.Status = "Completed"
+
+				if delay > 0 {
+					instanceInfos.Status = "Scheduled"
+					go func(task *Config.ScheduledTask, timer *time.Timer, instanceInfos *TaskInstanceInfo) {
+						<-timer.C // wait util the delay expire...
+						runTask()
+					}(task, timer, instanceInfos)
+				} else {
+					instanceInfos.Status = "Running"
+					go runTask()
 				}
+
 				// Send event message...
 				var eventDatas []*MessageData
 				evtData := new(MessageData)
 				evtData.TYPENAME = "Server.MessageData"
 				evtData.Name = "taskInfos"
 				evtData.Value = instanceInfos
+
 				eventDatas = append(eventDatas, evtData)
-				evt, _ := NewEvent(UpdateTaskEvent, ConfigurationEvent, eventDatas)
+				evt, _ := NewEvent(NewTaskEvent, ConfigurationEvent, eventDatas)
 				GetServer().GetEventManager().BroadcastEvent(evt)
 			}
-
-			if delay > 0 {
-				instanceInfos.Status = "Scheduled"
-				go func(task *Config.ScheduledTask, timer *time.Timer, instanceInfos *TaskInstanceInfo) {
-					<-timer.C // wait util the delay expire...
-					runTask()
-				}(task, timer, instanceInfos)
-			} else {
-				instanceInfos.Status = "Running"
-				go runTask()
-			}
-
-			// Send event message...
-			var eventDatas []*MessageData
-			evtData := new(MessageData)
-			evtData.TYPENAME = "Server.MessageData"
-			evtData.Name = "taskInfos"
-			evtData.Value = instanceInfos
-
-			eventDatas = append(eventDatas, evtData)
-			evt, _ := NewEvent(NewTaskEvent, ConfigurationEvent, eventDatas)
-			GetServer().GetEventManager().BroadcastEvent(evt)
-
 		// reset the task.
 		case uuid := <-this.m_cancelScheduledTasksChan:
 			for i := 0; i < len(instancesInfos); i++ {
@@ -357,6 +373,7 @@ func (this *TaskManager) scheduleTask(task *Config.ScheduledTask) {
 		task.SetStartTime(nextTime.Unix())
 
 	} else {
+
 		if task.GetStartTime() == 0 {
 			// Run the task directly in that case.
 			this.m_setScheduledTasksChan <- task

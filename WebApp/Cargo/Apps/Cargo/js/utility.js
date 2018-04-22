@@ -1714,6 +1714,7 @@ function formatBoolean(value) {
 
 // Format the value
 function formatValue(value, typeName) {
+    
     // get the base type name.
     if(getBaseTypeExtension(typeName).length > 0){
         typeName = getBaseTypeExtension(typeName)
@@ -1743,6 +1744,8 @@ function formatValue(value, typeName) {
     }else if (isObject(value)) {
         if (value.M_valueOf != null) {
             formatedValue = value.M_valueOf
+        }else if(value.toString != undefined){
+            formatedValue = value.toString() // that function can be use to display object as string.
         }
     } else if (isString(value)) {
         // remove empty values.

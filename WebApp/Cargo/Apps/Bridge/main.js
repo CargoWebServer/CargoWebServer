@@ -11,6 +11,7 @@ var ChangeThemeEvent = 101;
 var mainPage = null;
 var catalog = null;
 var homePage = null;
+var bodyElement = null;
 
 function init() {
     // console.log("welcome to bridge!")
@@ -29,7 +30,7 @@ function init() {
         }
     }
 
-    var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
+    bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
     // The body element....
     var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
@@ -59,7 +60,7 @@ function init() {
 var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon-util-01", "10.2.128.70", 9494)
 //var service = new Server("mon104", "10.67.44.73", 9494)
-var service = new Server("mon176", "10.67.44.31", 9494)
+//var service = new Server("mon176", "10.67.44.31", 9494)
 
 var xapian = null
 

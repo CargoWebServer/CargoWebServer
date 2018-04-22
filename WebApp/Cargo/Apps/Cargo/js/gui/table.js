@@ -536,6 +536,7 @@ var TableRow = function (table, index, data, id) {
 		}
 	}
 
+	// Display the row in that case.
 	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
 
 	// empty space to keep rows align with it header.
@@ -607,7 +608,7 @@ var TableCell = function (row, index, value) {
 			// Here I will remove the cell editor from the cell div.
 			try {
 				cell.editor.editor.element.parentNode.removeChild(cell.editor.editor.element);
-			} catch (err){
+			} catch (err) {
 				// Nothing to catch here.
 			}
 
@@ -1666,6 +1667,60 @@ var ColumnFilter = function (index, table) {
 	this.filterPanel = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel_scroll" }).down()
 		.appendElement({ "tag": "div", "class": "filter_panel" }).down()
 
+	// Now the search box to select element base on given values... 
+	var searchPanelButtons = this.filterPanelDiv.prependElement({ "tag": "div", "class": "filter_panel_buttons", "style": "margin-bottom: 1px; height: auto;" }).down()
+	this.searchBox = searchPanelButtons.appendElement({ "tag": "input", "style": "display:table-cell; width: 100%; border: 1px solid transparent;" }).down()
+
+	// Set selection state from a given values.
+	this.searchBox.element.onkeyup = function (columnFilter) {
+		return function (evt) {
+			var val = this.value;
+
+			if(evt.keyCode == 13){
+				columnFilter.okBtn.element.click()
+			}
+
+			//Short code
+			function matchRuleShort(str, rule) {
+				return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
+			}
+
+			//Explanation code
+			function matchRuleExpl(str, rule) {
+				// "."  => Find a single character, except newline or line terminator
+				// ".*" => Matches any string that contains zero or more characters
+				rule = rule.split("*").join(".*");
+
+				// "^"  => Matches any string with the following at the beginning of it
+				// "$"  => Matches any string with that in front at the end of it
+				rule = "^" + rule + "$"
+
+				//Create a regular expression object for matching string
+				var regex = new RegExp(rule);
+
+				//Returns true if it finds a match, otherwise it returns false
+				return regex.test(str);
+			}
+
+			// Now I will apply the val to each row of the filter...
+			for (var i = 1; i < columnFilter.checkboxs.length; i++) {
+				var checkbox = columnFilter.checkboxs[i]
+				var id = checkbox.element.id
+				if(matchRuleShort(id.toUpperCase(), val) || id.toUpperCase().includes(val.toUpperCase())){
+					if(!checkbox.element.checked){
+						checkbox.element.checked = true
+					}
+					columnFilter.checkboxs[0].element.checked = false
+				}else if(checkbox.element.checked){
+					checkbox.element.checked = false
+				}
+				if(this.value.length == 0){
+					columnFilter.checkboxs[0].element.checked = true
+				}
+			}
+		}
+	}(this)
+
 	// Now the button...
 	var filterPanelButtons = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel_buttons" }).down()
 
@@ -1728,6 +1783,7 @@ var ColumnFilter = function (index, table) {
 			for (var i = 1; i < filter.checkboxs.length; i++) {
 				if (this.checked == true) {
 					filter.checkboxs[i].element.checked = true
+					filter.searchBox.element.value = ""
 				} else {
 					filter.checkboxs[i].element.checked = false
 				}
@@ -1743,11 +1799,29 @@ var ColumnFilter = function (index, table) {
 	////////////////////////////////////////////////////////////////////////////////////
 	this.filterIcon.element.onclick = function (filter) {
 		return function () {
+			if (filter.filterPanelDiv.element.style.display == "block") {
+				filter.filterPanelDiv.element.style.display = "none"
+				return
+			}
+			var filterPanelDivs = document.getElementsByClassName("filter_panel_div")
+			for (var i = 0; i < filterPanelDivs.length; i++) {
+				filterPanelDivs[i].style.display = "none"
+			}
+
 			if (filter.filterPanelDiv.element.style.display != "block") {
 				filter.filterPanelDiv.element.style.display = "block"
+				filter.table.div.element.getBoundingClientRect()
+				// I will display the fiter at right if is outiside the table.
+				var divRect = filter.filterPanelDiv.element.getBoundingClientRect()
+				var tableRect = filter.table.div.element.getBoundingClientRect()
+				if (divRect.x + divRect.width > tableRect.x + tableRect.width) {
+					filter.filterPanelDiv.element.style.right = "20px"
+				}
 			} else {
 				filter.filterPanelDiv.element.style.display = "none"
 			}
+
+
 		}
 	}(this)
 
@@ -1785,7 +1859,7 @@ ColumnFilter.prototype.getValues = function () {
 			// multiple values
 			var values_ = this.table.getModel().getValueAt(i, this.index)
 			for (var j = 0; j < values_.length; j++) {
-				value = formatValue(values_[j], this.type)
+				value = formatValue(values_[j], this.type.replace("[]", ""))
 				var k = 0
 				for (k = 0; k < values.length; k++) {
 					if (values[k] == value) {
@@ -1816,6 +1890,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 
 	// First of all I wil get the list of value...
 	var type = this.table.getModel().getColumnClass(this.index)
+
 	if (!isXsDate(this.type)) {
 		var values = this.getValues()
 		// So here I will create the list of values with checkbox...
@@ -1988,10 +2063,11 @@ ColumnFilter.prototype.initFilterPanel = function () {
  * @param value the filter value.
  */
 ColumnFilter.prototype.appendFilter = function (value) {
+	// if it already exist.
 	if (value != "" && value != undefined) {
 		var id = randomUUID()
 		var line = this.filterPanel.appendElement({ "tag": "div", "id": id }).down()
-		var checkbox = line.appendElement({ "tag": "input", "type": "checkbox", "name": value, "checked": "true" }).down()
+		var checkbox = line.appendElement({ "tag": "input", "type": "checkbox", "id":value, "name": value, "checked": "true" }).down()
 		var label = line.appendElement({ "tag": "label", "for": id, "name": value, "innerHtml": value.toString() })
 		this.checkboxs.push(checkbox) // Keep reference to the checkbox...
 		this.filters[value] = checkbox
