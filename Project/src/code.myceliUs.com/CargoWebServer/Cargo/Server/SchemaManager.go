@@ -918,9 +918,16 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 	// Resolve the reference, and append an element of this existing
 	// type.
 	if len(element.Ref) > 0 {
-		isRef := true //strings.HasSuffix(element.Type, "anyURI")
+		isRef := strings.HasSuffix(element.Type, "anyURI") // Only anyUri will be considere as a reference type.
 		if val, ok := this.globalElements[schema.Id+"."+removeNs(element.Ref)]; ok {
-			ref := element.Name
+			var ref string
+			// if no name is given in the element I will use it reference as name.
+			if len(element.Name) > 0 {
+				ref = element.Name
+			} else {
+				ref = element.Ref
+			}
+
 			element = val
 
 			if p, ok := this.prototypes[schema.Id+"."+element.Name]; ok {

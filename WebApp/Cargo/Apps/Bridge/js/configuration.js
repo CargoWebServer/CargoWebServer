@@ -72,6 +72,9 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.removeDataSchema(entity.M_id)
                         }
+                        if(view.deleteCallback!=undefined){
+                            view.deleteCallback(entity)
+                        }
                     }
                 }
 
@@ -143,12 +146,33 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
     var contentView = new EntityPanel(configurationContent, content.TYPENAME,
         function (content, title) {
             return function (contentView) {
+                if (content.TYPENAME == "Config.DataStoreConfiguration") {
+                    // The delete callback function.
+                    contentView.deleteCallback = function (entity) {
+                        // Here I will remove the folder if the entity is 
+                        // a database...
+                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            // also remove the data store.
+                            server.dataManager.deleteDataStore(entity.M_id,
+                                // success callback
+                                function () {
+
+                                },
+                                // error callback.
+                                function () {
+
+                                }, this)
+
+                        }
+                    }
+                }
+
                 // Always set the value after the panel was initialysed.
                 contentView.setEntity(content)
                 contentView.header.display()
 
                 // The data store configuration.
-                if (content.TYPENAME == "Config.DataStoreConfiguration") {
+               if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
                     // Here I have a service configuration.
                     if (content.UUID != undefined) {
@@ -157,7 +181,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             homePage.dataExplorer.initDataSchema(content)
                         }
                     }
-
+                    
                     // Here I will broadcast a local event, export data menue need that information.
                     var evt = {
                         "code": NewDataStoreEvent, "name": DataEvent,
@@ -244,25 +268,6 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                         }
                     }(contentView)
-
-                    // The delete callback function.
-                    contentView.deleteCallback = function (entity) {
-                        // Here I will remove the folder if the entity is 
-                        // a database...
-                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            // also remove the data store.
-                            server.dataManager.deleteDataStore(entity.M_id,
-                                // success callback
-                                function () {
-
-                                },
-                                // error callback.
-                                function () {
-
-                                }, this)
-
-                        }
-                    }
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,
