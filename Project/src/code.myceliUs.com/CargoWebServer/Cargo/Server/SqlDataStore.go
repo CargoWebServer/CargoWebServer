@@ -60,6 +60,9 @@ type SqlDataStore struct {
 
 	/** The list of reference informations **/
 	m_refInfos map[string][][]string
+
+	/** Keep prototypes here **/
+	m_prototypes map[string]*EntityPrototype
 }
 
 func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error) {
@@ -84,6 +87,8 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	if store.m_vendor == Config.DataStoreVendor_CARGO {
 		return nil, errors.New("Mycelius is a Key value store not sql.")
 	}
+
+	store.m_prototypes = make(map[string]*EntityPrototype, 0)
 
 	return store, nil
 }
@@ -249,6 +254,9 @@ func (this *SqlDataStore) Connect() error {
 	if err != nil {
 		return err
 	}
+
+	// set the prototype in the map...
+	this.GetEntityPrototypes()
 
 	return err
 }
@@ -759,6 +767,12 @@ func (this *SqlDataStore) Close() error {
 	if this.m_db != nil {
 		return this.m_db.Close()
 	}
+
+	// Clear the map.
+	for typeName, _ := range this.m_prototypes {
+		delete(this.m_prototypes, typeName)
+	}
+
 	return nil
 }
 
@@ -825,6 +839,10 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 
 	if !Utility.IsValidVariableName(id) {
 		return nil, errors.New("Wrong type name " + id + "!")
+	}
+
+	if this.m_prototypes[id] != nil {
+		return this.m_prototypes[id], nil
 	}
 
 	var prototype *EntityPrototype
@@ -927,6 +945,10 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 			}
 		}
 	}
+
+	// keep in the map.
+	this.m_prototypes[id] = prototype
+
 	return prototype, err
 }
 

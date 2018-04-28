@@ -1,0 +1,17 @@
+.test{
+    border : 1px solid black;
+    display: inline-block;
+}
+
+body .test{
+    min-width: 100px;
+    background-color: greenyellow;
+}
+
+.test div{
+    /*display : table-cell;*/
+    vertical-align: middle;
+    text-align : center;
+    background-color: fuchsia;
+}
+

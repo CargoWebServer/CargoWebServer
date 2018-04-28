@@ -918,14 +918,15 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 	// Resolve the reference, and append an element of this existing
 	// type.
 	if len(element.Ref) > 0 {
-		isRef := strings.HasSuffix(element.Type, "anyURI")
+		isRef := true //strings.HasSuffix(element.Type, "anyURI")
 		if val, ok := this.globalElements[schema.Id+"."+removeNs(element.Ref)]; ok {
+			ref := element.Name
 			element = val
 
 			if p, ok := this.prototypes[schema.Id+"."+element.Name]; ok {
 				// Here the prototype is found...
-				if !Utility.Contains(prototype.Fields, "M_"+element.Name) {
-					prototype.Fields = append(prototype.Fields, "M_"+element.Name)
+				if !Utility.Contains(prototype.Fields, "M_"+ref) {
+					prototype.Fields = append(prototype.Fields, "M_"+ref)
 
 					if p.TypeName == "xs.anyURI" || getRootTypeName(p.TypeName) == "xs.anyURI" || isRef {
 						prototype.FieldsType = append(prototype.FieldsType, p.TypeName+":Ref")
@@ -943,8 +944,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 			} else {
 				p := this.createPrototypeElement(schema, element)
 				if p != nil {
-					if !Utility.Contains(prototype.Fields, "M_"+element.Name) {
-						prototype.Fields = append(prototype.Fields, "M_"+element.Name)
+					if !Utility.Contains(prototype.Fields, "M_"+ref) {
+						prototype.Fields = append(prototype.Fields, "M_"+ref)
 
 						if p.TypeName == "xs.anyURI" || getRootTypeName(p.TypeName) == "xs.anyURI" || isRef {
 							prototype.FieldsType = append(prototype.FieldsType, p.TypeName+":Ref")

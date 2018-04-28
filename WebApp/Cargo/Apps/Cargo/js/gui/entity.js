@@ -426,7 +426,12 @@ FieldPanel.prototype.setValue = function (value) {
 			var values = []
 			for (var i = 0; i < value.length; i++) {
 				if (isObjectReference(value[i])) {
-					values.push(entities[value[i]])
+					if(entities[value[i]] != undefined){
+						values.push(entities[value[i]])
+					}else{
+						// the value is undefined
+						console.log("---> value not initialyse localy: ", value[i])
+					}
 				} else {
 					values.push(value[i])
 				}
@@ -435,11 +440,19 @@ FieldPanel.prototype.setValue = function (value) {
 		} else {
 			if (isObjectReference(value)) {
 				value = entities[value]
-			}
-			if (value.UUID != undefined) {
-				this.value.element.id = value.UUID + "_panel"
+				if (value != undefined) {
+					if (value.UUID != undefined) {
+						this.value.element.id = value.UUID + "_panel"
+					}
+				}else{
+					// Here I will get the value from the sever.
+					console.log("---> value not initialyse localy: ", value)
+				}
 			}
 		}
+	} else {
+		// Here I got an object reference.
+		console.log("value is a reference:", value)
 	}
 
 	this.value.element.style.display = ""
@@ -580,7 +593,12 @@ FieldRenderer.prototype.setValue = function (value) {
 				function setValue(value, index, fieldRenderer) {
 					// simply append the values with there index in that case.
 					var v = formatValue(value, fieldRenderer.parent.fieldType.replace("[]", ""))
-					var row = fieldRenderer.renderer.appendRow([v], index)
+					if (isArray(v)) {
+						var row = fieldRenderer.renderer.appendRow(v, index)
+					} else {
+						var row = fieldRenderer.renderer.appendRow([v], index)
+					}
+
 				}
 				// Here we got an array of basic types.
 				if (isArray(value)) {
@@ -777,7 +795,7 @@ var FieldEditor = function (fieldPanel, callback) {
 				// In case of date i need to transform the value into a unix time.
 				if (isXsTime(fieldPanel.fieldType) || isXsDate(fieldPanel.fieldType)) {
 					value = moment(value).unix()
-					if(value == 0){
+					if (value == 0) {
 						fieldPanel.value.element.innerText = ""
 					}
 				}
@@ -853,7 +871,7 @@ FieldEditor.prototype.setValue = function (value) {
 				this.editor.element.checked = false
 			}
 		} else if (this.editor.element.type == "date" || this.editor.element.type == "datetime-local") {
-			if(value == 0){
+			if (value == 0) {
 				value = new Date().toISOString()
 			}
 			if (isXsTime(this.parent.fieldType)) {

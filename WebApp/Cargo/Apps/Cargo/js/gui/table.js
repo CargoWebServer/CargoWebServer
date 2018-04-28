@@ -634,14 +634,16 @@ var TableCell = function (row, index, value) {
 	}
 
 	// The click event is use to edit array ...
-	if (!this.getType().startsWith("[]")) {
-		// Now the double click event...
-		this.div.element.ondblclick = function (cell) {
-			return function (e) {
-				e.stopPropagation()
-				cell.setCellEditor()
-			}
-		}(this)
+	if (this.getType() != undefined) {
+		if (!this.getType().startsWith("[]")) {
+			// Now the double click event...
+			this.div.element.ondblclick = function (cell) {
+				return function (e) {
+					e.stopPropagation()
+					cell.setCellEditor()
+				}
+			}(this)
+		}
 	}
 }
 
@@ -1063,6 +1065,9 @@ var TableCellRenderer = function (cell) {
  * @param {} value The value to display in the cell.
  */
 TableCellRenderer.prototype.render = function (value, fieldType) {
+	if (fieldType == null) {
+		return
+	}
 	if (this.cell.row.table.renderFcts[fieldType] != undefined) {
 		// In that case I will use the overide function to render the cell.
 		return this.cell.row.table.renderFcts[fieldType](value)
@@ -1159,7 +1164,7 @@ function renderRef(div, ref, fieldName, refOwner) {
 							return function () {
 								if (entityPanel.getEntity == undefined) {
 									// In that case I will set the entity.
-									server.entityManager.getEntityByUuid(ref, true,
+									server.entityManager.getEntityByUuid(ref, false,
 										// success callback
 										function (entity, entityPanel) {
 											entityPanel.setEntity(entity)
@@ -1896,8 +1901,8 @@ ColumnFilter.prototype.initFilterPanel = function () {
 
 	if (!isXsDate(this.type)) {
 		if (this.type.endsWith(":Ref")) {
-			this.getValues(function(columnFilter){
-				return function(ids){
+			this.getValues(function (columnFilter) {
+				return function (ids) {
 					// So here I will create the list of values with checkbox...
 					// the first element is the uuid so i will not display it.
 					for (var i = 1; i < ids.length; i++) {
@@ -2086,12 +2091,12 @@ ColumnFilter.prototype.appendFilter = function (value, id) {
 
 	// if it already exist.
 	if (value != "" && value != undefined) {
-		if(id == undefined){
+		if (id == undefined) {
 			id = value
 		}
 		// only one checbox for a given id.
-		for(var i=0; i < this.checkboxs.length; i++){
-			if(this.checkboxs[i].id == id + "_checkbox"){
+		for (var i = 0; i < this.checkboxs.length; i++) {
+			if (this.checkboxs[i].id == id + "_checkbox") {
 				return this.checkboxs[i]
 			}
 		}

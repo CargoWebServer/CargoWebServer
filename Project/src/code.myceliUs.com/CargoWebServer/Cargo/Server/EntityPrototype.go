@@ -340,7 +340,11 @@ func (this *EntityPrototype) generateConstructor() string {
 	// Create field and set her initial values.
 	for i := 3; i < len(this.Fields); i++ {
 		if len(this.FieldsDefaultValue[i]) != 0 {
-			constructorSrc += " this." + this.Fields[i] + " = " + this.FieldsDefaultValue[i] + "\n"
+			if strings.HasPrefix(this.FieldsType[i], "[]") {
+				constructorSrc += " this." + this.Fields[i] + " = []\n"
+			} else {
+				constructorSrc += " this." + this.Fields[i] + " = " + this.FieldsDefaultValue[i] + "\n"
+			}
 		} else {
 			if strings.HasPrefix(this.FieldsType[i], "[]") {
 				constructorSrc += " this." + this.Fields[i] + " = []\n"
