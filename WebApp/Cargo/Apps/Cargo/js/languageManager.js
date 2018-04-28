@@ -94,20 +94,8 @@ LanguageManager.prototype.setLanguage = function (language) {
 		for (var i = 0; i < this.textElements[textElementsId].length; i++) {
 			var element = this.textElements[textElementsId][i]
 			if (element != undefined) {
+				// set the element language here.
 				this.setElementText(element, textElementsId)
-			}
-		}
-	}
-
-	// each language has it class of div (ex fr, en )
-	// if it not correspond to the active language it will not be displayed.
-	for (var l in this.languageInfo) {
-		var elements = document.getElementsByClassName(l)
-		for (var i = 0; i < elements.length; i++) {
-			if (l != this.language) {
-				elements[i].style.display = "none";
-			} else {
-				elements[i].style.display = "";
 			}
 		}
 	}

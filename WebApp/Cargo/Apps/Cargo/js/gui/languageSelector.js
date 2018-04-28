@@ -40,10 +40,35 @@ LanguageSelector.prototype.setLanguage = function(language){
         this.languageListDiv.parentElement.removeElement(this.languageListDiv)
         this.languageListDiv = null
     }
+
     // call the callback function.
     if(this.callback != null){
         this.callback(language)
     }
+    
+	// each language has it class of div (ex fr, en )
+	// if it not correspond to the active language it will not be displayed.
+	var styleSheet = getStyleSheetByFileName("/css/gui/languageSelector.css")
+	for (var language_ in languageInfo) {
+        var ruleIndex = -1;
+		for (var j = 0; j < styleSheet.cssRules.length; j++) {
+			var rule = styleSheet.cssRules[j]
+			if (rule.selectorText == "div:lang(" + language_ + ")") {
+				ruleIndex = j
+                rule.style.display = "none"
+                break;
+			}
+        }
+        // append the rule if not exist.
+		if (ruleIndex == -1) {
+            ruleIndex = 0;
+			styleSheet.insertRule("div:lang(" + language_ + ") { display: none; }", 0);
+		}
+        // Set the language as needed
+		if(language_ == language.id){
+            styleSheet.cssRules[ruleIndex].style.display = "block";
+		}
+	}
 }
 
 LanguageSelector.prototype.displayLanguages = function(){
