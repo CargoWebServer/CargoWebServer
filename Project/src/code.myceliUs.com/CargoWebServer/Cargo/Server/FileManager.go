@@ -1468,6 +1468,17 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
 	}
 
+	// Generate the openFileEvent.
+	eventData := make([]*MessageData, 1)
+	fileInfo := new(MessageData)
+	fileInfo.TYPENAME = "Server.MessageData"
+	fileInfo.Name = "FileInfo"
+	fileInfo.Value = map[string]interface{}{"sessionId": sessionId, "fileId": file.GetUuid()}
+	eventData[0] = fileInfo
+
+	evt, _ := NewEvent(OpenFileEvent, file.GetUuid()+"_editor", eventData)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
 	// Return the file object...
 	return file
 }

@@ -554,8 +554,6 @@ function propertyFromStylesheet(selector, attribute) {
                         value = rule.style.getPropertyValue(attribute);
                         return true;
                     }
-
-                    return false;
                 });
             }
 
@@ -566,6 +564,22 @@ function propertyFromStylesheet(selector, attribute) {
     return value;
 }
 
+function getRulesByName(selector) {
+    var rules = [];
+
+    [].some.call(document.styleSheets, function (sheet) {
+        return [].some.call(sheet.rules, function (rule) {
+            if (selector === rule.selectorText) {
+                return [].some.call(rule.style, function (style) {
+                    rules.push(rules)
+                    return rules;
+                });
+            }
+            return rules;
+        });
+    });
+    return rules;
+}
 
 /**
  * The map of frame rules indexed by their name.

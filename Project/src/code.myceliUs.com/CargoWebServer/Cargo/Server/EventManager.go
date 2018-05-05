@@ -2,8 +2,8 @@ package Server
 
 import (
 	"encoding/json"
-
 	"log"
+	"reflect"
 	"regexp"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -36,26 +36,27 @@ const (
 	UpdateFileEvent                = 19
 	OpenFileEvent                  = 20
 	CloseFileEvent                 = 21
+	FileEditEvent                  = 22
 	DataEvent                      = "DataEvent"
-	DeleteRowEvent                 = 22
-	NewRowEvent                    = 23
-	UpdateRowEvent                 = 24
-	NewDataStoreEvent              = 25
-	DeleteDataStoreEvent           = 26
+	DeleteRowEvent                 = 23
+	NewRowEvent                    = 24
+	UpdateRowEvent                 = 25
+	NewDataStoreEvent              = 26
+	DeleteDataStoreEvent           = 27
 	SecurityEvent                  = "SecurityEvent"
-	NewRoleEvent                   = 27
-	DeleteRoleEvent                = 28
-	UpdateRoleEvent                = 29
+	NewRoleEvent                   = 28
+	DeleteRoleEvent                = 29
+	UpdateRoleEvent                = 30
 	PrototypeEvent                 = "PrototypeEvent"
-	NewPrototypeEvent              = 30
-	UpdatePrototypeEvent           = 31
-	DeletePrototypeEvent           = 32
+	NewPrototypeEvent              = 31
+	UpdatePrototypeEvent           = 32
+	DeletePrototypeEvent           = 33
 	ProjectEvent                   = "ProjectEvent"
 	EmailEvent                     = "EmailEvent"
 	ServiceEvent                   = "ServiceEvent"
 	ConfigurationEvent             = "ConfigurationEvent"
-	NewTaskEvent                   = 33
-	UpdateTaskEvent                = 34
+	NewTaskEvent                   = 34
+	UpdateTaskEvent                = 35
 	EventEvent                     = "EventEvent"
 	LdapEvent                      = "LdapEvent"
 	OAuth2Event                    = "OAuth2Event"
@@ -71,6 +72,11 @@ type EventManager struct {
 	// The map of avalaible event channels...
 	m_channels     map[string]*EventChannel
 	m_eventDataMap map[*Event]string
+
+	// Contain the list of edit event for a given file.
+	// The first map contain the list fileUuid as id
+	// The second map contain the edit event uuid as id
+	m_fileEditEvents map[string]map[string]interface{}
 
 	// Concurent map access.
 	m_opChannel chan map[string]interface{}
@@ -92,6 +98,7 @@ func newEventManager() *EventManager {
 	eventManager := new(EventManager)
 	eventManager.m_channels = make(map[string]*EventChannel, 0)
 	eventManager.m_opChannel = make(chan map[string]interface{}, 0)
+	eventManager.m_fileEditEvents = make(map[string]map[string]interface{}, 0)
 
 	// Concurrency...
 	go func() {
@@ -120,7 +127,36 @@ func newEventManager() *EventManager {
 				} else if op["op"] == "BroadcastEvent" {
 					evt := op["evt"].(*Event)
 					channel := eventManager.m_channels[evt.GetName()]
+					log.Println("---> eventNumber ", *evt.Code, evt.GetName(), evt.GetEvtData())
 					if channel != nil {
+						var messages []*MessageData
+						json.Unmarshal([]byte(eventManager.m_eventDataMap[evt]), messages)
+						eventNumber := int(*evt.Code)
+						if eventNumber == OpenFileEvent {
+							for i := 0; i < len(messages); i++ {
+								log.Println(messages[i])
+								log.Println(reflect.TypeOf(messages[i].Value).String())
+							}
+						} else if eventNumber == CloseFileEvent {
+
+						} else if eventNumber == UpdateFileEvent {
+
+						} else if eventNumber == DeleteFileEvent {
+
+						} else if eventNumber == FileEditEvent {
+							log.Println("---> ", messages)
+							for i := 0; i < len(messages); i++ {
+								log.Println(messages[i])
+								log.Println(reflect.TypeOf(messages[i].Value).String())
+								fileEditEvent := messages[i].Value.(map[string]interface{})
+								if eventManager.m_fileEditEvents[evt.GetName()] == nil {
+									eventManager.m_fileEditEvents[evt.GetName()] = make(map[string]interface{})
+								}
+								// Keep the edit event in memory.
+								eventManager.m_fileEditEvents[evt.GetName()][fileEditEvent["uuid"].(string)] = fileEditEvent
+							}
+						}
+
 						channel.broadcastEvent(evt)
 					}
 					delete(eventManager.m_eventDataMap, evt)
@@ -147,7 +183,6 @@ func newEventManager() *EventManager {
 				} else if op["op"] == "RemoveEventListener" {
 					id := op["id"].(string)
 					name := op["name"].(string)
-
 					// Remove the listener
 					listener := eventManager.m_channels[name].m_listeners[id]
 					eventManager.m_channels[name].removeEventListener(listener)
@@ -402,6 +437,7 @@ type EventChannel struct {
  * This funtion is use to broadcast the event over listener...
  */
 func (this *EventChannel) broadcastEvent(evt *Event) {
+
 	for _, listener := range this.m_listeners {
 		listener.onEvent(evt)
 	}

@@ -7,7 +7,6 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
@@ -19,6 +18,14 @@
 #include "third_party/protobuf/version.h"
 #endif
 // @@protoc_insertion_point(includes)
+
+namespace protobuf_rpc_2eproto {
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_rpc_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Data;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_rpc_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Error;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_rpc_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Event;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_rpc_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Request;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_rpc_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Response;
+}  // namespace protobuf_rpc_2eproto
 namespace com {
 namespace mycelius {
 namespace message {
@@ -56,14 +63,9 @@ class MessageDefaultTypeInternal {
 }  // namespace mycelius
 }  // namespace com
 namespace protobuf_rpc_2eproto {
-void InitDefaultsDataImpl() {
+static void InitDefaultsData() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::com::mycelius::message::_Data_default_instance_;
     new (ptr) ::com::mycelius::message::Data();
@@ -72,20 +74,12 @@ void InitDefaultsDataImpl() {
   ::com::mycelius::message::Data::InitAsDefaultInstance();
 }
 
-void InitDefaultsData() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsDataImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_Data =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsData}, {}};
 
-void InitDefaultsRequestImpl() {
+static void InitDefaultsRequest() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_rpc_2eproto::InitDefaultsData();
   {
     void* ptr = &::com::mycelius::message::_Request_default_instance_;
     new (ptr) ::com::mycelius::message::Request();
@@ -94,20 +88,13 @@ void InitDefaultsRequestImpl() {
   ::com::mycelius::message::Request::InitAsDefaultInstance();
 }
 
-void InitDefaultsRequest() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsRequestImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_Request =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsRequest}, {
+      &protobuf_rpc_2eproto::scc_info_Data.base,}};
 
-void InitDefaultsResponseImpl() {
+static void InitDefaultsResponse() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_rpc_2eproto::InitDefaultsData();
   {
     void* ptr = &::com::mycelius::message::_Response_default_instance_;
     new (ptr) ::com::mycelius::message::Response();
@@ -116,19 +103,13 @@ void InitDefaultsResponseImpl() {
   ::com::mycelius::message::Response::InitAsDefaultInstance();
 }
 
-void InitDefaultsResponse() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsResponseImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_Response =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsResponse}, {
+      &protobuf_rpc_2eproto::scc_info_Data.base,}};
 
-void InitDefaultsErrorImpl() {
+static void InitDefaultsError() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::com::mycelius::message::_Error_default_instance_;
     new (ptr) ::com::mycelius::message::Error();
@@ -137,20 +118,12 @@ void InitDefaultsErrorImpl() {
   ::com::mycelius::message::Error::InitAsDefaultInstance();
 }
 
-void InitDefaultsError() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsErrorImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_Error =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsError}, {}};
 
-void InitDefaultsEventImpl() {
+static void InitDefaultsEvent() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_rpc_2eproto::InitDefaultsData();
   {
     void* ptr = &::com::mycelius::message::_Event_default_instance_;
     new (ptr) ::com::mycelius::message::Event();
@@ -159,23 +132,13 @@ void InitDefaultsEventImpl() {
   ::com::mycelius::message::Event::InitAsDefaultInstance();
 }
 
-void InitDefaultsEvent() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsEventImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_Event =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsEvent}, {
+      &protobuf_rpc_2eproto::scc_info_Data.base,}};
 
-void InitDefaultsMessageImpl() {
+static void InitDefaultsMessage() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_rpc_2eproto::InitDefaultsRequest();
-  protobuf_rpc_2eproto::InitDefaultsResponse();
-  protobuf_rpc_2eproto::InitDefaultsError();
-  protobuf_rpc_2eproto::InitDefaultsEvent();
   {
     void* ptr = &::com::mycelius::message::_Message_default_instance_;
     new (ptr) ::com::mycelius::message::Message();
@@ -184,9 +147,20 @@ void InitDefaultsMessageImpl() {
   ::com::mycelius::message::Message::InitAsDefaultInstance();
 }
 
-void InitDefaultsMessage() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsMessageImpl);
+::google::protobuf::internal::SCCInfo<4> scc_info_Message =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 4, InitDefaultsMessage}, {
+      &protobuf_rpc_2eproto::scc_info_Request.base,
+      &protobuf_rpc_2eproto::scc_info_Response.base,
+      &protobuf_rpc_2eproto::scc_info_Error.base,
+      &protobuf_rpc_2eproto::scc_info_Event.base,}};
+
+void InitDefaults() {
+  ::google::protobuf::internal::InitSCC(&scc_info_Data.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Request.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Response.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Error.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Event.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Message.base);
 }
 
 ::google::protobuf::Metadata file_level_metadata[6];
@@ -294,15 +268,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 void protobuf_AssignDescriptors() {
   AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
   AssignDescriptors(
-      "rpc.proto", schemas, file_default_instances, TableStruct::offsets, factory,
+      "rpc.proto", schemas, file_default_instances, TableStruct::offsets,
       file_level_metadata, file_level_enum_descriptors, NULL);
 }
 
 void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
+  static ::google::protobuf::internal::once_flag once;
+  ::google::protobuf::internal::call_once(once, protobuf_AssignDescriptors);
 }
 
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
@@ -346,8 +319,8 @@ void AddDescriptorsImpl() {
 }
 
 void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
+  static ::google::protobuf::internal::once_flag once;
+  ::google::protobuf::internal::call_once(once, AddDescriptorsImpl);
 }
 // Force AddDescriptors() to be called at dynamic initialization time.
 struct StaticDescriptorInitializer {
@@ -429,17 +402,15 @@ const int Data::kTypeNameFieldNumber;
 
 Data::Data()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsData();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Data.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Data)
 }
 Data::Data(const Data& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0) {
+      _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_name()) {
@@ -458,7 +429,6 @@ Data::Data(const Data& from)
 }
 
 void Data::SharedCtor() {
-  _cached_size_ = 0;
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   databytes_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   typename__.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -477,9 +447,7 @@ void Data::SharedDtor() {
 }
 
 void Data::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Data::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -487,17 +455,10 @@ const ::google::protobuf::Descriptor* Data::descriptor() {
 }
 
 const Data& Data::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsData();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Data.base);
   return *internal_default_instance();
 }
 
-Data* Data::New(::google::protobuf::Arena* arena) const {
-  Data* n = new Data;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Data::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Data)
@@ -508,16 +469,13 @@ void Data::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 15u) {
     if (cached_has_bits & 0x00000001u) {
-      GOOGLE_DCHECK(!name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*name_.UnsafeRawStringPointer())->clear();
+      name_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(!databytes_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*databytes_.UnsafeRawStringPointer())->clear();
+      databytes_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000004u) {
-      GOOGLE_DCHECK(!typename__.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*typename__.UnsafeRawStringPointer())->clear();
+      typename__.ClearNonDefaultToEmptyNoArena();
     }
     type_ = 3;
   }
@@ -531,7 +489,7 @@ bool Data::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Data)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -777,9 +735,7 @@ size_t Data::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -851,13 +807,15 @@ void Data::Swap(Data* other) {
 }
 void Data::InternalSwap(Data* other) {
   using std::swap;
-  name_.Swap(&other->name_);
-  databytes_.Swap(&other->databytes_);
-  typename__.Swap(&other->typename__);
+  name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  databytes_.Swap(&other->databytes_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  typename__.Swap(&other->typename__, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(type_, other->type_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Data::GetMetadata() const {
@@ -878,9 +836,8 @@ const int Request::kIdFieldNumber;
 
 Request::Request()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsRequest();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Request.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Request)
 }
@@ -888,7 +845,6 @@ Request::Request(const Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _has_bits_(from._has_bits_),
-      _cached_size_(0),
       params_(from.params_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   method_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -903,7 +859,6 @@ Request::Request(const Request& from)
 }
 
 void Request::SharedCtor() {
-  _cached_size_ = 0;
   method_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -919,9 +874,7 @@ void Request::SharedDtor() {
 }
 
 void Request::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Request::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -929,17 +882,10 @@ const ::google::protobuf::Descriptor* Request::descriptor() {
 }
 
 const Request& Request::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsRequest();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Request.base);
   return *internal_default_instance();
 }
 
-Request* Request::New(::google::protobuf::Arena* arena) const {
-  Request* n = new Request;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Request::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Request)
@@ -951,12 +897,10 @@ void Request::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
-      GOOGLE_DCHECK(!method_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*method_.UnsafeRawStringPointer())->clear();
+      method_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(!id_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*id_.UnsafeRawStringPointer())->clear();
+      id_.ClearNonDefaultToEmptyNoArena();
     }
   }
   _has_bits_.Clear();
@@ -969,7 +913,7 @@ bool Request::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Request)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -993,7 +937,8 @@ bool Request::MergePartialFromCodedStream(
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_params()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_params()));
         } else {
           goto handle_unusual;
         }
@@ -1057,7 +1002,9 @@ void Request::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->params_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->params(static_cast<int>(i)), output);
+      2,
+      this->params(static_cast<int>(i)),
+      output);
   }
 
   // required string id = 3;
@@ -1178,9 +1125,7 @@ size_t Request::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1246,12 +1191,13 @@ void Request::Swap(Request* other) {
 }
 void Request::InternalSwap(Request* other) {
   using std::swap;
-  params_.InternalSwap(&other->params_);
-  method_.Swap(&other->method_);
-  id_.Swap(&other->id_);
+  CastToBase(&params_)->InternalSwap(CastToBase(&other->params_));
+  method_.Swap(&other->method_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  id_.Swap(&other->id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Request::GetMetadata() const {
@@ -1271,9 +1217,8 @@ const int Response::kIdFieldNumber;
 
 Response::Response()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsResponse();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Response.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Response)
 }
@@ -1281,7 +1226,6 @@ Response::Response(const Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _has_bits_(from._has_bits_),
-      _cached_size_(0),
       results_(from.results_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1292,7 +1236,6 @@ Response::Response(const Response& from)
 }
 
 void Response::SharedCtor() {
-  _cached_size_ = 0;
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
@@ -1306,9 +1249,7 @@ void Response::SharedDtor() {
 }
 
 void Response::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Response::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -1316,17 +1257,10 @@ const ::google::protobuf::Descriptor* Response::descriptor() {
 }
 
 const Response& Response::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsResponse();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Response.base);
   return *internal_default_instance();
 }
 
-Response* Response::New(::google::protobuf::Arena* arena) const {
-  Response* n = new Response;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Response::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Response)
@@ -1337,8 +1271,7 @@ void Response::Clear() {
   results_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(!id_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-    (*id_.UnsafeRawStringPointer())->clear();
+    id_.ClearNonDefaultToEmptyNoArena();
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -1350,7 +1283,7 @@ bool Response::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Response)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -1358,7 +1291,8 @@ bool Response::MergePartialFromCodedStream(
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_results()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_results()));
         } else {
           goto handle_unusual;
         }
@@ -1411,7 +1345,9 @@ void Response::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->results_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, this->results(static_cast<int>(i)), output);
+      1,
+      this->results(static_cast<int>(i)),
+      output);
   }
 
   cached_has_bits = _has_bits_[0];
@@ -1494,9 +1430,7 @@ size_t Response::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1555,11 +1489,11 @@ void Response::Swap(Response* other) {
 }
 void Response::InternalSwap(Response* other) {
   using std::swap;
-  results_.InternalSwap(&other->results_);
-  id_.Swap(&other->id_);
+  CastToBase(&results_)->InternalSwap(CastToBase(&other->results_));
+  id_.Swap(&other->id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Response::GetMetadata() const {
@@ -1581,17 +1515,15 @@ const int Error::kDataFieldNumber;
 
 Error::Error()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsError();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Error.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Error)
 }
 Error::Error(const Error& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0) {
+      _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_message()) {
@@ -1610,7 +1542,6 @@ Error::Error(const Error& from)
 }
 
 void Error::SharedCtor() {
-  _cached_size_ = 0;
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1629,9 +1560,7 @@ void Error::SharedDtor() {
 }
 
 void Error::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Error::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -1639,17 +1568,10 @@ const ::google::protobuf::Descriptor* Error::descriptor() {
 }
 
 const Error& Error::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsError();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Error.base);
   return *internal_default_instance();
 }
 
-Error* Error::New(::google::protobuf::Arena* arena) const {
-  Error* n = new Error;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Error::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Error)
@@ -1660,16 +1582,13 @@ void Error::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 7u) {
     if (cached_has_bits & 0x00000001u) {
-      GOOGLE_DCHECK(!message_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*message_.UnsafeRawStringPointer())->clear();
+      message_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(!id_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*id_.UnsafeRawStringPointer())->clear();
+      id_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000004u) {
-      GOOGLE_DCHECK(!data_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*data_.UnsafeRawStringPointer())->clear();
+      data_.ClearNonDefaultToEmptyNoArena();
     }
   }
   code_ = 0;
@@ -1683,7 +1602,7 @@ bool Error::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Error)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -1923,9 +1842,7 @@ size_t Error::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1997,13 +1914,15 @@ void Error::Swap(Error* other) {
 }
 void Error::InternalSwap(Error* other) {
   using std::swap;
-  message_.Swap(&other->message_);
-  id_.Swap(&other->id_);
-  data_.Swap(&other->data_);
+  message_.Swap(&other->message_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  id_.Swap(&other->id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  data_.Swap(&other->data_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(code_, other->code_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Error::GetMetadata() const {
@@ -2024,9 +1943,8 @@ const int Event::kEvtDataFieldNumber;
 
 Event::Event()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsEvent();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Event.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Event)
 }
@@ -2034,7 +1952,6 @@ Event::Event(const Event& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _has_bits_(from._has_bits_),
-      _cached_size_(0),
       evtdata_(from.evtdata_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -2046,7 +1963,6 @@ Event::Event(const Event& from)
 }
 
 void Event::SharedCtor() {
-  _cached_size_ = 0;
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   code_ = 0;
 }
@@ -2061,9 +1977,7 @@ void Event::SharedDtor() {
 }
 
 void Event::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Event::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -2071,17 +1985,10 @@ const ::google::protobuf::Descriptor* Event::descriptor() {
 }
 
 const Event& Event::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsEvent();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Event.base);
   return *internal_default_instance();
 }
 
-Event* Event::New(::google::protobuf::Arena* arena) const {
-  Event* n = new Event;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Event::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Event)
@@ -2092,8 +1999,7 @@ void Event::Clear() {
   evtdata_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(!name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-    (*name_.UnsafeRawStringPointer())->clear();
+    name_.ClearNonDefaultToEmptyNoArena();
   }
   code_ = 0;
   _has_bits_.Clear();
@@ -2106,7 +2012,7 @@ bool Event::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Event)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -2144,7 +2050,8 @@ bool Event::MergePartialFromCodedStream(
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_evtdata()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_evtdata()));
         } else {
           goto handle_unusual;
         }
@@ -2197,7 +2104,9 @@ void Event::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->evtdata_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->evtdata(static_cast<int>(i)), output);
+      3,
+      this->evtdata(static_cast<int>(i)),
+      output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2302,9 +2211,7 @@ size_t Event::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -2370,12 +2277,12 @@ void Event::Swap(Event* other) {
 }
 void Event::InternalSwap(Event* other) {
   using std::swap;
-  evtdata_.InternalSwap(&other->evtdata_);
-  name_.Swap(&other->name_);
+  CastToBase(&evtdata_)->InternalSwap(CastToBase(&other->evtdata_));
+  name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(code_, other->code_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Event::GetMetadata() const {
@@ -2410,17 +2317,15 @@ const int Message::kIdFieldNumber;
 
 Message::Message()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_rpc_2eproto::InitDefaultsMessage();
-  }
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_rpc_2eproto::scc_info_Message.base);
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Message)
 }
 Message::Message(const Message& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0) {
+      _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_data()) {
@@ -2457,7 +2362,6 @@ Message::Message(const Message& from)
 }
 
 void Message::SharedCtor() {
-  _cached_size_ = 0;
   data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&rqst_, 0, static_cast<size_t>(
@@ -2481,9 +2385,7 @@ void Message::SharedDtor() {
 }
 
 void Message::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
 const ::google::protobuf::Descriptor* Message::descriptor() {
   ::protobuf_rpc_2eproto::protobuf_AssignDescriptorsOnce();
@@ -2491,17 +2393,10 @@ const ::google::protobuf::Descriptor* Message::descriptor() {
 }
 
 const Message& Message::default_instance() {
-  ::protobuf_rpc_2eproto::InitDefaultsMessage();
+  ::google::protobuf::internal::InitSCC(&protobuf_rpc_2eproto::scc_info_Message.base);
   return *internal_default_instance();
 }
 
-Message* Message::New(::google::protobuf::Arena* arena) const {
-  Message* n = new Message;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Message::Clear() {
 // @@protoc_insertion_point(message_clear_start:com.mycelius.message.Message)
@@ -2512,12 +2407,10 @@ void Message::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 63u) {
     if (cached_has_bits & 0x00000001u) {
-      GOOGLE_DCHECK(!data_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*data_.UnsafeRawStringPointer())->clear();
+      data_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(!id_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*id_.UnsafeRawStringPointer())->clear();
+      id_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000004u) {
       GOOGLE_DCHECK(rqst_ != NULL);
@@ -2552,7 +2445,7 @@ bool Message::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Message)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -2726,25 +2619,25 @@ void Message::SerializeWithCachedSizes(
   // optional .com.mycelius.message.Request rqst = 4;
   if (cached_has_bits & 0x00000004u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, *this->rqst_, output);
+      4, this->_internal_rqst(), output);
   }
 
   // optional .com.mycelius.message.Response rsp = 5;
   if (cached_has_bits & 0x00000008u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, *this->rsp_, output);
+      5, this->_internal_rsp(), output);
   }
 
   // optional .com.mycelius.message.Error err = 6;
   if (cached_has_bits & 0x00000010u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, *this->err_, output);
+      6, this->_internal_err(), output);
   }
 
   // optional .com.mycelius.message.Event evt = 7;
   if (cached_has_bits & 0x00000020u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, *this->evt_, output);
+      7, this->_internal_evt(), output);
   }
 
   // optional bytes data = 8;
@@ -2798,28 +2691,28 @@ void Message::SerializeWithCachedSizes(
   if (cached_has_bits & 0x00000004u) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        4, *this->rqst_, deterministic, target);
+        4, this->_internal_rqst(), deterministic, target);
   }
 
   // optional .com.mycelius.message.Response rsp = 5;
   if (cached_has_bits & 0x00000008u) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        5, *this->rsp_, deterministic, target);
+        5, this->_internal_rsp(), deterministic, target);
   }
 
   // optional .com.mycelius.message.Error err = 6;
   if (cached_has_bits & 0x00000010u) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        6, *this->err_, deterministic, target);
+        6, this->_internal_err(), deterministic, target);
   }
 
   // optional .com.mycelius.message.Event evt = 7;
   if (cached_has_bits & 0x00000020u) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        7, *this->evt_, deterministic, target);
+        7, this->_internal_evt(), deterministic, target);
   }
 
   // optional bytes data = 8;
@@ -2920,35 +2813,33 @@ size_t Message::ByteSizeLong() const {
     if (has_rqst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *this->rqst_);
+          *rqst_);
     }
 
     // optional .com.mycelius.message.Response rsp = 5;
     if (has_rsp()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *this->rsp_);
+          *rsp_);
     }
 
     // optional .com.mycelius.message.Error err = 6;
     if (has_err()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *this->err_);
+          *err_);
     }
 
     // optional .com.mycelius.message.Event evt = 7;
     if (has_evt()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *this->evt_);
+          *evt_);
     }
 
   }
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -3046,8 +2937,10 @@ void Message::Swap(Message* other) {
 }
 void Message::InternalSwap(Message* other) {
   using std::swap;
-  data_.Swap(&other->data_);
-  id_.Swap(&other->id_);
+  data_.Swap(&other->data_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  id_.Swap(&other->id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(rqst_, other->rqst_);
   swap(rsp_, other->rsp_);
   swap(err_, other->err_);
@@ -3057,7 +2950,6 @@ void Message::InternalSwap(Message* other) {
   swap(type_, other->type_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Message::GetMetadata() const {
@@ -3070,5 +2962,27 @@ void Message::InternalSwap(Message* other) {
 }  // namespace message
 }  // namespace mycelius
 }  // namespace com
+namespace google {
+namespace protobuf {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Data* Arena::CreateMaybeMessage< ::com::mycelius::message::Data >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Data >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Request* Arena::CreateMaybeMessage< ::com::mycelius::message::Request >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Request >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Response* Arena::CreateMaybeMessage< ::com::mycelius::message::Response >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Response >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Error* Arena::CreateMaybeMessage< ::com::mycelius::message::Error >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Error >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Event* Arena::CreateMaybeMessage< ::com::mycelius::message::Event >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Event >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::com::mycelius::message::Message* Arena::CreateMaybeMessage< ::com::mycelius::message::Message >(Arena* arena) {
+  return Arena::CreateInternal< ::com::mycelius::message::Message >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)

@@ -91,10 +91,32 @@ var CodeEditor = function (parent) {
             if (editor !== undefined) {
                 // Supend the change event propagation
                 codeEditor.quiet = true
+                // TODO multiple users synch to be applied here...
                 editor.setValue(decode64(file.M_data), -1)
                 editor.clearSelection()
                 if (editor.getCursorPosition != undefined) {
                     var position = editor.getCursorPosition()
+                    editor.scrollToLine(position.row + 1, true, true, function () { });
+                    editor.gotoLine(position.row + 1, position.column)
+                }
+                // Resume the chage event propagation.
+                codeEditor.quiet = false
+            }
+        }
+    })
+
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
+        if (evt.dataMap.entity !== undefined) {
+            var file = evt.dataMap["entity"]
+            var editor = codeEditor.editors[file.UUID + "_editor"]
+            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
+                // Supend the change event propagation
+                codeEditor.quiet = true
+                if (editor.getCursorPosition != undefined) {
+                    var position = editor.getCursorPosition()
+                    // TODO multiple users synch to be 3. here...
+                    editor.setValue(decode64(file.M_data), -1)
+                    editor.clearSelection()
                     editor.scrollToLine(position.row + 1, true, true, function () { });
                     editor.gotoLine(position.row + 1, position.column)
                 }
@@ -111,26 +133,6 @@ var CodeEditor = function (parent) {
                 codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
             } else if (codeEditor.editors[editorUuid].editor.setTheme !== undefined) {
                 codeEditor.editors[editorUuid].editor.setTheme(evt.dataMap.theme);
-            }
-        }
-    })
-
-    server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
-        if (evt.dataMap.entity !== undefined) {
-            var file = evt.dataMap["entity"]
-            var editor = codeEditor.editors[file.UUID + "_editor"]
-            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
-                // Supend the change event propagation
-                codeEditor.quiet = true
-                if (editor.getCursorPosition != undefined) {
-                    var position = editor.getCursorPosition()
-                    editor.setValue(decode64(file.M_data), -1)
-                    editor.clearSelection()
-                    editor.scrollToLine(position.row + 1, true, true, function () { });
-                    editor.gotoLine(position.row + 1, position.column)
-                }
-                // Resume the chage event propagation.
-                codeEditor.quiet = false
             }
         }
     })
@@ -334,13 +336,15 @@ CodeEditor.prototype.appendFile = function (file, coord) {
             var record = multiRecord.pop()
             var themeClass = record.target.classList[record.target.classList.length - 1]
             var isDark = record.target.className.indexOf("ace_dark") != -1
-            if (themeClass != codeEditor.themeClass && themeClass != "ace-tm") {
-                // Keep it in the local storage.
-                localStorage.setItem("bridge_editor_theme_class", themeClass)
-                localStorage.setItem("bridge_editor_theme", codeEditor.theme)
-                codeEditor.themeClass = themeClass
-                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": { "theme": codeEditor.theme, "themeClass": codeEditor.themeClass, "isDark": isDark } }
-                server.eventHandler.broadcastLocalEvent(evt)
+            if (themeClass != codeEditor.themeClass) {
+                if (themeClass != "ace-tm" && themeClass != "ace_selecting" && themeClass != "ace_focus") {
+                    // Keep it in the local storage.
+                    localStorage.setItem("bridge_editor_theme_class", themeClass)
+                    localStorage.setItem("bridge_editor_theme", codeEditor.theme)
+                    codeEditor.themeClass = themeClass
+                    evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": { "theme": codeEditor.theme, "themeClass": codeEditor.themeClass, "isDark": isDark } }
+                    server.eventHandler.broadcastLocalEvent(evt)
+                }
             }
         }
     }(this))
@@ -357,7 +361,12 @@ CodeEditor.prototype.appendFile = function (file, coord) {
     ace.require('ace/ext/settings_menu').init(editor);
     editor.setTheme(this.theme);
     editor.getSession().setMode(fileMode);
-
+    var rules = getRulesByName(".ace_step")
+    for (var i = 0; i < rules.length; i++) {
+        if (rules[i].cssText.indexOf("background") != -1) {
+            rules[i].style.background = "";
+        }
+    }
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
@@ -365,6 +374,59 @@ CodeEditor.prototype.appendFile = function (file, coord) {
     });
 
     this.editors[file.UUID + "_editor"] = editor
+
+    // Create the event listener for the current editor.
+    editor.eventListner = new EventHub(file.UUID + "_editor")
+    // create the stack.
+    editor.networkEvents = []
+    server.eventHandler.addEventListener(
+        editor.eventListner,
+        function () {
+            server.eventHandler.appendEventFilter(
+                "\\.*",
+                file.UUID + "_editor",
+                function () { },
+                function () { },
+                undefined)
+        }
+    )
+
+    // Event reveived when one participant open a file.
+    editor.eventListner.attach(editor, OpenFileEvent, function (evt, codeEditor) {
+        var sessionId = evt.dataMap.FileInfo.sessionId;
+        var fileId = evt.dataMap.FileInfo.fileId;
+        // TODO 
+        // - get the user information from the session id.
+        // - Associate a color with that user (marker color ace_step)
+        console.log("Im open! ", evt)
+    })
+
+    // Event received when one participant close a file.
+    editor.eventListner.attach(editor, CloseFileEvent, function (evt, codeEditor) {
+        var sessionId = evt.dataMap.FileInfo.sessionId;
+        var fileId = evt.dataMap.FileInfo.fileId;
+        // TODO 
+        // Cancel editEvent modification made by sessiondId hint 'codeEditor.networkEvents'
+        // remove the marker 
+        // reset the marker color for that session.
+        console.log("Im close! ", evt)
+    })
+
+    // Received change from the network.
+    editor.eventListner.attach(editor, FileEditEvent, function (evt, codeEditor) {
+        if (!objectPropInArray(codeEditor.networkEvents, "time", evt.dataMap.FileEditEvent.time) && evt.dataMap.FileEditEvent.sessionId != server.sessionId) {
+            // Throw local event here
+            evt.dataMap.FileEditEvent.aceEvt.uuid = evt.dataMap.FileEditEvent.uuid
+            var aceEvt = evt.dataMap.FileEditEvent.aceEvt;
+            codeEditor.getSession().getDocument().applyDeltas([aceEvt]);
+            var r = codeEditor.getSelectionRange()
+            r.start = codeEditor.getSession().getDocument().createAnchor(aceEvt.start);
+            r.end = codeEditor.getSession().getDocument().createAnchor(aceEvt.end);
+            r.id = codeEditor.getSession().addMarker(r, "user1 ace_step", "text");
+
+        }
+        codeEditor.networkEvents.push(evt.dataMap.FileEditEvent)
+    })
 
     // Editor command here.
     editor.commands.addCommands([{
@@ -385,13 +447,38 @@ CodeEditor.prototype.appendFile = function (file, coord) {
 
     // In case of file update...
     editor.getSession().on('change', function (fileUUID, codeEditor) {
-        return function () {
+        return function (aceEvt) {
             if (!codeEditor.quiet && entities[fileUUID] !== undefined) {
                 var editor = codeEditor.editors[fileUUID + "_editor"]
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
                 var file = entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
                 server.eventHandler.broadcastLocalEvent(evt)
+                if (aceEvt.uuid == undefined) {
+
+                    // Now the network event.
+                    var entityInfo = {
+                        "TYPENAME": "Server.MessageData",
+                        "Name": "FileEditEvent",
+                        "Value": {
+                            "aceEvt": aceEvt,
+                            "time": new Date().getTime(),
+                            "sessionId": server.sessionId,
+                            "uuid": randomUUID()
+                        }
+                    }
+                    // Also broadcast the event over the network...
+                    //server.eventHandler.broadcastEvent(evt)
+                    server.eventManager.broadcastEventData(
+                        FileEditEvent,
+                        fileUUID + "_editor",
+                        [entityInfo],
+                        function () { },
+                        function () { },
+                        undefined
+                    )
+                }
+
             }
         }
     }(file.UUID, this));
@@ -419,6 +506,21 @@ CodeEditor.prototype.removeFile = function (uuid) {
         this.panel.removeElement(this.filesPanel[uuid])
         delete this.filesPanel[uuid]
         delete this.files[uuid]
+
+        // Disconnect the listener.
+        var editor = this.editors[uuid + "_editor"]
+
+        // Detach the local event channel.
+        editor.eventListner.detach(editor.eventListner, FileEditEvent)
+
+        // Also detach the listener on the sever.
+        server.eventHandler.removeEventManager(
+            editor.eventListner,
+            function () {
+                // callback
+            }
+        )
+
         delete this.editors[uuid + "_editor"]
 
         // If there's no more file i will reset the shadow.
@@ -435,6 +537,36 @@ CodeEditor.prototype.removeFile = function (uuid) {
         }
     }
 }
+
+function getRulesByName(selector) {
+    var rules = [];
+    for (var i = 0; i < document.styleSheets.length; i++) {
+        for (var j = 0; j < document.styleSheets[i].rules.length; j++) {
+            if (document.styleSheets[i].rules[j] != undefined) {
+                if (document.styleSheets[i].rules[j].selectorText != undefined) {
+                    if (document.styleSheets[i].rules[j].selectorText.indexOf(selector) != -1) {
+                        rules.push(document.styleSheets[i].rules[j]);
+                    }
+                }
+            }
+        }
+    }
+
+    /* [].some.call(document.styleSheets, function (sheet) {
+         return [].some.call(sheet.rules, function (rule) {
+             if (selector === rule.selectorText) {
+                 return [].some.call(rule.style, function (style) {
+                     rules.push(rules)
+                     return rules;
+                 });
+             }
+         });
+     });*/
+    return rules;
+}
+
+
+
 
 /**
  * Set the current file panel.
@@ -479,6 +611,6 @@ CodeEditor.prototype.setActiveFile = function (uuid, coord) {
         var editor = this.editors[uuid + "_editor"]
         editor.focus();
         editor.gotoLine(coord.ln, coord.col, true);
-        editor.renderer.scrollToRow(coord.ln-3); // minus 3 to see couple line before...
+        editor.renderer.scrollToRow(coord.ln - 3); // minus 3 to see couple line before...
     }
 }

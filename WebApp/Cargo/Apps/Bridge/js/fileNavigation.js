@@ -162,6 +162,26 @@ var FileNavigator = function (parent) {
             // Remove the file.
             fileNavigator.removeFile(evt.dataMap["fileId"])
         }
+
+        // Now the network event.
+        var entityInfo = {
+            "TYPENAME": "Server.MessageData",
+            "Name": "FileInfo",
+            "Value": {
+                "sessionId": server.sessionId,
+                "fileId": evt.dataMap.fileId
+            }
+        }
+
+        // Also broadcast the event over the network...
+        server.eventManager.broadcastEventData(
+            CloseFileEvent,
+            evt.dataMap.fileId + "_editor",
+            [entityInfo],
+            function () { },
+            function () { },
+            undefined
+        )
     })
 
     // The change file event.

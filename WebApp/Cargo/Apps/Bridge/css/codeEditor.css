@@ -26,3 +26,10 @@
      overflow: auto;
      font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
  }
+ 
+ .ace_step {
+     background: green;
+ }
+  .user1{
+     background: red;
+ }
