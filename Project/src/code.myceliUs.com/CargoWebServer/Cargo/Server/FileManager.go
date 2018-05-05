@@ -601,6 +601,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
 			file.SetData(base64.StdEncoding.EncodeToString(filedata))
 		}
+
 		eventData := make([]*MessageData, 2)
 		fileInfo := new(MessageData)
 		fileInfo.TYPENAME = "Server.MessageData"
@@ -1190,6 +1191,7 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //    xhr.send(formData);
 //}
 func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight int64, thumbnailMaxWidth int64, messageId string, sessionId string) {
+
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1468,16 +1470,29 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
 	}
 
+	// Append an event listener for that file.
+	//conn := GetServer().getConnectionById(sessionId)
+	//listener := NewEventListener(file.UUID+"_editor", conn)
+	//GetServer().GetEventManager().AddEventListener(listener)
+
 	// Generate the openFileEvent.
 	eventData := make([]*MessageData, 1)
 	fileInfo := new(MessageData)
 	fileInfo.TYPENAME = "Server.MessageData"
 	fileInfo.Name = "FileInfo"
-	fileInfo.Value = map[string]interface{}{"sessionId": sessionId, "fileId": file.GetUuid()}
+
+	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
+	var account *CargoEntities.Account
+	if session != nil {
+		account = session.GetAccountPtr()
+	}
+
+	fileInfo.Value = map[string]interface{}{"accountId": account.GetUuid(), "fileId": file.GetUuid()}
+
 	eventData[0] = fileInfo
 
-	evt, _ := NewEvent(OpenFileEvent, file.GetUuid()+"_editor", eventData)
-	GetServer().GetEventManager().BroadcastEvent(evt)
+	//evt, _ := NewEvent(OpenFileEvent, file.GetUuid()+"_editor", eventData)
+	GetServer().GetEventManager().BroadcastEventData(OpenFileEvent, file.GetUuid()+"_editor", eventData, Utility.RandomUUID(), sessionId)
 
 	// Return the file object...
 	return file

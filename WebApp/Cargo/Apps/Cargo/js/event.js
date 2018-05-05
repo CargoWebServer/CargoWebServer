@@ -348,6 +348,43 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 }
 
 /**
+* Return the list of file edit event.
+* @param {string} uuid The file uuid that we want edit events.
+* @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+* @param {function} errorCallback In case of error.
+* @param {object} caller A place to store object from the request context and get it back from the response context.
+*/
+EventHandler.prototype.getFileEditEvents = function (uuid, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(uuid, "STRING", "filter"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        "EventManagerGetFileEditEvents", // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            if (caller.successCallback != undefined) {
+                caller.successCallback(result[0], caller.caller)
+                caller.successCallback = undefined
+            }
+        },
+        function (errMsg, caller) {
+            // call the immediate error callback.
+            if (caller.errorCallback != undefined) {
+                caller.errorCallback(errMsg, caller.caller)
+                caller.errorCallback = undefined
+            }
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/**
 * Broadcast an event localy over a given channel
 * var evt = {"code":OpenEntityEvent, "channelId":FileEvent, "dataMap":{"fileInfo": file}}
 * server.eventHandler.broadcastLocalEvent(evt)

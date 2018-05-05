@@ -137,19 +137,6 @@ var CodeEditor = function (parent) {
         }
     })
 
-    /** Always display the license. */
-    /*server.fileManager.getFileByPath("/LICENSE",
-        // Success callback 
-        function (result, caller) {
-            result.M_mime = "text/plain"
-            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": result } }
-            server.eventHandler.broadcastLocalEvent(evt)
-        },
-        // Error callback
-        function (errObj, caller) {
-
-        }, {})*/
-
     return this
 }
 
@@ -377,6 +364,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
 
     // Create the event listener for the current editor.
     editor.eventListner = new EventHub(file.UUID + "_editor")
+
     // create the stack.
     editor.networkEvents = []
     server.eventHandler.addEventListener(
@@ -391,20 +379,30 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         }
     )
 
+    // Get the list of file edit event.
+    server.eventHandler.getFileEditEvents(file.UUID,
+        // The success callback
+        function (evts, editor) {
+            console.log(evts)
+            if (evts != null) {
+                editor.playFileEvents(evts)
+            }
+        },
+        // The error callback
+        function () {
+
+        }, editor)
+
     // Event reveived when one participant open a file.
     editor.eventListner.attach(editor, OpenFileEvent, function (evt, codeEditor) {
-        var sessionId = evt.dataMap.FileInfo.sessionId;
-        var fileId = evt.dataMap.FileInfo.fileId;
         // TODO 
         // - get the user information from the session id.
         // - Associate a color with that user (marker color ace_step)
-        console.log("Im open! ", evt)
+        console.log("Im open! ", evt.dataMap.FileEditEvent)
     })
 
     // Event received when one participant close a file.
     editor.eventListner.attach(editor, CloseFileEvent, function (evt, codeEditor) {
-        var sessionId = evt.dataMap.FileInfo.sessionId;
-        var fileId = evt.dataMap.FileInfo.fileId;
         // TODO 
         // Cancel editEvent modification made by sessiondId hint 'codeEditor.networkEvents'
         // remove the marker 
@@ -412,20 +410,38 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         console.log("Im close! ", evt)
     })
 
+    // That function is use to set the editor file in correct state in respect of 
+    // multi-users utilisation.
+    editor.playFileEvents = function (evts) {
+        for (var i = 0; i < evts.length; i++) {
+            var evt = evts[i]
+            if (!objectPropInArray(this.networkEvents, "time", evt.time)) {
+                // Throw local event here
+                evt.aceEvt.uuid = evt.uuid
+                var aceEvt = evt.aceEvt;
+                this.getSession().getDocument().applyDeltas([aceEvt]);
+
+                // Other account id have marker.
+                if (evt.accountId != server.accountId) {
+                    var classId = evt.accountId.replaceAll("%", "-").replaceAll(".", "-")
+                    classId = classId
+                    // I will apply a 70% level of saturation so the text will be readeable.
+                    addStyleString(classId, "." + classId + "{background: "+applySat(70, evt.color)+ ";}")
+                    var r = this.getSelectionRange()
+                    r.start = this.getSession().getDocument().createAnchor(aceEvt.start);
+                    r.end = this.getSession().getDocument().createAnchor(aceEvt.end);
+                    r.id = this.getSession().addMarker(r, classId + " ace_step", "background");
+                }
+            }
+            this.networkEvents.push(evt)
+        }
+    }
+
     // Received change from the network.
     editor.eventListner.attach(editor, FileEditEvent, function (evt, codeEditor) {
-        if (!objectPropInArray(codeEditor.networkEvents, "time", evt.dataMap.FileEditEvent.time) && evt.dataMap.FileEditEvent.sessionId != server.sessionId) {
-            // Throw local event here
-            evt.dataMap.FileEditEvent.aceEvt.uuid = evt.dataMap.FileEditEvent.uuid
-            var aceEvt = evt.dataMap.FileEditEvent.aceEvt;
-            codeEditor.getSession().getDocument().applyDeltas([aceEvt]);
-            var r = codeEditor.getSelectionRange()
-            r.start = codeEditor.getSession().getDocument().createAnchor(aceEvt.start);
-            r.end = codeEditor.getSession().getDocument().createAnchor(aceEvt.end);
-            r.id = codeEditor.getSession().addMarker(r, "user1 ace_step", "text");
-
+        if(evt.dataMap.FileEditEvent.sessionId != server.sessionId){
+            codeEditor.playFileEvents([evt.dataMap.FileEditEvent])
         }
-        codeEditor.networkEvents.push(evt.dataMap.FileEditEvent)
     })
 
     // Editor command here.
@@ -452,7 +468,9 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                 var editor = codeEditor.editors[fileUUID + "_editor"]
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
                 var file = entities[fileUUID]
+
                 file.M_data = encode64(editor.getSession().getValue())
+
                 server.eventHandler.broadcastLocalEvent(evt)
                 if (aceEvt.uuid == undefined) {
 
@@ -463,6 +481,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                         "Value": {
                             "aceEvt": aceEvt,
                             "time": new Date().getTime(),
+                            "accountId": server.accountId,
                             "sessionId": server.sessionId,
                             "uuid": randomUUID()
                         }

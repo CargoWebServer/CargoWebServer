@@ -154,6 +154,10 @@ var LoginPage = function (loginCallback, serverId) {
 					caller.successCallback = function (session) {
 						if (this.loginCallback != undefined) {
 							this.loginCallback(session)
+
+							// Keep the account id...
+							server.accountId = session.M_accountPtr.UUID
+
 							// call once...
 							this.loginCallback = undefined
 							var rememberMe = localStorage.getItem('_remember_me_')

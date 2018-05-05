@@ -3,8 +3,14 @@ package Server
 import (
 	"encoding/json"
 	"log"
-	"reflect"
 	"regexp"
+
+	"bufio"
+	"encoding/csv"
+	"io"
+	"math/rand"
+	"os"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
@@ -76,7 +82,7 @@ type EventManager struct {
 	// Contain the list of edit event for a given file.
 	// The first map contain the list fileUuid as id
 	// The second map contain the edit event uuid as id
-	m_fileEditEvents map[string]map[string]interface{}
+	m_fileEditEvents map[string][]interface{}
 
 	// Concurent map access.
 	m_opChannel chan map[string]interface{}
@@ -91,6 +97,11 @@ func (this *Server) GetEventManager() *EventManager {
 	return eventManager
 }
 
+func random(min, max int) int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(max-min) + min
+}
+
 /**
  * A singleton that manage the event channels...
  */
@@ -98,7 +109,25 @@ func newEventManager() *EventManager {
 	eventManager := new(EventManager)
 	eventManager.m_channels = make(map[string]*EventChannel, 0)
 	eventManager.m_opChannel = make(chan map[string]interface{}, 0)
-	eventManager.m_fileEditEvents = make(map[string]map[string]interface{}, 0)
+	eventManager.m_fileEditEvents = make(map[string][]interface{}, 0)
+
+	// I will keep the list of color by user id... so if the
+	// Here I will read the color tag...
+	colors := make([]string, 0)
+	colorNamePath := GetServer().GetConfigurationManager().GetDataPath() + "/colorName.csv"
+	colorNameFile, _ := os.Open(colorNamePath)
+	csvReader := csv.NewReader(bufio.NewReader(colorNameFile))
+	for {
+		val, err := csvReader.Read()
+		// Stop at EOF.
+		if err == io.EOF {
+			break
+		}
+
+		colors = append(colors, val[1])
+	}
+
+	accountIdColor := make(map[string]string, 0)
 
 	// Concurrency...
 	go func() {
@@ -113,6 +142,10 @@ func newEventManager() *EventManager {
 					}
 				} else if op["op"] == "getEventData" {
 					op["result"].(chan string) <- eventManager.m_eventDataMap[op["evt"].(*Event)]
+				} else if op["op"] == "GetFileEditEvents" {
+					uuid := op["uuid"].(string)
+					op["events"].(chan interface{}) <- eventManager.m_fileEditEvents[uuid+"_editor"]
+
 				} else if op["op"] == "removeClosedListener" {
 					for _, channel := range eventManager.m_channels {
 						for _, listener := range channel.m_listeners {
@@ -127,33 +160,52 @@ func newEventManager() *EventManager {
 				} else if op["op"] == "BroadcastEvent" {
 					evt := op["evt"].(*Event)
 					channel := eventManager.m_channels[evt.GetName()]
-					log.Println("---> eventNumber ", *evt.Code, evt.GetName(), evt.GetEvtData())
 					if channel != nil {
-						var messages []*MessageData
-						json.Unmarshal([]byte(eventManager.m_eventDataMap[evt]), messages)
 						eventNumber := int(*evt.Code)
 						if eventNumber == OpenFileEvent {
-							for i := 0; i < len(messages); i++ {
-								log.Println(messages[i])
-								log.Println(reflect.TypeOf(messages[i].Value).String())
+							// Create the map of file event.
+							if eventManager.m_fileEditEvents[evt.GetName()] == nil {
+								eventManager.m_fileEditEvents[evt.GetName()] = make([]interface{}, 0)
 							}
-						} else if eventNumber == CloseFileEvent {
-
 						} else if eventNumber == UpdateFileEvent {
-
+							// So here I will save pending event for a given sessionId...
+							// The rest of the pending change will stay unchange.
+							fileInfo := make(map[string]interface{}, 0)
+							json.Unmarshal(evt.GetEvtData()[0].GetDataBytes(), &fileInfo)
+							if eventManager.m_fileEditEvents[fileInfo["UUID"].(string)+"_editor"] != nil {
+								delete(eventManager.m_fileEditEvents, fileInfo["UUID"].(string)+"_editor")
+							}
 						} else if eventNumber == DeleteFileEvent {
-
+							// simply remove the list of pending change.
+							delete(eventManager.m_fileEditEvents, evt.GetName())
 						} else if eventNumber == FileEditEvent {
-							log.Println("---> ", messages)
-							for i := 0; i < len(messages); i++ {
-								log.Println(messages[i])
-								log.Println(reflect.TypeOf(messages[i].Value).String())
-								fileEditEvent := messages[i].Value.(map[string]interface{})
-								if eventManager.m_fileEditEvents[evt.GetName()] == nil {
-									eventManager.m_fileEditEvents[evt.GetName()] = make(map[string]interface{})
+							for i := 0; i < len(evt.GetEvtData()); i++ {
+								msg := make(map[string]interface{}, 0)
+								json.Unmarshal(evt.GetEvtData()[i].GetDataBytes(), &msg)
+								if msg["accountId"] != nil {
+									if eventManager.m_fileEditEvents[evt.GetName()] == nil {
+										eventManager.m_fileEditEvents[evt.GetName()] = make([]interface{}, 0)
+									}
+
+									// I will get the account id here.
+
+									accountId := msg["accountId"].(string)
+									if _, ok := accountIdColor[accountId]; !ok {
+										index := random(0, len(colors)-1)
+										accountIdColor[accountId] = colors[index]
+
+										// remove the color from the index.
+										colors = append(colors[:index], colors[index+1:]...)
+									}
+
+									data0 := make(map[string]interface{}, 0)
+									json.Unmarshal(evt.EvtData[0].DataBytes, &data0)
+									data0["color"] = accountIdColor[accountId]
+									evt.EvtData[0].DataBytes, _ = json.Marshal(data0)
+
+									// Keep the edit event in memory.
+									eventManager.m_fileEditEvents[evt.GetName()] = append(eventManager.m_fileEditEvents[evt.GetName()], data0)
 								}
-								// Keep the edit event in memory.
-								eventManager.m_fileEditEvents[evt.GetName()][fileEditEvent["uuid"].(string)] = fileEditEvent
 							}
 						}
 
@@ -280,8 +332,7 @@ type EventListener struct {
 	// the type of event, use by channel
 	m_eventName string
 	// the listener addresse...
-	m_addr *WebSocketConnection
-
+	m_addr    *WebSocketConnection
 	m_filters []string
 
 	m_opChannel chan map[string]interface{}
@@ -295,7 +346,6 @@ func NewEventListener(eventName string, conn *WebSocketConnection) *EventListene
 	listner.m_addr = conn
 	listner.m_eventName = eventName
 	listner.m_id = conn.GetUuid()
-
 	listner.m_opChannel = make(chan map[string]interface{}, 0)
 
 	// Concurrency...
@@ -572,4 +622,21 @@ func (this *EventManager) AppendEventFilter(filter string, channelId string, mes
 	arguments["channelId"] = channelId
 	arguments["sessionId"] = sessionId
 	this.m_opChannel <- arguments
+}
+
+// @api 1.0
+// Return the list of file edit events.
+// @param {string} uuid The file uuid
+// @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+func (this *EventManager) GetFileEditEvents(uuid string, messageId string, sessionId string) interface{} {
+	//log.Println("append event filter ", filter, " for type ", eventType, " to session ", sessionId)
+	arguments := make(map[string]interface{})
+	arguments["op"] = "GetFileEditEvents"
+	arguments["uuid"] = uuid
+	arguments["events"] = make(chan interface{}, 0)
+	this.m_opChannel <- arguments
+	return <-arguments["events"].(chan interface{})
 }
