@@ -1198,7 +1198,6 @@ func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight i
 		return
 	}
 
-	log.Println("---> 1201")
 	tmpPath := GetServer().GetConfigurationManager().GetTmpPath() + "/" + file.GetName()
 
 	// I will open the file from the tmp directory.

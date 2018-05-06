@@ -5,11 +5,7 @@ import (
 	"log"
 	"regexp"
 
-	"bufio"
-	"encoding/csv"
-	"io"
 	"math/rand"
-	"os"
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -114,18 +110,26 @@ func newEventManager() *EventManager {
 	// I will keep the list of color by user id... so if the
 	// Here I will read the color tag...
 	colors := make([]string, 0)
-	colorNamePath := GetServer().GetConfigurationManager().GetDataPath() + "/colorName.csv"
-	colorNameFile, _ := os.Open(colorNamePath)
-	csvReader := csv.NewReader(bufio.NewReader(colorNameFile))
-	for {
-		val, err := csvReader.Read()
-		// Stop at EOF.
-		if err == io.EOF {
-			break
-		}
-
-		colors = append(colors, val[1])
-	}
+	colors = append(colors, "#3cb44b")
+	colors = append(colors, "#ffe119")
+	colors = append(colors, "#0082c8	")
+	colors = append(colors, "#f58231")
+	colors = append(colors, "#911eb4")
+	colors = append(colors, "#46f0f0")
+	colors = append(colors, "#f032e6")
+	colors = append(colors, "#d2f53c")
+	colors = append(colors, "#fabebe")
+	colors = append(colors, "#008080")
+	colors = append(colors, "#e6beff")
+	colors = append(colors, "#aa6e28")
+	colors = append(colors, "#fffac8	")
+	colors = append(colors, "#800000")
+	colors = append(colors, "#aaffc3")
+	colors = append(colors, "#808000")
+	colors = append(colors, "#ffd8b1	")
+	colors = append(colors, "#000080")
+	colors = append(colors, "#808080	")
+	colors = append(colors, "#e6194b")
 
 	accountIdColor := make(map[string]string, 0)
 
