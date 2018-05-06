@@ -88,6 +88,8 @@ var HomePage = function () {
 
     homePage = this
 
+
+
     // That function is use to change the theme in the project explorer.
     server.fileManager.attach(this, ChangeThemeEvent, function (evt, HomePage) {
 
@@ -187,7 +189,7 @@ var HomePage = function () {
         changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
         
         if (evt.dataMap.isDark) {
-
+            localStorage.setItem("isDark", true)
             changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".diagramLnk", "." + evt.dataMap.themeClass)
             
@@ -231,6 +233,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass)
         } else {
+            localStorage.setItem("isDark", false)
             changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".diagramLnk", "." + evt.dataMap.themeClass + " .ace_gutter")
 

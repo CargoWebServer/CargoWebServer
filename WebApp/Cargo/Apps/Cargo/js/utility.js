@@ -15,7 +15,6 @@
  * 
  * Authors: Dave Courtois
  * Contributors:
- *     .
  */
 
 /**

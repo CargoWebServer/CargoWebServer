@@ -425,8 +425,13 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                 if (evt.accountId != server.accountId) {
                     var classId = evt.accountId.replaceAll("%", "-").replaceAll(".", "-")
                     classId = classId
-                    // I will apply a 70% level of saturation so the text will be readeable.
-                    addStyleString(classId, "." + classId + "{background: "+applySat(70, evt.color)+ ";}")
+                    // I will apply a 75% level of saturation so the text will be readeable.
+                    if(localStorage.getItem("isDark") == "true"){
+                        addStyleString(classId, "." + classId + "{background: "+applySat(25, evt.color)+ ";}")
+                    }else{
+                        addStyleString(classId, "." + classId + "{background: "+applySat(75, evt.color)+ ";}")
+                    }
+                    
                     var r = this.getSelectionRange()
                     r.start = this.getSession().getDocument().createAnchor(aceEvt.start);
                     r.end = this.getSession().getDocument().createAnchor(aceEvt.end);
@@ -451,7 +456,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         exec: function (codeEditor) {
             return function (editor) {
                 editor.showSettingsMenu();
-                var themeSelect = document.getElementById('setTheme');
+                var themeSelect = document.getElementById('-theme');
                 themeSelect.addEventListener("change", function () {
                     // Here I will throw a change theme event.
                     codeEditor.theme = this.value

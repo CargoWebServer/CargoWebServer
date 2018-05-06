@@ -370,6 +370,7 @@ FileNavigator.prototype.saveFile = function (fileId) {
             f.lastModifiedDate = new Date(0);
         }
         if (file.UUID.length == 0) {
+            file.M_data = ""
             server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
                 // Success callback
                 function (result, caller) {
@@ -383,6 +384,8 @@ FileNavigator.prototype.saveFile = function (fileId) {
                 },
                 /*file*/ {})
         } else {
+            // File data are send via http post and not the websocket in that case.
+            file.M_data = ""
             server.fileManager.saveFile(file, f, 256, 256,
                 // Success callback
                 function (result, caller) {
