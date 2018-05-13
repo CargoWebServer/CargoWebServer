@@ -1,3 +1,6 @@
+/**
+ * The main entry point, just like c++ or java...
+ */
 function main () {
     var div = new Element(document.getElementsByTagName("body")[0],{"tag": "div", "class" : "test", "style":"width: auto; height: auto;"})
     var button = new Element(null, {"tag" : "button", "innerHtml" : "BOUTON"})

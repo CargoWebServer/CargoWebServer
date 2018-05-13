@@ -711,7 +711,7 @@ func (this *GraphStore) merge(r1 map[string]map[string]interface{}, r2 map[strin
  */
 func (this *GraphStore) evaluate(typeName string, fieldName string, comparator string, expected interface{}, value interface{}) (bool, error) {
 	isMatch := false
-
+	log.Println("----> typeName", typeName, fieldName, comparator, expected, value)
 	// if the value is nil i will automatically return
 	if value == nil {
 		return isMatch, nil
@@ -845,6 +845,7 @@ func (this *GraphStore) evaluate(typeName string, fieldName string, comparator s
  * That function test if a given value match all expressions of a given ast...
  */
 func (this *GraphStore) match(ast *ast.QueryAst, values map[string]interface{}) (bool, error) {
+
 	// test if the value is composite.
 	if ast.IsComposite() {
 		ast1, _, ast2 := ast.GetSubQueries()

@@ -1,0 +1,25 @@
+.item_display{
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.item_display .field_panel {
+    grid-template-columns: 1fr 6fr;
+}
+
+.item_display_content{
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+    flex-grow: 1;
+    position: relative;
+    overflow-y: auto;
+    height: 100px;
+}

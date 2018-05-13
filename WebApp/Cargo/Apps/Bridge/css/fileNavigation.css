@@ -1,13 +1,9 @@
 /** The file navigator **/
  #workingFilesDiv{
 	position: absolute; 
-    top: 0px; left: 0px; right: 0px; 
+    top: 0px; left: 3px; right: 0px; 
     height: 30px;
     z-index: 1;
- }
-
- #workingFilesDiv.scrolling{
-
  }
 
 .fileNavigator{
@@ -73,13 +69,12 @@
 .fa-save-all:before{
     content: "\f0c7";
     position:relative;
-    top: -4px;
-    left: -4px;
+    top: -3px; 
+    left: -5px;
 }
 .fa-save-all:after {
     content: "\f0c7";
     position:absolute;
-    left: 10px;
+    left: 12px;
     top: 10px;
-    background-color:white;
 }

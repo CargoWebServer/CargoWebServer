@@ -1,0 +1,18 @@
+pre {
+    margin-top: 3.44rem;
+}
+
+blockquote {
+    margin-top: 1.25rem;
+}
+
+.nowrap{
+  white-space: nowrap;
+}
+
+@media(max-width:48em){
+  table .btn{
+    font-size:0.75rem;
+    font-size:3.5vw;
+  }
+}

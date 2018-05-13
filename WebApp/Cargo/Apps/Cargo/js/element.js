@@ -17,7 +17,7 @@
 /**
 * @fileOverview Html element wrapper class.
 * @author Dave Courtois, Philippe Séguin-Boies, Eric Kavalec
-* @version 1.0
+* @version 1.0.0
 */
 
 /**
@@ -38,7 +38,7 @@ function createChildElement(parent, node) {
         nodeElement.id = randomUUID();
         node.id = nodeElement.id;
     }
-    if (parent == null) {
+    if (parent === null) {
         document.getElementsByTagName("body")[0].appendChild(node);
     } else {
         parent.appendElement(nodeElement);
@@ -156,14 +156,14 @@ var Element = function (parent, params, callback, appendFront) {
                 }
                 else if (param == "id") {
                     this.id = params[param];
-                    if (params["NS"] != undefined) {
+                    if (params["NS"] !== undefined) {
                         this.element.setAttributeNS(param.NS, param, params[param])
                     } else {
                         this.element.setAttribute(param, params[param])
                     }
 
                 } else {
-                    if (params["NS"] != undefined) {
+                    if (params["NS"] !== undefined) {
                         this.element.setAttributeNS(param.NS, param, params[param])
                     } else {
                         this.element.setAttribute(param, params[param])

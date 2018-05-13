@@ -29,7 +29,7 @@ function init() {
             }
         }
     }
-
+    
     bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
     // The body element....
@@ -48,10 +48,6 @@ function init() {
     )
     // the main page...
     mainPage = new MainPage(mainLayout, loginPage)
-
-    /*bodyElement.element.oncontextmenu = function(){
-        return false;
-    }*/
 }
 
 /**
@@ -68,7 +64,6 @@ var xapian = null
  * This function is the entry point of the application...
  */
 function main() {
-
     server.eventHandler.appendEventFilter(
         "CargoEntities.",
         "EntityEvent",

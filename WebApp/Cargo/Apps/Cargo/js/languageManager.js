@@ -125,11 +125,18 @@ LanguageManager.prototype.setElementText = function (element, textId) {
 				if (this.elements[element.uuid].element.getAttribute("data-match-error") != null) {
 					// Set the error text here.
 					this.elements[element.uuid].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
-				} else {
-					this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
+				}else if(this.elements[element.uuid].element.value.length > 0){
+				    this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
+				}else {
+
+				    this.elements[element.uuid].setAttribute("placeholder", this.languageInfo[this.language][textId])
+				    
 				}
+				
 			} else {
-				this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
+			        this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
+			    
+				
 			}
 		}
 	}

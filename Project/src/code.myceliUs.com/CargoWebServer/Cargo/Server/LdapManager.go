@@ -516,10 +516,17 @@ func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *C
 	// Il will make a lookup first and test if the computer contain the name
 	ids, _ := net.LookupAddr(ip)
 	if len(ids) > 0 {
-		return this.getComputer(strings.ToUpper(ids[0]))
+
+		id := strings.ToUpper(ids[0])
+		if strings.HasSuffix(id, ".") {
+			id = id[0 : len(id)-1]
+		}
+		log.Println("---> 524 computer domain : ", id)
+		return this.getComputer(id)
 	} else {
 		hostname, _ := os.Hostname()
 		computer, err := this.getComputerByName(strings.ToUpper(hostname))
+		log.Println(computer)
 		if err == nil {
 			return computer, nil
 		}

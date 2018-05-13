@@ -16,6 +16,10 @@
      background-size: 200px 200px;*/
  }
 
+#workingFilesDiv.scrolling{
+   /** Do not remove it it's use by the theme selector */ 
+}
+
  .codeEditor .ace_editor {
     position: initial;
  }
@@ -29,4 +33,8 @@
  
  .CargoEntities-Account-6e0e89d0-76fa-3dd0-80af-85fd6c562e96{
      background-color: yellow;
+ }
+ 
+ .ace_autocomplete{
+     display: none;
  }

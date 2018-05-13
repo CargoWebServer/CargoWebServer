@@ -5,6 +5,7 @@ import (
 	"bytes"
 	base64 "encoding/base64"
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"image"
 	"image/gif"
@@ -20,6 +21,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"github.com/nfnt/resize"
+	"golang.org/x/net/html"
 
 	"code.myceliUs.com/Utility"
 	"github.com/polds/imgbase64"
@@ -531,21 +533,13 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 
 		GetServer().GetEventManager().BroadcastEvent(evt)
 
+		// append the ?checksum in includes path.
+		if file.GetMime() == "text/html" {
+			filedata = this.setHtmlIncludes(file.GetPath(), filedata)
+		}
 	}
 
 	return file, nil
-}
-
-/**
- * Return a file with a given uuid, or id.
- */
-func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
-	ids := []interface{}{id}
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", ids)
-	if fileEntity != nil {
-		return fileEntity.(*CargoEntities.File), errObj
-	}
-	return nil, errObj
 }
 
 /**
@@ -573,6 +567,12 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	file := fileEntity.(*CargoEntities.File)
 
 	if file.GetChecksum() != checksum {
+		// append the ?checksum in includes path.
+		var oldChecksum = file.GetChecksum()
+		if file.GetMime() == "text/html" {
+			filedata = this.setHtmlIncludes(file.GetPath(), filedata)
+		}
+
 		if !dbFile {
 			// Save the data to the disck...
 			filename := file.GetName()
@@ -591,11 +591,14 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		err := GetServer().GetEntityManager().saveEntity(file)
 		if err != nil {
 			log.Println("---> save file error ", err)
+		} else if file.GetMime() == "application/javascript" || file.GetMime() == "text/css" || file.GetMime() == "text/json" {
+			// Here I will remplace the old checksum with the new one.
+			this.updateHtmlChecksum(oldChecksum, checksum, file.GetPath()+"/"+file.GetName())
 		}
 
-	} else {
+	} /*else {
 		return nil
-	}
+	}*/
 
 	if err == nil {
 		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
@@ -619,6 +622,118 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	}
 
 	return nil
+}
+
+func (this *FileManager) updateHtmlChecksum(oldChecksum string, newChecksum string, filePath string) {
+	// So first of all I need to get all html files...
+	var query EntityQuery
+	query.Fields = []string{"UUID", "M_path", "M_name", "M_mime"}
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.File"
+	query.Query = `CargoEntities.File.M_mime == "text/html"`
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData("CargoEntities", string(queryStr), []interface{}{}, []interface{}{})
+	if err == nil {
+		for i := 0; i < len(results); i++ {
+			fileInfo := results[i]
+			// So here I will read the file content...
+			txt, err := ioutil.ReadFile(this.root + fileInfo[1].(string) + "/" + fileInfo[2].(string))
+			if err == nil {
+				if strings.Index(string(txt), oldChecksum) != -1 {
+					// The old reference was found!
+					data := strings.Replace(string(txt), oldChecksum, newChecksum, -1)
+					this.saveFile(fileInfo[0].(string), []byte(data), "", 256, 256, false)
+				} else if strings.Index(string(txt), filePath) != -1 {
+					// In case the file was not exist before.
+					data := strings.Replace(string(txt), filePath, filePath+"?"+newChecksum, -1)
+					this.saveFile(fileInfo[0].(string), []byte(data), "", 256, 256, false)
+				} else if strings.HasPrefix(filePath, fileInfo[1].(string)) {
+					// In case the file is in the same directory as the html file and
+					// it path is express relatively.
+					relativeFilePath := filePath[len(fileInfo[1].(string))+1:]
+					data := strings.Replace(string(txt), relativeFilePath, relativeFilePath+"?"+newChecksum, -1)
+					this.saveFile(fileInfo[0].(string), []byte(data), "", 256, 256, false)
+				}
+			}
+		}
+	}
+}
+
+/**
+ * If the file is an html file and it contain link to file entities I will append
+ * the file checksum in the import link so the cache will reload that file
+ * correctly.
+ */
+func (this *FileManager) setHtmlIncludes(path string, filedata []byte) []byte {
+	doc, _ := html.Parse(strings.NewReader(string(filedata)))
+	var f func(*html.Node)
+	var refs = make([]*html.Node, 0)
+
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && (n.Data == "link" || n.Data == "script") {
+			refs = append(refs, n)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+
+	f(doc)
+
+	f_ := func(basePath string, path string, a *html.Attribute) {
+		// Retreive the existing file...
+		fileId := Utility.CreateSha1Key([]byte(path))
+		file, _ := this.getFileById(fileId)
+
+		var checksum string
+		if len(strings.Split(path, "?")) > 1 {
+			checksum = strings.Split(path, "?")[1]
+			path = strings.Split(path, "?")[0]
+		}
+		if file != nil {
+			if checksum != file.GetChecksum() {
+				log.Println("--> checksum: ", file.GetChecksum())
+				// Change the actual value with the new checksum
+				a.Val = path + "?" + file.GetChecksum()
+			}
+		} else {
+			log.Println(basePath + "/" + path)
+			fileId := Utility.CreateSha1Key([]byte(basePath + "/" + path))
+			file, _ := this.getFileById(fileId)
+			if file != nil {
+				if checksum != file.GetChecksum() {
+					log.Println("--> checksum: ", file.GetChecksum())
+					// Change the actual value with the new checksum
+					a.Val = path + "?" + file.GetChecksum()
+				}
+			}
+		}
+	}
+
+	// iteration over found refs...
+	for i := 0; i < len(refs); i++ {
+		n := refs[i]
+		if n.Data == "script" {
+			for j := 0; j < len(n.Attr); j++ {
+				if n.Attr[j].Key == "src" {
+					f_(path, n.Attr[j].Val, &n.Attr[j])
+				}
+			}
+		} else if n.Data == "link" {
+			for j := 0; j < len(n.Attr); j++ {
+				if n.Attr[j].Key == "href" {
+					f_(path, n.Attr[j].Val, &n.Attr[j])
+				}
+			}
+		}
+	}
+
+	// Render the modified document.
+	var buf bytes.Buffer
+	w := io.Writer(&buf)
+	html.Render(w, doc)
+	// Return the modified html document.
+	return buf.Bytes()
 }
 
 /**
@@ -688,6 +803,18 @@ func (this *FileManager) openFile(fileId string, sessionId string) (*CargoEntiti
 
 	// I will return the file
 	return file, nil
+}
+
+/**
+ * Return a file with a given uuid, or id.
+ */
+func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
+	ids := []interface{}{id}
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", ids)
+	if fileEntity != nil {
+		return fileEntity.(*CargoEntities.File), errObj
+	}
+	return nil, errObj
 }
 
 /**
@@ -1219,6 +1346,8 @@ func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight i
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
+
+	// Now I will change file checksum in the all index.html files...
 
 }
 

@@ -1,0 +1,17 @@
+.session_panel{
+    font-family: 'Questrial', sans-serif;
+    color: rgba(1.0, 1.0, 1.0, .5);
+}
+
+.btn{
+    font-size : 0.8rem;
+    cursor:pointer;
+}
+
+.checkbox span{
+    padding-left: 5px;
+    padding-top: 8px;
+    font-family: 'Questrial', sans-serif;
+    color: white;
+    vertical-align: bottom;
+}

@@ -1,34 +1,27 @@
 /** Display a dropdown list with associated language. **/
 #language-list-div{
-    display: table; 
-    border-spacing:2px 2px;
-    position: absolute; 
-    right: 2px; 
-    /** Can be change for style **/
-    background-color: black; 
-    padding: 4px;
     z-index: 100;
+    padding: 5px;
 }
 
-.language-list-div-row{
-    display: table-row;
+.language_select_btn{
+    background-color: transparent;
 }
 
 .language-list-div-row span:hover{
     cursor: pointer;
-    color: rgba(255,255,255,.75);
+    color: white;
 }
 
-.language-list-div-row div{
-    display: table-cell;
+.language-list-div-row span{
+    margin-left: 5px;
+    margin-right: 5px;
+    font-family: 'Questrial', sans-serif;
+    color: rgba(255,255,255,.5);
 }
 
 .language-list-div-row .flag-icon{
     min-width: 16px;
-}
-
-.flag-div{
-    /* border: 1px solid white; */
 }
 
 .flag-div:hover{

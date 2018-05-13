@@ -20,7 +20,7 @@
 /**
  * @fileOverview Various helper functions.
  * @author Dave Courtois
- * @version 1.0
+ * @version 1.0.0
  */
 
 window.URL = window.URL || window.webkitURL;  // Take care of vendor prefixes.
@@ -565,20 +565,20 @@ function propertyFromStylesheet(selector, attribute) {
 
 function getRulesByName(selector) {
     var rules = [];
-
-    [].some.call(document.styleSheets, function (sheet) {
-        return [].some.call(sheet.rules, function (rule) {
-            if (selector === rule.selectorText) {
-                return [].some.call(rule.style, function (style) {
-                    rules.push(rules)
-                    return rules;
-                });
+    for (var i = 0; i < document.styleSheets.length; i++) {
+        for (var j = 0; j < document.styleSheets[i].rules.length; j++) {
+            if (document.styleSheets[i].rules[j] != undefined) {
+                if (document.styleSheets[i].rules[j].selectorText != undefined) {
+                    if (document.styleSheets[i].rules[j].selectorText.indexOf(selector) != -1) {
+                        rules.push(document.styleSheets[i].rules[j]);
+                    }
+                }
             }
-            return rules;
-        });
-    });
+        }
+    }
     return rules;
 }
+
 
 /**
  * The map of frame rules indexed by their name.

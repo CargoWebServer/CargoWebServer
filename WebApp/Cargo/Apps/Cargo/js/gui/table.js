@@ -66,7 +66,7 @@ server.languageManager.appendLanguageInfo(tableTextInfo)
 var Table = function (id, parent) {
 
 	this.id = id
-	if (this.id.length == 0) {
+	if (this.id.length === 0) {
 		this.id = randomUUID()
 	}
 
@@ -1636,7 +1636,7 @@ ColumnSorter.prototype.setOrder = function () {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//  The column filter...
+//                              The column filter...
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -1800,7 +1800,7 @@ var ColumnFilter = function (index, table) {
 	this.initFilterPanel()
 
 	////////////////////////////////////////////////////////////////////////////////////
-	//            Event...
+	//                                  Event...
 	////////////////////////////////////////////////////////////////////////////////////
 	this.filterIcon.element.onclick = function (filter) {
 		return function () {

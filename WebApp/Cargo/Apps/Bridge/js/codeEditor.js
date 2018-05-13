@@ -1,133 +1,144 @@
 /**
  * The code editor
  * TODO create the split functionnality
- * TODO create the multiuser access for a single file
  */
-
+ 
 var CodeEditor = function (parent) {
-
-    // The panel...
-    this.panel = parent.appendElement({ "tag": "div", "class": "codeEditor" }).down()
+    
+    // the panel...
+    this.panel = parent.appendElement({ "tag": "div", "class": "codeEditor" }).down();
 
     // The open files...
-    this.files = {}
+    this.files = {};
 
     // The toolbars associated whit each editor.
-    this.toolbars = {}
+    this.toolbars = {};
 
     // The current file.
-    this.activeFile = null
+    this.activeFile = null;
 
     // The editor
-    this.editors = {}
+    this.editors = {};
 
     // The map of file panels.
-    this.filesPanel = {}
+    this.filesPanel = {};
 
     // TODO create the new file event and the delete file event here...
-    this.quiet = false
+    this.quiet = false;
+    
+    // Keep the cursor position.
+    this.lastCursorPosition = null;
 
     // Here I will create the file toolbar...
     //this.fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
-    this.theme = localStorage.getItem("bridge_editor_theme")
-    if (this.theme == undefined) {
-        this.theme = "ace/theme/chrome"
+    this.theme = localStorage.getItem("bridge_editor_theme");
+    if (this.theme === undefined) {
+        this.theme = "ace/theme/chrome";
     }
 
-    this.themeClass = localStorage.getItem("bridge_editor_theme_class")
-    if (this.themeClass == undefined) {
-        this.themeClass = "ace-chrome"
+    this.themeClass = localStorage.getItem("bridge_editor_theme_class");
+    if (this.themeClass === undefined) {
+        this.themeClass = "ace-chrome";
     }
 
     // Here I will attach the file navigator to file event.
-    // Open.
-    server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
-        if (evt.dataMap["fileInfo"] !== undefined) {
-            var file = entities[evt.dataMap["fileInfo"].UUID]
-            if (file == undefined) {
-                file = evt.dataMap["fileInfo"]
-            }
 
+
+    // Attach the file open event.
+    server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
+        if (evt.dataMap.fileInfo !== undefined) {
+            var file = entities[evt.dataMap.fileInfo.UUID];
+            if (file === undefined) {
+                file = evt.dataMap.fileInfo;
+            }
+            
             if (file.M_data !== undefined) {
                 // Here thats mean the file was open
-                codeEditor.appendFile(file, evt.dataMap["coord"])
+                codeEditor.appendFile(file, evt.dataMap.coord);
             }
 
-        } else if (evt.dataMap["bpmnDiagramInfo"] !== undefined) {
-            var diagram = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+        } else if (evt.dataMap.bpmnDiagramInfo !== undefined) {
+            var diagram = entities[evt.dataMap.bpmnDiagramInfo.UUID];
             if (diagram !== undefined) {
-                codeEditor.appendBpmnDiagram(diagram)
+                codeEditor.appendBpmnDiagram(diagram);
             }
-        } else if (evt.dataMap["prototypeInfo"] != undefined) {
-            var prototype = evt.dataMap["prototypeInfo"]
+        } else if (evt.dataMap.prototypeInfo !== undefined) {
+            var prototype = evt.dataMap.prototypeInfo;
             if (prototype !== undefined) {
-                codeEditor.appendPrototypeEditor(prototype)
+                codeEditor.appendPrototypeEditor(prototype);
             }
-        } else if (evt.dataMap["searchInfo"] != undefined) {
-            codeEditor.appendSearchPage(evt.dataMap["searchInfo"])
+        } else if (evt.dataMap.searchInfo !== undefined) {
+            codeEditor.appendSearchPage(evt.dataMap.searchInfo);
         }
-    })
+    });
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, codeEditor) {
-        var fileId = evt.dataMap["fileId"]
+        var fileId = evt.dataMap.fileId;
         if (fileId !== undefined) {
-            codeEditor.removeFile(fileId)
+            codeEditor.removeFile(fileId);
             if (codeEditor.toolbars[fileId] !== undefined) {
                 for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
                     var toolbar = codeEditor.toolbars[fileId][i];
                     homePage.toolbarDiv.removeElement(toolbar);
                 }
             }
-            codeEditor.toolbars[fileId] = []
+            codeEditor.toolbars[fileId] = [];
         }
-    })
+    });
 
     // Attach the file update event.
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
-            var file = evt.dataMap["fileInfo"]
-            var editor = codeEditor.editors[file.UUID + "_editor"]
-            if (editor !== undefined) {
+            var file = evt.dataMap.fileInfo;
+            var editor = codeEditor.editors[file.UUID + "_editor"];
+            if (editor !== undefined && file.M_data.length > 0) {
                 // Supend the change event propagation
-                codeEditor.quiet = true
+                codeEditor.quiet = true;
                 // TODO multiple users synch to be applied here...
-                editor.setValue(decode64(file.M_data), -1)
-                editor.clearSelection()
-                if (editor.getCursorPosition != undefined) {
-                    var position = editor.getCursorPosition()
+                editor.setValue(decode64(file.M_data), -1);
+                editor.clearSelection();
+                if (codeEditor.lastCursorPosition !== undefined) {
+                    var position = codeEditor.lastCursorPosition;
                     editor.scrollToLine(position.row + 1, true, true, function () { });
-                    editor.gotoLine(position.row + 1, position.column)
+                    editor.gotoLine(position.row + 1, position.column);
+                    // set the editor focus.
+                    editor.focus(); 
                 }
                 // Resume the chage event propagation.
-                codeEditor.quiet = false
+                codeEditor.quiet = false;
+                
+                
             }
         }
-    })
+    });
 
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap.entity !== undefined) {
-            var file = evt.dataMap["entity"]
-            var editor = codeEditor.editors[file.UUID + "_editor"]
-            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
+            var file = evt.dataMap.entity;
+            var editor = codeEditor.editors[file.UUID + "_editor"];
+            
+            if (editor !== undefined && file.TYPENAME === "CargoEntities.File" && file.M_data.length > 0) {
                 // Supend the change event propagation
-                codeEditor.quiet = true
-                if (editor.getCursorPosition != undefined) {
-                    var position = editor.getCursorPosition()
+                codeEditor.quiet = true;
+                if (codeEditor.lastCursorPosition !== undefined) {
+                    var position = codeEditor.lastCursorPosition;
                     // TODO multiple users synch to be 3. here...
-                    editor.setValue(decode64(file.M_data), -1)
-                    editor.clearSelection()
+                    editor.setValue(decode64(file.M_data), -1);
+                    editor.clearSelection();
                     editor.scrollToLine(position.row + 1, true, true, function () { });
-                    editor.gotoLine(position.row + 1, position.column)
+                    editor.gotoLine(position.row + 1, position.column);
+                    // set the editor focus.
+                    editor.focus();
                 }
                 // Resume the chage event propagation.
-                codeEditor.quiet = false
+                codeEditor.quiet = false;
             }
         }
-    })
+    });
 
     server.fileManager.attach(this, ChangeThemeEvent, function (evt, codeEditor) {
-        codeEditor.theme = evt.dataMap.theme
+        codeEditor.theme = evt.dataMap.theme;
         for (var editorUuid in codeEditor.editors) {
             if (codeEditor.editors[editorUuid].setTheme !== undefined) {
                 codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
@@ -135,10 +146,10 @@ var CodeEditor = function (parent) {
                 codeEditor.editors[editorUuid].editor.setTheme(evt.dataMap.theme);
             }
         }
-    })
+    });
 
-    return this
-}
+    return this;
+};
 
 /**
  * Create a new Search page.
@@ -146,17 +157,17 @@ var CodeEditor = function (parent) {
 CodeEditor.prototype.appendSearchPage = function (searchInfo) {
     if (this.files[searchInfo.UUID] !== undefined) {
         // Set the tab active...
-        this.setActiveFile(searchInfo.UUID)
-        return
+        this.setActiveFile(searchInfo.UUID);
+        return;
     }
 
-    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": searchInfo.UUID + "_search_div" }).down()
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": searchInfo.UUID + "_search_div" }).down();
     // create and display the search page.
-    new SearchPage(filePanel, searchInfo)
-    this.files[searchInfo.UUID] = searchInfo
-    this.filesPanel[searchInfo.UUID] = filePanel
-    this.setActiveFile(searchInfo.UUID)
-}
+    new SearchPage(filePanel, searchInfo);
+    this.files[searchInfo.UUID] = searchInfo;
+    this.filesPanel[searchInfo.UUID] = filePanel;
+    this.setActiveFile(searchInfo.UUID);
+};
 
 /**
  * Here I will display the prototype editor.
@@ -165,25 +176,25 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
     // Here I will set the prototype editor.
     if (this.files[prototype.TypeName] !== undefined) {
         // Set the tab active...
-        this.setActiveFile(prototype.TypeName)
-        return
+        this.setActiveFile(prototype.TypeName);
+        return;
     }
 
     server.configurationManager.getActiveConfigurations(
         function (results, caller) {
-            var namespaces = []
+            var namespaces = [];
             for (var i = 0; i < results.M_dataStoreConfigs.length; i++) {
                 // Sql entities are not part of the heritage system.
                 if (results.M_dataStoreConfigs[i].M_dataStoreType == 2) {
-                    namespaces.push(results.M_dataStoreConfigs[i].M_id)
+                    namespaces.push(results.M_dataStoreConfigs[i].M_id);
                 }
             }
-            var codeEditor = caller.codeEditor
-            var prototype = caller.prototype
+            var codeEditor = caller.codeEditor;
+            var prototype = caller.prototype;
             var entityEditor = new EntityPrototypeEditor(filePanel, namespaces, undefined, function (entityEditor) {
-                entityEditor.typeNameInput.element.value = prototype.TypeName
-                entityEditor.setCurrentPrototype(prototype)
-                entityEditor.space.element.style.display = ""
+                entityEditor.typeNameInput.element.value = prototype.TypeName;
+                entityEditor.setCurrentPrototype(prototype);
+                entityEditor.space.element.style.display = "";
             })
         },
         function (errObj, caller) {
@@ -205,16 +216,12 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
         this.diagram.canvas.initWorkspace()
         return
     }
-
+    
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.UUID + "_editor" }).down()
-
-
     this.diagram = new SvgDiagram(filePanel, diagram)
-
     this.diagram.init(function (codeEditor, diagram, filePanel) {
         return function () {
             codeEditor.diagram.drawDiagramElements()
-
             codeEditor.files[diagram.UUID] = diagram
             codeEditor.filesPanel[diagram.UUID] = filePanel
             codeEditor.setActiveFile(diagram.UUID)
@@ -237,7 +244,7 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                     }
                 }
             }(filePanel)
-
+            
             window.addEventListener("resize", function (canvas) {
                 return function () {
                     canvas.initWorkspace()
@@ -263,7 +270,6 @@ CodeEditor.prototype.appendFile = function (file, coord) {
     } else if (file.M_mime == "text/plain") {
         fileMode = "ace/mode/text"
     }
-
 
     // Here I will set the file
     if (this.files[file.UUID] != undefined) {
@@ -354,6 +360,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
             rules[i].style.background = "";
         }
     }
+    
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
@@ -364,7 +371,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
 
     // Create the event listener for the current editor.
     editor.eventListner = new EventHub(file.UUID + "_editor")
-
+    
     // create the stack.
     editor.networkEvents = []
     server.eventHandler.addEventListener(
@@ -465,7 +472,46 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         }(this),
         readOnly: true
     }]);
-
+    
+    /**
+     *  Fix the autocomplete ppsition.
+     */
+    editor.textInput.getElement().onkeydown = function(fileUUID, codeEditor){
+        return function(evt){
+            var editor = codeEditor.editors[fileUUID + "_editor"]
+            if(editor.completer!==undefined){
+                
+                var popup = editor.completer.popup;
+                if(popup !== undefined){
+                    if (evt.keyCode == 27 || evt.keyCode == 13 || evt.keyCode == 8 || evt.keyCode == 9 || evt.keyCode == 16) {
+                        popup.container.style.display = "";
+                    }else {
+                        var pos1 = editor.renderer.$cursorLayer.getPixelPosition(this.base, true);
+                        pos1.left -= popup.getTextLeftOffset();
+                        var rect = editor.container.getBoundingClientRect();
+                        pos1.top += rect.top - editor.renderer.layerConfig.offset;
+                        pos1.left += rect.left - editor.renderer.scrollLeft;
+                        pos1.left += editor.renderer.gutterWidth;
+                        popup.container.style.top = pos1.top + "px";
+                        popup.container.style.left = pos1.left + "px";
+                        popup.container.style.display = "block";
+                    }
+                }
+            }
+        }
+    }(file.UUID, this)
+    
+    // when the editor lost the focus.
+    editor.textInput.getElement().onblur= editor.textInput.getElement().onmousedown =  function(fileUUID, codeEditor){
+        return function(evt){
+            var editor = codeEditor.editors[fileUUID + "_editor"]
+            if(editor.completer!==undefined){
+                var popup = editor.completer.popup;
+                popup.container.style.display = "";
+            }
+        }
+    }(file.UUID, this)
+    
     // In case of file update...
     editor.getSession().on('change', function (fileUUID, codeEditor) {
         return function (aceEvt) {
@@ -473,8 +519,11 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                 var editor = codeEditor.editors[fileUUID + "_editor"]
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
                 var file = entities[fileUUID]
-
+                
                 file.M_data = encode64(editor.getSession().getValue())
+                
+                // Keep the cursor position in memory.
+                codeEditor.lastCursorPosition = editor.getCursorPosition();
 
                 server.eventHandler.broadcastLocalEvent(evt)
                 if (aceEvt.uuid == undefined) {
@@ -535,16 +584,18 @@ CodeEditor.prototype.removeFile = function (uuid) {
         var editor = this.editors[uuid + "_editor"]
 
         // Detach the local event channel.
-        editor.eventListner.detach(editor.eventListner, FileEditEvent)
-
-        // Also detach the listener on the sever.
-        server.eventHandler.removeEventManager(
-            editor.eventListner,
-            function () {
-                // callback
-            }
-        )
-
+        if(editor.eventListner != null){
+            editor.eventListner.detach(editor.eventListner, FileEditEvent)
+    
+            // Also detach the listener on the sever.
+            server.eventHandler.removeEventManager(
+                editor.eventListner,
+                function () {
+                    // callback
+                }
+            )
+        }
+        
         delete this.editors[uuid + "_editor"]
 
         // If there's no more file i will reset the shadow.
@@ -562,43 +613,15 @@ CodeEditor.prototype.removeFile = function (uuid) {
     }
 }
 
-function getRulesByName(selector) {
-    var rules = [];
-    for (var i = 0; i < document.styleSheets.length; i++) {
-        for (var j = 0; j < document.styleSheets[i].rules.length; j++) {
-            if (document.styleSheets[i].rules[j] != undefined) {
-                if (document.styleSheets[i].rules[j].selectorText != undefined) {
-                    if (document.styleSheets[i].rules[j].selectorText.indexOf(selector) != -1) {
-                        rules.push(document.styleSheets[i].rules[j]);
-                    }
-                }
-            }
-        }
-    }
-
-    /* [].some.call(document.styleSheets, function (sheet) {
-         return [].some.call(sheet.rules, function (rule) {
-             if (selector === rule.selectorText) {
-                 return [].some.call(rule.style, function (style) {
-                     rules.push(rules)
-                     return rules;
-                 });
-             }
-         });
-     });*/
-    return rules;
-}
-
-
-
-
 /**
  * Set the current file panel.
  */
 CodeEditor.prototype.setActiveFile = function (uuid, coord) {
+    
     for (var id in this.filesPanel) {
         this.filesPanel[id].element.style.display = "none"
     }
+    
     if (this.filesPanel[uuid] !== undefined) {
         this.filesPanel[uuid].element.style.display = ""
         var header = document.getElementById("workingFilesDiv")
@@ -637,4 +660,5 @@ CodeEditor.prototype.setActiveFile = function (uuid, coord) {
         editor.gotoLine(coord.ln, coord.col, true);
         editor.renderer.scrollToRow(coord.ln - 3); // minus 3 to see couple line before...
     }
+    
 }

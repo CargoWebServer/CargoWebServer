@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"log"
+	//	"log"
 
 	"github.com/robertkrimen/otto"
 
@@ -109,6 +109,7 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
  * Remove reference and create sub entity entity.
  */
 func (this *DynamicEntity) setObject(obj map[string]interface{}) {
+
 	// Here I will create the entity object.
 	object := make(map[string]interface{})
 
@@ -154,9 +155,10 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 		if val != nil {
 			if reflect.TypeOf(val).String() == "otto.Value" {
 				val, _ = val.(otto.Value).Export()
-				log.Println("----> val otto: ", field, val)
+				//log.Println("----> val otto: ", field, val)
 			}
 			if strings.HasPrefix(field, "M_") {
+				//log.Println("----> 169 field ", fieldType, reflect.TypeOf(val).String(), field, ":", val)
 				if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") {
 					if strings.HasPrefix(fieldType, "[]") {
 						if reflect.TypeOf(val).String() == "[]interface {}" {
@@ -431,6 +433,7 @@ func (this *DynamicEntity) GetParent() interface{} {
  */
 func (this *DynamicEntity) GetChilds() []interface{} {
 	var childs []interface{}
+	// I will get the childs by their uuid's if there already exist.
 	uuids := this.GetChildsUuid()
 	for i := 0; i < len(uuids); i++ {
 		child, _ := GetServer().GetEntityManager().getEntityByUuid(uuids[i])

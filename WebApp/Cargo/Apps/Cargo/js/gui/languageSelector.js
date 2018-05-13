@@ -6,23 +6,38 @@ var LanguageSelector = function(parent, languages, callback){
 
     this.languages = languages;
 
-    this.panel = parent.appendElement({"tag":"div", "class":"language-selector", "style":"display: table-cell; vertical-align: middle;"}).down()
+    this.panel = parent.appendElement({"tag":"div", "class":"language-selector dropdown"}).down()
     
-    this.currentLanguageDiv = this.panel.appendElement({"tag":"div", "style":"display: table; border-spacing:2px 2px; position: relative;"}).down()
-    this.flagDiv = this.currentLanguageDiv.appendElement({"tag":"div", "style":"display: table-cell;"}).down()
-  
-    this.currentLanguage = null;
-    this.languageListDiv = null;
+    this.currentLanguageDiv = this.panel.appendElement({"tag":"button", "id":"language_select_btn", 
+    "class":"current-language btn btn-outline-secondary dropdown-toggle", "type":"button", "data-toggle":"dropdown", 
+    "aria-haspopup":"true", "aria-expanded" : "false", "style":"background-color: transparent; border: none;"}).down()
+    
+    // This is the button.
+    this.flagDiv = this.currentLanguageDiv.appendElement({"tag":"div"}).down()
+    this.currentLanguageSpan = this.currentLanguageDiv.appendElement({"tag":"span", "style":"margin-left: 5px;"}).down()
+    
+    this.languageListDiv = this.panel.appendElement({"tag":"ul", "id":"language-list-div", "class":"dropdown-menu dropdown-menu-right bg-dark", "role":"menu", "aria-labelledby":"language_select_btn"}).down()
+    
+    var panelLeft = getCoords(this.panel.element).left
+    if(panelLeft == 0){
+        this.languageListDiv.element.style.left = "0px"
+    }
 
+    for(var i=0; i < this.languages.length; i++){
+        var row = this.languageListDiv.appendElement({"tag":"li", "class":"language-list-div-row", "role":"presentation"}).down()
+            var item = row.appendElement({"tag":"div", "class":"menuitem"}).down();
+            item.appendElement({"tag":"div", "class":"flag-icon flag-icon-" + this.languages[i].flag})
+            var languageSpan = item.appendElement({"tag":"span", "innerHtml":this.languages[i].name}).down()
+            row.element.onclick = function(selector, language){
+                return function(){
+                    selector.setLanguage(language)
+                }
+            }(this, this.languages[i])
+    }
+    
     if(languages.length > 0){
         this.setLanguage(languages[0]);
     }
-
-    this.flagDiv.element.onclick = function(selector){
-        return function(){
-            selector.displayLanguages();
-        }
-    }(this)
 
     // Call when the language change.
     this.callback = callback
@@ -33,71 +48,13 @@ var LanguageSelector = function(parent, languages, callback){
 /** Set the current language. */
 LanguageSelector.prototype.setLanguage = function(language){
     this.flagDiv.element.className = "flag-div flag-icon flag-icon-" + language.flag;
-    this.flagDiv.element.title = language.name;
+    this.currentLanguageSpan.element.innerText = language.name;
+    
     // keep track of the current language...
     this.currentLanguage = language;
-    if(this.languageListDiv != null){
-        this.languageListDiv.parentElement.removeElement(this.languageListDiv)
-        this.languageListDiv = null
-    }
 
     // call the callback function.
     if(this.callback != null){
         this.callback(language)
-    }
-    
-	// each language has it class of div (ex fr, en )
-	// if it not correspond to the active language it will not be displayed.
-	var styleSheet = getStyleSheetByFileName("/css/gui/languageSelector.css")
-	for (var language_ in languageInfo) {
-        var ruleIndex = -1;
-		for (var j = 0; j < styleSheet.cssRules.length; j++) {
-			var rule = styleSheet.cssRules[j]
-			if (rule.selectorText == "div:lang(" + language_ + ")") {
-				ruleIndex = j
-                rule.style.display = "none"
-                break;
-			}
-        }
-        // append the rule if not exist.
-		if (ruleIndex == -1) {
-            ruleIndex = 0;
-			styleSheet.insertRule("div:lang(" + language_ + ") { display: none; }", 0);
-		}
-        // Set the language as needed
-		if(language_ == language.id){
-            styleSheet.cssRules[ruleIndex].style.display = "block";
-		}
-	}
-}
-
-LanguageSelector.prototype.displayLanguages = function(){
-    // remove the list if one already exist.
-    if(this.languageListDiv != null){
-        this.languageListDiv.parentElement.removeElement(this.languageListDiv)
-        this.languageListDiv = null
-        return;
-    }
-
-    this.languageListDiv = this.panel.appendElement({"tag":"div", "id":"language-list-div"}).down()
-    this.languageListDiv.element.style.top = this.flagDiv.element.offsetHeight + 5 + "px"
-
-    var panelLeft = getCoords(this.panel.element).left
-    if(panelLeft == 0){
-        this.languageListDiv.element.style.left = "0px"
-    }
-
-    for(var i=0; i < this.languages.length; i++){
-        if(this.currentLanguage.name != this.languages[i].name){
-        var row = this.languageListDiv.appendElement({"tag":"div", "class":"language-list-div-row", "style":"display: table-row;"}).down()
-            var languageSpan = row.appendElement({"tag":"span","style":"display: table-cell;", "innerHtml":this.languages[i].name}).down()
-            row.appendElement({"tag":"div", "style":"display: table-cell;", "class":"flag-icon flag-icon-" + this.languages[i].flag})
-            
-            languageSpan.element.onclick = function(selector, language){
-                return function(){
-                    selector.setLanguage(language)
-                }
-            }(this, this.languages[i])
-        }
     }
 }

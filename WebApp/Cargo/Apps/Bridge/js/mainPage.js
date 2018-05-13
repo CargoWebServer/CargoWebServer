@@ -1,7 +1,6 @@
 /**
  * The main page is the page displayed when no user are logged in.
  */
-
 var MainPage = function(parent, loginPage){
 
 	// The main layout...

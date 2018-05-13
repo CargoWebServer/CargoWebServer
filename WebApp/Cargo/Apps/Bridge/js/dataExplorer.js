@@ -38,7 +38,7 @@ var DataExplorer = function (parent) {
     // New prototype event
     server.prototypeManager.attach(this, NewPrototypeEvent, function (evt, dataExplorer) {
         var storeId = evt.dataMap.prototype.TypeName.split(".")[0]
-        if (dataExplorer.schemasView[storeId] != undefined) {
+        if (dataExplorer.schemasView[storeId] !== undefined) {
             dataExplorer.prototypesView[evt.dataMap.prototype.TypeName] = new PrototypeTreeView(dataExplorer.schemasView[storeId], evt.dataMap.prototype)
         }
     })
@@ -46,7 +46,7 @@ var DataExplorer = function (parent) {
     // Delete prototype event.
     server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, dataExplorer) {
         var storeId = evt.dataMap.prototype.TypeName.split(".")[0]
-        if (dataExplorer.schemasView[storeId] != undefined) {
+        if (dataExplorer.schemasView[storeId] !== undefined) {
             var treeView = dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
             treeView.panel.element.parentNode.removeChild(treeView.panel.element)
             delete dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
