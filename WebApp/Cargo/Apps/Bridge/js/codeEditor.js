@@ -42,8 +42,6 @@ var CodeEditor = function (parent) {
     }
 
     // Here I will attach the file navigator to file event.
-
-
     // Attach the file open event.
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
@@ -483,7 +481,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                 
                 var popup = editor.completer.popup;
                 if(popup !== undefined){
-                    if (evt.keyCode == 27 || evt.keyCode == 13 || evt.keyCode == 8 || evt.keyCode == 9 || evt.keyCode == 16) {
+                    if (evt.keyCode == 27 || evt.keyCode == 13 || evt.keyCode == 8 || evt.keyCode == 9 || evt.keyCode == 16 || evt.keyCode == 17 || evt.keyCode == 18) {
                         popup.container.style.display = "";
                     }else {
                         var pos1 = editor.renderer.$cursorLayer.getPixelPosition(this.base, true);
@@ -502,7 +500,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
     }(file.UUID, this)
     
     // when the editor lost the focus.
-    editor.textInput.getElement().onblur= editor.textInput.getElement().onmousedown =  function(fileUUID, codeEditor){
+    editor.textInput.getElement().onblur = editor.textInput.getElement().onfocus =  function(fileUUID, codeEditor){
         return function(evt){
             var editor = codeEditor.editors[fileUUID + "_editor"]
             if(editor.completer!==undefined){
@@ -582,22 +580,22 @@ CodeEditor.prototype.removeFile = function (uuid) {
 
         // Disconnect the listener.
         var editor = this.editors[uuid + "_editor"]
-
-        // Detach the local event channel.
-        if(editor.eventListner != null){
-            editor.eventListner.detach(editor.eventListner, FileEditEvent)
-    
-            // Also detach the listener on the sever.
-            server.eventHandler.removeEventManager(
-                editor.eventListner,
-                function () {
-                    // callback
-                }
-            )
-        }
+        if(editor != null){
+            // Detach the local event channel.
+            if(editor.eventListner != null){
+                editor.eventListner.detach(editor.eventListner, FileEditEvent)
         
-        delete this.editors[uuid + "_editor"]
-
+                // Also detach the listener on the sever.
+                server.eventHandler.removeEventManager(
+                    editor.eventListner,
+                    function () {
+                        // callback
+                    }
+                )
+            }
+            
+            delete this.editors[uuid + "_editor"]
+        }
         // If there's no more file i will reset the shadow.
         if (Object.keys(this.files).length == 0) {
             var header = document.getElementById("workingFilesDiv")

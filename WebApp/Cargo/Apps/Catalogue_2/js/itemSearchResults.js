@@ -45,6 +45,10 @@ var ItemSearchResultPage = function (parent) {
 
     // I will made use of a tab panel to display the results.
     this.tabPanel = new TabPanel(this.itemDisplayPanel);
+    
+    
+    
+    
 
     return this;
 }
@@ -345,6 +349,7 @@ ItemSearchResultPage.prototype.displayTabResults = function (results, query) {
                 var entity = table.getModel().entities[i]
                 cell.div.element.onclick = function (entity) {
                     return function () {
+                        mainPage.searchResultPage.element.parentNode.removeChild(mainPage.searchResultPage.element)
                         mainPage.itemDisplayPage.displayTabItem(entity)
                     }
                 }(entity)

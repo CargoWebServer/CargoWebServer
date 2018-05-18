@@ -6,16 +6,18 @@
 var Spinner = function(parent, radius){
     this.panel = parent.appendElement({ "tag": "div", "id":"waitingDiv" }).down();
 
+    var spinner = new CreateSpinner(radius)
+    this.panel.appendElement(spinner)
+    return this
+}
+
+function CreateSpinner(radius){
+  
     var spinner = new SVG_Element(null, "spinner", "spinner", "svg");
-    this.radius = radius;
-    if(this.radius == undefined){
-        this.radius = 30;
-    }
 
-    spinner.setSvgAttribute("viewBox", "0 0 " + (2  * this.radius + 6) + " " +  (2  * this.radius + 6) + "" );
-    spinner.setSvgAttribute("width", 2  * this.radius + 5 + "px");
-    spinner.setSvgAttribute("height", 2  * this.radius + 5 + "px");
-
+    spinner.setSvgAttribute("viewBox", "0 0 " + (2  * radius + 0.2*radius) + " " +  (2  * radius + 0.2*radius) + "" );
+    spinner.setSvgAttribute("width", 2  * radius + 1/6 *radius + "px");
+    spinner.setSvgAttribute("height", 2  * radius + 1/6 * radius + "px");
     var ring = new SVG_Circle( spinner, "spin_circle", "ring", "50%", "50%", "45%");
     ring.setSvgAttribute("fill", "none");
     ring.setSvgAttribute("stroke-width", "10%");
@@ -25,7 +27,6 @@ var Spinner = function(parent, radius){
     circle.setSvgAttribute("fill", "none");
     circle.setSvgAttribute("stroke-width", "10%");
     circle.setSvgAttribute("stroke-linecap", "butt");
-    
-    this.panel.appendElement(spinner)
-    return this
+
+    return spinner
 }

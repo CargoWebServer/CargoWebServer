@@ -74,20 +74,21 @@ var Table = function (id, parent) {
 	this.parent = parent
 
 	// The div...
-	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id: id }).down()
+	this.div = parent.appendElement({ "tag": "table", "class": "scrolltable", id: id }).down()
 
+    // The append row button.
 	this.appendRowBtn = parent.prependElement({ "tag": "div", "class": "row_button append_row_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-plus" });
 
 	this.parent.element.onmouseover = function (appendRowBtn) {
 		return function () {
-			appendRowBtn.element.style.display = "table-cell"
+			appendRowBtn.element.classList.add("active");
 		}
 	}(this.appendRowBtn)
 
 	this.parent.element.onmouseleave = function (appendRowBtn) {
 		return function () {
-			appendRowBtn.element.style.display = "none"
+			appendRowBtn.element.classList.remove("active");
 		}
 	}(this.appendRowBtn)
 
@@ -308,9 +309,10 @@ Table.prototype.filterValues = function () {
 Table.prototype.refresh = function () {
 	// Add items to HTML table element
 	for (var rowIndex in this.orderedRows) {
-		if (this.header != null) {
+	    // buggy when reseize the window.
+		/*if (this.header != null) {
 			this.header.div.element.style.display = ""
-		}
+		}*/
 		var item = this.orderedRows[rowIndex].div
 		if (item != undefined) {
 			this.rowGroup.element.appendChild(item.element)
@@ -341,7 +343,7 @@ Table.prototype.appendRow = function (values, id) {
 	}
 
 	if (this.rowGroup == null) {
-		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
+		this.rowGroup = this.div.appendElement({ "tag": "tbody", "class": "table_body" }).down()
 	}
 
 	this.div.element.style.display = ""
@@ -399,15 +401,15 @@ var TableHeader = function (table) {
 	this.table = table
 	this.cells = []
 	this.div = table.div
-		.prependElement({ "tag": "div", "class": "table_header", "style": "" }).down()
+		.prependElement({ "tag": "thead", "class": "table_header", "style": "" }).down()
 
 	// The first cell will be there to match the save button...
-	this.buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
+	this.buttonDiv = this.div.appendElement({ "tag": "th", "scope":"col", "class": "table_header_btn_div", "style":"background-color: transparent; border: none;" }).down()
 
 	this.exportBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "width: 100%;" }).down()
 	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title": "download table data file." })
 
-	this.maximizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
+	this.maximizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
 	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })
 
 	this.minimizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
@@ -416,32 +418,34 @@ var TableHeader = function (table) {
 	this.numberOfRowLabel = this.buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label" }).down()
 
 	if (this.table.rowGroup == null) {
-		this.table.rowGroup = this.table.div.appendElement({ "tag": "div", "class": "table_body" }).down()
+		this.table.rowGroup = this.table.div.appendElement({ "tag": "tbody", "class": "table_body" }).down()
 	}
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
 		return function (evt) {
 			evt.stopPropagation(true)
-			this.style.display = "none"
 			rowGroup.element.style.display = "table-row-group"
-			minimizeBtn.element.style.display = "table-cell"
-			numberOfRowLabel.element.style.display = "none"
+			minimizeBtn.element.classList.add("set_visible")
+			this.classList.remove("set_visible")
+			numberOfRowLabel.element.classList.remove("set_visible")
 		}
 	}(this.table.rowGroup, this.minimizeBtn, this.numberOfRowLabel)
 
 	this.minimizeBtn.element.onclick = function (rowGroup, maximizeBtn, numberOfRowLabel, table) {
 		return function (evt) {
 			evt.stopPropagation(true)
-			this.style.display = "none"
 			if (rowGroup != null) {
 				rowGroup.element.style.display = ""
 			}
-			maximizeBtn.element.style.display = "table-cell"
+			
+			maximizeBtn.element.classList.add("set_visible")
+			this.classList.remove("set_visible")
+			
 			if (table.rows.length > 0) {
-				numberOfRowLabel.element.style.display = "table-cell"
+				numberOfRowLabel.element.classList.add("set_visible")
 				numberOfRowLabel.element.innerHTML = table.rows.length
 			} else {
-				numberOfRowLabel.element.style.display = "none"
+				numberOfRowLabel.element.classList.remove("set_visible")
 			}
 		}
 	}(this.table.rowGroup, this.maximizeBtn, this.numberOfRowLabel, this.table)
@@ -452,7 +456,7 @@ var TableHeader = function (table) {
 	// I will create the header cell...
 	for (var i = 0; i < table.getModel().getColumnCount(); i++) {
 		var title = table.getModel().getColumnName(i)
-		var cell = this.div.appendElement({ "tag": "div", "class": "header_cell" }).down()
+		var cell = this.div.appendElement({ "tag": "th", "class": "header_cell" }).down()
 
 		var cellContent = cell.appendElement({ "tag": "div", "class": "cell_content" }).down()
 		// The column sorter...
@@ -537,7 +541,7 @@ var TableRow = function (table, index, data, id) {
 	}
 
 	// Display the row in that case.
-	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
+	this.div = table.rowGroup.appendElement({ "tag": "tr", "class": "table_row", "id": this.id }).down()
 
 	// empty space to keep rows align with it header.
 	this.saveBtn = this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button" }).down()
@@ -549,7 +553,7 @@ var TableRow = function (table, index, data, id) {
 	}
 
 	// The delete button.
-	this.deleteBtn = this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button delete_row_btn", "id": this.id + "_delete_btn" }).down()
+	this.deleteBtn = this.div.appendElement({ "tag": "div", "class": "row_button delete_row_btn", "id": this.id + "_delete_btn" }).down()
 	this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
 	// Now the action...
@@ -568,18 +572,19 @@ var TableRow = function (table, index, data, id) {
 	this.div.element.onmouseenter = function (deleteBtn, table) {
 		return function (evt) {
 			evt.stopPropagation()
+			
 			var deleteBtns = table.div.element.getElementsByClassName("row_button delete_row_btn")
 			for (var i = 0; i < deleteBtns.length; i++) {
-				deleteBtns[i].style.visibility = "hidden"
+				deleteBtns[i].classList.remove("set_visible")
 			}
-			deleteBtn.element.style.visibility = "visible"
+			deleteBtn.element.classList.add("set_visible")
 		}
 	}(this.deleteBtn, this.table)
 
 	this.table.div.element.onmouseleave = function () {
 		var deleteBtns = this.getElementsByClassName("row_button delete_row_btn")
 		for (var i = 0; i < deleteBtns.length; i++) {
-			deleteBtns[i].style.visibility = "hidden"
+			deleteBtns[i].classList.remove("set_visible") 
 		}
 	}
 
@@ -596,7 +601,7 @@ var TableRow = function (table, index, data, id) {
 var TableCell = function (row, index, value) {
 	this.index = index
 	this.row = row
-	this.div = row.div.appendElement({ "tag": "div", "class": "body_cell" }).down()
+	this.div = row.div.appendElement({ "tag": "td", "class": "body_cell" }).down()
 	this.valueDiv = null
 
 	// The object that display the data value in the cell
@@ -1950,7 +1955,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 			// So here I will create the years selector...
 			var yid = randomUUID()
 			var yline = this.filterPanel.appendElement({ "tag": "div", "id": yid, "style": "display: table;" }).down()
-			var ymaximizeBtn = yline.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "display: table-cell; padding-left:5px;" }).down()
+			var ymaximizeBtn = yline.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "/*display: table-cell;*/ padding-left:5px;" }).down()
 			var ycheckbox = yline.appendElement({ "tag": "input", "type": "checkbox", "name": "year_" + y, "checked": "true", "style": "display: table-cell; vertical-align: middle;" }).down()
 			var ylabel = yline.appendElement({ "tag": "label", "for": yid, "name": "year_" + y, "innerHtml": y, "style": "display: table-cell; vertical-align: middle;" }).down()
 

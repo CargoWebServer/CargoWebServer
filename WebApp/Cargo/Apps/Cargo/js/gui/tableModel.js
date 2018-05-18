@@ -162,7 +162,7 @@ TableModel.prototype.getColumnClass = function (column) {
  * @param {int} column The column index
  */
 TableModel.prototype.isCellEditable = function (column) {
-    return true // Test only ...// this.editable[column]
+    return this.editable[column]
 }
 
 TableModel.prototype.setIsCellEditable = function (column, val) {

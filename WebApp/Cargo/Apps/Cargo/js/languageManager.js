@@ -99,8 +99,35 @@ LanguageManager.prototype.setLanguage = function (language) {
 			}
 		}
 	}
+	
+	var styleSheet = getStyleSheetByFileName("/css/main.css")
+	for (var languageId in this.languageInfo) {
+        // div:lang(fr) {display: none;}
+        var exist = false;
+        
+        for(var i=0; i < styleSheet.cssRules.length; i++){
+            if(styleSheet.cssRules[i].selectorText == "div:lang("+ languageId +")"){
+                if(this.language == languageId){
+                    styleSheet.cssRules[i].style.display = "block";
+                }else{
+                    styleSheet.cssRules[i].style.display = "none";
+                }
+                exist = true;
+            }
+        }
+        if(!exist){
+            if(this.language == languageId){
+                styleSheet.insertRule("div:lang("+ languageId +"){display: block;}", 1);
+            }else{
+                styleSheet.insertRule("div:lang("+ languageId +"){display: none;}", 1);
+            }
+        }
+	}
 }
 
+LanguageManager.prototype.refresh = function () {
+    this.setLanguage(this.language)
+}
 /**
  * Set the text of an element with the text in the languageInfo map with a given id.
  * @param {Element} element The element that contains the text.
@@ -125,18 +152,12 @@ LanguageManager.prototype.setElementText = function (element, textId) {
 				if (this.elements[element.uuid].element.getAttribute("data-match-error") != null) {
 					// Set the error text here.
 					this.elements[element.uuid].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
-				}else if(this.elements[element.uuid].element.value.length > 0){
-				    this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
 				}else {
-
 				    this.elements[element.uuid].setAttribute("placeholder", this.languageInfo[this.language][textId])
-				    
 				}
 				
 			} else {
 			        this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
-			    
-				
 			}
 		}
 	}

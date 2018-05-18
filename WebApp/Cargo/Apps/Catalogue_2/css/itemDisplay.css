@@ -8,9 +8,7 @@
     flex-direction: column;
 }
 
-.item_display .field_panel {
-    grid-template-columns: 1fr 6fr;
-}
+
 
 .item_display_content{
     display: -webkit-box;
@@ -22,4 +20,33 @@
     position: relative;
     overflow-y: auto;
     height: 100px;
+}
+
+.largeCol{
+    padding: .75rem 1.25rem;
+}
+
+.itemRow{
+    padding : 0;
+    
+}
+
+.list-group{
+    padding-left :15px;
+    padding-right : 15px;
+}
+
+.paddedhor{
+    padding-left :15px;
+    padding-right : 15px;
+}
+
+@media (min-aspect-ratio : 3/2){
+    .col .col-thin{
+    ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width: 100%;
+}
 }

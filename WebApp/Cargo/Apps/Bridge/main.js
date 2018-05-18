@@ -57,7 +57,7 @@ var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon-util-01", "10.2.128.70", 9494)
 //var service = new Server("mon104", "10.67.44.73", 9494)
 //var service = new Server("mon176", "10.67.46.210", 9494)
-
+// rrrrr
 var xapian = null
 
 /**

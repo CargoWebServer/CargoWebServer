@@ -491,7 +491,7 @@ function getStyleSheetByFileName(fileName) {
                 }
             }
             if (href != undefined) {
-                if (href.toUpperCase() == url.toUpperCase()) {
+                if (href.toUpperCase().startsWith(url.toUpperCase())) {
                     return stylesheet
                 }
             }

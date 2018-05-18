@@ -100,6 +100,12 @@ body{
     }
 }
 
+@media (min-width : 767px){
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
 .contentrow{
     margin-left: 0px;
     margin-right : 0px;
@@ -138,7 +144,7 @@ body{
     color : #fff;
 }
 
-.my-4{ 
+.my-4 .dark{ 
     border-top:1px solid rgba(0,0,0,.2);
 }
 

@@ -8,7 +8,10 @@ var mainPageText = {
         "welcomeTipText3" : " for a filtered search.",
         "advancedSearchText": " Advanced search",
         "navbarSearchText" : "Search in the catalog...",
-        "recentSearchText" : "Recent searches"
+        "recentSearchText" : "Recent searches",
+        "supplierSearchLnk" : "by supplier",
+        "localisationSearchLnk" : "by localisation",
+        "generalSearchLnk" : "générale"
     },
     "fr": {
         "quickSearchText": " Recherche rapide",
@@ -18,7 +21,10 @@ var mainPageText = {
         "welcomeTipText3" : " pour une recherche filtrée.",
         "advancedSearchText" : " Recherche avancée",
         "navbarSearchText" : "Recherche dans le catalogue...",
-        "recentSearchText" : "Recherches récentes"
+        "recentSearchText" : "Recherches récentes",
+        "supplierSearchLnk" : "par fournisseur",
+        "localisationSearchLnk" : "par localisation",
+        "generalSearchLnk" : "générale"
     },
     
     "es" : {
@@ -29,7 +35,10 @@ var mainPageText = {
         "welcomeTipText2" : " para una búsqueda de categoría y ",
         "welcomeTipText3" : " para una búsqueda filtrada.",
         "navbarSearchText" : "Buscar en el catálogo ...",
-        "recentSearchText" : "Búsquedas recientes"
+        "recentSearchText" : "Búsquedas recientes",
+        "supplierSearchLnk" : "",
+        "localisationSearchLnk" : "",
+        "generalSearchLnk" : ""
     }
 };
 
@@ -39,14 +48,14 @@ server.languageManager.appendLanguageInfo(mainPageText);
 
 /** Contain the main page layout **/
 var MainPage = function () {
-
+    // Set special search context to general (item's).
+    this.searchContext = "generalSearchLnk";
+    
     // The panel.
     this.panel = new Element(document.body, { "tag": "div", "id": "main-page" });
     
-    
-    
     // Building the navbar with all the content inside
-    this.panel.appendElement({"tag" : "nav", "class" : "navbar navbar-expand-md navbar-fixed-top navbar-dark bg-dark", "style" : "z-index : 10;"}).down()
+    this.panel.appendElement({"tag" : "nav", "class" : "navbar navbar-expand-md navbar-fixed-top navbar-dark bg-dark", "style" : "z-index : 10;", "id" : "top-navigation"}).down()
     .appendElement({"tag" : "div", "class" : "container-fluid"}).down()
     .appendElement({"tag" : "div", "class" : "navbar-header"}).down()
  
@@ -62,17 +71,21 @@ var MainPage = function () {
     .appendElement({"tag" : "div", "class" : "collapse navbar-collapse", "id" : "collapsibleNavbar"}).down()
     
     .appendElement({"tag" : "div", "class": "ml-auto", "id" : "searchbardiv"}).down()
-    .appendElement({"tag" : "form", "class" : "navbar-form navbar-center", "role" : "search", "id" : "searchbar"}).down()
+    .appendElement({"tag" : "div", "class" : "navbar-form navbar-center", "id" : "searchbar"}).down()
     .appendElement({"tag" : "div", "class" : "input-group"}).down()
-    .appendElement({"tag" : "input", "type" : "text", "name" : "search", "class" : "form-control","style" : "font-family: 'Questrial', sans-serif;","id" : "navbarSearchText"})
+    .appendElement({"tag" : "input", "type" : "text", "class" : "form-control","style" : "font-family: 'Questrial', sans-serif;","id" : "navbarSearchText"})
     .appendElement({"tag" : "div", "class" : "input-group-btn"}).down()
-    
+
     .appendElement({"tag" : "button", "class" : "btn btn-default text-light", "data-toggle" : "dropdown","type" : "button", "aria-expanded" : "false", "role": "menu", "id" : "advancedSearchButtonNavbar"}).down()
-    .appendElement({"tag" : "i", "class" : "fa fa-angle-double-down"})
+    .appendElement({"tag" : "i", "class" : "fa fa-caret-down", "style":"padding-right: 5px;"})
     .appendElement({"tag" : "span" , "id" : "advancedSearchText"}).up()
     .appendElement({"tag" : "div", "class" : "dropdown-menu bg-dark text-light border border-secondary", "id" : "advancedSearchCollapse"}).down()
-    .appendElement({"tag" : "div", "class" : "", "innerHtml" : "hello"}).up()
-    .appendElement({"tag" : "button", "type" : "button", "class" : "btn btn-default"}).down()
+    .appendElement({"tag":"a", "class":"dropdown-item bg-dark", "id":"generalSearchLnk"})
+    .appendElement({"tag":"a", "class":"dropdown-item bg-dark", "id":"supplierSearchLnk"})
+    .appendElement({"tag":"a", "class":"dropdown-item bg-dark", "id":"localisationSearchLnk"}).up()
+    
+
+    .appendElement({"tag" : "button", "type" : "button", "class" : "btn btn-default","id" :"searchButton"}).down()
     .appendElement({"tag" : "i", "class" :"fa fa-search"}).up().up().up().up().up()
     .appendElement({"tag" : "ul", "class" : "nav navbar-nav ml-auto"}).down()
     .appendElement({"tag" : "li", "id":"sessionPanelDiv", "class" : "navItem"})
@@ -90,13 +103,13 @@ var MainPage = function () {
     );
     
     this.panel.appendElement({"tag" : "div", "class" : "row contentrow", "style" : "height : calc(100vh - 56px); width : 100%;"}).down()
-    .appendElement({"tag" : "div", "class" : "sidenav", "id" : "mySideNav", "style" : "background-color : #343a40;opacity:0.93; position:fixed;top:50px;"}).down()
-    .appendElement({"tag" : "a" , "href" : "#", "onclick" : "closeNav()","class" : "closebtn", "innerHtml" : "&times", "style":"position:absolute;"}).up()
+    .appendElement({"tag" : "div", "class" : "sidenav", "id" : "mySideNav", "style" : "background-color : #343a40; position:fixed;top:50px;"}).down()
+    .appendElement({"tag" : "a" , "href" : "#", "onclick" : "openNav()","class" : "closebtn", "innerHtml" : "&times", "style":"position:absolute;"}).up()
     .appendElement({"tag" : "span", "id" : "main", "class" : "col", "style" : "overflow-y : scroll;"}).down()
     .appendElement({"tag" : "div", "class" : "container", "style" : "height:100vh; padding-top : 20px;", "id" : "main-container"}).down()
     .appendElement({"tag" : "div","class" : "jumbotron bg-dark text-light border border-dark align-items-center", "style" : "margin: 20px; padding : 2rem 1rem;"}).down()
     .appendElement({"tag" : "h1", "class" : "display-5", "id" : "welcomeText", "style" : "text-align : center;"})
-    .appendElement({"tag" : "hr", "class" : "my-4"})
+    .appendElement({"tag" : "hr", "class" : "my-4 dark"})
     .appendElement({"tag" : "p", "class" : "lead"}).down()
     .appendElement({"tag" : "span","id":"welcomeTipText1"})
     .appendElement({"tag" : "button" ,"class": "btn btn-outline-light disabled", "style":"opacity : 1; font-size : 0.8rem;cursor:default;"}).down()
@@ -125,11 +138,11 @@ var MainPage = function () {
     .appendElement({"tag" : "div","class" : "col card border border-dark align-items-center", "style" : "margin:20px;"}).down()
     .appendElement({"tag" : "h1", "class" : "card-body display-5 smallertitle"})
     .appendElement({"tag" : "hr", "class" : "my-4"}).up().up().up().up()
- 
     .appendElement({"tag" : "div", "id" : "notificationDiv" , "style" : "z-index : 100;position:fixed; width: 275px; right:2%;top:10%;"}).down()
     .up().up()
-     closeNav();
-    
+     openNav();
+    this.contentPanel = this.panel.getChildById("main")
+    this.welcomePage = this.panel.getChildById("main-container")
     catalogMessageHub.attach(this, welcomeEvent, function (evt, mainPage) {
         if(server.sessionId == evt.dataMap.welcomeEvent.sessionId){
             var user = evt.dataMap.welcomeEvent.user
@@ -142,9 +155,85 @@ var MainPage = function () {
         }
         
     })
+    
+    this.panel.getChildById("searchButton").element.onclick = function () {
+        try{
+            mainPage.welcomePage.element.parentNode.removeChild(mainPage.welcomePage.element)
+        }
+        catch (error){
+            
+        }
+        spinner.panel.element.style.display = "";
+        // Here I will display the seach results.
+        mainPage.searchItems(mainPage.panel.getChildById("navbarSearchText").element.value)
+    }
+    
+    this.panel.getChildById("navbarSearchText").element.onkeyup = function (evt) {
+        if (evt.keyCode == 13) {
+            try{
+                mainPage.welcomePage.element.parentNode.removeChild(mainPage.welcomePage.element)
+            }
+            catch (error){
+            
+            }
+            spinner.panel.element.style.display = "";
+            // Here I will display the seach results.
+            mainPage.searchItems(mainPage.panel.getChildById("navbarSearchText").element.value)
+        }
+    }
+    
+    
+    this.searchResultPage = new SearchResultPage(this.contentPanel)
+    this.itemDisplayPage = new ItemDisplayPage(this.contentPanel)
+
+    // Advance search.
+    var supplierLnk = this.panel.getChildById("supplierSearchLnk");
+    var localisationLnk = this.panel.getChildById("localisationSearchLnk")
+    var generalSearchLnk = this.panel.getChildById("generalSearchLnk")
+    
+
+    generalSearchLnk.element.onclick = supplierLnk.element.onclick = localisationLnk.element.onclick = function(contentPanel, advancedSearchText){
+        return function(){
+            mainPage.searchContext = this.id
+            if(this.id == "generalSearchLnk"){
+                server.languageManager.refresh()
+            }else{
+                advancedSearchText.element.innerHTML = this.innerHTML
+            }
+            document.getElementById("navbarSearchText").focus()
+        }
+    }(this.contentPanel, this.panel.getChildById("advancedSearchText"))
+    
+
+    this.itemDisplayPage.panel.element.style.display = "none";
     return this;
-    
-    
+}
+
+/**
+ * The context can be general, supplier or localisation.
+ */
+MainPage.prototype.searchItems = function (keyword) {
+    // Set specific fields here.
+    var fields = []
+    console.log(service.conn)
+    // First of a ll I will clear the search panel.
+    xapian.search(
+        dbpaths,
+        keyword.toUpperCase(),
+        fields,
+        "en",
+        0,
+        1000,
+        // success callback
+        function (results, caller) {
+            mainPage.searchResultPage.displayResults(results, caller.keyword, mainPage.searchContext );
+            //mainPage.searchInput.element.value = ""
+            //mainPage.searchInput.element.focus()
+        },
+        // error callback
+        function () {
+
+        }, {"keyword":keyword })
 }
 
 function showNotification(alertType, message,delay){
@@ -187,18 +276,13 @@ function showNotification(alertType, message,delay){
 }
 
 
-function openNav() {
-     showNotification("warning", "You have been warned");
-    if(!document.getElementById("mySideNav").classList.contains("openedNav")){
-        document.getElementById("mySideNav").classList.add("openedNav");
-        document.getElementById("mySideNav").classList.remove("closedNav");
-    }else{
-        document.getElementById("mySideNav").classList.add("closedNav");
-        document.getElementById("mySideNav").classList.remove("openedNav");
-    }
-}
 
-function closeNav(){
-    document.getElementById("mySideNav").classList.remove("openedNav");
-    document.getElementById("mySideNav").classList.add("closedNav");
+function openNav() {
+    if(!document.getElementById("mySideNav").classList.contains("closedNav")){
+        document.getElementById("mySideNav").classList.remove("openedNav");
+        document.getElementById("mySideNav").classList.add("closedNav");
+    }else{
+        document.getElementById("mySideNav").classList.remove("closedNav");
+        document.getElementById("mySideNav").classList.add("openedNav");
+    }
 }
