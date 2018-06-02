@@ -173,6 +173,16 @@ func NewStringValue(val interface{}) (*QueryAst, error) {
 }
 
 /**
+ * string
+ */
+func NewNullValue(val interface{}) (*QueryAst, error) {
+	// The value must be equal to 'null'...
+	ast := new(QueryAst)
+	ast.value = nil // nil value.
+	return ast, nil
+}
+
+/**
  * indentifier
  */
 func NewIdValue(val0 interface{}, val1 interface{}) (*QueryAst, error) {

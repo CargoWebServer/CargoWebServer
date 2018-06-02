@@ -144,12 +144,16 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								}
 							} else if reflect.TypeOf(v).String() == "[]interface {}" {
 								for i := 0; i < len(v.([]interface{})); i++ {
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+									if v.([]interface{})[i] != nil {
+										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+									}
 								}
 							} else if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
 								for i := 0; i < len(v.([]map[string]interface{})); i++ {
-									if v.([]map[string]interface{})[i]["UUID"] != nil {
-										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
+									if v.([]map[string]interface{})[i] != nil {
+										if v.([]map[string]interface{})[i]["UUID"] != nil {
+											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
+										}
 									}
 								}
 							} else {

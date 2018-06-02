@@ -335,6 +335,11 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 		errObj := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype with name "+typeName+" not found!"))
 		return "", errObj
 	}
+	if len(prototype.Ids) <= 1 {
+		errObj := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No id define for the type "+typeName))
+		return "", errObj
+
+	}
 
 	// First of all I will get the uuid...
 	fieldType := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[1])]
@@ -1640,95 +1645,106 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntities = function (typeName, storeId, query, offset, limit, orderBy, asc, lazy, progressCallback, successCallback, errorCallback, caller) {
-//    // First of all i will get the entity prototype.
-//    server.entityManager.getEntityPrototype(typeName, storeId,
-//        // The success callback.
-//        function (result, caller) {
-//            // Set the parameters.
-//            var typeName = caller.typeName
-//            var storeId = caller.storeId
-//            var query = caller.query
-//            var successCallback = caller.successCallback
-//            var progressCallback = caller.progressCallback
-//            var errorCallback = caller.errorCallback
-//			  var lazy = caller.lazy
-//            var caller = caller.caller
-//            // Create the list of parameters.
-//            var params = []
-//            params.push(createRpcData(typeName, "STRING", "typeName"))
-//            params.push(createRpcData(storeId, "STRING", "storeId"))
-//            params.push(createRpcData(query, "JSON_STR", "query"))
-//            params.push(createRpcData(offset, "INTEGER", "offset"))
-//            params.push(createRpcData(limit, "INTEGER", "limit"))
-//			  params.push(createRpcData(orderBy, "JSON_STR", "orderBy", "[]string"))
-//			  params.push(createRpcData(asc, "BOOLEAN", "asc"))
-//            // Call it on the server.
-//            server.executeJsFunction(
-//                "EntityManagerGetEntities", // The function to execute remotely on server
-//                params, // The parameters to pass to that function
-//                function (index, total, caller) { // The progress callback
-//                    // Keep track of the file transfert.
-//                    caller.progressCallback(index, total, caller.caller)
-//                },
-//                function (result, caller) {
-//                    var entities = []
-//                    if (result[0] != undefined) {
-//                        for (var i = 0; i < result[0].length; i++) {
-//                            var entity = eval("new " + caller.prototype.TypeName + "()")
-//                            if (i == result[0].length - 1) {
-//                                entity.initCallback = function (caller) {
-//                                    return function (entity) {
-//                                        server.entityManager.setEntity(entity)
-//                                        if( caller.successCallback != undefined){
-//                                        		caller.successCallback(entities, caller.caller)
-//                                        		caller.successCallback = undefined
-//                                    		}
-//                                    }
-//                                } (caller)
-//                            } else {
-//                                entity.initCallback = function (entity) {
-//                                    server.entityManager.setEntity(entity)
-//                                }
-//                            }
-//                            // push the entitie before init it...
-//                            entities.push(entity)
-//                            // call init...
-//                            entity.init(result[0][i], lazy)
-//                        }
-//                    }
-//                    if (result[0] == null || result[0].length==0) {
-//                        if( caller.successCallback != undefined){
-//                        	caller.successCallback(entities, caller.caller)
-//                            caller.successCallback = undefined
-//                    	}
-//                    }
-//                },
-//                function (errMsg, caller) {
-//                    // call the immediate error callback.
-//                    if( caller.errorCallback != undefined){
-//                    		caller.errorCallback(errMsg, caller.caller)
-//							caller.errorCallback = undefined
-//					  }
-//                    // dispatch the message.
-//                    server.errorManager.onError(errMsg)
-//                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "prototype": result, "lazy":lazy } // The caller
-//            )
-//        },
-//        // The error callback.
-//        function (errMsg, caller) {
-//          	// call the immediate error callback.
-//         		if( caller.errorCallback != undefined){
-//            		caller.errorCallback(errMsg, caller.caller)
-//					caller.errorCallback = undefined
-//				}
-//            // dispatch the message.
-//            server.errorManager.onError(errMsg)
-//        }, { "typeName": typeName, "storeId": storeId, "query": query, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "lazy":lazy })
-//}
+// EntityManager.prototype.getEntities = function (typeName, storeId, query, offset, limit, orderBy, asc, lazy, progressCallback, successCallback, errorCallback, caller) {
+//     // First of all i will get the entity prototype.
+//     server.entityManager.getEntityPrototype(typeName, storeId,
+//         // The success callback.
+//         function (result, caller) {
+//             // Set the parameters.
+//             var typeName = caller.typeName
+//             var storeId = caller.storeId
+//             var query = caller.query
+//             var successCallback = caller.successCallback
+//             var progressCallback = caller.progressCallback
+//             var errorCallback = caller.errorCallback
+//             var lazy = caller.lazy
+//             var caller = caller.caller
+//             // Create the list of parameters.
+//             var params = []
+//             params.push(createRpcData(typeName, "STRING", "typeName"))
+//             params.push(createRpcData(storeId, "STRING", "storeId"))
+//             params.push(createRpcData(query, "JSON_STR", "query"))
+//             params.push(createRpcData(offset, "INTEGER", "offset"))
+//             params.push(createRpcData(limit, "INTEGER", "limit"))
+//             params.push(createRpcData(orderBy, "JSON_STR", "orderBy", "[]string"))
+//             params.push(createRpcData(asc, "BOOLEAN", "asc"))
+//             // Call it on the server.
+//             server.executeJsFunction(
+//                 "EntityManagerGetEntities", // The function to execute remotely on server
+//                 params, // The parameters to pass to that function
+//                 function (index, total, caller) { // The progress callback
+//                     // Keep track of the file transfert.
+//                     caller.progressCallback(index, total, caller.caller)
+//                 },
+//                 function (result, caller) {
+//                     var entities = []
+//                     if (result[0] == null) {
+//                         if (caller.successCallback != undefined) {
+//                             caller.successCallback(entities, caller.caller)
+//                             caller.successCallback = undefined
+//                         }
+//                     } else {
+//                         var values = result[0];
+//                         if (values.length > 0) {
+//                             var initEntitiesFct = function (values, caller, entities) {
+//                                 var value = values.pop()
+//                                 var entity = eval("new " + caller.prototype.TypeName + "()")
+//                                 entities.push(entity)
+//                                 if (values.length == 0) {
+//                                     entity.initCallback = function (caller, entities) {
+//                                         return function (entity) {
+//                                             server.entityManager.setEntity(entity)
+//                                             if (caller.successCallback != undefined) {
+//                                                 caller.successCallback(entities, caller.caller)
+//                                                 caller.successCallback = undefined
+//                                             }
+//                                         }
+//                                     }(caller, entities)
+//                                     entity.init(value, lazy)
+//                                 } else {
+//                                     entity.initCallback = function (entity) {
+//                                         server.entityManager.setEntity(entity)
+//                                     }
+//                                     entity.init(value, lazy, function (values, caller, entities) {
+//                                         return function () {
+//                                             initEntitiesFct(values, caller, entities)
+//                                         }
+//                                     }(values, caller, entities))
+//                                 }
+//                             }
+//                             initEntitiesFct(values, caller, entities)
+//                         } else {
+//                             if (caller.successCallback != undefined) {
+//                                 caller.successCallback(entities, caller.caller)
+//                                 caller.successCallback = undefined
+//                             }
+//                         }
+//                     }
+//                 },
+//                 function (errMsg, caller) {
+//                     // call the immediate error callback.
+//                     if (caller.errorCallback != undefined) {
+//                         caller.errorCallback(errMsg, caller.caller)
+//                         caller.errorCallback = undefined
+//                     }
+//                     // dispatch the message.
+//                     server.errorManager.onError(errMsg)
+//                 }, // Error callback
+//                 { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "prototype": result, "lazy": lazy } // The caller
+//             )
+//         },
+//         // The error callback.
+//         function (errMsg, caller) {
+//             // call the immediate error callback.
+//             if (caller.errorCallback != undefined) {
+//                 caller.errorCallback(errMsg, caller.caller)
+//                 caller.errorCallback = undefined
+//             }
+//             // dispatch the message.
+//             server.errorManager.onError(errMsg)
+//         }, { "typeName": typeName, "storeId": storeId, "query": query, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback, "lazy": lazy })
+// }
 func (this *EntityManager) GetEntities(typeName string, storeId string, query *EntityQuery, offset int, limit int, orderBy []interface{}, asc bool, messageId string, sessionId string) []interface{} {
-
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

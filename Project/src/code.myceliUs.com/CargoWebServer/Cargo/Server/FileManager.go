@@ -1754,9 +1754,11 @@ func (this *FileManager) ReadExcelFile(filePath string, sheetName string, messag
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this FileManager) ReadDir(path string, messageId string, sessionId string) []string {
+	if strings.HasPrefix(path, "/") {
+		path = this.root + path
+	}
 	var lst []string
 	files, err := ioutil.ReadDir(path)
-
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err))
 		return nil

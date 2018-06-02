@@ -441,6 +441,28 @@ var CarbonCopy = function (name, email) {
 
 
 /**
+ * Create a new empty query.
+ * @constructor
+ */
+var EntityQuery = function () {
+    this.TYPENAME = "Server.EntityQuery"
+
+    // The name of the entity
+    this.TypeName = ""
+    
+	// The list of field to retreive, delete or modify
+    this.Fields = []
+    
+	// The base index, this must be of form indexFieldName=indexFieldValue
+    this.Indexs = []
+    
+	// The query to execute by the search engine.
+    this.Query = ""
+    
+    return this
+}
+
+/**
  * This structure is use in the transfer of files use in attach.
  * @param {string} fileName  The name of the file
  * @param {string} fileData  The file data

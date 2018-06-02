@@ -110,7 +110,7 @@ var gotoTab = gotoTable{
 	},
 	gotoRow{ // S14
 		-1, // S'
-		25, // Query
+		26, // Query
 		-1, // Value
 		8, // Object
 		
@@ -125,7 +125,7 @@ var gotoTab = gotoTable{
 	gotoRow{ // S16
 		-1, // S'
 		-1, // Query
-		27, // Value
+		28, // Value
 		-1, // Object
 		
 	},
@@ -235,6 +235,20 @@ var gotoTab = gotoTable{
 		
 	},
 	gotoRow{ // S32
+		-1, // S'
+		-1, // Query
+		-1, // Value
+		-1, // Object
+		
+	},
+	gotoRow{ // S33
+		-1, // S'
+		-1, // Query
+		-1, // Value
+		-1, // Object
+		
+	},
+	gotoRow{ // S34
 		-1, // S'
 		-1, // Query
 		-1, // Value

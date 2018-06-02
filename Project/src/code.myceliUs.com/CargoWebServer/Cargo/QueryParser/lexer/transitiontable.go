@@ -69,16 +69,20 @@ var TransTab = TransitionTable{
 				return 17
 			case r == 102 : // ['f','f']
 				return 19
-			case 103 <= r && r <= 115 : // ['g','s']
+			case 103 <= r && r <= 109 : // ['g','m']
+				return 16
+			case r == 110 : // ['n','n']
+				return 20
+			case 111 <= r && r <= 115 : // ['o','s']
 				return 16
 			case r == 116 : // ['t','t']
-				return 20
+				return 21
 			case 117 <= r && r <= 122 : // ['u','z']
 				return 16
 			case r == 124 : // ['|','|']
-				return 21
-			case r == 126 : // ['~','~']
 				return 22
+			case r == 126 : // ['~','~']
+				return 23
 			
 			
 			
@@ -100,7 +104,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -114,97 +118,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -216,7 +220,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -228,7 +232,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 38 : // ['&','&']
-				return 34
+				return 35
 			
 			
 			
@@ -260,15 +264,15 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 46 : // ['.','.']
-				return 35
+				return 36
 			case r == 48 : // ['0','0']
 				return 11
 			case 49 <= r && r <= 57 : // ['1','9']
 				return 12
 			case r == 69 : // ['E','E']
-				return 36
+				return 37
 			case r == 101 : // ['e','e']
-				return 36
+				return 37
 			
 			
 			
@@ -280,11 +284,11 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 37
+				return 38
 			case r == 69 : // ['E','E']
-				return 36
+				return 37
 			case r == 101 : // ['e','e']
-				return 36
+				return 37
 			
 			
 			
@@ -298,95 +302,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -398,13 +402,13 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 46 : // ['.','.']
-				return 35
+				return 36
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 11
 			case r == 69 : // ['E','E']
-				return 36
+				return 37
 			case r == 101 : // ['e','e']
-				return 36
+				return 37
 			
 			
 			
@@ -416,13 +420,13 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 46 : // ['.','.']
-				return 35
+				return 36
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 12
 			case r == 69 : // ['E','E']
-				return 36
+				return 37
 			case r == 101 : // ['e','e']
-				return 36
+				return 37
 			
 			
 			
@@ -434,7 +438,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -446,7 +450,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -458,7 +462,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -488,11 +492,11 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 43 : // ['+','+']
-				return 47
-			case r == 45 : // ['-','-']
-				return 47
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 48
+			case r == 45 : // ['-','-']
+				return 48
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 49
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
 			case r == 95 : // ['_','_']
@@ -510,7 +514,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 61 : // ['=','=']
-				return 23
+				return 24
 			
 			
 			
@@ -528,7 +532,7 @@ var TransTab = TransitionTable{
 			case r == 95 : // ['_','_']
 				return 16
 			case r == 97 : // ['a','a']
-				return 49
+				return 50
 			case 98 <= r && r <= 122 : // ['b','z']
 				return 16
 			
@@ -547,11 +551,11 @@ var TransTab = TransitionTable{
 				return 16
 			case r == 95 : // ['_','_']
 				return 16
-			case 97 <= r && r <= 113 : // ['a','q']
+			case 97 <= r && r <= 116 : // ['a','t']
 				return 16
-			case r == 114 : // ['r','r']
-				return 50
-			case 115 <= r && r <= 122 : // ['s','z']
+			case r == 117 : // ['u','u']
+				return 51
+			case 118 <= r && r <= 122 : // ['v','z']
 				return 16
 			
 			
@@ -563,8 +567,18 @@ var TransTab = TransitionTable{
 		// S21
 		func(r rune) int {
 			switch {
-			case r == 124 : // ['|','|']
-				return 34
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 16
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 16
+			case r == 95 : // ['_','_']
+				return 16
+			case 97 <= r && r <= 113 : // ['a','q']
+				return 16
+			case r == 114 : // ['r','r']
+				return 52
+			case 115 <= r && r <= 122 : // ['s','z']
+				return 16
 			
 			
 			
@@ -575,8 +589,8 @@ var TransTab = TransitionTable{
 		// S22
 		func(r rune) int {
 			switch {
-			case r == 61 : // ['=','=']
-				return 23
+			case r == 124 : // ['|','|']
+				return 35
 			
 			
 			
@@ -587,6 +601,8 @@ var TransTab = TransitionTable{
 		// S23
 		func(r rune) int {
 			switch {
+			case r == 61 : // ['=','=']
+				return 24
 			
 			
 			
@@ -597,100 +613,6 @@ var TransTab = TransitionTable{
 		// S24
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
 			
 			
 			
@@ -701,6 +623,100 @@ var TransTab = TransitionTable{
 		// S25
 		func(r rune) int {
 			switch {
+			case r == 32 : // [' ',' ']
+				return 3
+			case r == 33 : // ['!','!']
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
+			case r == 35 : // ['#','#']
+				return 27
+			case r == 36 : // ['$','$']
+				return 27
+			case r == 37 : // ['%','%']
+				return 27
+			case r == 40 : // ['(','(']
+				return 28
+			case r == 41 : // [')',')']
+				return 28
+			case r == 42 : // ['*','*']
+				return 27
+			case r == 43 : // ['+','+']
+				return 27
+			case r == 44 : // [',',',']
+				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
+			case r == 58 : // [':',':']
+				return 29
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
+				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
+			case r == 126 : // ['~','~']
+				return 27
+			case r == 192 : // [\u00c0,\u00c0]
+				return 34
+			case r == 199 : // [\u00c7,\u00c7]
+				return 34
+			case r == 200 : // [\u00c8,\u00c8]
+				return 34
+			case r == 201 : // [\u00c9,\u00c9]
+				return 34
+			case r == 202 : // [\u00ca,\u00ca]
+				return 34
+			case r == 203 : // [\u00cb,\u00cb]
+				return 34
+			case r == 212 : // [\u00d4,\u00d4]
+				return 34
+			case r == 224 : // [\u00e0,\u00e0]
+				return 34
+			case r == 232 : // [\u00e8,\u00e8]
+				return 34
+			case r == 233 : // [\u00e9,\u00e9]
+				return 34
+			case r == 234 : // [\u00ea,\u00ea]
+				return 34
+			case r == 235 : // [\u00eb,\u00eb]
+				return 34
+			case r == 244 : // [\u00f4,\u00f4]
+				return 34
 			
 			
 			
@@ -711,100 +727,6 @@ var TransTab = TransitionTable{
 		// S26
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
 			
 			
 			
@@ -818,97 +740,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -922,97 +844,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1026,97 +948,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1130,97 +1052,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1234,97 +1156,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1338,125 +1260,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
+				return 25
 			case r == 34 : // ['"','"']
-				return 51
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
-			case r == 39 : // [''',''']
-				return 52
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 51 : // ['0','3']
-				return 53
-			case 52 <= r && r <= 55 : // ['4','7']
-				return 54
-			case 56 <= r && r <= 57 : // ['8','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 55
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case r == 97 : // ['a','a']
-				return 31
-			case r == 98 : // ['b','b']
-				return 56
-			case 99 <= r && r <= 101 : // ['c','e']
-				return 31
-			case r == 102 : // ['f','f']
-				return 56
-			case 103 <= r && r <= 109 : // ['g','m']
-				return 31
-			case r == 110 : // ['n','n']
-				return 56
-			case 111 <= r && r <= 113 : // ['o','q']
-				return 31
-			case r == 114 : // ['r','r']
-				return 56
-			case r == 115 : // ['s','s']
-				return 31
-			case r == 116 : // ['t','t']
-				return 56
-			case r == 117 : // ['u','u']
-				return 57
-			case 118 <= r && r <= 122 : // ['v','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1470,97 +1364,125 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 53
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
+			case r == 39 : // [''',''']
+				return 54
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 51 : // ['0','3']
+				return 55
+			case 52 <= r && r <= 55 : // ['4','7']
+				return 56
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 57
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case r == 97 : // ['a','a']
+				return 32
+			case r == 98 : // ['b','b']
+				return 58
+			case 99 <= r && r <= 101 : // ['c','e']
+				return 32
+			case r == 102 : // ['f','f']
+				return 58
+			case 103 <= r && r <= 109 : // ['g','m']
+				return 32
+			case r == 110 : // ['n','n']
+				return 58
+			case 111 <= r && r <= 113 : // ['o','q']
+				return 32
+			case r == 114 : // ['r','r']
+				return 58
+			case r == 115 : // ['s','s']
+				return 32
+			case r == 116 : // ['t','t']
+				return 58
+			case r == 117 : // ['u','u']
+				return 59
+			case 118 <= r && r <= 122 : // ['v','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -1571,6 +1493,100 @@ var TransTab = TransitionTable{
 		// S34
 		func(r rune) int {
 			switch {
+			case r == 32 : // [' ',' ']
+				return 3
+			case r == 33 : // ['!','!']
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
+			case r == 35 : // ['#','#']
+				return 27
+			case r == 36 : // ['$','$']
+				return 27
+			case r == 37 : // ['%','%']
+				return 27
+			case r == 40 : // ['(','(']
+				return 28
+			case r == 41 : // [')',')']
+				return 28
+			case r == 42 : // ['*','*']
+				return 27
+			case r == 43 : // ['+','+']
+				return 27
+			case r == 44 : // [',',',']
+				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
+			case r == 58 : // [':',':']
+				return 29
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
+				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
+			case r == 126 : // ['~','~']
+				return 27
+			case r == 192 : // [\u00c0,\u00c0]
+				return 34
+			case r == 199 : // [\u00c7,\u00c7]
+				return 34
+			case r == 200 : // [\u00c8,\u00c8]
+				return 34
+			case r == 201 : // [\u00c9,\u00c9]
+				return 34
+			case r == 202 : // [\u00ca,\u00ca]
+				return 34
+			case r == 203 : // [\u00cb,\u00cb]
+				return 34
+			case r == 212 : // [\u00d4,\u00d4]
+				return 34
+			case r == 224 : // [\u00e0,\u00e0]
+				return 34
+			case r == 232 : // [\u00e8,\u00e8]
+				return 34
+			case r == 233 : // [\u00e9,\u00e9]
+				return 34
+			case r == 234 : // [\u00ea,\u00ea]
+				return 34
+			case r == 235 : // [\u00eb,\u00eb]
+				return 34
+			case r == 244 : // [\u00f4,\u00f4]
+				return 34
 			
 			
 			
@@ -1581,12 +1597,6 @@ var TransTab = TransitionTable{
 		// S35
 		func(r rune) int {
 			switch {
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 37
-			case r == 69 : // ['E','E']
-				return 36
-			case r == 101 : // ['e','e']
-				return 36
 			
 			
 			
@@ -1597,12 +1607,12 @@ var TransTab = TransitionTable{
 		// S36
 		func(r rune) int {
 			switch {
-			case r == 43 : // ['+','+']
-				return 47
-			case r == 45 : // ['-','-']
-				return 47
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 58
+				return 38
+			case r == 69 : // ['E','E']
+				return 37
+			case r == 101 : // ['e','e']
+				return 37
 			
 			
 			
@@ -1613,12 +1623,12 @@ var TransTab = TransitionTable{
 		// S37
 		func(r rune) int {
 			switch {
+			case r == 43 : // ['+','+']
+				return 48
+			case r == 45 : // ['-','-']
+				return 48
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 37
-			case r == 69 : // ['E','E']
-				return 36
-			case r == 101 : // ['e','e']
-				return 36
+				return 60
 			
 			
 			
@@ -1629,98 +1639,12 @@ var TransTab = TransitionTable{
 		// S38
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 10
-			case r == 33 : // ['!','!']
-				return 38
-			case r == 35 : // ['#','#']
-				return 39
-			case r == 36 : // ['$','$']
-				return 39
-			case r == 37 : // ['%','%']
-				return 39
-			case r == 40 : // ['(','(']
-				return 40
-			case r == 41 : // [')',')']
-				return 40
-			case r == 42 : // ['*','*']
-				return 39
-			case r == 43 : // ['+','+']
-				return 39
-			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
-				return 42
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 43
-			case r == 58 : // [':',':']
-				return 41
-			case r == 59 : // [';',';']
-				return 41
-			case r == 60 : // ['<','<']
-				return 39
-			case r == 61 : // ['=','=']
-				return 39
-			case r == 62 : // ['>','>']
-				return 39
-			case r == 63 : // ['?','?']
-				return 41
-			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
-				return 41
-			case r == 96 : // ['`','`']
 				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
-				return 40
-			case r == 124 : // ['|','|']
-				return 10
-			case r == 125 : // ['}','}']
-				return 40
-			case r == 126 : // ['~','~']
-				return 39
-			case r == 192 : // [\u00c0,\u00c0]
-				return 46
-			case r == 199 : // [\u00c7,\u00c7]
-				return 46
-			case r == 200 : // [\u00c8,\u00c8]
-				return 46
-			case r == 201 : // [\u00c9,\u00c9]
-				return 46
-			case r == 202 : // [\u00ca,\u00ca]
-				return 46
-			case r == 203 : // [\u00cb,\u00cb]
-				return 46
-			case r == 212 : // [\u00d4,\u00d4]
-				return 46
-			case r == 224 : // [\u00e0,\u00e0]
-				return 46
-			case r == 232 : // [\u00e8,\u00e8]
-				return 46
-			case r == 233 : // [\u00e9,\u00e9]
-				return 46
-			case r == 234 : // [\u00ea,\u00ea]
-				return 46
-			case r == 235 : // [\u00eb,\u00eb]
-				return 46
-			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+			case r == 69 : // ['E','E']
+				return 37
+			case r == 101 : // ['e','e']
+				return 37
 			
 			
 			
@@ -1734,95 +1658,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -1836,95 +1760,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -1938,95 +1862,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -2037,6 +1961,98 @@ var TransTab = TransitionTable{
 		// S42
 		func(r rune) int {
 			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
 			
 			
 			
@@ -2047,98 +2063,6 @@ var TransTab = TransitionTable{
 		// S43
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 10
-			case r == 33 : // ['!','!']
-				return 38
-			case r == 35 : // ['#','#']
-				return 39
-			case r == 36 : // ['$','$']
-				return 39
-			case r == 37 : // ['%','%']
-				return 39
-			case r == 40 : // ['(','(']
-				return 40
-			case r == 41 : // [')',')']
-				return 40
-			case r == 42 : // ['*','*']
-				return 39
-			case r == 43 : // ['+','+']
-				return 39
-			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
-				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 43
-			case r == 58 : // [':',':']
-				return 41
-			case r == 59 : // [';',';']
-				return 41
-			case r == 60 : // ['<','<']
-				return 39
-			case r == 61 : // ['=','=']
-				return 39
-			case r == 62 : // ['>','>']
-				return 39
-			case r == 63 : // ['?','?']
-				return 41
-			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
-				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
-				return 40
-			case r == 124 : // ['|','|']
-				return 10
-			case r == 125 : // ['}','}']
-				return 40
-			case r == 126 : // ['~','~']
-				return 39
-			case r == 192 : // [\u00c0,\u00c0]
-				return 46
-			case r == 199 : // [\u00c7,\u00c7]
-				return 46
-			case r == 200 : // [\u00c8,\u00c8]
-				return 46
-			case r == 201 : // [\u00c9,\u00c9]
-				return 46
-			case r == 202 : // [\u00ca,\u00ca]
-				return 46
-			case r == 203 : // [\u00cb,\u00cb]
-				return 46
-			case r == 212 : // [\u00d4,\u00d4]
-				return 46
-			case r == 224 : // [\u00e0,\u00e0]
-				return 46
-			case r == 232 : // [\u00e8,\u00e8]
-				return 46
-			case r == 233 : // [\u00e9,\u00e9]
-				return 46
-			case r == 234 : // [\u00ea,\u00ea]
-				return 46
-			case r == 235 : // [\u00eb,\u00eb]
-				return 46
-			case r == 244 : // [\u00f4,\u00f4]
-				return 46
 			
 			
 			
@@ -2152,95 +2076,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -2254,125 +2178,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
-			case r == 34 : // ['"','"']
-				return 59
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
-			case r == 39 : // [''',''']
-				return 59
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 51 : // ['0','3']
-				return 60
-			case 52 <= r && r <= 55 : // ['4','7']
-				return 61
-			case 56 <= r && r <= 57 : // ['8','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 62
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case r == 97 : // ['a','a']
-				return 44
-			case r == 98 : // ['b','b']
-				return 63
-			case 99 <= r && r <= 101 : // ['c','e']
-				return 44
-			case r == 102 : // ['f','f']
-				return 63
-			case 103 <= r && r <= 109 : // ['g','m']
-				return 44
-			case r == 110 : // ['n','n']
-				return 63
-			case 111 <= r && r <= 113 : // ['o','q']
-				return 44
-			case r == 114 : // ['r','r']
-				return 63
-			case r == 115 : // ['s','s']
-				return 44
-			case r == 116 : // ['t','t']
-				return 63
-			case r == 117 : // ['u','u']
-				return 64
-			case 118 <= r && r <= 122 : // ['v','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -2386,95 +2280,125 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
+			case r == 34 : // ['"','"']
+				return 61
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
+			case r == 39 : // [''',''']
+				return 61
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 51 : // ['0','3']
+				return 62
+			case 52 <= r && r <= 55 : // ['4','7']
+				return 63
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 64
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case r == 97 : // ['a','a']
+				return 45
+			case r == 98 : // ['b','b']
+				return 65
+			case 99 <= r && r <= 101 : // ['c','e']
+				return 45
+			case r == 102 : // ['f','f']
+				return 65
+			case 103 <= r && r <= 109 : // ['g','m']
+				return 45
+			case r == 110 : // ['n','n']
+				return 65
+			case 111 <= r && r <= 113 : // ['o','q']
+				return 45
+			case r == 114 : // ['r','r']
+				return 65
+			case r == 115 : // ['s','s']
+				return 45
+			case r == 116 : // ['t','t']
+				return 65
+			case r == 117 : // ['u','u']
+				return 66
+			case 118 <= r && r <= 122 : // ['v','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -2485,8 +2409,98 @@ var TransTab = TransitionTable{
 		// S47
 		func(r rune) int {
 			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 58
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
 			
 			
 			
@@ -2498,13 +2512,7 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 48
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 16
-			case r == 95 : // ['_','_']
-				return 16
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 16
+				return 60
 			
 			
 			
@@ -2516,16 +2524,12 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 16
+				return 49
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
 			case r == 95 : // ['_','_']
 				return 16
-			case 97 <= r && r <= 107 : // ['a','k']
-				return 16
-			case r == 108 : // ['l','l']
-				return 65
-			case 109 <= r && r <= 122 : // ['m','z']
+			case 97 <= r && r <= 122 : // ['a','z']
 				return 16
 			
 			
@@ -2543,11 +2547,11 @@ var TransTab = TransitionTable{
 				return 16
 			case r == 95 : // ['_','_']
 				return 16
-			case 97 <= r && r <= 116 : // ['a','t']
+			case 97 <= r && r <= 107 : // ['a','k']
 				return 16
-			case r == 117 : // ['u','u']
-				return 66
-			case 118 <= r && r <= 122 : // ['v','z']
+			case r == 108 : // ['l','l']
+				return 67
+			case 109 <= r && r <= 122 : // ['m','z']
 				return 16
 			
 			
@@ -2559,100 +2563,18 @@ var TransTab = TransitionTable{
 		// S51
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
+				return 16
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
+				return 16
 			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 16
+			case 97 <= r && r <= 107 : // ['a','k']
+				return 16
+			case r == 108 : // ['l','l']
+				return 68
+			case 109 <= r && r <= 122 : // ['m','z']
+				return 16
 			
 			
 			
@@ -2663,100 +2585,18 @@ var TransTab = TransitionTable{
 		// S52
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
+				return 16
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
+				return 16
 			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 16
+			case 97 <= r && r <= 116 : // ['a','t']
+				return 16
+			case r == 117 : // ['u','u']
+				return 69
+			case 118 <= r && r <= 122 : // ['v','z']
+				return 16
 			
 			
 			
@@ -2770,99 +2610,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 67
-			case 56 <= r && r <= 57 : // ['8','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -2876,99 +2714,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 69
-			case 56 <= r && r <= 57 : // ['8','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -2982,97 +2818,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 70
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -3086,97 +2924,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 72
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -3190,101 +3030,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 70
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 71
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 71
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -3295,8 +3131,100 @@ var TransTab = TransitionTable{
 		// S58
 		func(r rune) int {
 			switch {
+			case r == 32 : // [' ',' ']
+				return 3
+			case r == 33 : // ['!','!']
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
+			case r == 35 : // ['#','#']
+				return 27
+			case r == 36 : // ['$','$']
+				return 27
+			case r == 37 : // ['%','%']
+				return 27
+			case r == 40 : // ['(','(']
+				return 28
+			case r == 41 : // [')',')']
+				return 28
+			case r == 42 : // ['*','*']
+				return 27
+			case r == 43 : // ['+','+']
+				return 27
+			case r == 44 : // [',',',']
+				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 58
+				return 31
+			case r == 58 : // [':',':']
+				return 29
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
+				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
+			case r == 126 : // ['~','~']
+				return 27
+			case r == 192 : // [\u00c0,\u00c0]
+				return 34
+			case r == 199 : // [\u00c7,\u00c7]
+				return 34
+			case r == 200 : // [\u00c8,\u00c8]
+				return 34
+			case r == 201 : // [\u00c9,\u00c9]
+				return 34
+			case r == 202 : // [\u00ca,\u00ca]
+				return 34
+			case r == 203 : // [\u00cb,\u00cb]
+				return 34
+			case r == 212 : // [\u00d4,\u00d4]
+				return 34
+			case r == 224 : // [\u00e0,\u00e0]
+				return 34
+			case r == 232 : // [\u00e8,\u00e8]
+				return 34
+			case r == 233 : // [\u00e9,\u00e9]
+				return 34
+			case r == 234 : // [\u00ea,\u00ea]
+				return 34
+			case r == 235 : // [\u00eb,\u00eb]
+				return 34
+			case r == 244 : // [\u00f4,\u00f4]
+				return 34
 			
 			
 			
@@ -3308,97 +3236,103 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 32 : // [' ',' ']
-				return 10
+				return 3
 			case r == 33 : // ['!','!']
-				return 38
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 39
+				return 27
 			case r == 36 : // ['$','$']
-				return 39
+				return 27
 			case r == 37 : // ['%','%']
-				return 39
+				return 27
 			case r == 40 : // ['(','(']
-				return 40
+				return 28
 			case r == 41 : // [')',')']
-				return 40
+				return 28
 			case r == 42 : // ['*','*']
-				return 39
+				return 27
 			case r == 43 : // ['+','+']
-				return 39
+				return 27
 			case r == 44 : // [',',',']
-				return 41
+				return 29
 			case r == 45 : // ['-','-']
-				return 39
+				return 27
 			case r == 46 : // ['.','.']
-				return 41
+				return 29
 			case r == 47 : // ['/','/']
-				return 42
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 43
+				return 73
 			case r == 58 : // [':',':']
-				return 41
+				return 29
 			case r == 59 : // [';',';']
-				return 41
+				return 29
 			case r == 60 : // ['<','<']
-				return 39
+				return 27
 			case r == 61 : // ['=','=']
-				return 39
+				return 27
 			case r == 62 : // ['>','>']
-				return 39
+				return 27
 			case r == 63 : // ['?','?']
-				return 41
+				return 29
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 27
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 74
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 32
 			case r == 91 : // ['[','[']
-				return 40
+				return 28
 			case r == 92 : // ['\','\']
-				return 45
+				return 71
 			case r == 93 : // [']',']']
-				return 40
+				return 28
 			case r == 94 : // ['^','^']
-				return 39
+				return 27
 			case r == 95 : // ['_','_']
-				return 41
+				return 29
 			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
+				return 25
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 74
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 32
 			case r == 123 : // ['{','{']
-				return 40
+				return 28
 			case r == 124 : // ['|','|']
-				return 10
+				return 30
 			case r == 125 : // ['}','}']
-				return 40
+				return 28
 			case r == 126 : // ['~','~']
-				return 39
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 34
 			
 			
 			
@@ -3409,100 +3343,8 @@ var TransTab = TransitionTable{
 		// S60
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 10
-			case r == 33 : // ['!','!']
-				return 38
-			case r == 35 : // ['#','#']
-				return 39
-			case r == 36 : // ['$','$']
-				return 39
-			case r == 37 : // ['%','%']
-				return 39
-			case r == 40 : // ['(','(']
-				return 40
-			case r == 41 : // [')',')']
-				return 40
-			case r == 42 : // ['*','*']
-				return 39
-			case r == 43 : // ['+','+']
-				return 39
-			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
-				return 42
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 72
-			case 56 <= r && r <= 57 : // ['8','9']
-				return 43
-			case r == 58 : // [':',':']
-				return 41
-			case r == 59 : // [';',';']
-				return 41
-			case r == 60 : // ['<','<']
-				return 39
-			case r == 61 : // ['=','=']
-				return 39
-			case r == 62 : // ['>','>']
-				return 39
-			case r == 63 : // ['?','?']
-				return 41
-			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
-				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
-				return 40
-			case r == 124 : // ['|','|']
-				return 10
-			case r == 125 : // ['}','}']
-				return 40
-			case r == 126 : // ['~','~']
-				return 39
-			case r == 192 : // [\u00c0,\u00c0]
-				return 46
-			case r == 199 : // [\u00c7,\u00c7]
-				return 46
-			case r == 200 : // [\u00c8,\u00c8]
-				return 46
-			case r == 201 : // [\u00c9,\u00c9]
-				return 46
-			case r == 202 : // [\u00ca,\u00ca]
-				return 46
-			case r == 203 : // [\u00cb,\u00cb]
-				return 46
-			case r == 212 : // [\u00d4,\u00d4]
-				return 46
-			case r == 224 : // [\u00e0,\u00e0]
-				return 46
-			case r == 232 : // [\u00e8,\u00e8]
-				return 46
-			case r == 233 : // [\u00e9,\u00e9]
-				return 46
-			case r == 234 : // [\u00ea,\u00ea]
-				return 46
-			case r == 235 : // [\u00eb,\u00eb]
-				return 46
-			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 60
 			
 			
 			
@@ -3516,97 +3358,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 74
-			case 56 <= r && r <= 57 : // ['8','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -3620,95 +3460,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 75
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -3722,95 +3564,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 77
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -3824,99 +3668,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 75
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 76
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 76
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -3925,6 +3765,214 @@ var TransTab = TransitionTable{
 		},
 	
 		// S65
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S66
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 78
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 79
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 79
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S67
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
@@ -3936,7 +3984,7 @@ var TransTab = TransitionTable{
 			case 97 <= r && r <= 114 : // ['a','r']
 				return 16
 			case r == 115 : // ['s','s']
-				return 77
+				return 80
 			case 116 <= r && r <= 122 : // ['t','z']
 				return 16
 			
@@ -3946,7 +3994,29 @@ var TransTab = TransitionTable{
 			return NoState
 		},
 	
-		// S66
+		// S68
+		func(r rune) int {
+			switch {
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 16
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 16
+			case r == 95 : // ['_','_']
+				return 16
+			case 97 <= r && r <= 107 : // ['a','k']
+				return 16
+			case r == 108 : // ['l','l']
+				return 81
+			case 109 <= r && r <= 122 : // ['m','z']
+				return 16
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S69
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
@@ -3958,323 +4028,9 @@ var TransTab = TransitionTable{
 			case 97 <= r && r <= 100 : // ['a','d']
 				return 16
 			case r == 101 : // ['e','e']
-				return 78
+				return 82
 			case 102 <= r && r <= 122 : // ['f','z']
 				return 16
-			
-			
-			
-			}
-			return NoState
-		},
-	
-		// S67
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 69
-			case 56 <= r && r <= 57 : // ['8','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
-			
-			
-			
-			}
-			return NoState
-		},
-	
-		// S68
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
-			
-			
-			
-			}
-			return NoState
-		},
-	
-		// S69
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 30
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
 			
 			
 			
@@ -4288,101 +4044,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 79
+				return 30
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 72
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 80
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 80
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -4396,101 +4150,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 79
+				return 31
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 80
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 80
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -4502,99 +4252,99 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 32 : // [' ',' ']
-				return 10
+				return 3
 			case r == 33 : // ['!','!']
-				return 38
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 39
+				return 27
 			case r == 36 : // ['$','$']
-				return 39
+				return 27
 			case r == 37 : // ['%','%']
-				return 39
+				return 27
 			case r == 40 : // ['(','(']
-				return 40
+				return 28
 			case r == 41 : // [')',')']
-				return 40
+				return 28
 			case r == 42 : // ['*','*']
-				return 39
+				return 27
 			case r == 43 : // ['+','+']
-				return 39
+				return 27
 			case r == 44 : // [',',',']
-				return 41
+				return 29
 			case r == 45 : // ['-','-']
-				return 39
+				return 27
 			case r == 46 : // ['.','.']
-				return 41
+				return 29
 			case r == 47 : // ['/','/']
-				return 42
-			case 48 <= r && r <= 55 : // ['0','7']
-				return 74
-			case 56 <= r && r <= 57 : // ['8','9']
-				return 43
+				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
 			case r == 58 : // [':',':']
-				return 41
+				return 29
 			case r == 59 : // [';',';']
-				return 41
+				return 29
 			case r == 60 : // ['<','<']
-				return 39
+				return 27
 			case r == 61 : // ['=','=']
-				return 39
+				return 27
 			case r == 62 : // ['>','>']
-				return 39
+				return 27
 			case r == 63 : // ['?','?']
-				return 41
+				return 29
 			case r == 64 : // ['@','@']
-				return 39
+				return 27
 			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 32
 			case r == 91 : // ['[','[']
-				return 40
+				return 28
 			case r == 92 : // ['\','\']
-				return 73
+				return 33
 			case r == 93 : // [']',']']
-				return 40
+				return 28
 			case r == 94 : // ['^','^']
-				return 39
+				return 27
 			case r == 95 : // ['_','_']
-				return 41
+				return 29
 			case r == 96 : // ['`','`']
-				return 38
+				return 25
 			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
+				return 32
 			case r == 123 : // ['{','{']
-				return 40
+				return 28
 			case r == 124 : // ['|','|']
-				return 10
+				return 30
 			case r == 125 : // ['}','}']
-				return 40
+				return 28
 			case r == 126 : // ['~','~']
-				return 39
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 34
 			
 			
 			
@@ -4606,97 +4356,103 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 32 : // [' ',' ']
-				return 10
+				return 3
 			case r == 33 : // ['!','!']
-				return 38
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 39
+				return 27
 			case r == 36 : // ['$','$']
-				return 39
+				return 27
 			case r == 37 : // ['%','%']
-				return 39
+				return 27
 			case r == 40 : // ['(','(']
-				return 40
+				return 28
 			case r == 41 : // [')',')']
-				return 40
+				return 28
 			case r == 42 : // ['*','*']
-				return 39
+				return 27
 			case r == 43 : // ['+','+']
-				return 39
+				return 27
 			case r == 44 : // [',',',']
-				return 41
+				return 29
 			case r == 45 : // ['-','-']
-				return 39
+				return 27
 			case r == 46 : // ['.','.']
-				return 41
+				return 29
 			case r == 47 : // ['/','/']
-				return 42
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 43
+				return 83
 			case r == 58 : // [':',':']
-				return 41
+				return 29
 			case r == 59 : // [';',';']
-				return 41
+				return 29
 			case r == 60 : // ['<','<']
-				return 39
+				return 27
 			case r == 61 : // ['=','=']
-				return 39
+				return 27
 			case r == 62 : // ['>','>']
-				return 39
+				return 27
 			case r == 63 : // ['?','?']
-				return 41
+				return 29
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 27
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 84
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 32
 			case r == 91 : // ['[','[']
-				return 40
+				return 28
 			case r == 92 : // ['\','\']
-				return 45
+				return 71
 			case r == 93 : // [']',']']
-				return 40
+				return 28
 			case r == 94 : // ['^','^']
-				return 39
+				return 27
 			case r == 95 : // ['_','_']
-				return 41
+				return 29
 			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
+				return 25
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 84
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 32
 			case r == 123 : // ['{','{']
-				return 40
+				return 28
 			case r == 124 : // ['|','|']
-				return 10
+				return 30
 			case r == 125 : // ['}','}']
-				return 40
+				return 28
 			case r == 126 : // ['~','~']
-				return 39
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 34
 			
 			
 			
@@ -4708,97 +4464,103 @@ var TransTab = TransitionTable{
 		func(r rune) int {
 			switch {
 			case r == 32 : // [' ',' ']
-				return 10
+				return 3
 			case r == 33 : // ['!','!']
-				return 38
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 39
+				return 27
 			case r == 36 : // ['$','$']
-				return 39
+				return 27
 			case r == 37 : // ['%','%']
-				return 39
+				return 27
 			case r == 40 : // ['(','(']
-				return 40
+				return 28
 			case r == 41 : // [')',')']
-				return 40
+				return 28
 			case r == 42 : // ['*','*']
-				return 39
+				return 27
 			case r == 43 : // ['+','+']
-				return 39
+				return 27
 			case r == 44 : // [',',',']
-				return 41
+				return 29
 			case r == 45 : // ['-','-']
-				return 39
+				return 27
 			case r == 46 : // ['.','.']
-				return 41
+				return 29
 			case r == 47 : // ['/','/']
-				return 42
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 43
+				return 83
 			case r == 58 : // [':',':']
-				return 41
+				return 29
 			case r == 59 : // [';',';']
-				return 41
+				return 29
 			case r == 60 : // ['<','<']
-				return 39
+				return 27
 			case r == 61 : // ['=','=']
-				return 39
+				return 27
 			case r == 62 : // ['>','>']
-				return 39
+				return 27
 			case r == 63 : // ['?','?']
-				return 41
+				return 29
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
+				return 27
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 84
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 32
 			case r == 91 : // ['[','[']
-				return 40
+				return 28
 			case r == 92 : // ['\','\']
-				return 45
+				return 71
 			case r == 93 : // [']',']']
-				return 40
+				return 28
 			case r == 94 : // ['^','^']
-				return 39
+				return 27
 			case r == 95 : // ['_','_']
-				return 41
+				return 29
 			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
+				return 25
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 84
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 32
 			case r == 123 : // ['{','{']
-				return 40
+				return 28
 			case r == 124 : // ['|','|']
-				return 10
+				return 30
 			case r == 125 : // ['}','}']
-				return 40
+				return 28
 			case r == 126 : // ['~','~']
-				return 39
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 34
 			
 			
 			
@@ -4812,99 +4574,97 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 81
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 55 : // ['0','7']
+				return 77
+			case 56 <= r && r <= 57 : // ['8','9']
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 82
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 82
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -4918,99 +4678,95 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 81
+				return 44
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 82
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 82
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -5019,6 +4775,320 @@ var TransTab = TransitionTable{
 		},
 	
 		// S77
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S78
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 85
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 86
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 86
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S79
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 85
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 86
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 86
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S80
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
@@ -5030,7 +5100,7 @@ var TransTab = TransitionTable{
 			case 97 <= r && r <= 100 : // ['a','d']
 				return 16
 			case r == 101 : // ['e','e']
-				return 78
+				return 82
 			case 102 <= r && r <= 122 : // ['f','z']
 				return 16
 			
@@ -5040,7 +5110,7 @@ var TransTab = TransitionTable{
 			return NoState
 		},
 	
-		// S78
+		// S81
 		func(r rune) int {
 			switch {
 			case 48 <= r && r <= 57 : // ['0','9']
@@ -5058,427 +5128,17 @@ var TransTab = TransitionTable{
 			return NoState
 		},
 	
-		// S79
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 83
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 84
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 84
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
-			
-			
-			
-			}
-			return NoState
-		},
-	
-		// S80
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 3
-			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
-				return 25
-			case r == 35 : // ['#','#']
-				return 26
-			case r == 36 : // ['$','$']
-				return 26
-			case r == 37 : // ['%','%']
-				return 26
-			case r == 40 : // ['(','(']
-				return 27
-			case r == 41 : // [')',')']
-				return 27
-			case r == 42 : // ['*','*']
-				return 26
-			case r == 43 : // ['+','+']
-				return 26
-			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 83
-			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 84
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 84
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
-				return 29
-			case r == 125 : // ['}','}']
-				return 27
-			case r == 126 : // ['~','~']
-				return 26
-			case r == 192 : // [\u00c0,\u00c0]
-				return 33
-			case r == 199 : // [\u00c7,\u00c7]
-				return 33
-			case r == 200 : // [\u00c8,\u00c8]
-				return 33
-			case r == 201 : // [\u00c9,\u00c9]
-				return 33
-			case r == 202 : // [\u00ca,\u00ca]
-				return 33
-			case r == 203 : // [\u00cb,\u00cb]
-				return 33
-			case r == 212 : // [\u00d4,\u00d4]
-				return 33
-			case r == 224 : // [\u00e0,\u00e0]
-				return 33
-			case r == 232 : // [\u00e8,\u00e8]
-				return 33
-			case r == 233 : // [\u00e9,\u00e9]
-				return 33
-			case r == 234 : // [\u00ea,\u00ea]
-				return 33
-			case r == 235 : // [\u00eb,\u00eb]
-				return 33
-			case r == 244 : // [\u00f4,\u00f4]
-				return 33
-			
-			
-			
-			}
-			return NoState
-		},
-	
-		// S81
-		func(r rune) int {
-			switch {
-			case r == 32 : // [' ',' ']
-				return 10
-			case r == 33 : // ['!','!']
-				return 38
-			case r == 35 : // ['#','#']
-				return 39
-			case r == 36 : // ['$','$']
-				return 39
-			case r == 37 : // ['%','%']
-				return 39
-			case r == 40 : // ['(','(']
-				return 40
-			case r == 41 : // [')',')']
-				return 40
-			case r == 42 : // ['*','*']
-				return 39
-			case r == 43 : // ['+','+']
-				return 39
-			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
-				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
-				return 85
-			case r == 58 : // [':',':']
-				return 41
-			case r == 59 : // [';',';']
-				return 41
-			case r == 60 : // ['<','<']
-				return 39
-			case r == 61 : // ['=','=']
-				return 39
-			case r == 62 : // ['>','>']
-				return 39
-			case r == 63 : // ['?','?']
-				return 41
-			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 86
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
-				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 86
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
-			case r == 123 : // ['{','{']
-				return 40
-			case r == 124 : // ['|','|']
-				return 10
-			case r == 125 : // ['}','}']
-				return 40
-			case r == 126 : // ['~','~']
-				return 39
-			case r == 192 : // [\u00c0,\u00c0]
-				return 46
-			case r == 199 : // [\u00c7,\u00c7]
-				return 46
-			case r == 200 : // [\u00c8,\u00c8]
-				return 46
-			case r == 201 : // [\u00c9,\u00c9]
-				return 46
-			case r == 202 : // [\u00ca,\u00ca]
-				return 46
-			case r == 203 : // [\u00cb,\u00cb]
-				return 46
-			case r == 212 : // [\u00d4,\u00d4]
-				return 46
-			case r == 224 : // [\u00e0,\u00e0]
-				return 46
-			case r == 232 : // [\u00e8,\u00e8]
-				return 46
-			case r == 233 : // [\u00e9,\u00e9]
-				return 46
-			case r == 234 : // [\u00ea,\u00ea]
-				return 46
-			case r == 235 : // [\u00eb,\u00eb]
-				return 46
-			case r == 244 : // [\u00f4,\u00f4]
-				return 46
-			
-			
-			
-			}
-			return NoState
-		},
-	
 		// S82
 		func(r rune) int {
 			switch {
-			case r == 32 : // [' ',' ']
-				return 10
-			case r == 33 : // ['!','!']
-				return 38
-			case r == 35 : // ['#','#']
-				return 39
-			case r == 36 : // ['$','$']
-				return 39
-			case r == 37 : // ['%','%']
-				return 39
-			case r == 40 : // ['(','(']
-				return 40
-			case r == 41 : // [')',')']
-				return 40
-			case r == 42 : // ['*','*']
-				return 39
-			case r == 43 : // ['+','+']
-				return 39
-			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
-				return 42
 			case 48 <= r && r <= 57 : // ['0','9']
-				return 85
-			case r == 58 : // [':',':']
-				return 41
-			case r == 59 : // [';',';']
-				return 41
-			case r == 60 : // ['<','<']
-				return 39
-			case r == 61 : // ['=','=']
-				return 39
-			case r == 62 : // ['>','>']
-				return 39
-			case r == 63 : // ['?','?']
-				return 41
-			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 70 : // ['A','F']
-				return 86
-			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
-			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
+				return 16
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 16
 			case r == 95 : // ['_','_']
-				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 102 : // ['a','f']
-				return 86
-			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
-			case r == 123 : // ['{','{']
-				return 40
-			case r == 124 : // ['|','|']
-				return 10
-			case r == 125 : // ['}','}']
-				return 40
-			case r == 126 : // ['~','~']
-				return 39
-			case r == 192 : // [\u00c0,\u00c0]
-				return 46
-			case r == 199 : // [\u00c7,\u00c7]
-				return 46
-			case r == 200 : // [\u00c8,\u00c8]
-				return 46
-			case r == 201 : // [\u00c9,\u00c9]
-				return 46
-			case r == 202 : // [\u00ca,\u00ca]
-				return 46
-			case r == 203 : // [\u00cb,\u00cb]
-				return 46
-			case r == 212 : // [\u00d4,\u00d4]
-				return 46
-			case r == 224 : // [\u00e0,\u00e0]
-				return 46
-			case r == 232 : // [\u00e8,\u00e8]
-				return 46
-			case r == 233 : // [\u00e9,\u00e9]
-				return 46
-			case r == 234 : // [\u00ea,\u00ea]
-				return 46
-			case r == 235 : // [\u00eb,\u00eb]
-				return 46
-			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 16
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 16
 			
 			
 			
@@ -5492,101 +5152,101 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
 				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 87
 			case r == 58 : // [':',':']
-				return 28
+				return 29
 			case r == 59 : // [';',';']
-				return 28
+				return 29
 			case r == 60 : // ['<','<']
-				return 26
+				return 27
 			case r == 61 : // ['=','=']
-				return 26
+				return 27
 			case r == 62 : // ['>','>']
-				return 26
+				return 27
 			case r == 63 : // ['?','?']
-				return 28
+				return 29
 			case r == 64 : // ['@','@']
-				return 26
+				return 27
 			case 65 <= r && r <= 70 : // ['A','F']
 				return 88
 			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
+				return 32
 			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
 				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
 			case r == 96 : // ['`','`']
-				return 24
+				return 25
 			case 97 <= r && r <= 102 : // ['a','f']
 				return 88
 			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
+				return 32
 			case r == 123 : // ['{','{']
-				return 27
+				return 28
 			case r == 124 : // ['|','|']
-				return 29
+				return 30
 			case r == 125 : // ['}','}']
-				return 27
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -5600,101 +5260,101 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
-			case r == 45 : // ['-','-']
-				return 26
-			case r == 46 : // ['.','.']
-				return 28
-			case r == 47 : // ['/','/']
 				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 87
 			case r == 58 : // [':',':']
-				return 28
+				return 29
 			case r == 59 : // [';',';']
-				return 28
+				return 29
 			case r == 60 : // ['<','<']
-				return 26
+				return 27
 			case r == 61 : // ['=','=']
-				return 26
+				return 27
 			case r == 62 : // ['>','>']
-				return 26
+				return 27
 			case r == 63 : // ['?','?']
-				return 28
+				return 29
 			case r == 64 : // ['@','@']
-				return 26
+				return 27
 			case 65 <= r && r <= 70 : // ['A','F']
 				return 88
 			case 71 <= r && r <= 90 : // ['G','Z']
-				return 31
+				return 32
 			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 68
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
 				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
 			case r == 96 : // ['`','`']
-				return 24
+				return 25
 			case 97 <= r && r <= 102 : // ['a','f']
 				return 88
 			case 103 <= r && r <= 122 : // ['g','z']
-				return 31
+				return 32
 			case r == 123 : // ['{','{']
-				return 27
+				return 28
 			case r == 124 : // ['|','|']
-				return 29
+				return 30
 			case r == 125 : // ['}','}']
-				return 27
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -5708,99 +5368,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 89
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 70 : // ['A','F']
 				return 90
 			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
 			case r == 96 : // ['`','`']
-				return 38
+				return 39
 			case 97 <= r && r <= 102 : // ['a','f']
 				return 90
 			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
+				return 45
 			case r == 123 : // ['{','{']
-				return 40
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -5814,99 +5474,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
 			case 48 <= r && r <= 57 : // ['0','9']
 				return 89
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
+				return 40
 			case 65 <= r && r <= 70 : // ['A','F']
 				return 90
 			case 71 <= r && r <= 90 : // ['G','Z']
-				return 44
+				return 45
 			case r == 91 : // ['[','[']
-				return 40
-			case r == 92 : // ['\','\']
-				return 73
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
 				return 41
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
 			case r == 96 : // ['`','`']
-				return 38
+				return 39
 			case 97 <= r && r <= 102 : // ['a','f']
 				return 90
 			case 103 <= r && r <= 122 : // ['g','z']
-				return 44
+				return 45
 			case r == 123 : // ['{','{']
-				return 40
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -5920,97 +5580,101 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 91
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 92
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 92
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -6024,97 +5688,101 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 3
 			case r == 33 : // ['!','!']
-				return 24
-			case r == 34 : // ['"','"']
 				return 25
+			case r == 34 : // ['"','"']
+				return 26
 			case r == 35 : // ['#','#']
-				return 26
+				return 27
 			case r == 36 : // ['$','$']
-				return 26
+				return 27
 			case r == 37 : // ['%','%']
-				return 26
+				return 27
 			case r == 40 : // ['(','(']
-				return 27
+				return 28
 			case r == 41 : // [')',')']
-				return 27
+				return 28
 			case r == 42 : // ['*','*']
-				return 26
+				return 27
 			case r == 43 : // ['+','+']
-				return 26
+				return 27
 			case r == 44 : // [',',',']
-				return 28
+				return 29
 			case r == 45 : // ['-','-']
-				return 26
+				return 27
 			case r == 46 : // ['.','.']
-				return 28
+				return 29
 			case r == 47 : // ['/','/']
-				return 29
-			case 48 <= r && r <= 57 : // ['0','9']
 				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 91
 			case r == 58 : // [':',':']
-				return 28
-			case r == 59 : // [';',';']
-				return 28
-			case r == 60 : // ['<','<']
-				return 26
-			case r == 61 : // ['=','=']
-				return 26
-			case r == 62 : // ['>','>']
-				return 26
-			case r == 63 : // ['?','?']
-				return 28
-			case r == 64 : // ['@','@']
-				return 26
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 31
-			case r == 91 : // ['[','[']
-				return 27
-			case r == 92 : // ['\','\']
-				return 32
-			case r == 93 : // [']',']']
-				return 27
-			case r == 94 : // ['^','^']
-				return 26
-			case r == 95 : // ['_','_']
-				return 28
-			case r == 96 : // ['`','`']
-				return 24
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 31
-			case r == 123 : // ['{','{']
-				return 27
-			case r == 124 : // ['|','|']
 				return 29
-			case r == 125 : // ['}','}']
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
 				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 92
+			case 71 <= r && r <= 90 : // ['G','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 71
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 92
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
 			case r == 126 : // ['~','~']
-				return 26
+				return 27
 			case r == 192 : // [\u00c0,\u00c0]
-				return 33
+				return 34
 			case r == 199 : // [\u00c7,\u00c7]
-				return 33
+				return 34
 			case r == 200 : // [\u00c8,\u00c8]
-				return 33
+				return 34
 			case r == 201 : // [\u00c9,\u00c9]
-				return 33
+				return 34
 			case r == 202 : // [\u00ca,\u00ca]
-				return 33
+				return 34
 			case r == 203 : // [\u00cb,\u00cb]
-				return 33
+				return 34
 			case r == 212 : // [\u00d4,\u00d4]
-				return 33
+				return 34
 			case r == 224 : // [\u00e0,\u00e0]
-				return 33
+				return 34
 			case r == 232 : // [\u00e8,\u00e8]
-				return 33
+				return 34
 			case r == 233 : // [\u00e9,\u00e9]
-				return 33
+				return 34
 			case r == 234 : // [\u00ea,\u00ea]
-				return 33
+				return 34
 			case r == 235 : // [\u00eb,\u00eb]
-				return 33
+				return 34
 			case r == 244 : // [\u00f4,\u00f4]
-				return 33
+				return 34
 			
 			
 			
@@ -6128,95 +5796,99 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 93
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
 				return 40
-			case r == 92 : // ['\','\']
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 94
+			case 71 <= r && r <= 90 : // ['G','Z']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 94
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
-				return 46
+				return 47
 			
 			
 			
@@ -6230,95 +5902,511 @@ var TransTab = TransitionTable{
 			case r == 32 : // [' ',' ']
 				return 10
 			case r == 33 : // ['!','!']
-				return 38
+				return 39
 			case r == 35 : // ['#','#']
-				return 39
+				return 40
 			case r == 36 : // ['$','$']
-				return 39
+				return 40
 			case r == 37 : // ['%','%']
-				return 39
+				return 40
 			case r == 40 : // ['(','(']
-				return 40
+				return 41
 			case r == 41 : // [')',')']
-				return 40
+				return 41
 			case r == 42 : // ['*','*']
-				return 39
+				return 40
 			case r == 43 : // ['+','+']
-				return 39
+				return 40
 			case r == 44 : // [',',',']
-				return 41
-			case r == 45 : // ['-','-']
-				return 39
-			case r == 46 : // ['.','.']
-				return 41
-			case r == 47 : // ['/','/']
 				return 42
-			case 48 <= r && r <= 57 : // ['0','9']
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
 				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 93
 			case r == 58 : // [':',':']
-				return 41
+				return 42
 			case r == 59 : // [';',';']
-				return 41
+				return 42
 			case r == 60 : // ['<','<']
-				return 39
+				return 40
 			case r == 61 : // ['=','=']
-				return 39
+				return 40
 			case r == 62 : // ['>','>']
-				return 39
+				return 40
 			case r == 63 : // ['?','?']
-				return 41
+				return 42
 			case r == 64 : // ['@','@']
-				return 39
-			case 65 <= r && r <= 90 : // ['A','Z']
-				return 44
-			case r == 91 : // ['[','[']
 				return 40
-			case r == 92 : // ['\','\']
+			case 65 <= r && r <= 70 : // ['A','F']
+				return 94
+			case 71 <= r && r <= 90 : // ['G','Z']
 				return 45
-			case r == 93 : // [']',']']
-				return 40
-			case r == 94 : // ['^','^']
-				return 39
-			case r == 95 : // ['_','_']
+			case r == 91 : // ['[','[']
 				return 41
-			case r == 96 : // ['`','`']
-				return 38
-			case 97 <= r && r <= 122 : // ['a','z']
-				return 44
-			case r == 123 : // ['{','{']
+			case r == 92 : // ['\','\']
+				return 76
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
 				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 102 : // ['a','f']
+				return 94
+			case 103 <= r && r <= 122 : // ['g','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
 			case r == 124 : // ['|','|']
 				return 10
 			case r == 125 : // ['}','}']
-				return 40
+				return 41
 			case r == 126 : // ['~','~']
-				return 39
+				return 40
 			case r == 192 : // [\u00c0,\u00c0]
-				return 46
+				return 47
 			case r == 199 : // [\u00c7,\u00c7]
-				return 46
+				return 47
 			case r == 200 : // [\u00c8,\u00c8]
-				return 46
+				return 47
 			case r == 201 : // [\u00c9,\u00c9]
-				return 46
+				return 47
 			case r == 202 : // [\u00ca,\u00ca]
-				return 46
+				return 47
 			case r == 203 : // [\u00cb,\u00cb]
-				return 46
+				return 47
 			case r == 212 : // [\u00d4,\u00d4]
-				return 46
+				return 47
 			case r == 224 : // [\u00e0,\u00e0]
-				return 46
+				return 47
 			case r == 232 : // [\u00e8,\u00e8]
-				return 46
+				return 47
 			case r == 233 : // [\u00e9,\u00e9]
-				return 46
+				return 47
 			case r == 234 : // [\u00ea,\u00ea]
-				return 46
+				return 47
 			case r == 235 : // [\u00eb,\u00eb]
-				return 46
+				return 47
 			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S91
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 3
+			case r == 33 : // ['!','!']
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
+			case r == 35 : // ['#','#']
+				return 27
+			case r == 36 : // ['$','$']
+				return 27
+			case r == 37 : // ['%','%']
+				return 27
+			case r == 40 : // ['(','(']
+				return 28
+			case r == 41 : // [')',')']
+				return 28
+			case r == 42 : // ['*','*']
+				return 27
+			case r == 43 : // ['+','+']
+				return 27
+			case r == 44 : // [',',',']
+				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
+			case r == 58 : // [':',':']
+				return 29
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
+				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
+			case r == 126 : // ['~','~']
+				return 27
+			case r == 192 : // [\u00c0,\u00c0]
+				return 34
+			case r == 199 : // [\u00c7,\u00c7]
+				return 34
+			case r == 200 : // [\u00c8,\u00c8]
+				return 34
+			case r == 201 : // [\u00c9,\u00c9]
+				return 34
+			case r == 202 : // [\u00ca,\u00ca]
+				return 34
+			case r == 203 : // [\u00cb,\u00cb]
+				return 34
+			case r == 212 : // [\u00d4,\u00d4]
+				return 34
+			case r == 224 : // [\u00e0,\u00e0]
+				return 34
+			case r == 232 : // [\u00e8,\u00e8]
+				return 34
+			case r == 233 : // [\u00e9,\u00e9]
+				return 34
+			case r == 234 : // [\u00ea,\u00ea]
+				return 34
+			case r == 235 : // [\u00eb,\u00eb]
+				return 34
+			case r == 244 : // [\u00f4,\u00f4]
+				return 34
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S92
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 3
+			case r == 33 : // ['!','!']
+				return 25
+			case r == 34 : // ['"','"']
+				return 26
+			case r == 35 : // ['#','#']
+				return 27
+			case r == 36 : // ['$','$']
+				return 27
+			case r == 37 : // ['%','%']
+				return 27
+			case r == 40 : // ['(','(']
+				return 28
+			case r == 41 : // [')',')']
+				return 28
+			case r == 42 : // ['*','*']
+				return 27
+			case r == 43 : // ['+','+']
+				return 27
+			case r == 44 : // [',',',']
+				return 29
+			case r == 45 : // ['-','-']
+				return 27
+			case r == 46 : // ['.','.']
+				return 29
+			case r == 47 : // ['/','/']
+				return 30
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 31
+			case r == 58 : // [':',':']
+				return 29
+			case r == 59 : // [';',';']
+				return 29
+			case r == 60 : // ['<','<']
+				return 27
+			case r == 61 : // ['=','=']
+				return 27
+			case r == 62 : // ['>','>']
+				return 27
+			case r == 63 : // ['?','?']
+				return 29
+			case r == 64 : // ['@','@']
+				return 27
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 32
+			case r == 91 : // ['[','[']
+				return 28
+			case r == 92 : // ['\','\']
+				return 33
+			case r == 93 : // [']',']']
+				return 28
+			case r == 94 : // ['^','^']
+				return 27
+			case r == 95 : // ['_','_']
+				return 29
+			case r == 96 : // ['`','`']
+				return 25
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 32
+			case r == 123 : // ['{','{']
+				return 28
+			case r == 124 : // ['|','|']
+				return 30
+			case r == 125 : // ['}','}']
+				return 28
+			case r == 126 : // ['~','~']
+				return 27
+			case r == 192 : // [\u00c0,\u00c0]
+				return 34
+			case r == 199 : // [\u00c7,\u00c7]
+				return 34
+			case r == 200 : // [\u00c8,\u00c8]
+				return 34
+			case r == 201 : // [\u00c9,\u00c9]
+				return 34
+			case r == 202 : // [\u00ca,\u00ca]
+				return 34
+			case r == 203 : // [\u00cb,\u00cb]
+				return 34
+			case r == 212 : // [\u00d4,\u00d4]
+				return 34
+			case r == 224 : // [\u00e0,\u00e0]
+				return 34
+			case r == 232 : // [\u00e8,\u00e8]
+				return 34
+			case r == 233 : // [\u00e9,\u00e9]
+				return 34
+			case r == 234 : // [\u00ea,\u00ea]
+				return 34
+			case r == 235 : // [\u00eb,\u00eb]
+				return 34
+			case r == 244 : // [\u00f4,\u00f4]
+				return 34
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S93
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
 				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
+			
+			
+			
+			}
+			return NoState
+		},
+	
+		// S94
+		func(r rune) int {
+			switch {
+			case r == 32 : // [' ',' ']
+				return 10
+			case r == 33 : // ['!','!']
+				return 39
+			case r == 35 : // ['#','#']
+				return 40
+			case r == 36 : // ['$','$']
+				return 40
+			case r == 37 : // ['%','%']
+				return 40
+			case r == 40 : // ['(','(']
+				return 41
+			case r == 41 : // [')',')']
+				return 41
+			case r == 42 : // ['*','*']
+				return 40
+			case r == 43 : // ['+','+']
+				return 40
+			case r == 44 : // [',',',']
+				return 42
+			case r == 45 : // ['-','-']
+				return 40
+			case r == 46 : // ['.','.']
+				return 42
+			case r == 47 : // ['/','/']
+				return 43
+			case 48 <= r && r <= 57 : // ['0','9']
+				return 44
+			case r == 58 : // [':',':']
+				return 42
+			case r == 59 : // [';',';']
+				return 42
+			case r == 60 : // ['<','<']
+				return 40
+			case r == 61 : // ['=','=']
+				return 40
+			case r == 62 : // ['>','>']
+				return 40
+			case r == 63 : // ['?','?']
+				return 42
+			case r == 64 : // ['@','@']
+				return 40
+			case 65 <= r && r <= 90 : // ['A','Z']
+				return 45
+			case r == 91 : // ['[','[']
+				return 41
+			case r == 92 : // ['\','\']
+				return 46
+			case r == 93 : // [']',']']
+				return 41
+			case r == 94 : // ['^','^']
+				return 40
+			case r == 95 : // ['_','_']
+				return 42
+			case r == 96 : // ['`','`']
+				return 39
+			case 97 <= r && r <= 122 : // ['a','z']
+				return 45
+			case r == 123 : // ['{','{']
+				return 41
+			case r == 124 : // ['|','|']
+				return 10
+			case r == 125 : // ['}','}']
+				return 41
+			case r == 126 : // ['~','~']
+				return 40
+			case r == 192 : // [\u00c0,\u00c0]
+				return 47
+			case r == 199 : // [\u00c7,\u00c7]
+				return 47
+			case r == 200 : // [\u00c8,\u00c8]
+				return 47
+			case r == 201 : // [\u00c9,\u00c9]
+				return 47
+			case r == 202 : // [\u00ca,\u00ca]
+				return 47
+			case r == 203 : // [\u00cb,\u00cb]
+				return 47
+			case r == 212 : // [\u00d4,\u00d4]
+				return 47
+			case r == 224 : // [\u00e0,\u00e0]
+				return 47
+			case r == 232 : // [\u00e8,\u00e8]
+				return 47
+			case r == 233 : // [\u00e9,\u00e9]
+				return 47
+			case r == 234 : // [\u00ea,\u00ea]
+				return 47
+			case r == 235 : // [\u00eb,\u00eb]
+				return 47
+			case r == 244 : // [\u00f4,\u00f4]
+				return 47
 			
 			
 			

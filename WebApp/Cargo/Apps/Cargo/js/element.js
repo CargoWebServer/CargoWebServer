@@ -204,7 +204,6 @@ var Element = function (parent, params, callback, appendFront) {
                         parent.prependElement(this)
                     }
                 }
-
             }
 
             if (innerHtml != null) {
@@ -303,6 +302,8 @@ Element.prototype.removeElement = function (e) {
     delete this.childs[e.id]
 }
 
+
+
 /**
 * Remove all the childs of an element.
 * @stability 1
@@ -347,8 +348,17 @@ Element.prototype.init = function () {
 }
 
 Element.prototype.delete = function () {
+    if(this.parentElement != null){
+        this.parentElement.removeElement(this)
+    }
     this.removeAllChilds()
-    this.element.parentNode.removeChild(this.element)
+    try{
+        this.element.parentNode.removeChild(this.element)
+    }catch(err){
+        
+    }
+    
+    
     delete this
 }
 

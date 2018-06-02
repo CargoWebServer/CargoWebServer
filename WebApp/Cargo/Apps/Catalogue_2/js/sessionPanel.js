@@ -183,7 +183,11 @@ var SessionPanel = function(parent){
 	    delete timers[session.UUID];
 	    var sessionDiv = document.getElementById(session.M_id)
 	    if(sessionDiv !== undefined){
-	        sessionDiv.parentNode.removeChild(sessionDiv);
+	        try{
+	            sessionDiv.parentNode.removeChild(sessionDiv);
+	        }catch(err){
+	            
+	        }
 	    }
 	})
 	

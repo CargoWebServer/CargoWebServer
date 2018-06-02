@@ -1,0 +1,362 @@
+
+ 
+var PackageDisplayPage = function (parent) {
+
+    // The result content.
+    this.panel = new Element(parent, { "tag": "div", "id": "package_display_page_panel", "class": "item_display container-fluid" , "style" :"margin-top : 15px;"})
+
+    this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs querynav","id" : "queries"}).down()
+    // Now I will display the list of results...
+    this.navbar.appendElement({"tag":"button","class":"btn btn-dark toggleBtn", "onclick" : "packageSwitchContext()","innerHtml" :"Voir les recherches"})
+    
+    this.packageResultPanel = this.panel.appendElement({ "tag": "div", "class": "search_results_content tab-content" }).down()
+    this.currentItem = null
+    
+    return this
+}
+  
+function packageSwitchContext(){
+    document.getElementById("package_display_page_panel").style.display = "none"
+    document.getElementById("item_search_result_page").style.display = ""
+}
+
+
+function showPackage(itemID){
+    packageElement = document.getElementById(itemID+"-packagesContent")
+    packageElement.scrollIntoView({
+        behavior : 'smooth'
+    })
+}
+ 
+  
+
+function parsePkgImage(itemID){
+    checkImageExists("/Catalogue_2/photo/" +itemID + "/", function(existsImage) {
+        for(var i =0; i< existsImage; i++) {
+            // image exist
+            if(i == 0){
+                var child = document.createElement("li")
+                child.setAttribute("data-target", "#" + itemID + "-carousel")
+                child.setAttribute("data-slide-to" , "0")
+                child.setAttribute("class", "active")
+                document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
+                child = document.createElement("div")
+                child.setAttribute("class", "carousel-item active")
+                var picture = document.createElement("img")
+                picture.setAttribute("src", "../../Catalogue_2/photo/" + itemID + "/photo_" + Number(i+1) + ".jpg")
+                picture.setAttribute("class", "img-fluid rounded carouselImage")
+                child.appendChild(picture)
+                document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
+            }else{
+                var child = document.createElement("li")
+                child.setAttribute("data-target", "#"+ itemID + "-carousel")
+                child.setAttribute("data-slide-to", i)
+                document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
+                child = document.createElement("div")
+                child.setAttribute("class", "carousel-item")
+                var picture = document.createElement("img")
+                picture.setAttribute("src", "../../Catalogue_2/photo/" + itemID + "/photo_" + Number(i+1) + ".jpg")
+                picture.setAttribute("class", "img-fluid rounded carouselImage")
+                child.appendChild(picture)
+                document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
+            }
+            
+        }
+        
+    });
+} 
+
+/**
+ * Display an item information.
+ * @param {*} item 
+ */
+PackageDisplayPage.prototype.displayTabItem = function (pkg) {
+    
+    var packageID = pkg.M_id  + "_p"
+    
+    document.getElementById("package_display_page_panel").style.display = ""
+    document.getElementById("item_display_page_panel").style.display = "none"
+    document.getElementById("item_search_result_page").style.display = "none"
+    
+    if(document.getElementById(packageID + "-li") !== null){
+        document.getElementById(packageID + "-li").childNodes[0].click()
+        return;
+    }
+     this.navbar.appendElement({"tag" : "li", "class" : "nav-item","id" : packageID + "-li", "style" : "display:flex;flex-direction:row;"}).down()
+    .appendElement({"tag" : "span", "class" : "nav-link active", "href" : "#" + packageID + "-query", "role" : "tab", "data-toggle" : "tab", "aria-controls" : packageID  + "-query","aria-selected" : "true", "id" : packageID + "-tab", "style" : "display: flex;flex-direction: row;align-items: center; padding: 5px;border-radius:0;"}).down()
+    .appendElement({"tag":"a","class" : "tabLink", "href" : "#" +packageID + "-query", "innerHtml" : packageID , "style" : "text-decoration : none;"})
+    .appendElement({"tag" : "a","id" : packageID+"-close", "aria-label" : "Close" , "class" : "tabLink", "id" : packageID+"-closebtn"}).down()
+    .appendElement({"tag" : "span", "aria-hidden" :"true", "innerHtml" : "&times;", "style" : "padding-left: 5px;color:#007bff"}).up()
+    
+    this.packageResultPanel.appendElement({"tag" : "div","class" : "tab-pane fade show result-tab-content", "style" : "position:relative; background-color : white;", "id" : packageID + "-query", "role" : "tabpanel", "aria-labelledby" :packageID + "-tab" }).down()
+    .appendElement({"tag" : "div", "class" : "jumbotron"}).down()
+    .appendElement({"tag" : "div", "class": "d-flex justify-content-around"}).down()
+    .appendElement({"tag" : "h1", "style" : "text-align:center;", "innerHtml" : pkg.M_name}).up()
+    .appendElement({"tag" : "hr", "class" : "my-4"})
+    .appendElement({"tag" :"div", "class" : "container-fluid"}).down()
+    .appendElement({"tag" : "span", "class" : "row"}).down()
+    .appendElement({"tag" : "div", "class" : "col-md order-0"}).down()
+    .appendElement({"tag" : "div", "class" : "row paddedhor"}).down()
+    .appendElement({"tag" : "div", "id" : packageID + "-carousel", "class" : "carousel slide d-flex justify-content-center ", "data-ride": "carousel"}).down()
+    .appendElement({"tag" : "ol", "class" : "carousel-indicators", "id" : packageID + "-carousel-indicators"})
+    .appendElement({"tag" : "div", "class" : "carousel-inner rounded", "id" : packageID + "-carousel-inner"})
+    .appendElement({"tag" : "a", "class" : "carousel-control-prev", "href" : "#" + packageID + "-carousel", "role" : "button","data-slide" :"prev" , "id" : packageID + "-carousel-control-prev"}).down()
+    .appendElement({"tag" : "span", "class" : "carousel-control-prev-icon", "aria-hidden" : "true"})
+    .appendElement({"tag" : "span", "class" : "sr-only", "innerHtml" : "Previous"}).up()
+    .appendElement({"tag" : "a", "class" : "carousel-control-next", "href" : "#" + packageID + "-carousel", "role" : "button","data-slide" :"next" , "id" : packageID + "-carousel-control-next"}).down()
+    .appendElement({"tag" : "span", "class" : "carousel-control-next-icon", "aria-hidden" : "true"})
+    .appendElement({"tag" : "span", "class" : "sr-only", "innerHtml" : "Previous"}).up().up().up().up()
+    
+    .appendElement({"tag" : "div", "class" : "col-md order-1"}).down()
+    .appendElement({"tag" : "div", "class" : "list-group ", "id" : packageID + "-detailsGroup"}).down()
+    .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : "Détails"})
+    .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+    .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Description", "style" : "border-right :1px solid #e9ecef;"})
+    .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "value" : pkg.M_description.toString()}).up()
+    .appendElement({"tag" : "div", "class" :"row list-group-item  itemRow d-flex"}).down()
+    .appendElement({"tag" : "div", "class" : "col  largeCol", "innerHtml" : "Quantité", "style" : "border-right : 1px solid #e9ecef;"})
+    .appendElement({"tag" : "div", "class" : "col  largeCol list-group-item-action", "innerHtml" : pkg.M_quantity.toString()}).up()
+    .appendElement({"tag" : "div", "class" :"row list-group-item  itemRow d-flex"}).down()
+    .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Paquets", "style" : "border-right : 1px solid #e9ecef;"})
+    .appendElement({"tag" : "div", "class" : "col  largeCol list-group-item-action","id" : packageID + "-packaged"}).up().up()
+    
+    .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
+    
+    
+    .appendElement({"tag" : "div", "class" : "list-group ", "id" : packageID + "-inventoryGroup"}).down()
+    .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : "Inventaire"}).up().up().up().up()
+    .appendElement({"tag" : "span" , "class" : "row order-2"}).down()
+    .appendElement({"tag" : "div", "class" : "col-md"}).down()
+    .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
+  
+    
+    .appendElement({"tag" : "div", "id" : packageID + "-items", "class" : "list-group"}).down()
+    .appendElement({"tag" : "div", "class" : "text-light bg-dark d-flex justify-content-center align-items-center flex-direction-row list-group-item", "style"  : "font-size : 2rem;"}).down()
+    .appendElement({"tag" : "span", "innerHtml" : "Items"})
+     .appendElement({"tag" : "i", "class" : "fa fa-object-ungroup", "style" : "margin:10px;"}).up().up()
+     
+     .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
+    .appendElement({"tag" : "div", "class" : "list-group innerShadow", "id" : packageID + "-suppliersDetails"}).down()
+    .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : "Fournisseurs"})
+    .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
+
+    
+   
+   if(pkg.M_packages.length == 0){
+       this.packageResultPanel.getChildById(packageID+"-packaged").element.innerHTML = "Aucun"
+   }else{
+       for(var i  = 0; i < pkg.M_packages.length; i++){
+           server.entityManager.getEntityByUuid(pkg.M_packages[i], false, 
+           function(item_package, caller){
+                caller.packagesDiv.appendElement({"tag" : "span"}).down()
+                .appendElement({"tag" : "div", "innerHtml" : item_package.M_id})
+                .appendElement({"tag" : "a","id" : item_package.M_id+"-showbtn", "aria-label" : "Show" , "class" : "tabLink"}).down()
+                .appendElement({"tag" : "span", "aria-hidden" :"true","class" : "fa fa-share-square-o", "style" : "padding-left: 5px;color:#007bff"}).up()
+           }, function () {},
+           {"packagesDiv" : this.packageResultPanel.getChildById(packageID + "-packaged")})
+       }
+   }
+   
+   
+   for(var i  = 0; i < pkg.M_items.length; i++){
+       server.entityManager.getEntityByUuid(pkg.M_items[i], false, 
+       function(item, caller){
+           caller.itemSection.appendElement({"tag" : "div", "class" :"list-group-item row itemRow d-flex innerShadow", "id" : item.M_id + "-itemRow", "style" : "margin-left : 0px; margin-right:0px;"}).down()
+           .appendElement({"tag" : "div", "class" : "col-md-3 d-flex justify-content-center align-items-center"}).down()
+           .appendElement({"tag": "img", "src" : "../../Catalogue_2/photo/" + item.M_id + "/photo_1.jpg","class" : "img-fluid rounded"}).up()
+           .appendElement({"tag" : "div", "class" : "col-md largeCol"}).down()
+           .appendElement({"tag" : "div", "class" : "list-group"}).down()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "ID"})
+           .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action", "innerHtml" : item.M_id}).up()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Nom"})
+           .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action", "innerHtml" : item.M_name}).up()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Alias"})
+           .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action", "innerHtml" : item.M_alias}).up().up().up()
+           .appendElement({"tag" : "div", "class" : "col-md-2 largeCol d-flex justify-content-center align-items-center"}).down()
+           .appendElement({"tag" : "button", "class" : "btn btn-outline-dark", "id" : item.M_id + "-showItemButton"}).down()
+           .appendElement({"tag" : "span", "innerHtml" : "Voir l'item"})
+            .appendElement({"tag" : "i", "class" : "fa fa-object-ungroup", "style" : "margin:10px;"}).up()
+           
+         caller.itemSection.getChildById(item.M_id + "-showItemButton").element.addEventListener('click', function(){
+                mainPage.itemDisplayPage.displayTabItem(item)
+        })
+          
+           
+       }, function (){
+           
+       }, {"itemSection" : this.packageResultPanel.getChildById(packageID + "-items")})
+   }
+   
+   for(var i = 0; i < pkg.M_supplied.length; i++){
+        server.entityManager.getEntityByUuid(pkg.M_supplied[i], false, 
+        function(item_supplier, caller) {
+           
+            caller.pkgContent.appendElement({"tag" : "div", "class" : "list-group", "id" : item_supplier.M_id + "-supplierDetails"}).down()
+            .appendElement({"tag" : "div", "class" : "swoop", "style" : "margin: 10px;"})
+            
+           
+            server.entityManager.getEntityByUuid(item_supplier.M_supplier, false, 
+            function(supplier, caller){
+                caller.itemSupplier.element.innerHTML = ""
+                caller.itemSupplier.appendElement({"tag" : "div", "class" : "list-group", "id" : supplier + "-list"}).down()
+                .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : supplier.M_name})
+                .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "ID", "style" : "border-right :1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : caller.supplierInfo.M_id}).up()
+                .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Prix", "style" : "border-right :1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : caller.supplierInfo.M_price.M_valueOf +" " + caller.supplierInfo.M_price.M_currency.M_valueOf}).up()
+                
+                .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex", "id":supplier.M_id + "-order-line", "style":"visibility: hidden;"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité à ajouter", "style" : "border-right:1px solid #e9ecef"})
+                .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action "}).down()
+                .appendElement({"tag" : "div", "class" : "input-group"}).down()
+                
+                .appendElement({"tag" :"input", "type" : "number", "class" : "form-control text-center", "value" : "1", "id" : caller.supplierInfo.M_id + "-qtyToOrder"})
+                .appendElement({"tag" : "div", "class" : "input-group-btn"}).down()
+
+                .appendElement({"tag" : "button", "class" : "btn btn-dark", "type" : "button", "id" : caller.supplierInfo.M_id + "-addButton"}).down()
+                .appendElement({"tag" : "span","innerHtml" : "Ajouter "})
+                .appendElement({"tag" : "i", "class" : "fa fa-cart-plus", "style" : "margin-left:5px;"}).up().up().up().up().up()
+                        
+                .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
+                
+                // Here I will attach the line to order...
+                catalogMessageHub.attach(caller.itemSupplier.getChildById(supplier.M_id + "-order-line"), welcomeEvent, function(evt, orderLine){
+            	    if(server.account === undefined){
+            	        return
+            	    }
+            	    orderLine.element.style.visibility = "visible";
+                })
+                
+                if(server.account !== undefined){
+            	   caller.itemSupplier.getChildById(supplier.M_id + "-order-line").element.style.visibility = "visible";
+            	}
+            	   
+                if(caller.callback != undefined){
+                    caller.callback()
+                }
+                
+                caller.itemSupplier.getChildById(caller.supplierInfo.M_id + "-addButton").element.onclick = function(supplierRef, qty, ovmm){
+                    return function () {
+                        
+                       var newOrderLine = new CatalogSchema.ItemSupplierOrderType()
+                        newOrderLine.M_itemSupplierRef = supplierRef
+                        newOrderLine.M_quantity = qty.element.value
+                        mainPage.orderPage.addOrderItem(newOrderLine)
+                    }
+                    
+                }(caller.supplierInfo.UUID, caller.itemSupplier.getChildById(caller.supplierInfo.M_id+"-qtyToOrder"), caller.supplierInfo.M_id)
+                
+            }, 
+            function(){},
+            {"itemSupplier" : caller.pkgContent.getChildById(item_supplier.M_id + "-supplierDetails"), "supplierInfo" : item_supplier})
+        },
+        function(){}, { "pkgContent" : this.packageResultPanel.getChildById(packageID+ "-suppliersDetails"), "item_package" : pkg}
+        )
+    }
+   
+   
+   
+   for(var i=0; i < pkg.M_inventoried.length; i++){
+        server.entityManager.getEntityByUuid(pkg.M_inventoried[i], false,
+            function(inventory, caller){
+                var id = (packageID+i+"-place")
+                var temp = document.createElement("div")
+                temp.setAttribute("class","swoop")
+                var child = document.createElement("div")
+                child.setAttribute("class", "row list-group-item itemRow d-flex")
+                var col1 = document.createElement("div")
+                col1.setAttribute("class", "col largeCol")
+                col1.innerHTML = "Emplacement"
+                col1.setAttribute("style", "border-right :1px solid #e9ecef;")
+                var col2 = document.createElement("div")
+                col2.setAttribute("class","col largeCol list-group-item-action d-flex justify-content-center")
+                col2.setAttribute("id",id)
+                col2.appendChild(temp)
+                child.appendChild(col1)
+                child.appendChild(col2)
+                document.getElementById(packageID+"-inventoryGroup").appendChild(child)
+                var list = new Array()
+               parseLocalisation(inventory.M_located,list, packageID, id )
+               caller.inventoryContainer.appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité en stock", "style" : "border-right : 1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action d-flex justify-content-center", "innerHtml" : inventory.M_quantity}).up()
+                .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Stock minimal", "style" : "border-right : 1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action d-flex justify-content-center", "innerHtml" : inventory.M_safetyStock}).up()
+                .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité en commande", "style" : "border-right : 1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action d-flex justify-content-center", "innerHtml" : inventory.M_reorderQty}).up()
+            },
+            function(){
+                
+            }, {"packageID" : packageID, "i" : i, "inventoryContainer" : this.packageResultPanel.getChildById(packageID + "-inventoryGroup")})
+    }
+   
+   
+   
+   
+   
+   
+    parsePkgImage(pkg.M_id)
+    
+    this.navbar.getChildById(packageID+"-closebtn").element.onclick = function(tab,content){
+        return function(){
+            tabParent = tab.element.parentNode;
+            var i = Array.prototype.indexOf.call(tabParent.childNodes, tab.element);
+            tabParent.removeChild(tab.element)
+            content.element.parentNode.removeChild(content.element)
+            if(tabParent.childNodes.length > 1){
+                if(i > tabParent.childNodes.length - 1){
+                    tabParent.childNodes[tabParent.childNodes.length - 1].childNodes[0].click()
+                }else{
+                    tabParent.childNodes[i].childNodes[0].click()
+                }
+            }
+        }
+    }(this.navbar.getChildById(packageID + "-li"),  this.packageResultPanel.getChildById(packageID+"-query") )
+    
+    var tab = document.getElementById(packageID + "-tab")
+            tab.classList.remove("active")
+            tab.click()
+            
+    document.getElementById("package_display_page_panel").scrollIntoView()
+}
+
+
+function parseLocalisation(location, list, packageID, containername){
+    server.entityManager.getEntityByUuid(location, false, 
+        function(localisation, caller){
+            caller.list.push(localisation)
+            if(localisation.M_parent != ""){
+                parseLocalisation(localisation.M_parent, list, caller.packageID, caller.containername)
+            }else{
+                document.getElementById(caller.containername).innerHTML = ""
+                var child1 = document.createElement("nav")
+                child1.setAttribute("aria-label", "breadcrumb")
+                var child2 = document.createElement("ol")
+                child2.setAttribute("class" , "breadcrumb")
+                child2.setAttribute("style", "background-color:white;")
+                child1.appendChild(child2)
+                for(var i = caller.list.length -1; i>=0; i--){
+                    var child3 = document.createElement("li")
+                    child3.setAttribute("class", "breadcrumb-item")
+                    var child4 = document.createElement("a")
+                    child4.setAttribute("href", "#")
+                    child4.innerHTML = caller.list[i].M_name
+                    child3.appendChild(child4)
+                    child2.appendChild(child3)
+                }
+                document.getElementById(caller.containername).appendChild(child1)
+            }
+            
+            
+        },
+        function(){}, {"list" : list, "packageID" : packageID, "containername" : containername})
+}
+
+

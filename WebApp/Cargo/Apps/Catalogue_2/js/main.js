@@ -5,8 +5,8 @@ var bodyElement = new Element(document.body, { "tag": "div", "id": "body-element
 // Here I will display the spinner.
 var spinner = new Spinner(bodyElement, 30);
     
-var service = new Server("localhost", "127.0.0.1", 9494)
-//var service = new Server("mon176", "10.67.46.210", 9494)
+//var service = new Server("localhost", "127.0.0.1", 9494)
+var service = new Server("mon176", "10.67.46.210", 9494)
 var xapian = null
 
 // The list of datastore to looking in.
@@ -15,12 +15,22 @@ var dbpaths = []
 var itemTypes = []
 
 var welcomeEvent = 2000
+var createOrderEvent = 2001
+var modifiedOrderEvent = 2002
+var cancelOrderEvent = 2004
 var catalogMessage = "catalogMessage"
-
+var catalog = null
 // Create the event listener for the current editor.
 var catalogMessageHub = new EventHub(catalogMessage)
 
+
 function main() {
+    
+    /*var url= "http://free.currencyconverterapi.com/api/v5/convert?q=EUR_USD&compact=y"
+     $.getJSON(url,function(data){
+        console.log(data)
+      });*/
+
     // Initialisation of the interface.
     function main_() {
         // set the login page in the body to display it.
@@ -89,6 +99,7 @@ function main() {
                                 //}
                                 // display the interface.
                                 spinner.panel.element.style.display = "none";
+                                catalog = results
                             },
                             function (err) {
                                 var errObj = err.dataMap["errorObj"]

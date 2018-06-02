@@ -91,7 +91,7 @@ function getEntityIdsFromUuid(uuid, callback) {
         var query = {}
         query.TypeName = prototype.TypeName
         query.Fields = prototype.Ids
-        query.Query = prototype.TypeName + '.UUID == "' + uuid + '"'
+        query.Query = prototype.TypeName + '.UUID=="' + uuid + '"'
         server.dataManager.read(prototype.TypeName.split(".")[0], JSON.stringify(query), [], [],
             // success callback
             function (results, caller) {
@@ -322,6 +322,10 @@ function appendReferenced(refName, target, owner) {
  * Set object reference.
  */
 function setRef(owner, property, refValue, isArray) {
+    if (refValue == null) {
+        return owner
+    }
+
     if (refValue.length == 0) {
         return owner
     }
@@ -462,8 +466,9 @@ function setRef(owner, property, refValue, isArray) {
  * @param {object} object The object to initialyse.
  * @param {object} values The plain JSON object that contain values.
  * @param {bool} lazy If the value is at false child must be intialyse from te server, if not only childs uuid's are set.
+ * @param {bool} callback Use by external function to initalyse collection in correct oreder.
  */
-function setObjectValues(object, values, lazy) {
+function setObjectValues(object, values, lazy, callback) {
     // Get the entity prototype.
     var prototype = getEntityPrototype(object["TYPENAME"])
     if (prototype == undefined) {
@@ -639,6 +644,7 @@ function setObjectValues(object, values, lazy) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
                                 if (!lazy) {
+                                    console.log("-----> ", property, values[property], "is Array ", isArray_)
                                     subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
                                 } else {
                                     object[property] = values[property]
@@ -680,6 +686,11 @@ function setObjectValues(object, values, lazy) {
                         },
                         function (err, caller) {
                             console.log("err ", err)
+                            if (subObjects.length == 0) {
+                                caller.callback(caller.parent)
+                            } else {
+                                setSubObject(caller.parent, caller.subObjects, caller.callback)
+                            }
                         },
                         { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
                 } else {
@@ -702,7 +713,7 @@ function setObjectValues(object, values, lazy) {
         }
     }
 
-    // Call the init callback.
+    // Call the init callback. // TODO correct me!
     if (subObjects.length == 0) {
         if (object.initCallback != undefined) {
             object.initCallback(object)
@@ -715,12 +726,16 @@ function setObjectValues(object, values, lazy) {
                 object.initCallback == undefined
             }
         } else {
-            setSubObject(object, subObjects, function (object) {
-                if (object.initCallback != undefined) {
-                    object.initCallback(object)
-                    object.initCallback == undefined
-                }
-            })
+            if (callback != undefined) {
+                setSubObject(object, subObjects, callback)
+            } else {
+                setSubObject(object, subObjects, function (object) {
+                    if (object.initCallback != undefined) {
+                        object.initCallback(object)
+                        object.initCallback == undefined
+                    }
+                })
+            }
         }
     }
 

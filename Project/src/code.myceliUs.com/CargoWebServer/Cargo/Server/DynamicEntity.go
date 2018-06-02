@@ -164,23 +164,26 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 						if reflect.TypeOf(val).String() == "[]interface {}" {
 							uuids := make([]interface{}, 0)
 							for j := 0; j < len(val.([]interface{})); j++ {
-								if reflect.TypeOf(val.([]interface{})[j]).String() == "map[string]interface {}" {
-									if val.([]interface{})[j].(map[string]interface{})["TYPENAME"] != nil {
-										// Set parent information if is not already set.
-										if !strings.HasSuffix(fieldType, ":Ref") {
-											val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = obj["UUID"]
-											val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
-											child := NewDynamicEntity()
-											child.setObject(val.([]interface{})[j].(map[string]interface{}))
-											GetServer().GetEntityManager().setEntity(child)
-											val.([]interface{})[j].(map[string]interface{})["UUID"] = child.GetUuid()
+								if val.([]interface{})[j] != nil {
+									if reflect.TypeOf(val.([]interface{})[j]).String() == "map[string]interface {}" {
+										if val.([]interface{})[j].(map[string]interface{})["TYPENAME"] != nil {
+											// Set parent information if is not already set.
+											if !strings.HasSuffix(fieldType, ":Ref") {
+												val.([]interface{})[j].(map[string]interface{})["ParentUuid"] = obj["UUID"]
+												val.([]interface{})[j].(map[string]interface{})["ParentLnk"] = field
+												child := NewDynamicEntity()
+												child.setObject(val.([]interface{})[j].(map[string]interface{}))
+												GetServer().GetEntityManager().setEntity(child)
+												val.([]interface{})[j].(map[string]interface{})["UUID"] = child.GetUuid()
+											}
+											// Keep it on the cache
+											uuids = append(uuids, val.([]interface{})[j].(map[string]interface{})["UUID"])
 										}
-										// Keep it on the cache
-										uuids = append(uuids, val.([]interface{})[j].(map[string]interface{})["UUID"])
+									} else {
+										object[field] = val
 									}
-								} else {
-									object[field] = val
 								}
+
 							}
 							if len(uuids) > 0 {
 								object[field] = uuids

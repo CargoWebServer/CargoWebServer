@@ -71,6 +71,7 @@ var TokMap = TokenMap{
 		"string",
 		"boolean",
 		"regex",
+		"null",
 		"id",
 		".",
 	},
@@ -87,8 +88,9 @@ var TokMap = TokenMap{
 		"string": 8,
 		"boolean": 9,
 		"regex": 10,
-		"id": 11,
-		".": 12,
+		"null": 11,
+		"id": 12,
+		".": 13,
 	},
 }
 

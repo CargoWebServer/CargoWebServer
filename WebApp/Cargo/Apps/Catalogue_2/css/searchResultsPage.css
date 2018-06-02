@@ -55,7 +55,8 @@
     display: none;
 }
 
-#queries {
+
+.querynav {
     background-color: rgba(0,0,0,.55);
     border-top-left-radius : .5rem;
     border-top-right-radius : .5rem;
@@ -79,4 +80,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 400px;
+}
+
+.append_item_btn span:hover{
+    cursor: pointer;
+    color: steelblue;
 }

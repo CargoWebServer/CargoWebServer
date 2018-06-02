@@ -112,10 +112,20 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
+		String: `Value : null	<< ast.NewNullValue(X[0]) >>`,
+		Id: "Value",
+		NTType: 2,
+		Index: 9,
+		NumSymbols: 1,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.NewNullValue(X[0])
+		},
+	},
+	ProdTabEntry{
 		String: `Object : id "." id	<< ast.NewIdValue(X[0], X[2]) >>`,
 		Id: "Object",
 		NTType: 3,
-		Index: 9,
+		Index: 10,
 		NumSymbols: 3,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewIdValue(X[0], X[2])
@@ -125,7 +135,7 @@ var productionsTable = ProdTab {
 		String: `Object : Object "." id	<< ast.AppendIdValue(X[0], X[2]) >>`,
 		Id: "Object",
 		NTType: 3,
-		Index: 10,
+		Index: 11,
 		NumSymbols: 3,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.AppendIdValue(X[0], X[2])

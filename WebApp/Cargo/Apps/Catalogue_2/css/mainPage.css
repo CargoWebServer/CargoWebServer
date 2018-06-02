@@ -4,7 +4,7 @@ body{
 
 
 .sidenav {
-    width: 25%;
+    width: 20rem;
     z-index: 1;
     top: 0;
     left: 0;
@@ -17,7 +17,7 @@ body{
 .sidenav a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
-    font-size: 25px;
+    font-size: 20px;
     color: #818181;
     display: block;
     transition: 0.3s;
@@ -44,13 +44,17 @@ body{
 }
 
 .openedNav{
-    width : 20rem;
-    height : 100vh;
+    opacity : 1;
+    left : 0;
+    height : calc(100vh - 56px);
+    
 }
 
 .closedNav{
-    width:0;
+    opacity:0;
+    left : -20rem;
     height :100vh;
+   
 }
 
 @media (max-width: 767px) {
@@ -235,4 +239,12 @@ body{
   to {
     opacity: 1;
   }
+}
+
+.sideNavCategory{
+    cursor:pointer;
+}
+
+.sideNavCategory:hover{
+    background-color:#000000;
 }

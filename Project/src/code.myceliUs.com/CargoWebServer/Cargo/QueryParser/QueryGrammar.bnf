@@ -42,14 +42,18 @@ float64 : ['-'][[{_digit}] '.'] {_digit}  [_exponent] ;
 /** String **/
 string :  '"' {_esc_seq | _esc_string | _letter | _symbol | _digit | _group | _separator | _ponctuation | _accent | ' '} '"';
 
+/** Regular expression **/
 regex : '/' {_esc_seq | _esc_string | _letter | _symbol | _digit | _group  | _ponctuation | _accent | '\\'  | '|' | ' '} '/' ;
 
+/** Null value **/
+null: 'n' 'u' 'l' 'l';
+
 /** Boolean **/
-boolean: 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e';
+boolean : 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e';
 
 /** identifier **/
 id  :	('a'-'z'|'A'-'Z'|'_') [{'a'-'z'|'A'-'Z'|'0'-'9'|'_'}];
- 
+
 /** Comparator **/
 comparator: '!''=' | '=''=' | '~''=' | '>' | '<' | '>''=' | '<''=' | '^''=' | '$''=' ;
 
@@ -71,6 +75,7 @@ Value 	:
 		| string << ast.NewStringValue($0) >>
 		| boolean << ast.NewBoolValue($0) >>
 		| regex << ast.NewRegexExpr($0) >>
+		| null << ast.NewNullValue($0) >>
 		;
 		
 

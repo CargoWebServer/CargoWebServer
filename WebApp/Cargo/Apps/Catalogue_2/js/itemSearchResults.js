@@ -46,17 +46,15 @@ var ItemSearchResultPage = function (parent) {
     // I will made use of a tab panel to display the results.
     this.tabPanel = new TabPanel(this.itemDisplayPanel);
     
-    
-    
-    
-
     return this;
 }
 
 ItemSearchResultPage.prototype.displayResults = function (results, query) {
+    
     var headerText = "No results found for \"" + results.query + "\""
     spinner.panel.element.style.display = "none";
-
+    query = query.replace("*", "-");
+    
     var packages = []
     var uuids = []
     if (results.estimate > 0) {

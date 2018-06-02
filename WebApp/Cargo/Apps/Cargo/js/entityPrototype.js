@@ -428,6 +428,11 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "       return entities[this.ParentUuid]\n"
     constructorSrc += "  }\n"
 
+    constructorSrc += " this.getEscapedUuid = function(){\n"
+    constructorSrc += "     return this.UUID.replaceAll(\"%\", \"_\").replaceAll(\".\", \"_\").replaceAll(\"-\", \"_\");\n"
+    constructorSrc += " }\n"
+    
+
     // The get parent function
     constructorSrc += " this.getTypeName = function(){\n"
     constructorSrc += "       return getEntityPrototype(this.TYPENAME).TypeName\n"
@@ -492,12 +497,12 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " return this\n"
     constructorSrc += "}\n\n"
 
-    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object, lazy){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object, lazy, callback){\n"
     // First of all i will set reference in the result.
     constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
     constructorSrc += "   this.UUID = object.UUID\n"
     constructorSrc += "   this.IsInit = false\n"
-    constructorSrc += "   setObjectValues(this, object, lazy)\n"
+    constructorSrc += "   setObjectValues(this, object, lazy, callback)\n"
     constructorSrc += "}\n\n"
 
     // Set the function.

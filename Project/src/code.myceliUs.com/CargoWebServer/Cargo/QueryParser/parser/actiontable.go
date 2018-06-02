@@ -26,6 +26,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			shift(4),		/* id */
 			nil,		/* . */
 			
@@ -45,6 +46,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -64,6 +66,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			shift(4),		/* id */
 			nil,		/* . */
 			
@@ -83,6 +86,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			shift(10),		/* . */
 			
@@ -102,6 +106,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			shift(11),		/* . */
 			
@@ -121,6 +126,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			shift(4),		/* id */
 			nil,		/* . */
 			
@@ -140,6 +146,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -159,6 +166,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			shift(4),		/* id */
 			nil,		/* . */
 			
@@ -178,6 +186,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			shift(10),		/* . */
 			
@@ -197,6 +206,7 @@ var actionTab = actionTable{
 			shift(20),		/* string */
 			shift(21),		/* boolean */
 			shift(22),		/* regex */
+			shift(23),		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -216,7 +226,8 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
-			shift(23),		/* id */
+			nil,		/* null */
+			shift(24),		/* id */
 			nil,		/* . */
 			
 		},
@@ -235,7 +246,8 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
-			shift(24),		/* id */
+			nil,		/* null */
+			shift(25),		/* id */
 			nil,		/* . */
 			
 		},
@@ -254,6 +266,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -273,6 +286,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -292,6 +306,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			shift(4),		/* id */
 			nil,		/* . */
 			
@@ -303,7 +318,7 @@ var actionTab = actionTable{
 			nil,		/* INVALID */
 			nil,		/* $ */
 			nil,		/* ( */
-			shift(26),		/* ) */
+			shift(27),		/* ) */
 			shift(14),		/* operator */
 			nil,		/* comparator */
 			nil,		/* int64 */
@@ -311,6 +326,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -325,11 +341,12 @@ var actionTab = actionTable{
 			nil,		/* ) */
 			nil,		/* operator */
 			nil,		/* comparator */
-			shift(28),		/* int64 */
-			shift(29),		/* float64 */
-			shift(30),		/* string */
-			shift(31),		/* boolean */
-			shift(32),		/* regex */
+			shift(29),		/* int64 */
+			shift(30),		/* float64 */
+			shift(31),		/* string */
+			shift(32),		/* boolean */
+			shift(33),		/* regex */
+			shift(34),		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -349,6 +366,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -368,6 +386,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -387,6 +406,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -406,6 +426,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -425,6 +446,7 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
@@ -444,12 +466,53 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
 	actionRow{ // S23
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(9),		/* $, reduce: Value */
+			nil,		/* ( */
+			nil,		/* ) */
+			reduce(9),		/* operator, reduce: Value */
+			nil,		/* comparator */
+			nil,		/* int64 */
+			nil,		/* float64 */
+			nil,		/* string */
+			nil,		/* boolean */
+			nil,		/* regex */
+			nil,		/* null */
+			nil,		/* id */
+			nil,		/* . */
+			
+		},
+	},
+	actionRow{ // S24
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* operator */
+			reduce(11),		/* comparator, reduce: Object */
+			nil,		/* int64 */
+			nil,		/* float64 */
+			nil,		/* string */
+			nil,		/* boolean */
+			nil,		/* regex */
+			nil,		/* null */
+			nil,		/* id */
+			reduce(11),		/* ., reduce: Object */
+			
+		},
+	},
+	actionRow{ // S25
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -463,31 +526,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			reduce(10),		/* ., reduce: Object */
 			
 		},
 	},
-	actionRow{ // S24
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,		/* INVALID */
-			nil,		/* $ */
-			nil,		/* ( */
-			nil,		/* ) */
-			nil,		/* operator */
-			reduce(9),		/* comparator, reduce: Object */
-			nil,		/* int64 */
-			nil,		/* float64 */
-			nil,		/* string */
-			nil,		/* boolean */
-			nil,		/* regex */
-			nil,		/* id */
-			reduce(9),		/* ., reduce: Object */
-			
-		},
-	},
-	actionRow{ // S25
+	actionRow{ // S26
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -501,12 +546,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S26
+	actionRow{ // S27
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -520,12 +566,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S27
+	actionRow{ // S28
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -539,12 +586,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S28
+	actionRow{ // S29
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -558,12 +606,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S29
+	actionRow{ // S30
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -577,12 +626,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S30
+	actionRow{ // S31
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -596,12 +646,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S31
+	actionRow{ // S32
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -615,12 +666,13 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			
 		},
 	},
-	actionRow{ // S32
+	actionRow{ // S33
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
@@ -634,6 +686,27 @@ var actionTab = actionTable{
 			nil,		/* string */
 			nil,		/* boolean */
 			nil,		/* regex */
+			nil,		/* null */
+			nil,		/* id */
+			nil,		/* . */
+			
+		},
+	},
+	actionRow{ // S34
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* ( */
+			reduce(9),		/* ), reduce: Value */
+			reduce(9),		/* operator, reduce: Value */
+			nil,		/* comparator */
+			nil,		/* int64 */
+			nil,		/* float64 */
+			nil,		/* string */
+			nil,		/* boolean */
+			nil,		/* regex */
+			nil,		/* null */
 			nil,		/* id */
 			nil,		/* . */
 			

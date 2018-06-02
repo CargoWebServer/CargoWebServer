@@ -1,8 +1,9 @@
 var SearchResultPage = function (parent) {
     this.parent = parent;
     this.panel = new Element(null, {"tag":"div","id" : "item_search_result_page", "class" : "container-fluid", "style" :"margin-top : 15px; width 100%;"})
-    this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs d-none d-sm-flex","id" : "queries"}).down()
-    this.toggle = this.navbar.appendElement({"tag" : "button","class" :"btn btn-dark toggleBtn", "onclick" : "searchSwitchContext()", "innerHtml":"Voir les items trouvés",})
+    this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs d-none d-sm-flex querynav"}).down()
+    this.toggle = this.navbar.appendElement({"tag" : "button","class" :"btn btn-dark toggleBtn", "onclick" : "goToItem()", "innerHtml":"Voir les items trouvés",})
+    .appendElement({"tag" : "button","class" :"btn btn-dark", "onclick" : "goToPackage()", "innerHtml":"Voir les paquets trouvés",})
     
     this.mobileContent =  this.panel.appendElement({"tag" : "div", "class" : "container-fluid d-block d-sm-none"}).down()
     this.resultsContent = this.panel.appendElement({"tag" : "div", "class" : "tab-content  d-none d-sm-flex"}).down()
@@ -13,11 +14,13 @@ var SearchResultPage = function (parent) {
             if(searchResultPage.panel.element.offsetWidth < 500){
                 var contents = document.getElementsByClassName("result-tab-content")
                 for(var i = 0; i < contents.length; i++){
-                    var content = contents[i].childNodes[1];
+                    var content = contents[i].childNodes[0];
                     if(content != null){
-                        content.parentNode.removeChild(content)
                         var mobileContainer = document.getElementById(content.id.replace("_search_result", "-mobile-query"))
-                        mobileContainer.appendChild(content)
+                        if(mobileContainer !== null){
+                            content.parentNode.removeChild(content)
+                            mobileContainer.appendChild(content)
+                        }
                     }
                 }
             }else{
@@ -26,9 +29,11 @@ var SearchResultPage = function (parent) {
                     var id = contents[i].id
                     var content = contents[i].childNodes[0];
                     if(content != undefined){
-                        content.parentNode.removeChild(content);
                         var tabContainer = document.getElementById(content.id.replace("_search_result", "-query"))
-                        tabContainer.appendChild(content)
+                        if(tabContainer !== null){
+                            content.parentNode.removeChild(content);
+                            tabContainer.appendChild(content)
+                        }
                     }
                 }
             }
@@ -38,16 +43,25 @@ var SearchResultPage = function (parent) {
     return this
 }
 
-function searchSwitchContext(){
+function goToItem(){
     document.getElementById("item_display_page_panel").style.display = ""
     document.getElementById("item_search_result_page").style.display = "none"
 }
 
+function goToPackage(){
+    document.getElementById("package_display_page_panel").style.display = ""
+    document.getElementById("item_search_result_page").style.display = "none"
+}
+
 SearchResultPage.prototype.displayResults = function (results, query, context) {
+    queryTxt = query
+    query = query.replaceAll("*", "-").replaceAll(" ", "_").replaceAll("/", "_").replaceAll('"', "_").replaceAll("'", "_").replaceAll("\\", "_")
+    
     this.parent.element.appendChild(this.panel.element)
     spinner.panel.element.style.display = "none";
     document.getElementById("item_display_page_panel").style.display = "none"
     document.getElementById("item_search_result_page").style.display = ""
+     document.getElementById("order_page_panel").style.display = "none"
     
     if(results.results.length == 0){
         document.getElementById("navbarSearchText").classList.add("is-invalid");
@@ -72,18 +86,19 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
     
     this.navbar.appendElement({"tag" : "li", "class" : "nav-item", "name":query, "id" : query + "-li", "style" : "display:flex;flex-direction:row;"}).down()
     .appendElement({"tag" : "span", "class" : "nav-link active", "href" : "#" +query + "-query", "role" : "tab", "data-toggle" : "tab", "aria-controls" : query  + "-query", "name" : query, "id" : query + "-tab", "style" : "    display: flex;flex-direction: row;align-items: center; padding: 5px; border-radius:0px;"}).down()
-    .appendElement({"tag" : "span", "innerHtml" : query, "style" : "display:table-cell; padding-right : 8px;"})
+    .appendElement({"tag" : "span", "innerHtml" : queryTxt, "style" : "display:table-cell; padding-right : 8px;"})
     .appendElement({"tag" : "div", "class" : "swoop", "style" : "display : table-cell;"})
     
     this.mobileContent.appendElement({"tag" : "div", "class" : "d-flex flex-column ", "name" : query, "id" : query + "-mobilediv"}).down()
-    .appendElement({"tag" : "span", "class" : "d-flex flex-row align-items-center", /*, "href" : "#" + query + "-mobile-query", "role" : "tab", "data-toggle" : "tab", "aria-controls" : query ,"aria-expanded" : "false" ,*/ "name":query, "id" : query + "-mobiletab", "style" : "padding-top :10px;" }).down()
-    .appendElement({"tag" : "span","class" : "btn btn-secondary tabLink w-100", "innerHtml" : query, "style" : "display:table-cell; padding-right : 8px;"})
+    .appendElement({"tag" : "span", "class" : "d-flex flex-row align-items-center", "name":query, "id" : query + "-mobiletab", "style" : "padding-top :10px;" }).down()
+    .appendElement({"tag" : "span","class" : "btn btn-secondary tabLink w-100", "innerHtml" : queryTxt, "style" : "display:table-cell; padding-right : 8px;"})
     .appendElement({"tag" : "span", "class" : "btn"}).down()
     .appendElement({"tag" : "div", "class" : "swoop"}).up().up()
     .appendElement({"tag" : "div", "class":"mobile-content container", "name":query, "id" : query + "-mobile-query", "style":"padding: 0px;"})
     
+    this.resultsContent.appendElement({"tag" : "div","class" : "tab-pane fade show result-tab-content", "style" : "position:relative; background-color : white;", "name":query, "id" : query + "-query", "role" : "tabpanel", "aria-labelledby" :query + "-tab" }).down()
+    
     if(context == "generalSearchLnk"){
-        this.resultsContent.appendElement({"tag" : "div","class" : "tab-pane fade show result-tab-content", "style" : "style : position:relative; background-color : white;", "name":query, "id" : query + "-query", "role" : "tabpanel", "aria-labelledby" :query + "-tab" }).down()
         var packages = []
         var uuids = []
         if (results.estimate > 0) {
@@ -127,7 +142,7 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                 // error callback
                 function () {
     
-                }, { "itemSearchResultPage": itemSearchResultPage, "results": results, "uuids": uuids, "query": query, "getItem": getItem, "callback": callback })
+                }, { "itemSearchResultPage": itemSearchResultPage, "results": results, "uuids": uuids, "query": queryTxt, "getItem": getItem, "callback": callback })
         }
     
         // Get the properties items if any's
@@ -201,12 +216,18 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                 var result = results.results[i];
                 if (result.data.TYPENAME == "CatalogSchema.ItemType") {
                     if (uuids.indexOf(results.results[i].data.UUID) == -1) {
-                        uuids.push(results.results[i].data.UUID)
+                        if(results.results[i].data.UUID != undefined){
+                            uuids.push(results.results[i].data.UUID)
+                        }
                     }
                 } else if (result.data.TYPENAME == "CatalogSchema.PropertyType") {
                     if (uuids.indexOf(results.results[i].data.ParentUuid) == -1) {
-                        uuids.push(results.results[i].data.ParentUuid)
+                        if(results.results[i].data.ParentUuid != undefined){
+                            uuids.push(results.results[i].data.ParentUuid)
+                        }
                     }
+                }else if (result.data.TYPENAME == "CatalogSchema.ItemSupplierType") {
+                    itemSupplier.push(results.results[i].data)
                 }
             }
             headerText = "About " + (uuids.length) + " results " + " (" + results.elapsedTime / 1000 + "seconds)"
@@ -215,6 +236,16 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         var initItemSuppliers = function(uuids, itemSuppliers, q, itemSearchResultPage, callback){
             // The query.
             var uuid = uuids.pop()
+            
+            // In case of undefined values.
+            if(uuid == undefined){
+                initItemSuppliers(uuids, itemSuppliers, q, itemSearchResultPage, callback)
+                if(uuids.length == 0){
+                    callback(uuids, itemSuppliers, query, itemSearchResultPage, callback)
+                }
+                return
+            }
+           
         	server.entityManager.getEntityByUuid(uuid, false,
         		// success callback
         		function (itemSupplier, caller) {
@@ -229,7 +260,7 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         		// error callback
         		function (errObj, caller) {
         
-        		}, {"uuids":uuids, "itemSuppliers":itemSuppliers, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
+        		}, {"uuids":uuids, "itemSuppliers":itemSuppliers, "query": query, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
         }
         
         var getItemSuppliers = function(uuids, itemSuppliers, q, itemSearchResultPage, callback){
@@ -288,15 +319,17 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         
         		}, {"uuids":uuids, "pacakages":pacakages, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
         }
-        if(uuids.length > 0){
+        if(uuids.length > 0 && itemSupplier == 0){
             getPackages(uuids, [], query, this, getPackages);
         }else{
-            
+             this.displayTabResults(itemSupplier, query)
         }
         // this.displayTabResults(results, query)
     }else if(context == "localisationSearchLnk"){
         
     }
+    
+    fireResize()
 }
 
 SearchResultPage.prototype.displayTabResults = function (results, query, tabContent) {
@@ -304,13 +337,17 @@ SearchResultPage.prototype.displayTabResults = function (results, query, tabCont
     // Here I will set the tow string function for the properties type
     // that function is use by the column filter to help filtering the 
     // table values.
+    var queryTxt = query
+    query = query.replaceAll("*", "-").replaceAll(" ", "_").replaceAll("/", "_").replaceAll('"', "_").replaceAll("'", "_").replaceAll("\\", "_")
+    
+    
     document.getElementById(query + "-tab").innerHTML = ""
     document.getElementById(query + "-mobiletab").innerHTML = ""
-    var tab = this.navbar.getChildById(query + "-tab").appendElement({"tag":"a","class" : "tabLink", "href" : "#" +query + "-query", "innerHtml" : query + " - " + results.length + " results", "style" : "text-decoration : none;"})
+    var tab = this.navbar.getChildById(query + "-tab").appendElement({"tag":"a","class" : "tabLink", "href" : "#" +query + "-query", "innerHtml" : queryTxt + " - " + results.length + " results", "style" : "text-decoration : none;"})
     
     var mobileTab = this.mobileContent.getChildById(query+"-mobiletab")
     mobileTab.element.classList.add("btn-group")
-    mobileTab.appendElement({"tag":"a","class" : " btn btn-secondary tabLink w-100", "href" : "#" +query + "-query", "innerHtml" : query + " - " + results.length + " results"})
+    mobileTab.appendElement({"tag":"a","class" : " btn btn-secondary tabLink w-100", "href" : "#" +query + "-query", "innerHtml" : queryTxt + " - " + results.length + " results"})
     
     // The close button.
     var closeBtn = new Element(null, {"tag" : "a", "name" : query, "aria-label" : "Close" , "class" : "tabLink tabLink", "id" : query+"-closebtn"})
@@ -321,7 +358,8 @@ SearchResultPage.prototype.displayTabResults = function (results, query, tabCont
             tabParent = tab.element.parentNode;
             var i = Array.prototype.indexOf.call(tabParent.childNodes, tab.element);
             tabParent.removeChild(tab.element)
-            if(tabParent.childNodes.length > 1){
+            // The first tow button are not search item tabs...
+            if(tabParent.childNodes.length > 2){
                 if(i > tabParent.childNodes.length - 1){
                     tabParent.childNodes[tabParent.childNodes.length - 1].childNodes[0].click()
                 }else{
@@ -385,7 +423,7 @@ SearchResultPage.prototype.displayTabResults = function (results, query, tabCont
                     }
                 }
             }
-           
+            fireResize()
         }
     }(closeBtn, query, this)
     
@@ -412,161 +450,237 @@ SearchResultPage.prototype.displayTabResults = function (results, query, tabCont
     }(closeBtn)
     
     if(mainPage.searchContext == "generalSearchLnk"){
-        // Now I will append the found element in a table of entities.
-        var proto = getEntityPrototype("CatalogSchema.ItemType")
-    
-        // Set fields visibility.
-        proto.FieldsVisibility[10] = false;
-        proto.FieldsVisibility[11] = false;
-    
-        var model = new EntityTableModel(proto);
-        model.editable[2] = true;
-        model.editable[3] = true;
-    
-        // Set the list of entities in the model.
-        model.entities = results;
+
+        // This will be the next seach result table.
+        new ItemSearchResultTable(this.resultsContent.getChildById(query+"-query"), results, query, function(query){
+            // init callback.
+            spinner.panel.element.style.display = "none";
+            var tab = document.getElementById(query + "-tab")
+            tab.classList.remove("active")
+            tab.click()
+            
+            var mobiletab = document.getElementById(query + "-mobiletab")
+            mobiletab.classList.remove("active")
+            tab.click()
+            
+             // triger resize event
+            fireResize()
+
+            // refresh the language.
+            server.languageManager.refresh();
+            document.getElementById("advancedSearchText").innerHTML = document.getElementById(mainPage.searchContext).innerHTML
+        })
         
-        var table = new Table(query+ "_search_result", this.resultsContent.getChildById(query+"-query"))
-        table.div.element.classList.add("table")
-        table.div.element.classList.add("table-responsive")
-        table.div.element.classList.add("table-bordered")
-    
-        for (var i = 0; i < results.length; i++) {
-            for (var j = 0; j < results[i].M_properties.length; j++) {
-                var property = results[i].M_properties[j]
-                if (isObject(property.M_dimensionValue)) {
-                    // In that case I will display the value...
-                    property.toString = function (dimension) {
-                        return function () {
-                            // Return the dimension value.
-                            return dimension.M_valueOf + " " + dimension.M_unitOfMeasure.M_valueOf
-                        }
-                    }(property.M_dimensionValue)
-                } else if (property.M_stringValue != undefined) {
-                    property.toString = function (str) {
-                        return function () {
-                            return str
-                        }
-                    }(property.M_stringValue)
-                } else if (property.M_numericValue != undefined) {
-                    property.toString = function (val) {
-                        return function () {
-                            if (isInt(val)) {
-                                return formatValue(val, "xs.int")
-                            } else {
-                                return formatValue(val, "xs.decimal")
-                            }
-                        }
-                    }(property.M_numericValue)
-                } else if (property.M_booleanValue != undefined) {
-                    property.toString = function (val) {
-                        return function () {
-                            if (val == true) {
-                                return "true"
-                            } else {
-                                return "false"
-                            }
-                        }
-                    }(property.M_booleanValue)
-                }
-            }
-        }
-          
-        // Here I will set the renderer for the type CatalogSchema.DimensionType
-        // for the table.
-        table.renderFcts["CatalogSchema.DimensionType"] = function (value) {
-            // So here I will return the string that contain the unit of measure.
-            var str = value.M_valueOf
-    
-            if (value.M_unitOfMeasure.M_valueOf == "IN (inch)") {
-                str += '"'
-            } else if (value.M_unitOfMeasure.M_valueOf == "FT (feet)") {
-                str += "'"
-            } else {
-                str += " " + value.M_unitOfMeasure.M_valueOf
-            }
-            return new Element(null, { "tag": "div", "innerHtml": str });
-        }
-    
-        // The property display function...
-        table.renderFcts["[]CatalogSchema.PropertyType"] = function (properties) {
-            // So here I will return the string that contain the unit of measure.
-            var panel = new Element(null, { "tag": "div", "style": "display: table;width: 100%; border-collapse: collapse;margin-top: 2px;margin-bottom: 2px;" })
-            for (var i = 0; i < properties.length; i++) {
-                var property = properties[i]
-                var row = panel.appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
-    
-                // The propertie name.
-                row.appendElement({ "tag": "div", "style": "display:table-cell; padding-right: 5px;", "innerHtml": property.M_name + ": " })
-    
-                var valueDiv = row.appendElement({ "tag": "div", "style": "display:table-cell; width: 100%;" }).down()
-                // The propertie value...
-                if (isObject(property.M_dimensionValue)) {
-                    // Render the Dimension type with the function....
-                    valueDiv.appendElement(table.renderFcts["CatalogSchema.DimensionType"](property.M_dimensionValue))
-                } else if (property.M_stringValue != undefined) {
-                    valueDiv.element.innerHTML = property.M_stringValue
-                }
-            }
-            return panel;
-        }
-    
-        // I will append information to the model
-        table.setModel(model, function (table,query) {
-            return function () {
-                // Set hidden column here.
-                // init the table.
-                table.parent.element.style.position = "relative"
-                table.init()
-                table.header.maximizeBtn.element.click();
-                table.header.div.element.style.display = "table-header-group"
-                spinner.panel.element.style.display = "none";
-    
-                // I will set the action on the first cell...
-                for (var i = 0; i < table.rows.length; i++) {
-                    var cell = table.rows[i].cells[0]
-                    cell.div.element.style.textDecoration = "underline"
-                    cell.div.element.onmouseover = function () {
-                        this.style.color = "steelblue"
-                        this.style.cursor = "pointer"
-                    }
-    
-                    cell.div.element.onmouseleave = function () {
-                        this.style.color = ""
-                        this.style.cursor = "default"
-                    }
-    
-                    // Now the onclick... 
-                    var entity = table.getModel().entities[i]
-                    cell.div.element.onclick = function (entity) {
-                        return function () {
-                            //mainPage.searchResultPage.resultsContent.element.parentNode.removeChild(mainPage.searchResultPage.resultsContent.element)
-                            mainPage.itemDisplayPage.displayTabItem(entity)
-                        }
-                    }(entity)
-                }
-                
-                var tab = document.getElementById(query + "-tab")
-                tab.classList.remove("active")
-                tab.click()
-                
-                var mobiletab = document.getElementById(query + "-mobiletab")
-                mobiletab.classList.remove("active")
-                tab.click()
-                
-                /** triger resize event **/
-                fireResize()
-                
-                // Set the table header dark.
-                table.header.div.element.classList.add("thead-dark")
-                
-                // refresh the language.
-                server.languageManager.refresh();
-            }
-        }(table,query))
     } else if(mainPage.searchContext == "supplierSearchLnk"){
-        console.log(results)
+        
+        // Display the search results for that client.
+        var supplierSearchResults = new ItemSupplierSearchResults(this.resultsContent.getChildById(query+"-query"), results, query, function(query){
+            var tab = document.getElementById(query + "-tab")
+            tab.classList.remove("active")
+            tab.click()
+                    
+            var mobiletab = document.getElementById(query + "-mobiletab")
+            mobiletab.classList.remove("active")
+            tab.click()
+                    
+             /** triger resize event **/
+            fireResize()
+    
+            // refresh the language.
+            server.languageManager.refresh();
+            document.getElementById("advancedSearchText").innerHTML = document.getElementById(mainPage.searchContext).innerHTML
+
+        })
+
     }
 }
 
+
+/**
+ * Display the seach results.
+ */
+var ItemSearchResultTable = function(parent, items, query, callback){
+    parent.element.style.width = "100%";
+    
+    // Callback informations.
+    this.callback = callback
+    this.query = query
+    
+    // page information
+    this.pageIndex = 0;
+    this.pageSize = 20;
+    
+    // Keep the items to display.
+    this.items = items;
+    
+    // Ajout de la table de recherhe.
+    this.panel = parent.appendElement({"tag":"div", "class":"container-fluid", "id": query + "_search_result"}).down()
+    this.table = this.panel.appendElement({"tag":"table", "class":"table"}).down()
+    
+    // Now I will append the header.
+    this.table.appendElement({"tag":"thead", "class":"table_header thead-dark"}).down()
+        .appendElement({"tag":"tr"}).down()
+        .appendElement({"tag":"th", "id":"item-id-header", "innerHtml":"OVMM"})
+        .appendElement({"tag":"th", "id":"item-type-header", "innerHtml":"Type"})
+        .appendElement({"tag":"th", "id":"item-description-header", "innerHtml":"Description"})
+        .appendElement({"tag":"th", "id":"item-alias-header", "innerHtml":"alias"})
+        .appendElement({"tag":"th", "id":"item-keyword-header", "innerHtml":"mot clés"})
+        .appendElement({"tag":"th", "id":"item-comments-header", "innerHtml":"commentaire(s)"})
+        .appendElement({"tag":"th", "id":"item-specs-header", "innerHtml":"spécification"})
+        .appendElement({"tag":"th", "id":"item-basket-header", "class":"append_item_btn"})
+        
+    // Now the table body.
+    this.tbody = this.table.appendElement({"tag":"tbody"}).down()
+    
+    // Now the pagination...
+    var ul = this.panel.appendElement({"tag":"nav"}).down()
+        .appendElement({"tag":"ul", "class":"pagination", "style":"display: flex; justify-content: center; flex-wrap: wrap;"}).down()
+    
+    // The previous link.
+    /*this.previous = ul.appendElement({"tag":"li", "class":"page-item"}).down()
+    this.previous.appendElement({"tag":"a", "class":"page-link", "href":"#", "aria-label":"Previous"}).down()
+    .appendElement({"tag":"span", "aria-hidden":"true", "innerHtml":"&laquo;"})
+    .appendElement({"tag":"sr-only", "aria-hidden":"true"}).up().up()*/
+    
+    this.pageLnks = []
+    for(var i=0; i < items.length / this.pageSize; i++ ){
+        this.pageLnks[i] = ul.appendElement({"tag":"li", "class":"page-item"}).down()
+        this.pageLnks[i].appendElement({"tag":"a", "class":"page-link", "href":"#", "innerHtml":(i + 1).toString()}).down()
+        this.pageLnks[i].element.onclick = function(index, itemSearchResultTable){
+            return function(){
+                for(var i=0; i < itemSearchResultTable.pageLnks.length; i++){
+                    itemSearchResultTable.pageLnks[i].element.classList.remove("active")
+                }
+                this.classList.add("active")
+                itemSearchResultTable.displayPage(index)
+            }
+        }(i, this)
+        
+    }
+    
+    this.pageLnks[0].element.click()
+
+    // Now the page to list of page to be inserted.
+    /*this.next = ul.appendElement({"tag":"li", "class":"page-item"}).down()
+    this.next.appendElement({"tag":"a", "class":"page-link", "href":"#", "aria-label":"Next"}).down()
+    .appendElement({"tag":"span", "aria-hidden":"true", "innerHtml":"&raquo;"})
+    .appendElement({"tag":"sr-only", "aria-hidden":"true"})*/
+        
+    // So here i will react to the login event.
+    
+    // The login event.
+	catalogMessageHub.attach(this, welcomeEvent, function(evt, resultPage){
+	    if(server.account === undefined){
+	        return
+	    }
+	    
+        var appendItemBtns = document.getElementsByClassName("append_item_btn");
+        for(var i=0; i < appendItemBtns.length; i++){
+            appendItemBtns[i].style.display = ""
+        }
+	})
+
+    return this
+}
+
+ItemSearchResultTable.prototype.displayPage = function(index){
+    // set the index.
+    this.pageIndex = index;
+    this.tbody.removeAllChilds();
+    
+    for(var i=0; i < this.pageSize && (this.pageSize*index) + i < this.items.length; i++){
+        var item = this.items[(this.pageSize*index) + i];
+        var tr = this.tbody.appendElement({"tag":"tr"}).down()
+        
+        var lnk = tr.appendElement({"tag":"td", "innerHtml":item.M_id}).down()
+        lnk.element.style.textDecoration = "underline"
+        lnk.element.onmouseover = function () {
+            this.style.color = "steelblue"
+            this.style.cursor = "pointer"
+        }
+
+        lnk.element.onmouseleave = function () {
+            this.style.color = ""
+            this.style.cursor = "default"
+        }
+
+        // Now the onclick... 
+        var entity = entities[item.UUID]
+        lnk.element.onclick = function (entity) {
+            return function () {
+                mainPage.itemDisplayPage.displayTabItem(entity)
+            }
+        }(entity)
+        
+        tr.appendElement({"tag":"td", "innerHtml":item.M_name})
+        tr.appendElement({"tag":"td", "innerHtml":item.M_description})
+        
+        // The alias or supplier 
+        var alias = tr.appendElement({"tag":"td"}).down()
+            .appendElement({"tag":"tbody"}).down()
+            
+        for(var j=0; j < item.M_alias.length; j++){
+             alias.appendElement({"tag":"tr"}).down()
+                .appendElement({"tag":"td", "innerHtml":item.M_alias[j]})
+        }
+        
+        // Now the keyword...
+        var keywords =  tr.appendElement({"tag":"td"}).down()
+            .appendElement({"tag":"tbody"}).down()
+            
+        for(var j=0; j < item.M_keywords.length; j++){
+             keywords.appendElement({"tag":"tr"}).down()
+                .appendElement({"tag":"td", "innerHtml":item.M_keywords[j]})
+        }
+        
+        var comments =  tr.appendElement({"tag":"td"}).down()
+            .appendElement({"tag":"tbody"}).down()
+            
+        for(var j=0; j < item.M_comments.length; j++){
+             comments.appendElement({"tag":"tr"}).down()
+                .appendElement({"tag":"td", "innerHtml":item.M_comments[j]})
+        }
+
+        // Now the properties...
+        var properties =  tr.appendElement({"tag":"td"}).down()
+            .appendElement({"tag":"tbody"}).down()
+            
+        var appendItemBtn = properties.up().up().appendElement({"tag":"td"}).down()
+            .appendElement({"tag":"div", "class":"append_item_btn", "style":"position: relative; display: none;"}).down()
+        
+        appendItemBtn.appendElement({"tag":"span", "class":"fa fa-cart-plus"})
+        
+        // display if the user is connected.
+        if(server.account !== undefined){
+            appendItemBtn.element.style.display = "";
+        }
+        
+        appendItemBtn.element.onclick = function(item){
+            return function(){
+                mainPage.itemDisplayPage.displayTabItem(item, function(item){
+                    return function(){
+                    packageElement = document.getElementById(item.M_id + "-suppliersDetails")
+                    packageElement.scrollIntoView({
+                        behavior : 'smooth'
+                    })
+                }}(item))
+              
+            }
+        }(item)
+	    
+        // TODO display other type of values.
+        for(var j=0; j < item.M_properties.length; j++){
+            var property = item.M_properties[j]
+            // console.log(property.M_name)
+            var row = properties.appendElement({"tag":"tr"}).down();
+            row.appendElement({"tag":"td", "innerHtml":property.M_name})
+            if(property.M_stringValue.length > 0){
+                row.appendElement({"tag":"td", "innerHtml":property.M_stringValue})
+            }
+        }
+    }
+    
+    // call the callback
+    this.callback(this.query)
+}
 
