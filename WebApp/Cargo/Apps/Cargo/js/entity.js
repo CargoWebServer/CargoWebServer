@@ -644,7 +644,7 @@ function setObjectValues(object, values, lazy, callback) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
                                 if (!lazy) {
-                                    console.log("-----> ", property, values[property], "is Array ", isArray_)
+                                    //console.log("-----> ", property, values[property], "is Array ", isArray_)
                                     subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
                                 } else {
                                     object[property] = values[property]

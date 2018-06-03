@@ -275,6 +275,7 @@ EntityPrototype.prototype.init = function (object) {
 
     // Generate the class code.
     this.generateConstructor()
+    
 }
 
 
@@ -355,11 +356,13 @@ EntityPrototype.prototype.generateConstructor = function () {
                     constructorSrc += " this." + fieldName + " = 1\n"
                 } else {
                     if (this.FieldsType[i].endsWith(":Ref")) {
-                        constructorSrc += " this." + fieldName + " = null\n"
+                        constructorSrc += " this." + fieldName + " = null;\n"
                     } else {
 
                         if (this.FieldsNillable[i] == false) {
-                            constructorSrc += " this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                            constructorSrc += " try{\n";
+                            constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "();\n"
+                            constructorSrc += " }catch(err){\n  }\n"
                         } else {
                             constructorSrc += " if(getBaseTypeExtension(\"" +  this.FieldsType[i] +"\").startsWith(\"xs.\")){\n"
                             constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
@@ -396,7 +399,9 @@ EntityPrototype.prototype.generateConstructor = function () {
                     if (this.isNillable[i]) {
                         constructorSrc += " this." + fieldName + " = null\n"
                     } else {
-                        constructorSrc += " this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                        constructorSrc += " try{\n";
+                        constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                         constructorSrc += " }catch(err){\n  }\n"
                     }
                 }
             }
