@@ -93,14 +93,10 @@
  }
  
  PersonalPage.prototype.displayOrders = function(orders){
-     console.log(96, orders.length)
-
     for(var i = 0; i < orders.length; i++){
-        console.log(99, i, orders[i].M_status.M_valueOf)
-        console.log(99, i, orders[i].M_items)
-        
+
         if(orders[i].M_status.M_valueOf === "Pending"){
-             var creationDateString = orders[i].M_creationDate[0] + orders[i].M_creationDate[1] + orders[i].M_creationDate[2] + orders[i].M_creationDate[3] + "/" +orders[i].M_creationDate[5] + orders[i].M_creationDate[6] + "/" + orders[i].M_creationDate[8] + orders[i].M_creationDate[9] + "-" + orders[i].M_creationDate[11] + orders[i].M_creationDate[12]+ ":" + orders[i].M_creationDate[14] + orders[i].M_creationDate[15]
+            var creationDateString = orders[i].M_creationDate[0] + orders[i].M_creationDate[1] + orders[i].M_creationDate[2] + orders[i].M_creationDate[3] + "/" +orders[i].M_creationDate[5] + orders[i].M_creationDate[6] + "/" + orders[i].M_creationDate[8] + orders[i].M_creationDate[9] + "-" + orders[i].M_creationDate[11] + orders[i].M_creationDate[12]+ ":" + orders[i].M_creationDate[14] + orders[i].M_creationDate[15]
             var completionDateString = orders[i].M_completionDate[0] + orders[i].M_completionDate[1] + orders[i].M_completionDate[2] + orders[i].M_completionDate[3] + "/" +orders[i].M_completionDate[5] + orders[i].M_completionDate[6] + "/" + orders[i].M_completionDate[8] + orders[i].M_completionDate[9] + "-" + orders[i].M_completionDate[11] + orders[i].M_completionDate[12]+ ":" + orders[i].M_completionDate[14] + orders[i].M_completionDate[15]
         
             
@@ -114,13 +110,9 @@
             .appendElement({"tag" :"td", "data-th" : ""}).down()
             .appendElement({"tag" : "button", "class" : "btn btn-outline-dark", "onclick" : ""}).down()
             .appendElement({"tag" : "i", "class" : "fa fa-search-plus", "style" : "color:inherit;"}).up()
-
-        
         }
         
-        
-        for(var j =0; i<orders[i].M_items.length;i++){
- 
+        for(var j =0; j<orders[i].M_items.length;j++){
             server.entityManager.getEntityByUuid(orders[i].M_items[j].M_itemSupplierRef, false, 
                 function(item_supplier,caller){
                     server.entityManager.getEntityByUuid(item_supplier.M_package,false,
@@ -141,8 +133,6 @@
                     
                 },{})
         }
-        
-        
         
     }
  }

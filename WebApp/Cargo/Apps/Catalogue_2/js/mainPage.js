@@ -11,21 +11,21 @@ function deleteOreder(userId){
         
     },
     function(orders,caller){
-        var deleteOrders = function(oreders){
-            var order = oreders.pop()
+        var deleteOrders = function(orders){
+            var order = orders.pop()
             console.log("---> delete order ",order.UUID)
             server.entityManager.removeEntity(order.UUID,
-                function(result, oreders){
-                    if(oreders.length > 0){
+                function(result, orders){
+                    if(orders.length > 0){
                         deleteOrders(orders)
                     }
                 }, 
                 function(){
                     
-                }, oreders);
+                }, orders);
         }
         
-        deleteOrders(oreders)
+        deleteOrders(orders)
     },
     function(errObj,orders){
 
@@ -258,6 +258,7 @@ var MainPage = function () {
                 }
                 
                 // I will set the personnal page with the user command.
+                console.log("----> ", orders)
                 mainPage.personalPage = new PersonalPage(caller.userId, orders)
             },
             function(errObj,caller){

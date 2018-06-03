@@ -719,6 +719,10 @@ function setObjectValues(object, values, lazy, callback) {
             object.initCallback(object)
             object.initCallback == undefined
         }
+        // No subitem to initialyse but a callback...
+        if (callback != undefined) {
+            callback()
+        }
     } else if (subObjects.length > 0) {
         if (lazy) {
             if (object.initCallback != undefined) {
