@@ -44,12 +44,12 @@ body {
 }
 
 .scrolltable th{
-  font-size: 10pt;
+    font-size: 10pt;
 }
 
 .scrolltable > .table_body {
-  /* width: -webkit-fit-content;*/
-  overflow-y: auto;
+    /* width: -webkit-fit-content;*/
+    overflow-y: auto;
 }
 
 .dialog_delete_button:hover{
@@ -57,5 +57,9 @@ body {
 }
 
 .heritage_btn i{
-  display: none;
+    display: none;
+}
+
+.row_button {
+    visibility: visible;
 }

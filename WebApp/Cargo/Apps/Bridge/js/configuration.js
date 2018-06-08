@@ -384,92 +384,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                 } else if (content.TYPENAME == "Config.ServiceConfiguration") {
                     // Here I have a service configuration.
-                    var parent = content.getPanel().panel //.parentElement.parentElement
-
-                    // Keep the reference in the content.
-                    var actionsDiv = parent
-                        .appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow-y: auto; overflow-x: hidden;" }).down()
-
-                    // set the scrolling shadow...
-                    actionsDiv.element.onscroll = function (header) {
-                        return function () {
-                            var position = this.scrollTop;
-                            if (this.scrollTop > 0) {
-                                if (header.className.indexOf(" scrolling") == -1) {
-                                    header.className += " scrolling"
-                                }
-                            } else {
-                                header.className = header.className.replaceAll(" scrolling", "")
-                            }
-                        }
-                    }(actionsDiv.parentElement.parentElement.parentElement.element)
-
-                    window.addEventListener('resize',
-                        function (actionsDiv) {
-                            return function () {
-                                var parent = actionsDiv.parentElement.parentElement.parentElement.parentElement
-                                var top = parent.element.firstChild.offsetHeight
-                                var right = parent.element.clientWidth;
-                                if (top > 0 && right > 0) {
-                                    actionsDiv.element.style.width = right + "px"
-                                    actionsDiv.element.style.top = top + "px"
-                                }
-                            }
-                        }(actionsDiv), true);
-
-                    // Now I will get the list of action for a given services.
-                    server.serviceManager.getServiceActions(content.M_id,
-                        // success callback
-                        function (results, parent) {
-                            // Now I will display the list of action in panel.
-                            for (var i = 0; i < results.length; i++) {
-                                var result = results[i]
-                                new EntityPanel(parent, result.TYPENAME, function (entity) {
-                                    return function (panel) {
-                                        panel.setEntity(entity)
-                                        // Now I will display the action documentation correctly...
-                                        var documentationInput = CargoEntities.Action_M_doc
-                                        //panel.fields["M_doc"].panel.element.style.display = "none"
-                                        var doc = panel.fields["M_doc"].value.element.innerText
-                                        if (doc.indexOf("@src") != -1) {
-                                            doc = doc.split("@src")[0]
-                                        }
-
-                                        var values = doc.split("@")
-                                        doc = ""
-                                        for (var i = 0; i < values.length; i++) {
-                                            doc += "<div>"
-                                            if (values[i].startsWith("api")) {
-                                                doc += values[i].replaceAll("api 1.0", "<span style='color: green;'>api 1.0</span>")
-                                            } else if (values[i].startsWith("param") && values[i].indexOf("{callback}") == -1) {
-                                                var values_ = values[i].split("param")[1].split(" ")
-                                                doc += "<span class='doc_tag' style='vertical-align: top;'>param</span><span>"
-                                                var description = ""
-                                                for (var j = 1; j < values_.length; j++) {
-                                                    if (j == 1) {
-                                                        // The type:
-                                                        doc += "<span style='color: darkgreen; vertical-align: text-top'>" + values_[j] + "</span>"
-                                                    } else if (j == 2) {
-                                                        // The name
-                                                        doc += "<span style='color: color: #657383; font-weight:bold; vertical-align: text-top'>" + values_[j] + "</span>"
-                                                    } else {
-                                                        description = description + " " + values_[j]
-                                                    }
-                                                }
-                                                doc += "<span style='vertical-align: text-top'>" + description + "</span>"
-                                                doc += "</span>"
-                                            }
-                                            doc += "</div>"
-                                        }
-                                        panel.fields["M_doc"].value.element.innerHTML = doc
-                                    }
-                                }(result), undefined, false, result, "")
-                            }
-                        },
-                        // error callback
-                        function (errObj, caller) {
-
-                        }, actionsDiv)
+                    homePage.serviceExplorer.initService(content)
+   
                 } else if (content.TYPENAME == "Config.ScheduledTask") {
                     // Here I will personalise input a little.
                     content.getPanel().fields["M_frequency"].panel.element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
@@ -712,7 +628,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-
+                        
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.ServiceConfiguration") {
+                            homePage.serviceExplorer.setService(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+                        
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
                             configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                         } else {
@@ -728,7 +648,6 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         // disable the previous button.
                         configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                     }
-
                 }
             }(this)
 
@@ -745,7 +664,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-
+                        
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.ServiceConfiguration") {
+                            homePage.serviceExplorer.setService(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+                        
                         if (configurationPanel.currentIndex == 0) {
                             configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                         } else {

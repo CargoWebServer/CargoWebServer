@@ -50,6 +50,9 @@ var HomePage = function () {
 
     /** Display the list of task instance since the server started */
     this.taskInstancesExplorer = null
+    
+    /** Display the list of actions for a given service **/
+    this.serviceExplorer = null
 
     /** The file navigation  */
     this.fileNavigator = null
@@ -999,6 +1002,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.serviceSettingContext, this.servicesSettingDiv)
     this.servicesConfiguration = new ConfigurationPanel(this.servicesSettingDiv, "Services configuration", "Config.ServiceConfiguration", "serviceConfigs")
 
+    this.serviceExplorer =  new ServicesExplorer(this.servicesSettingDiv)
+
     // The database context...
     this.datasourceSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
     this.datasourceSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Data stores configuration" }).appendElement({ "tag": "i", "class": "fa fa-database" })
@@ -1031,6 +1036,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.taskSchedulerContext, this.scheduledTasksDiv)
 
     this.taskInstancesExplorer = new TaskInstancesExplorer(this.scheduledTasksDiv)
+    
+    
 
     // I will set the configuration of the panel...
     server.entityManager.getEntities("Config.Configurations", "Config", null, 0, -1, [], true, false,

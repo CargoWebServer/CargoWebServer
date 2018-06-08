@@ -104,22 +104,25 @@ LanguageManager.prototype.setLanguage = function (language) {
 	for (var languageId in this.languageInfo) {
         // div:lang(fr) {display: none;}
         var exist = false;
-        
-        for(var i=0; i < styleSheet.cssRules.length; i++){
-            if(styleSheet.cssRules[i].selectorText == "div:lang("+ languageId +")"){
-                if(this.language == languageId){
-                    styleSheet.cssRules[i].style.display = "block";
-                }else{
-                    styleSheet.cssRules[i].style.display = "none";
+        if(styleSheet !== null){
+            if(styleSheet.cssRules !== null){
+                for(var i=0; i < styleSheet.cssRules.length; i++){
+                    if(styleSheet.cssRules[i].selectorText == "div:lang("+ languageId +")"){
+                        if(this.language == languageId){
+                            styleSheet.cssRules[i].style.display = "block";
+                        }else{
+                            styleSheet.cssRules[i].style.display = "none";
+                        }
+                        exist = true;
+                    }
                 }
-                exist = true;
             }
-        }
-        if(!exist){
-            if(this.language == languageId){
-                styleSheet.insertRule("div:lang("+ languageId +"){display: block;}", 1);
-            }else{
-                styleSheet.insertRule("div:lang("+ languageId +"){display: none;}", 1);
+            if(!exist){
+                if(this.language == languageId){
+                    styleSheet.insertRule("div:lang("+ languageId +"){display: block;}", 1);
+                }else{
+                    styleSheet.insertRule("div:lang("+ languageId +"){display: none;}", 1);
+                }
             }
         }
 	}

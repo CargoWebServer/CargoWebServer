@@ -77,6 +77,12 @@ var Restriction = function () {
  * Return the entity title (ids string from it uuid)
  */
 function getEntityIdsFromUuid(uuid, callback) {
+    if(!isObjectReference(uuid)){
+        if(callback!==undefined){
+            callback()
+        }
+        return
+    }
     var prototype = getEntityPrototype(uuid.split("%")[0])
     // Here I will use the ids of an entity as titile.
     var ids = []
@@ -717,7 +723,7 @@ function setObjectValues(object, values, lazy, callback) {
     if (subObjects.length == 0) {
         if (object.initCallback != undefined) {
             object.initCallback(object)
-            object.initCallback == undefined
+            object.initCallback = undefined
         }
         // No subitem to initialyse but a callback...
         if (callback != undefined) {
@@ -727,7 +733,7 @@ function setObjectValues(object, values, lazy, callback) {
         if (lazy) {
             if (object.initCallback != undefined) {
                 object.initCallback(object)
-                object.initCallback == undefined
+                object.initCallback = undefined
             }
         } else {
             if (callback != undefined) {
@@ -736,7 +742,7 @@ function setObjectValues(object, values, lazy, callback) {
                 setSubObject(object, subObjects, function (object) {
                     if (object.initCallback != undefined) {
                         object.initCallback(object)
-                        object.initCallback == undefined
+                        object.initCallback = undefined
                     }
                 })
             }

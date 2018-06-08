@@ -1304,18 +1304,29 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //        }
 //        if (entities[evt.dataMap["entity"].UUID] == undefined) {
 //            var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
-//            entity.initCallback = function (self, evt, entity) {
+//            var initCallback = function (self, evt, entity) {
 //                return function (entity) {
 //                    server.entityManager.setEntity(entity)
 //                    EventHub.prototype.onEvent.call(self, evt)
 //                }
 //            } (this, evt, entity)
+//			  if(entity.initCallback == undefined){
+//				 entity.initCallback = initCallback
+//			  }else{
+//				 entity.initCallback = function(entity, initCallback){
+//					return function(entity){
+//						entity.initCallback(entity);
+//						initCallback(entity);
+//					}
+//				 }(entity, initCallback)
+//			  }
+//
 //            entity.init(evt.dataMap["entity"], false)
 //        } else {
 //            // update the object values.
 //            // but before I call the event I will be sure the entity have
 //            var entity = entities[evt.dataMap["entity"].UUID]
-//            entity.initCallback = function (self, evt, entity) {
+//            var initCallback = function (self, evt, entity) {
 //                return function (entity) {
 //                    // Test if the object has change here befor calling it.
 //                    server.entityManager.setEntity(entity)
@@ -1325,6 +1336,16 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //                    evt.done = true // Cut the cyclic recursion.
 //                }
 //            } (this, evt, entity)
+//			  if(entity.initCallback == undefined){
+//				 entity.initCallback = initCallback
+//			  }else{
+//				 entity.initCallback = function(entity, initCallback){
+//					return function(entity){
+//						entity.initCallback(entity);
+//						initCallback(entity);
+//					}
+//				 }(entity, initCallback)
+//			  }
 //            setObjectValues(entity, evt.dataMap["entity"])
 //        }
 //    } else if (evt.code == DeleteEntityEvent) {
@@ -1432,7 +1453,7 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //        },
 //        function (result, caller) {
 //            var entity = eval("new " + result[0].TYPENAME + "()")
-//            entity.initCallback = function () {
+//            var initCallback = function () {
 //                return function (entity) {
 //                    if (caller.successCallback != undefined) {
 //                        caller.successCallback(entity, caller.caller)
@@ -1440,6 +1461,16 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //                    }
 //                }
 //            } (caller)
+//			  if(entity.initCallback == undefined){
+//				 entity.initCallback = initCallback
+//			  }else{
+//				 entity.initCallback = function(entity, initCallback){
+//					return function(entity){
+//						entity.initCallback(entity);
+//						initCallback(entity);
+//					}
+//				 }(entity, initCallback)
+//			  }
 //            entity.init(result[0], false)
 //        },
 //        function (errMsg, caller) {
@@ -1520,7 +1551,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //        },
 //        function (result, caller) {
 //            var entity = eval("new " + result[0].TYPENAME + "()")
-//            entity.initCallback = function () {
+//            var initCallback = function () {
 //                return function (entity) {
 //                    // Set the new entity values...
 //                    server.entityManager.setEntity(entity)
@@ -1530,6 +1561,16 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //                    }
 //                }
 //            } (caller)
+//			  if(entity.initCallback == undefined){
+//				 entity.initCallback = initCallback
+//			  }else{
+//				 entity.initCallback = function(entity, initCallback){
+//					return function(entity){
+//						entity.initCallback(entity);
+//						initCallback(entity);
+//					}
+//				 }(entity, initCallback)
+//			  }
 //            entity.init(result[0], false)
 //        },
 //        function (errMsg, caller) {
@@ -1691,7 +1732,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                                 var entity = eval("new " + caller.prototype.TypeName + "()")
 //                                 entities.push(entity)
 //                                 if (values.length == 0) {
-//                                     entity.initCallback = function (caller, entities) {
+//                                     var initCallback = function (caller, entities) {
 //                                         return function (entity) {
 //                                             server.entityManager.setEntity(entity)
 //                                             if (caller.successCallback != undefined) {
@@ -1700,11 +1741,31 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                                             }
 //                                         }
 //                                     }(caller, entities)
+//									   if(entity.initCallback == undefined){
+//										  entity.initCallback = initCallback
+//									   }else{
+//										  entity.initCallback = function(entity, initCallback){
+//											 return function(entity){
+//												 entity.initCallback(entity);
+//												 initCallback(entity);
+//											 }
+//										  }(entity, initCallback)
+//									   }
 //                                     entity.init(value, lazy)
 //                                 } else {
-//                                     entity.initCallback = function (entity) {
+//                                     var initCallback = function (entity) {
 //                                         server.entityManager.setEntity(entity)
 //                                     }
+//									   if(entity.initCallback == undefined){
+//										  entity.initCallback = initCallback
+//									   }else{
+//										  entity.initCallback = function(entity, initCallback){
+//											 return function(entity){
+//												 entity.initCallback(entity);
+//												 initCallback(entity);
+//											 }
+//										  }(entity, initCallback)
+//									   }
 //                                     entity.init(value, lazy, function (values, caller, entities) {
 //                                         return function () {
 //                                             initEntitiesFct(values, caller, entities)
@@ -1851,7 +1912,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //                },
 //                function (result, caller) {
 //                    var entity = entities[result[0].UUID]
-//                    entity.initCallback = function (caller) {
+//                    var initCallback = function (caller) {
 //                        return function (entity) {
 //                          server.entityManager.setEntity(entity)
 //							if(caller.successCallback != undefined){
@@ -1860,11 +1921,21 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //							}
 //                        }
 //                    } (caller)
+//					  if(entity.initCallback == undefined){
+//					  		entity.initCallback = initCallback
+//					  }else{
+//						 	entity.initCallback = function(entity, initCallback){
+//								 return function(entity){
+//										entity.initCallback(entity);
+//										initCallback(entity);
+//									}
+//								}(entity, initCallback)
+//					  }
 //                    if (entity.IsInit == false) {
 //                        entity.init(result[0], lazy)
 //                    } else {
 //						if(caller.successCallback != undefined){
-//                            caller.successCallback(entity, caller.caller)
+//                          caller.successCallback(entity, caller.caller)
 //							caller.successCallback = undefined
 //						}
 //                    }
@@ -1971,7 +2042,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //                        return // break it here.
 //                    }
 //                    var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
-//                    entity.initCallback = function () {
+//                    var initCallback = function () {
 //                        return function (entity) {
 //							if(caller.successCallback != undefined){
 //                            	caller.successCallback(entity, caller.caller)
@@ -1979,6 +2050,16 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //							}
 //                        }
 //                    } (caller)
+//			  		  if(entity.initCallback == undefined){
+//				 		entity.initCallback = initCallback
+//			  		  }else{
+//				 		entity.initCallback = function(entity, initCallback, entityInitCallback){
+//							return function(entity){
+//								entityInitCallback(entity);
+//								initCallback(entity);
+//					  		}
+//				 	  	}(entity, initCallback, entity.initCallback)
+//			  		 }
 //                    entity.init(result[0], lazy)
 //                },
 //                function (errMsg, caller) {

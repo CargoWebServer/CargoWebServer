@@ -786,7 +786,14 @@ TableCell.prototype.setCellEditor = function (index) {
 
 	if (index == undefined) {
 		// Here the cell is editable so I will display the cell editor.
-		this.editor.edit(this.getValue(), this.getType());
+		this.editor.edit(this.getValue(), this.getType())/*, function(cell){
+		    return function(){
+		        console.log("---> value: ", cell.editor.getValue())
+		        console.log("---> values: ", cell.getValue())
+		        console.log(cell)
+		        //cell.setValue(cell.editor.getValue());
+		    }
+		}(this));*/
 
 		// Hide the cell renderer div...
 		if (this.valueDiv != undefined) {
@@ -1023,7 +1030,7 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 
 	// Set the on blur event.
 	if (this.editor != null) {
-		if (onblur != undefined) {
+		if (onblur != null) {
 			this.editor.element.onblur = onblur;
 		} else {
 			this.editor.element.onblur = this.onblur;
@@ -1260,14 +1267,16 @@ function createAppendRefBtn(parent, fieldName, fieldType, refOwner) {
 			var existing = refOwner[fieldName]
 			var lst = []
 			var uuidByIds = {}
-			for (var i = 0; i < ids.length; i++) {
-				var uuid = ids[i][0]
-				for (var j = 1; j < ids[i].length; j++) {
-					if (existing.indexOf(uuid) == -1) {
-						lst.push(ids[i][j]) // append only value that dosen't already exist.
-						uuidByIds[ids[i][j]] = uuid
-					}
-				}
+			if(existing != null){
+    			for (var i = 0; i < ids.length; i++) {
+    				var uuid = ids[i][0]
+    				for (var j = 1; j < ids[i].length; j++) {
+    					if (existing.indexOf(uuid) == -1) {
+    						lst.push(ids[i][j]) // append only value that dosen't already exist.
+    						uuidByIds[ids[i][j]] = uuid
+    					}
+    				}
+    			}
 			}
 
 			// true means no other value than auto complete can be set...
@@ -1910,11 +1919,13 @@ ColumnFilter.prototype.initFilterPanel = function () {
 				return function (ids) {
 					// So here I will create the list of values with checkbox...
 					// the first element is the uuid so i will not display it.
-					for (var i = 1; i < ids.length; i++) {
-						// I will append all the value independently...
-						if (ids[i] != null) {
-							columnFilter.appendFilter(ids[i].toString(), ids[0])
-						}
+					if(ids !== undefined){
+    					for (var i = 1; i < ids.length; i++) {
+    						// I will append all the value independently...
+    						if (ids[i] != null) {
+    							columnFilter.appendFilter(ids[i].toString(), ids[0])
+    						}
+    					}
 					}
 				}
 			}(this))

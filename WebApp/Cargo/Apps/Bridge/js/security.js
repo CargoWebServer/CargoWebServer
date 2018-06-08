@@ -139,7 +139,7 @@ var RoleManager = function (parent) {
     this.roles = {}
 
     // So here I will get the list of role from the server.
-    server.entityManager.getEntities("CargoEntities.Role", "CargoEntities", null, 0, -1, [], true, false,
+    server.entityManager.getEntities("CargoEntities.Role", "CargoEntities", null, 0, -1, [], false, false,
         // progressCallback
         function (index, total, caller) { },
         // successCallback
@@ -331,7 +331,7 @@ RoleManager.prototype.displayRole = function (role) {
     this.appendAccountBtn.element.onclick = function (roleManager, role) {
         return function () {
             // Here I will get the list of all account...
-            server.entityManager.getEntities("CargoEntities.Account", "CargoEntities", null, 0, -1, [], true, false,
+            server.entityManager.getEntities("CargoEntities.Account", "CargoEntities", null, 0, -1, [], false, false,
                 // Progress callback
                 function (index, total, caller) { },
                 // Success callback
@@ -352,6 +352,10 @@ RoleManager.prototype.displayRole = function (role) {
                         var account = results[i]
 
                         // Here I will remove account that already there...
+                        if(caller.role.M_accounts == undefined){
+                            caller.role.M_accounts = []
+                        }
+                        
                         if (!objectPropInArray(caller.role.M_accounts, "UUID", account.UUID)) {
                             var row = dialog.content.appendElement({ "tag": "div", "style": "display: table-row" }).down()
                             row.appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 4px;" }).down()
@@ -429,7 +433,7 @@ RoleManager.prototype.displayRole = function (role) {
 
     this.appendActionBtn.element.onclick = function (roleManager, role) {
         return function () {
-            server.entityManager.getEntities("CargoEntities.Action", "CargoEntities", null, 0, -1, [], true, false,
+            server.entityManager.getEntities("CargoEntities.Action", "CargoEntities", null, 0, -1, [], false, false,
                 // Progress callback
                 function (index, total, caller) { },
                 // Success callback
@@ -593,7 +597,7 @@ var PermissionManager = function (parent) {
             permissionManager.resultsDiv.removeAllChilds()
             permissionManager.resultsDiv.element.innerHTML = ""
 
-            server.entityManager.getEntities("CargoEntities.User", "CargoEntities", q, 0, -1, [], true, false,
+            server.entityManager.getEntities("CargoEntities.User", "CargoEntities", q, 0, -1, [], false, false,
                 // Progress...
                 function () {
 

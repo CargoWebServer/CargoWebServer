@@ -1265,6 +1265,10 @@ function contains(arr, obj) {
  * @returns {boolean} True if an object has a property with the same value.
  */
 function objectPropInArray(list, prop, val) {
+    if(list == undefined){
+        return false
+    }
+    
     if (list.length > 0) {
         for (var i = 0; i < list.length; i++) {
             if (list[i][prop] === val) {

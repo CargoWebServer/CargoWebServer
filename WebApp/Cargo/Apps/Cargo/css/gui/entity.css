@@ -115,8 +115,10 @@
 .field_panel{
 	/* margin: 2px; */
     display: grid;
+    padding: 2px;
+    
     /*Tow column*/
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 4fr;
     /** One row */
 	grid-template-rows: 1fr;
 	min-height: 1em;
