@@ -1,0 +1,92 @@
+/*------------------------------------------------*\
+  Swoop
+\*------------------------------------------------*/
+@-webkit-keyframes swoop {
+  0% {
+    box-shadow: inset 0 0 0 0 #67c1ea, inset 0 0 0 0 white;
+  }
+  50% {
+    box-shadow: inset 0 0 0 0 #67c1ea, inset 0 0 0 15px white;
+  }
+  100% {
+    box-shadow: inset 0 0 0 15px #67c1ea, inset 0 0 0 15px white;
+  }
+}
+@keyframes swoop {
+  0% {
+    box-shadow: inset 0 0 0 0 #67c1ea, inset 0 0 0 0 white;
+  }
+  50% {
+    box-shadow: inset 0 0 0 0 #67c1ea, inset 0 0 0 15px white;
+  }
+  100% {
+    box-shadow: inset 0 0 0 15px #67c1ea, inset 0 0 0 15px white;
+  }
+}
+.swoop {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  -webkit-animation: swoop 1s infinite;
+          animation: swoop 1s infinite;
+  animation-direction: reverse;
+  -webkit-animation-timing-function: cubic-bezier(0.71, 0.13, 1, 0.71);
+          animation-timing-function: cubic-bezier(0.71, 0.13, 1, 0.71);
+  background-color: #67c1ea;
+
+}
+
+.tabLink:hover{
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/** Hide edition button from the search view. **/
+.table_header_size_btn.set_visible{
+    display: none;
+}
+
+.row_button.delete_row_btn.set_visible{
+    visibility: hidden;
+}
+
+/** Do not display the append value button **/
+.append_row_btn.active {
+    display: none;
+}
+
+
+.querynav {
+    background-color: rgba(0,0,0,.55);
+    border-top-left-radius : .5rem;
+    border-top-right-radius : .5rem;
+    border-bottom-left-radius : 0;
+    border-bottom-right-radius : 0;
+}
+
+.bordered{
+    border-left : 1px solid white;
+}
+
+.toggleBtn{
+    border-top-left-radius : .5rem;
+    border-top-right-radius : 0;
+    border-bottom-left-radius : 0;
+    border-bottom-right-radius : 0;
+}
+
+.mobile-content{
+    background-color: white;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 400px;
+}
+
+.append_item_btn span:hover{
+    cursor: pointer;
+    color: steelblue;
+}
+
+.search_location_btn:hover{
+    color: white;
+}

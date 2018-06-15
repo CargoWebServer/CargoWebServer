@@ -307,7 +307,6 @@ QString ServiceContainer::Ping(){
 
 void  ServiceContainer::onSessionEnd(QString sessionId){
     QMutexLocker ml(&this->mutex);
-    delete this->engines[sessionId]; // Clear memory
     this->engines.remove(sessionId); // remove from the map.
     if(this->engines.count() == 0){
         // I will close the service.

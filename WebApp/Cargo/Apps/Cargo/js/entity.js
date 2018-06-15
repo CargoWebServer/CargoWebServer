@@ -346,7 +346,6 @@ function setRef(owner, property, refValue, isArray) {
         return owner
     }
 
-
     if (isArray) {
         var index = owner[property].length
         if (owner[property].indexOf(refValue) == -1) {
@@ -475,6 +474,7 @@ function setRef(owner, property, refValue, isArray) {
  * @param {bool} callback Use by external function to initalyse collection in correct oreder.
  */
 function setObjectValues(object, values, lazy, callback) {
+
     // Get the entity prototype.
     var prototype = getEntityPrototype(object["TYPENAME"])
     if (prototype == undefined) {
@@ -727,7 +727,7 @@ function setObjectValues(object, values, lazy, callback) {
         }
         // No subitem to initialyse but a callback...
         if (callback != undefined) {
-            callback()
+            callback(object)
         }
     } else if (subObjects.length > 0) {
         if (lazy) {

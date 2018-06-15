@@ -79,7 +79,7 @@ function entityTests() {
         return function () {
             AllEntityTestsReturnedResult_Test()
         }
-    } (), 3000);
+    }(), 3000);
 }
 
 //EntityManager.prototype.getEntities = function (typeName, storeId, queryStr, lazy, level, progressCallback, successCallback, errorCallback, caller)
@@ -98,7 +98,7 @@ function getEntities_Test() {
                         assert.ok(result[0].TYPENAME == "CargoEntities.Log");
                         testsReturnedResultMap["getEntities_Test"] = getEntities_Test
                     }
-                } (result))
+                }(result))
         },
         function () {
 
@@ -122,7 +122,7 @@ function getEntities_typeNameError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntities_typeNameError_Test"] = getEntities_typeNameError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -143,7 +143,7 @@ function getEntities_typeNameError_2_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntities_typeNameError_2_Test"] = getEntities_typeNameError_2_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -165,7 +165,7 @@ function getEntities_storeIdError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntities_storeIdError_Test"] = getEntities_storeIdError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -192,7 +192,7 @@ function getEntities_queryStrError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntities_queryStrError_Test"] = getEntities_queryStrError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -217,7 +217,7 @@ function getEntityByUuid_Test() {
                                 assert.ok(result.M_id == "CARGO_ENTITIES");
                                 testsReturnedResultMap["getEntityByUuid_Test"] = getEntityByUuid_Test
                             }
-                        } (result))
+                        }(result))
                 },
                 function () {
 
@@ -247,7 +247,7 @@ function getEntityByUuid_UuidError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityByUuid_UuidError_Test"] = getEntityByUuid_UuidError_Test
                     }
-                } (result))
+                }(result))
 
         },
         undefined)
@@ -270,7 +270,7 @@ function getEntityById_Test() {
                         assert.ok(result.M_id == "CARGO_ENTITIES");
                         testsReturnedResultMap["getEntityById_Test"] = getEntityById_Test
                     }
-                } (result))
+                }(result))
         }, function () {
 
         },
@@ -294,7 +294,7 @@ function getEntityById_typeNameError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityById_typeNameError_Test"] = getEntityById_typeNameError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined,
         undefined)
@@ -316,7 +316,7 @@ function getEntityById_idError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityById_idError_Test"] = getEntityById_idError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined,
         undefined)
@@ -346,7 +346,7 @@ function createEntity_Test() {
                                 assert.ok(result.M_id == "createEntity_Test");
                                 testsReturnedResultMap["createEntity_Test"] = createEntity_Test
                             }
-                        } (result))
+                        }(result))
                 },
                 function () {
 
@@ -377,7 +377,7 @@ function createEntity_parentUuidError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["createEntity_parentUuidError_Test"] = createEntity_parentUuidError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -400,7 +400,7 @@ function createEntity_parentUuidError_2_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["createEntity_parentUuidError_2_Test"] = createEntity_parentUuidError_2_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -429,7 +429,7 @@ function createEntity_attributeNameError_Test() {
                                 assert.ok(result.message != undefined, result.message);
                                 testsReturnedResultMap["createEntity_attributeNameError_Test"] = createEntity_attributeNameError_Test
                             }
-                        } (result))
+                        }(result))
 
                 },
                 undefined)
@@ -464,7 +464,7 @@ function createEntity_typeNameError_Test() {
                                 assert.ok(result.message != undefined, result.message);
                                 testsReturnedResultMap["createEntity_typeNameError_Test"] = createEntity_typeNameError_Test
                             }
-                        } (result))
+                        }(result))
 
                 },
                 undefined)
@@ -499,7 +499,7 @@ function createEntity_typeNameError_2_Test() {
                                 assert.ok(result.message != undefined, result.message);
                                 testsReturnedResultMap["createEntity_typeNameError_2_Test"] = createEntity_typeNameError_2_Test
                             }
-                        } (result))
+                        }(result))
 
                 },
                 undefined)
@@ -537,7 +537,7 @@ function removeEntity_Test() {
                                         assert.ok(result == true);
                                         testsReturnedResultMap["removeEntity_Test"] = removeEntity_Test
                                     }
-                                } (result))
+                                }(result))
                         },
                         function () {
 
@@ -582,7 +582,7 @@ function removeEntity_uuidError_Test() {
                                         assert.ok(result.message != undefined, result.message);
                                         testsReturnedResultMap["removeEntity_uuidError_Test"] = removeEntity_uuidError_Test
                                     }
-                                } (result))
+                                }(result))
                         },
                         undefined)
                 },
@@ -623,7 +623,7 @@ function saveEntity_Test() {
                                         assert.ok(result.M_id == "saveEntity_Test");
                                         testsReturnedResultMap["saveEntity_Test"] = saveEntity_Test
                                     }
-                                } (result))
+                                }(result))
                         },
                         function () {
 
@@ -654,7 +654,7 @@ function saveEntity_2_Test() {
                         assert.ok(result.TYPENAME == "CargoEntities.Role");
                         testsReturnedResultMap["saveEntity_2_Test"] = saveEntity_2_Test
                     }
-                } (result))
+                }(result))
         },
         function () {
 
@@ -721,7 +721,7 @@ function createEntityPrototype_Test_Part_2() {
                                 assert.ok(result.TypeName == "createEntityPrototype_Test.Item");
                                 testsReturnedResultMap["createEntityPrototype_Test"] = createEntityPrototype_Test
                             }
-                        } (result))
+                        }(result))
                 },
                 function () {
 
@@ -774,7 +774,7 @@ function createEntityPrototype_storeIdError_Test() {
                                 assert.ok(result.message != undefined);
                                 testsReturnedResultMap["createEntityPrototype_storeIdError_Test"] = createEntityPrototype_storeIdError_Test
                             }
-                        } (result))
+                        }(result))
 
                 },
                 undefined)
@@ -805,7 +805,7 @@ function createEntityPrototype_prototypeError_Test() {
                         assert.ok(result.message != undefined);
                         testsReturnedResultMap["createEntityPrototype_prototypeError_Test"] = createEntityPrototype_prototypeError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -824,7 +824,7 @@ function getEntityPrototype_Test() {
                         assert.ok(result.TypeName == "CargoEntities.Log");
                         testsReturnedResultMap["getEntityPrototype_Test"] = getEntityPrototype_Test
                     }
-                } (result))
+                }(result))
         },
         function () {
 
@@ -848,7 +848,7 @@ function getEntityPrototype_typeNameError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityPrototype_typeNameError_Test"] = getEntityPrototype_typeNameError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -869,7 +869,7 @@ function getEntityPrototype_storeIdError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityPrototype_storeIdError_Test"] = getEntityPrototype_storeIdError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -893,7 +893,7 @@ function getDerivedEntityPrototypes_Test() {
                         assert.ok(ok);
                         testsReturnedResultMap["getDerivedEntityPrototypes_Test"] = getDerivedEntityPrototypes_Test
                     }
-                } (result))
+                }(result))
         },
         function () {
 
@@ -916,7 +916,7 @@ function getDerivedEntityPrototypes_typeNameError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getDerivedEntityPrototypes_typeNameError_Test"] = getDerivedEntityPrototypes_typeNameError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
@@ -934,7 +934,7 @@ function getEntityPrototype_Test() {
                         assert.ok(result.length > 0);
                         testsReturnedResultMap["getEntityPrototype_Test"] = getEntityPrototype_Test
                     }
-                } (result))
+                }(result))
         },
         function () {
 
@@ -957,8 +957,22 @@ function getEntityPrototype_storeIdError_Test() {
                         assert.ok(result.message != undefined, result.message);
                         testsReturnedResultMap["getEntityPrototype_storeIdError_Test"] = getEntityPrototype_storeIdError_Test
                     }
-                } (result))
+                }(result))
         },
         undefined)
 }
 
+/*
+if (entity.initCallbacks == undefined) {
+    entity.initCallbacks = []
+} 
+entity.initCallbacks.push(initCallback)
+entity.initCallback = function(entity){
+    return function(){
+        while(entity.initCallbacks.length > 0){
+            var initCallback = initCallbacks.pop();
+            initCallback(entity);
+        }
+    }
+}(entity)
+*/

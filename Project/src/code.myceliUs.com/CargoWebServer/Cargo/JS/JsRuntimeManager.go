@@ -60,6 +60,7 @@ type JsVarInfos struct {
  * Wrap operation information...
  */
 type OperationInfos struct {
+	m_name    string
 	m_params  map[string]interface{}
 	m_returns chan ([]interface{})
 }
@@ -126,9 +127,16 @@ type JsRuntimeManager struct {
 	m_createVm OperationChannel
 	m_closeVm  OperationChannel
 
+	// Use that channel to execute various vm operation instead of
+	// accessing sessions channels maps (m_setVariable, m_getVariable...)
+	// directly.
+	m_execVmOperation OperationChannel
+
 	// JS channel
-	m_setFunction       chan (FunctionInfos)
-	m_getSession        chan (SessionInfos)
+	m_setFunction chan (FunctionInfos)
+	m_getSession  chan (SessionInfos)
+
+	// Map of channel by session.
 	m_setVariable       map[string]OperationChannel
 	m_getVariable       map[string]OperationChannel
 	m_executeJsFunction map[string]OperationChannel
@@ -159,10 +167,13 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_appendScript = make(OperationChannel)
 	jsRuntimeManager.m_closeVm = make(OperationChannel)
 	jsRuntimeManager.m_createVm = make(OperationChannel)
+	jsRuntimeManager.m_execVmOperation = make(OperationChannel)
 
 	// Create one channel by vm to set variable.
 	jsRuntimeManager.m_setFunction = make(chan (FunctionInfos))
 	jsRuntimeManager.m_getSession = make(chan (SessionInfos))
+
+	// Create sessions channel container.
 	jsRuntimeManager.m_setVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_getVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_executeJsFunction = make(map[string]OperationChannel)
@@ -366,6 +377,17 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				}
 
 				callback <- []interface{}{true} // unblock the channel...
+			case operationInfos := <-jsRuntimeManager.m_execVmOperation:
+				// Here I will execute various session action.
+				if operationInfos.m_name == "GetVar" {
+					jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "SetVar" {
+					jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "ExecuteJsFunction" {
+					jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "RunScript" {
+					jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				}
 
 			case operationInfos := <-jsRuntimeManager.m_createVm:
 				callback := operationInfos.m_returns
@@ -943,11 +965,15 @@ func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) 
 func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
 	// Protectect the map access...
 	var op OperationInfos
+	op.m_name = "RunScript"
 	op.m_params = make(map[string]interface{})
 	op.m_params["script"] = script
+	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
-	this.m_runScript[sessionId] <- op
+
+	this.m_execVmOperation <- op
+
 	// wait for completion
 	results := <-op.m_returns
 	var value otto.Value
@@ -970,7 +996,6 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
  * Append a script to all VM's
  */
 func (this *JsRuntimeManager) AppendScript(path string, script string, run bool) {
-
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["path"] = path
@@ -1008,11 +1033,14 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	jsFunctionInfos.m_functionParams = functionParams
 
 	var op OperationInfos
+	op.m_name = "ExecuteJsFunction"
 	op.m_params = make(map[string]interface{})
 	op.m_params["jsFunctionInfos"] = jsFunctionInfos
+	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
-	this.m_executeJsFunction[sessionId] <- op
+	this.m_execVmOperation <- op
+
 	// wait for completion
 	results := <-op.m_returns
 	return results[0].(JsFunctionInfos).m_results, results[0].(JsFunctionInfos).m_err
@@ -1032,14 +1060,15 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
 	info.m_val = val
 
 	var op OperationInfos
+	op.m_name = "SetVar"
 	op.m_params = make(map[string]interface{})
 	op.m_params["varInfos"] = info
+	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
-	this.m_setVariable[sessionId] <- op
+	this.m_execVmOperation <- op
 	// wait for completion
 	<-op.m_returns
-
 }
 
 /**
@@ -1047,7 +1076,7 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
  */
 func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} {
 	// Nothing to do with a close channel
-	if this.m_setVariable[sessionId] == nil {
+	if this.m_getVariable[sessionId] == nil {
 		return nil
 	}
 
@@ -1056,11 +1085,13 @@ func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} 
 	info.m_name = name
 
 	var op OperationInfos
+	op.m_name = "GetVar"
 	op.m_params = make(map[string]interface{})
 	op.m_params["varInfos"] = info
+	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
-	this.m_setVariable[sessionId] <- op
+	this.m_execVmOperation <- op
 
 	// wait for completion
 	results := <-op.m_returns

@@ -163,14 +163,16 @@ SessionPanel.prototype.setAccountInfo = function (accountInfo) {
 	// Now the other session from the same user...
 	if (this.accountInfo.M_sessions != undefined) {
 		for (var i = 0; i < this.accountInfo.M_sessions.length; i++) {
-			if (this.accountInfo.M_sessions[i].UUID != this.sessionInfo.UUID) {
-				var session = this.accountInfo.M_sessions[i]
-				var sessionInfoPanel = new SessionInfoPanel(this.otherSessionPanel, session, accountInfo, false, true)
-				// I will keep the reference to the panel...
-				this.otherSessionPanels[session.UUID] = sessionInfoPanel
-				this.otherSessionPanel.element.style.display = "inline-block"
-				this.otherSessionPanel.element.style.width = "100%"
-			}
+		    if(this.accountInfo.M_sessions[i] != undefined){
+    			if (this.accountInfo.M_sessions[i].UUID != this.sessionInfo.UUID) {
+    				var session = this.accountInfo.M_sessions[i]
+    				var sessionInfoPanel = new SessionInfoPanel(this.otherSessionPanel, session, accountInfo, false, true)
+    				// I will keep the reference to the panel...
+    				this.otherSessionPanels[session.UUID] = sessionInfoPanel
+    				this.otherSessionPanel.element.style.display = "inline-block"
+    				this.otherSessionPanel.element.style.width = "100%"
+    			}
+		    }
 		}
 	}
 

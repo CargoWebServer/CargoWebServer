@@ -439,6 +439,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		messageId := msg.GetId()
 		index := int(msg.GetIndex())
 		chunk := this.getChunkMessagesById(messageId)
+		log.Println("---> Transfert message: ", messageId, ":", index, "/", total)
 		if chunk != nil {
 			// So here it's not the first message receive for the file.
 			chunk[index] = msg.GetData()
@@ -446,11 +447,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 				// In that case it's the last message.
 				data := make([]byte, 0) // create the buffer that will contain the data.
 				for i := 0; i < total; i++ {
-					// Here I will try to decode the string if it'encoded.
-					val_, err := b64.StdEncoding.DecodeString(string(chunk[i]))
-					if err == nil {
-						chunk[i] = val_
-					}
 					data = append(data, chunk[i]...)
 				}
 

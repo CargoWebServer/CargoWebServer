@@ -99,7 +99,6 @@ function load() {
                                             // Get the active configuration.
                                             server.activeConfigurations = activeConfigurations
                                             if (main != null) {
-                                                // Here I will connect a listener to keep entities up to date.
                                                 main()
                                             }
                                         },

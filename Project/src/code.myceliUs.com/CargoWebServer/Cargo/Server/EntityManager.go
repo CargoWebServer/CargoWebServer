@@ -201,7 +201,9 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(q, []interface{}{}, []interface{}{})
-
+	if typeName == "CatalogSchema.OrderType" {
+		log.Println("---> results: ", results)
+	}
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 		return nil, errObj
@@ -209,9 +211,13 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 
 	entities := make([]Entity, 0)
 	for i := 0; i < len(results); i++ {
-		entity, err := this.getEntityByUuid(results[i][0].(string))
-		if err == nil {
-			entities = append(entities, entity)
+		if results[i][0] != nil {
+			if reflect.TypeOf(results[i][0]).Kind() == reflect.String {
+				entity, err := this.getEntityByUuid(results[i][0].(string))
+				if err == nil {
+					entities = append(entities, entity)
+				}
+			}
 		}
 	}
 
@@ -452,7 +458,7 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 	}
 
 	// I will also append the parent relationship...
-	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
+	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), true}
 	*triples = append(*triples, parentLnkTriple)
 
 	return nil
@@ -627,7 +633,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 				triples = append(triples[0:j], triples[j+1:]...)
 				j--
 				i--
-
 				break
 			}
 		}
@@ -637,7 +642,16 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	if len(existingTriples) > 0 {
 		toDelete := make([]interface{}, 0)
 		for i := 0; i < len(existingTriples); i++ {
-			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2], false})
+			isIndex := false
+			if len(strings.Split(existingTriples[i][1].(string), ":")) == 3 {
+				field := strings.Split(existingTriples[i][1].(string), ":")[2]
+				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
+					isIndex = true
+				}
+			} else if existingTriples[i][1].(string) == "TYPENAME" {
+				isIndex = true
+			}
+			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2], isIndex})
 		}
 		err = store.Delete("", toDelete)
 		if err != nil {
@@ -669,103 +683,78 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 }
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
-	uuid := entity.GetUuid()
-	typeName := entity.GetTypeName()
-
-	// First i will remove the entity childs...
-	childs := entity.GetChilds()
-	for i := 0; i < len(childs); i++ {
-		errObj := this.deleteEntity(childs[i].(Entity))
-		if errObj != nil {
-			return errObj
-		}
-	}
-
-	// remove the actual parent information from the cache.
-	if len(entity.GetParentUuid()) > 0 {
-		infos := make(map[string]interface{})
-		infos["name"] = "remove"
-		infos["uuid"] = entity.GetParentUuid()
-		this.m_cache.m_operations <- infos
-	}
-
-	var values map[string]interface{}
-	var err error
-
-	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getValues()
-		log.Println("---> delete entity event: ", values)
-	} else {
-		values, err = Utility.ToMap(entity)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-			return cargoError
-		}
-	}
-
-	triples := make([]interface{}, 0)
-	err = ToTriples(values, &triples)
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-		return cargoError
-	}
 
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
+	uuids := make([]string, 0)
+	uuids = append(uuids, entity.GetUuid())
+
 	// Now I will clear other references...
-	query := "(?,?, " + entity.GetUuid() + ")"
+	var triples []interface{}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entity.GetTypeName(), storeId)
 
 	// Now entity are quadify I will save it in the graph store.
-	references, err_ := store.Read(query, []interface{}{}, []interface{}{})
-
+	values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
 	if err_ == nil {
-
-		for i := 0; i < len(references); i++ {
-			// Remove the reference from the entity loaded in the cache.
-
-			infos := make(map[string]interface{})
-			infos["name"] = "remove"
-			infos["uuid"] = references[i][0].(string)
-
-			// set the entity
-			this.m_cache.m_operations <- infos
-			ref := this.getEntity(references[i][0].(string))
-
-			if ref != nil {
-				// Update the reference here.
-				// TODO Send only the change...
-				var eventDatas []*MessageData
-				evtData := new(MessageData)
-				evtData.TYPENAME = "Server.MessageData"
-				evtData.Name = "entity"
-				if reflect.TypeOf(ref).String() == "*Server.DynamicEntity" {
-					evtData.Value = ref.(*DynamicEntity).getValues()
-				} else {
-					evtData.Value = ref
+		for i := 0; i < len(values); i++ {
+			isIndex := false
+			if len(strings.Split(values[i][1].(string), ":")) == 3 {
+				field := strings.Split(values[i][1].(string), ":")[2]
+				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
+					isIndex = true
 				}
-				eventDatas = append(eventDatas, evtData)
-				evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventDatas)
-				GetServer().GetEventManager().BroadcastEvent(evt)
+			} else if values[i][1].(string) == "TYPENAME" {
+				isIndex = true
 			}
 
-			// Remove obsolete triples...
-			triples = append(triples, Triple{references[i][0].(string), references[i][1].(string), references[i][2], false})
+			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2], isIndex})
+			if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
+				if !Utility.Contains(uuids, values[i][0].(string)) {
+					uuids = append(uuids, values[i][0].(string))
+				}
+			}
 		}
 	}
 
-	err = store.Delete("", triples)
+	values, err_ = store.Read("("+entity.GetUuid()+",?,?)", []interface{}{}, []interface{}{})
+	if err_ == nil {
+		for i := 0; i < len(values); i++ {
+			isIndex := false
+			if len(strings.Split(values[i][1].(string), ":")) == 3 {
+				field := strings.Split(values[i][1].(string), ":")[2]
+				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
+					isIndex = true
+				}
+			} else if values[i][1].(string) == "TYPENAME" {
+				isIndex = true
+			}
+
+			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2], isIndex})
+			if reflect.TypeOf(values[i][2]).Kind() == reflect.String {
+				if Utility.IsValidEntityReferenceName(values[i][2].(string)) {
+					if !Utility.Contains(uuids, values[i][2].(string)) {
+						uuids = append(uuids, values[i][2].(string))
+					}
+				}
+			}
+		}
+	}
+
+	err := store.Delete("", triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
 	}
 
-	// Delete the entity from the cache.
-	infos := make(map[string]interface{})
-	infos["name"] = "remove"
-	infos["uuid"] = uuid
-	// set the entity
-	this.m_cache.m_operations <- infos
+	// Now I will remove the values from the cache.
+	for i := 0; i < len(uuids); i++ {
+		infos := make(map[string]interface{})
+		infos["name"] = "remove"
+		infos["uuid"] = uuids[i]
+		// set the entity
+		this.m_cache.m_operations <- infos
+	}
 
 	// Send event message...
 	var eventDatas []*MessageData
@@ -773,7 +762,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "entity"
 	// I will send only necessary entity properties.
-	evtData.Value = map[string]interface{}{"UUID": uuid, "TYPENAME": typeName}
+	evtData.Value = map[string]interface{}{"UUID": entity.GetUuid(), "TYPENAME": entity.GetTypeName()}
 
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
@@ -799,7 +788,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.createEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
+// EntityManager.prototype.createEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
 //	var params = []
 //	params.push(createRpcData(storeId, "STRING", "storeId"))
 //	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
@@ -876,7 +865,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.saveEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
+// EntityManager.prototype.saveEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
 //	var params = []
 //	params.push(createRpcData(storeId, "STRING", "storeId"))
 //	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
@@ -999,7 +988,7 @@ func (this *EntityManager) DeleteEntityPrototype(typeName string, storeId string
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.renameEntityPrototype = function(typeName, prototype, storeId, successCallback, errorCallback, caller){
+// EntityManager.prototype.renameEntityPrototype = function(typeName, prototype, storeId, successCallback, errorCallback, caller){
 //	var params = []
 //	params.push(createRpcData(typeName, "STRING", "typeName"))
 //	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
@@ -1167,7 +1156,7 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback, errorCallback, caller) {
+// EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback, errorCallback, caller) {
 //    // server is the client side singleton.
 //    var params = []
 //    params.push(createRpcData(storeId, "STRING", "storeId"))
@@ -1240,7 +1229,7 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityPrototype = function (typeName, storeId, successCallback, errorCallback, caller) {
+// EntityManager.prototype.getEntityPrototype = function (typeName, storeId, successCallback, errorCallback, caller) {
 //    // Retrun entity prototype that aleady exist.
 //    if (entityPrototypes[typeName] != undefined) {
 //        successCallback(entityPrototypes[typeName], caller)
@@ -1296,66 +1285,69 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 // @param {interface{}} values The entity to set.
 // @scope {public}
 // @src
-//EntityManager.prototype.onEvent = function (evt) {
-//    // Set the internal object.
-//    if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
-//        if (entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
-//            return
-//        }
-//        if (entities[evt.dataMap["entity"].UUID] == undefined) {
-//            var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
-//            var initCallback = function (self, evt, entity) {
-//                return function (entity) {
-//                    server.entityManager.setEntity(entity)
-//                    EventHub.prototype.onEvent.call(self, evt)
-//                }
-//            } (this, evt, entity)
-//			  if(entity.initCallback == undefined){
-//				 entity.initCallback = initCallback
-//			  }else{
-//				 entity.initCallback = function(entity, initCallback){
-//					return function(entity){
-//						entity.initCallback(entity);
-//						initCallback(entity);
-//					}
-//				 }(entity, initCallback)
-//			  }
-//
-//            entity.init(evt.dataMap["entity"], false)
-//        } else {
-//            // update the object values.
-//            // but before I call the event I will be sure the entity have
-//            var entity = entities[evt.dataMap["entity"].UUID]
-//            var initCallback = function (self, evt, entity) {
-//                return function (entity) {
-//                    // Test if the object has change here befor calling it.
-//                    server.entityManager.setEntity(entity)
-//                    if (evt.done == undefined) {
-//                        EventHub.prototype.onEvent.call(self, evt)
-//                    }
-//                    evt.done = true // Cut the cyclic recursion.
-//                }
-//            } (this, evt, entity)
-//			  if(entity.initCallback == undefined){
-//				 entity.initCallback = initCallback
-//			  }else{
-//				 entity.initCallback = function(entity, initCallback){
-//					return function(entity){
-//						entity.initCallback(entity);
-//						initCallback(entity);
-//					}
-//				 }(entity, initCallback)
-//			  }
-//            setObjectValues(entity, evt.dataMap["entity"])
-//        }
-//    } else if (evt.code == DeleteEntityEvent) {
-//        var entity = entities[evt.dataMap["entity"].UUID]
-//        if (entity != undefined) {
-//            this.resetEntity(entity)
-//            EventHub.prototype.onEvent.call(this, evt)
-//        }
-//    }
-//}
+// EntityManager.prototype.onEvent = function (evt) {
+//     // Set the internal object.
+//     if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
+//         if (entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
+//             return
+//         }
+//         if (entities[evt.dataMap["entity"].UUID] == undefined) {
+//             var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
+//             var initCallback = function (self, evt, entity) {
+//                 return function (entity) {
+//                     server.entityManager.setEntity(entity)
+//                     EventHub.prototype.onEvent.call(self, evt)
+//                 }
+//             }(this, evt, entity)
+//             if (entity.initCallbacks == undefined) {
+//                 entity.initCallbacks = []
+//             }
+//             entity.initCallbacks.push(initCallback)
+//             entity.initCallback = function(entity){
+//                 return function(){
+//                     while(entity.initCallbacks.length > 0){
+//                         var initCallback = entity.initCallbacks.pop();
+//                         initCallback(entity);
+//                     }
+//                 }
+//             }(entity)
+//             entity.init(evt.dataMap["entity"], false)
+//         } else {
+//             // update the object values.
+//             // but before I call the event I will be sure the entity have
+//             var entity = entities[evt.dataMap["entity"].UUID]
+//             var initCallback = function (self, evt, entity) {
+//                 return function (entity) {
+//                     // Test if the object has change here befor calling it.
+//                     server.entityManager.setEntity(entity)
+//                     if (evt.done == undefined) {
+//                         EventHub.prototype.onEvent.call(self, evt)
+//                     }
+//                     evt.done = true // Cut the cyclic recursion.
+//                 }
+//             }(this, evt, entity)
+//             if (entity.initCallbacks == undefined) {
+//                 entity.initCallbacks = []
+//             }
+//             entity.initCallbacks.push(initCallback)
+//             entity.initCallback = function(entity){
+//                 return function(){
+//                     while(entity.initCallbacks.length > 0){
+//                         var initCallback = entity.initCallbacks.pop();
+//                         initCallback(entity);
+//                     }
+//                 }
+//             }(entity)
+//             setObjectValues(entity, evt.dataMap["entity"])
+//         }
+//     } else if (evt.code == DeleteEntityEvent) {
+//         var entity = entities[evt.dataMap["entity"].UUID]
+//         if (entity != undefined) {
+//             this.resetEntity(entity)
+//             EventHub.prototype.onEvent.call(this, evt)
+//         }
+//     }
+// }
 func (this *EntityManager) OnEvent(evt interface{}) {
 	/** empty function here... **/
 }
@@ -1365,7 +1357,12 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 // @param {interface{}} values The entity to set.
 // @scope {public}
 // @src
-//EntityManager.prototype.setEntity = function (entity) {
+// EntityManager.prototype.setEntity = function (entity) {
+//    if(entity.UUID.length == 0){
+//		 console.log("entity has no UUID!", entity);
+//		 return;
+//	  }
+//	  entities[entity.UUID] = entity
 //    this.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
 //        function (prototype, caller) {
 //            var id_ = entity.TYPENAME + ":"
@@ -1408,7 +1405,7 @@ func (this *EntityManager) SetEntity(values interface{}) {
 // @param {interface{}} values The entity to set.
 // @scope {public}
 // @src
-//EntityManager.prototype.resetEntity = function (entity) {
+// EntityManager.prototype.resetEntity = function (entity) {
 //    var prototype = entityPrototypes[entity.TYPENAME]
 //    delete entities[entity.UUID]
 //    var id = entity.TYPENAME + ":"
@@ -1438,51 +1435,53 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.createEntity = function (parentUuid, attributeName, entity, successCallback, errorCallback, caller) {
-//    // server is the client side singleton.
-//    var params = []
-//    params.push(createRpcData(parentUuid, "STRING", "parentUuid"))
-//    params.push(createRpcData(attributeName, "STRING", "attributeName"))
-//    params.push(createRpcData(entity, "JSON_STR", "entity"))
-//    // Call it on the server.
-//    server.executeJsFunction(
-//        "EntityManagerCreateEntity", // The function to execute remotely on server
-//        params, // The parameters to pass to that function
-//        function (index, total, caller) { // The progress callback
-//            // Nothing special to do here.
-//        },
-//        function (result, caller) {
-//            var entity = eval("new " + result[0].TYPENAME + "()")
-//            var initCallback = function () {
-//                return function (entity) {
-//                    if (caller.successCallback != undefined) {
-//                        caller.successCallback(entity, caller.caller)
-//                        caller.successCallback = undefined
-//                    }
-//                }
-//            } (caller)
-//			  if(entity.initCallback == undefined){
-//				 entity.initCallback = initCallback
-//			  }else{
-//				 entity.initCallback = function(entity, initCallback){
-//					return function(entity){
-//						entity.initCallback(entity);
-//						initCallback(entity);
-//					}
-//				 }(entity, initCallback)
-//			  }
-//            entity.init(result[0], false)
-//        },
-//        function (errMsg, caller) {
-//          server.errorManager.onError(errMsg)
-//         	if( caller.errorCallback != undefined){
-//          	caller.errorCallback(errMsg, caller.caller)
-//				caller.errorCallback = undefined
-//			}
-//        }, // Error callback
-//        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-//    )
-//}
+// EntityManager.prototype.createEntity = function (parentUuid, attributeName, entity, successCallback, errorCallback, caller) {
+//     // server is the client side singleton.
+//     var params = []
+//     params.push(createRpcData(parentUuid, "STRING", "parentUuid"))
+//     params.push(createRpcData(attributeName, "STRING", "attributeName"))
+//     params.push(createRpcData(entity, "JSON_STR", "entity"))
+//     // Call it on the server.
+//     server.executeJsFunction(
+//         "EntityManagerCreateEntity", // The function to execute remotely on server
+//         params, // The parameters to pass to that function
+//         function (index, total, caller) { // The progress callback
+//             // Nothing special to do here.
+//         },
+//         function (result, caller) {
+//             var entity = eval("new " + result[0].TYPENAME + "()")
+//             var initCallback = function () {
+//                 return function (entity) {
+//                     if (caller.successCallback != undefined) {
+//                         caller.successCallback(entity, caller.caller)
+//                         caller.successCallback = undefined
+//                     }
+//                 }
+//             }(caller)
+//             if (entity.initCallbacks == undefined) {
+//                 entity.initCallbacks = []
+//             }
+//             entity.initCallbacks.push(initCallback)
+//             entity.initCallback = function (entity) {
+//                 return function () {
+//                     while (entity.initCallbacks.length > 0) {
+//                         var initCallback = entity.initCallbacks.pop();
+//                         initCallback(entity);
+//                     }
+//                 }
+//             }(entity)
+//             entity.init(result[0], false)
+//         },
+//         function (errMsg, caller) {
+//             server.errorManager.onError(errMsg)
+//             if (caller.errorCallback != undefined) {
+//                 caller.errorCallback(errMsg, caller.caller)
+//                 caller.errorCallback = undefined
+//             }
+//         }, // Error callback
+//         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+//     )
+// }
 func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, values interface{}, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1538,51 +1537,53 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
-//    // server is the client side singleton.
-//    var params = []
-//    params.push(createRpcData(entity, "JSON_STR", "entity"))
-//    // Call it on the server.
-//    server.executeJsFunction(
-//        "EntityManagerSaveEntity", // The function to execute remotely on server
-//        params, // The parameters to pass to that function
-//        function (index, total, caller) { // The progress callback
-//            // Nothing special to do here.
-//        },
-//        function (result, caller) {
-//            var entity = eval("new " + result[0].TYPENAME + "()")
-//            var initCallback = function () {
-//                return function (entity) {
-//                    // Set the new entity values...
-//                    server.entityManager.setEntity(entity)
-//                    if (caller.successCallback != undefined) {
-//                        caller.successCallback(entity, caller.caller)
-//                        caller.successCallback = undefined
-//                    }
-//                }
-//            } (caller)
-//			  if(entity.initCallback == undefined){
-//				 entity.initCallback = initCallback
-//			  }else{
-//				 entity.initCallback = function(entity, initCallback){
-//					return function(entity){
-//						entity.initCallback(entity);
-//						initCallback(entity);
-//					}
-//				 }(entity, initCallback)
-//			  }
-//            entity.init(result[0], false)
-//        },
-//        function (errMsg, caller) {
-//          server.errorManager.onError(errMsg)
-//         	if( caller.errorCallback != undefined){
-//          	caller.errorCallback(errMsg, caller.caller)
-//				caller.errorCallback = undefined
-//			}
-//        }, // Error callback
-//        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-//    )
-//}
+// EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
+//     // server is the client side singleton.
+//     var params = []
+//     params.push(createRpcData(entity, "JSON_STR", "entity"))
+//     // Call it on the server.
+//     server.executeJsFunction(
+//         "EntityManagerSaveEntity", // The function to execute remotely on server
+//         params, // The parameters to pass to that function
+//         function (index, total, caller) { // The progress callback
+//             // Nothing special to do here.
+//         },
+//         function (result, caller) {
+//             var entity = eval("new " + result[0].TYPENAME + "()")
+//             var initCallback = function () {
+//                 return function (entity) {
+//                     // Set the new entity values...
+//                     server.entityManager.setEntity(entity)
+//                     if (caller.successCallback != undefined) {
+//                         caller.successCallback(entity, caller.caller)
+//                         caller.successCallback = undefined
+//                     }
+//                 }
+//             }(caller)
+//             if (entity.initCallbacks == undefined) {
+//                 entity.initCallbacks = []
+//             }
+//             entity.initCallbacks.push(initCallback)
+//             entity.initCallback = function (entity) {
+//                 return function () {
+//                     while (entity.initCallbacks.length > 0) {
+//                         var initCallback = entity.initCallbacks.pop();
+//                         initCallback(entity);
+//                     }
+//                 }
+//             }(entity)
+//             entity.init(result[0], false)
+//         },
+//         function (errMsg, caller) {
+//             server.errorManager.onError(errMsg)
+//             if (caller.errorCallback != undefined) {
+//                 caller.errorCallback(errMsg, caller.caller)
+//                 caller.errorCallback = undefined
+//             }
+//         }, // Error callback
+//         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+//     )
+// }
 func (this *EntityManager) SaveEntity(values interface{}, messageId string, sessionId string) interface{} {
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -1741,31 +1742,35 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                                             }
 //                                         }
 //                                     }(caller, entities)
-//									   if(entity.initCallback == undefined){
-//										  entity.initCallback = initCallback
-//									   }else{
-//										  entity.initCallback = function(entity, initCallback){
-//											 return function(entity){
-//												 entity.initCallback(entity);
-//												 initCallback(entity);
-//											 }
-//										  }(entity, initCallback)
-//									   }
+//                                     if (entity.initCallbacks == undefined) {
+//                                         entity.initCallbacks = []
+//                                     }
+//                                     entity.initCallbacks.push(initCallback)
+//                                     entity.initCallback = function (entity) {
+//                                         return function () {
+//                                             while (entity.initCallbacks.length > 0) {
+//                                                 var initCallback = entity.initCallbacks.pop();
+//                                                 initCallback(entity);
+//                                             }
+//                                         }
+//                                     }(entity)
 //                                     entity.init(value, lazy)
 //                                 } else {
 //                                     var initCallback = function (entity) {
 //                                         server.entityManager.setEntity(entity)
 //                                     }
-//									   if(entity.initCallback == undefined){
-//										  entity.initCallback = initCallback
-//									   }else{
-//										  entity.initCallback = function(entity, initCallback){
-//											 return function(entity){
-//												 entity.initCallback(entity);
-//												 initCallback(entity);
-//											 }
-//										  }(entity, initCallback)
-//									   }
+//                                     if (entity.initCallbacks == undefined) {
+//                                         entity.initCallbacks = []
+//                                     }
+//                                     entity.initCallbacks.push(initCallback)
+//                                     entity.initCallback = function (entity) {
+//                                         return function () {
+//                                             while (entity.initCallbacks.length > 0) {
+//                                                 var initCallback = entity.initCallbacks.pop();
+//                                                 initCallback(entity);
+//                                             }
+//                                         }
+//                                     }(entity)
 //                                     entity.init(value, lazy, function (values, caller, entities) {
 //                                         return function () {
 //                                             initEntitiesFct(values, caller, entities)
@@ -1872,93 +1877,102 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityByUuid = function (uuid, lazy, successCallback, errorCallback, caller) {
-//    if(uuid.length == 0){
-//		return
-//	  }
-//    var entity = entities[uuid]
-//    if (entity != undefined) {
-//        if (entity.TYPENAME == entity.__class__ && entity.IsInit == true) {
-//            successCallback(entity, caller)
-//            return // break it here.
-//        }
-//    }
-//    var typeName = uuid.substring(0, uuid.indexOf("%"))
-//    var storeId = typeName.substring(0, typeName.indexOf("."))
-//    // Create the entity prototype here.
-//    var entity = eval("new " + typeName + "()")
-//    entity.UUID = uuid
-//    entity.TYPENAME = typeName
-//    server.entityManager.setEntity(entity)
-//    // First of all i will get the entity prototype.
-//    server.entityManager.getEntityPrototype(typeName, storeId,
-//        // The success callback.
-//        function (result, caller) {
-//            // Set the parameters.
-//            var uuid = caller.uuid
-//            var successCallback = caller.successCallback
-//            var progressCallback = caller.progressCallback
-//            var errorCallback = caller.errorCallback
-//			  var lazy = caller.lazy
-//            var caller = caller.caller
-//            var params = []
-//            params.push(createRpcData(uuid, "STRING", "uuid"))
-//            // Call it on the server.
-//            server.executeJsFunction(
-//                "EntityManagerGetEntityByUuid", // The function to execute remotely on server
-//                params, // The parameters to pass to that function
-//                function (index, total, caller) { // The progress callback
-//                    // Nothing special to do here.
-//                },
-//                function (result, caller) {
-//                    var entity = entities[result[0].UUID]
-//                    var initCallback = function (caller) {
-//                        return function (entity) {
-//                          server.entityManager.setEntity(entity)
-//							if(caller.successCallback != undefined){
-//                            	caller.successCallback(entity, caller.caller)
-//								caller.successCallback = undefined
-//							}
-//                        }
-//                    } (caller)
-//					  if(entity.initCallback == undefined){
-//					  		entity.initCallback = initCallback
-//					  }else{
-//						 	entity.initCallback = function(entity, initCallback){
-//								 return function(entity){
-//										entity.initCallback(entity);
-//										initCallback(entity);
-//									}
-//								}(entity, initCallback)
-//					  }
-//                    if (entity.IsInit == false) {
-//                        entity.init(result[0], lazy)
-//                    } else {
-//						if(caller.successCallback != undefined){
-//                          caller.successCallback(entity, caller.caller)
-//							caller.successCallback = undefined
-//						}
-//                    }
-//                },
-//                function (errMsg, caller) {
-//                  server.errorManager.onError(errMsg)
-//         			if( caller.errorCallback != undefined){
-//            			caller.errorCallback(errMsg, caller.caller)
-//						caller.errorCallback = undefined
-//					}
-//                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "lazy":lazy } // The caller
-//            )
-//        },
-//        // The error callback.
-//        function (errMsg, caller) {
-//          server.errorManager.onError(errMsg)
-//         	if( caller.errorCallback != undefined){
-//          	caller.errorCallback(errMsg, caller.caller)
-//				caller.errorCallback = undefined
-//			}
-//        }, { "uuid": uuid, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy":lazy })
-//}
+// EntityManager.prototype.getEntityByUuid = function (uuid, lazy, successCallback, errorCallback, caller) {
+//     if (uuid.length == 0) {
+//         return
+//     }
+//     var entity = entities[uuid]
+//     if (entity != undefined) {
+//         if (entity.TYPENAME == entity.__class__ && entity.IsInit == true) {
+//             successCallback(entity, caller)
+//             return // break it here.
+//         }
+//     }
+//     var typeName = uuid.substring(0, uuid.indexOf("%"))
+//     var storeId = typeName.substring(0, typeName.indexOf("."))
+//     // Create the entity prototype here.
+//     var entity = eval("new " + typeName + "()")
+//     entity.UUID = uuid
+//     entity.TYPENAME = typeName
+//     server.entityManager.setEntity(entity)
+//     // First of all i will get the entity prototype.
+//     server.entityManager.getEntityPrototype(typeName, storeId,
+//         // The success callback.
+//         function (result, caller) {
+//             // Set the parameters.
+//             var uuid = caller.uuid
+//             var successCallback = caller.successCallback
+//             var progressCallback = caller.progressCallback
+//             var errorCallback = caller.errorCallback
+//             var lazy = caller.lazy
+//             var caller = caller.caller
+//             var params = []
+//             params.push(createRpcData(uuid, "STRING", "uuid"))
+//             // Call it on the server.
+//             server.executeJsFunction(
+//                 "EntityManagerGetEntityByUuid", // The function to execute remotely on server
+//                 params, // The parameters to pass to that function
+//                 function (index, total, caller) { // The progress callback
+//                     // Nothing special to do here.
+//                 },
+//                 function (result, caller) {
+//                     var entity = entities[result[0].UUID]
+//					   if(entity == null){
+//							console.log("entity " + result[0].UUID + " was not defined!")
+//     				   		entity = eval("new " + caller.prototype.TypeName + "()")
+//     						entity.UUID = result[0].UUID
+//     						entity.TYPENAME = caller.prototype.TypeName
+//     						server.entityManager.setEntity(entity)
+//					   }
+//                     var initCallback = function (caller) {
+//                         return function (entity) {
+//                             server.entityManager.setEntity(entity)
+//                             if (caller.successCallback != undefined) {
+//                                 caller.successCallback(entity, caller.caller)
+//                                 caller.successCallback = undefined
+//                             }
+//                         }
+//                     }(caller)
+//                     if (entity.initCallbacks == undefined) {
+//                         entity.initCallbacks = []
+//                     }
+//                     entity.initCallbacks.push(initCallback)
+//                     entity.initCallback = function (entity) {
+//                         return function () {
+//                             while (entity.initCallbacks.length > 0) {
+//                                 var initCallback = entity.initCallbacks.pop();
+//                                 initCallback(entity);
+//                             }
+//                         }
+//                     }(entity)
+//                     if (entity.IsInit == false) {
+//                         entity.init(result[0], lazy)
+//                     } else {
+//                         if (caller.successCallback != undefined) {
+//                             caller.successCallback(entity, caller.caller)
+//                             caller.successCallback = undefined
+//                         }
+//                     }
+//                 },
+//                 function (errMsg, caller) {
+//                     server.errorManager.onError(errMsg)
+//                     if (caller.errorCallback != undefined) {
+//                         caller.errorCallback(errMsg, caller.caller)
+//                         caller.errorCallback = undefined
+//                     }
+//                 }, // Error callback
+//                 { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "lazy": lazy } // The caller
+//             )
+//         },
+//         // The error callback.
+//         function (errMsg, caller) {
+//             server.errorManager.onError(errMsg)
+//             if (caller.errorCallback != undefined) {
+//                 caller.errorCallback(errMsg, caller.caller)
+//                 caller.errorCallback = undefined
+//             }
+//         }, { "uuid": uuid, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy": lazy })
+// }
 func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1992,92 +2006,94 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntityById = function (typeName, storeId, ids, lazy, successCallback, errorCallback, caller, parent) {
-//    // key in the server.
-//    var id = typeName + ":"
-//    for (var i = 0; i < ids.length; i++) {
-//        id += ids[i]
-//        if (i < ids.length - 1) {
-//            id += "_"
-//        }
-//    }
-//    if (entities[id] != undefined) {
-//        successCallback(entities[id], caller)
-//        return // break it here.
-//    }
-//    // First of all i will get the entity prototype.
-//    server.entityManager.getEntityPrototype(typeName, storeId,
-//        // The success callback.
-//        function (result, caller) {
-//            // Set the parameters.
-//            var storeId = caller.storeId
-//            var typeName = caller.typeName
-//            var ids = caller.ids
-//            var successCallback = caller.successCallback
-//            var progressCallback = caller.progressCallback
-//            var errorCallback = caller.errorCallback
-//			  var lazy = caller.lazy
-//            var caller = caller.caller
-//            var params = []
-//            params.push(createRpcData(typeName, "STRING", "typeName"))
-//            params.push(createRpcData(storeId, "STRING", "storeId"))
-//            params.push(createRpcData(ids, "JSON_STR", "ids")) // serialyse as an JSON object array...
-//            // Call it on the server.
-//            server.executeJsFunction(
-//                "EntityManagerGetEntityById", // The function to execute remotely on server
-//                params, // The parameters to pass to that function
-//                function (index, total, caller) { // The progress callback
-//                    // Nothing special to do here.
-//                },
-//                function (result, caller) {
-//                    if (result[0] == null) {
-//                        return
-//                    }
-//                    // In case of existing entity.
-//                    if (entities[result[0].UUID] != undefined && result[0].TYPENAME == result[0].__class__) {
-//						if(caller.successCallback != undefined){
-//                        	caller.successCallback(entities[result[0].UUID], caller.caller)
-//							caller.successCallback = undefined
-//						}
-//                        return // break it here.
-//                    }
-//                    var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
-//                    var initCallback = function () {
-//                        return function (entity) {
-//							if(caller.successCallback != undefined){
-//                            	caller.successCallback(entity, caller.caller)
-//								caller.successCallback = undefined
-//							}
-//                        }
-//                    } (caller)
-//			  		  if(entity.initCallback == undefined){
-//				 		entity.initCallback = initCallback
-//			  		  }else{
-//				 		entity.initCallback = function(entity, initCallback, entityInitCallback){
-//							return function(entity){
-//								entityInitCallback(entity);
-//								initCallback(entity);
-//					  		}
-//				 	  	}(entity, initCallback, entity.initCallback)
-//			  		 }
-//                    entity.init(result[0], lazy)
-//                },
-//                function (errMsg, caller) {
-//          		server.errorManager.onError(errMsg)
-//         			if( caller.errorCallback != undefined){
-//          			caller.errorCallback(errMsg, caller.caller)
-//						caller.errorCallback = undefined
-//					}
-//                }, // Error callback
-//                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "ids": ids, "lazy":lazy } // The caller
-//            )
-//        },
-//        // The error callback.
-//        function (errMsg, caller) {
-//            server.errorManager.onError(errMsg)
-//            caller.errorCallback(errMsg, caller)
-//        }, { "storeId": storeId, "typeName": typeName, "ids": ids, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy":lazy })
-//}
+// EntityManager.prototype.getEntityById = function (typeName, storeId, ids, lazy, successCallback, errorCallback, caller, parent) {
+//     // key in the server.
+//     var id = typeName + ":"
+//     for (var i = 0; i < ids.length; i++) {
+//         id += ids[i]
+//         if (i < ids.length - 1) {
+//             id += "_"
+//         }
+//     }
+//     if (entities[id] != undefined) {
+//         successCallback(entities[id], caller)
+//         return // break it here.
+//     }
+//     // First of all i will get the entity prototype.
+//     server.entityManager.getEntityPrototype(typeName, storeId,
+//         // The success callback.
+//         function (result, caller) {
+//             // Set the parameters.
+//             var storeId = caller.storeId
+//             var typeName = caller.typeName
+//             var ids = caller.ids
+//             var successCallback = caller.successCallback
+//             var progressCallback = caller.progressCallback
+//             var errorCallback = caller.errorCallback
+//             var lazy = caller.lazy
+//             var caller = caller.caller
+//             var params = []
+//             params.push(createRpcData(typeName, "STRING", "typeName"))
+//             params.push(createRpcData(storeId, "STRING", "storeId"))
+//             params.push(createRpcData(ids, "JSON_STR", "ids")) // serialyse as an JSON object array...
+//             // Call it on the server.
+//             server.executeJsFunction(
+//                 "EntityManagerGetEntityById", // The function to execute remotely on server
+//                 params, // The parameters to pass to that function
+//                 function (index, total, caller) { // The progress callback
+//                     // Nothing special to do here.
+//                 },
+//                 function (result, caller) {
+//                     if (result[0] == null) {
+//                         return
+//                     }
+//                     // In case of existing entity.
+//                     if (entities[result[0].UUID] != undefined && result[0].TYPENAME == result[0].__class__) {
+//                         if (caller.successCallback != undefined) {
+//                             caller.successCallback(entities[result[0].UUID], caller.caller)
+//                             caller.successCallback = undefined
+//                         }
+//                         return // break it here.
+//                     }
+//                     var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
+//                     var initCallback = function () {
+//                         return function (entity) {
+//                             if (caller.successCallback != undefined) {
+//                                 caller.successCallback(entity, caller.caller)
+//                                 caller.successCallback = undefined
+//                             }
+//                         }
+//                     }(caller)
+//                     if (entity.initCallbacks == undefined) {
+//                         entity.initCallbacks = []
+//                     }
+//                     entity.initCallbacks.push(initCallback)
+//                     entity.initCallback = function (entity) {
+//                         return function () {
+//                             while (entity.initCallbacks.length > 0) {
+//                                 var initCallback = entity.initCallbacks.pop();
+//                                 initCallback(entity);
+//                             }
+//                         }
+//                     }(entity)
+//                     entity.init(result[0], lazy)
+//                 },
+//                 function (errMsg, caller) {
+//                     server.errorManager.onError(errMsg)
+//                     if (caller.errorCallback != undefined) {
+//                         caller.errorCallback(errMsg, caller.caller)
+//                         caller.errorCallback = undefined
+//                     }
+//                 }, // Error callback
+//                 { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "ids": ids, "lazy": lazy } // The caller
+//             )
+//         },
+//         // The error callback.
+//         function (errMsg, caller) {
+//             server.errorManager.onError(errMsg)
+//             caller.errorCallback(errMsg, caller)
+//         }, { "storeId": storeId, "typeName": typeName, "ids": ids, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "lazy": lazy })
+// }
 func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []interface{}, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

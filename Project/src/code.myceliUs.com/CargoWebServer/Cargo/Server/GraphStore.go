@@ -1868,8 +1868,6 @@ func (this *GraphStore) getTriples(key string, bucketId string) []Triple {
  * Get the value list...
  */
 func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params []interface{}) (results [][]interface{}, err error) {
-	//log.Println("----> 1847 ", queryStr)
-
 	if this.m_ipv4 != "127.0.0.1" {
 		if this.m_conn != nil {
 			if !this.m_conn.IsOpen() {
@@ -2248,11 +2246,16 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {
-			this.removeTriple(uuid)
+			log.Println("remove triple: ", triples[i])
+			err = this.removeTriple(uuid)
+			if err != nil {
+				log.Println("---> fail to remove triple, ", triples[i])
+				return err
+			}
+
 			triple := triples[i].(Triple)
 
 			this.removeIndex(triple.Subject, uuid, "S")

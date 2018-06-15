@@ -107,7 +107,11 @@ LanguageManager.prototype.setLanguage = function (language) {
         if(styleSheet !== null){
             if(styleSheet.cssRules !== null){
                 for(var i=0; i < styleSheet.cssRules.length; i++){
-                    if(styleSheet.cssRules[i].selectorText == "div:lang("+ languageId +")"){
+                    if(styleSheet.cssRules[i].selectorText == "div:lang("+ languageId +")" 
+                        || styleSheet.cssRules[i].selectorText == "span:lang("+ languageId +")"
+                        || styleSheet.cssRules[i].selectorText == "textarea:lang("+ languageId +")"
+                        || styleSheet.cssRules[i].selectorText == "input:lang("+ languageId +")"
+                        ){
                         if(this.language == languageId){
                             styleSheet.cssRules[i].style.display = "block";
                         }else{
@@ -120,8 +124,14 @@ LanguageManager.prototype.setLanguage = function (language) {
             if(!exist){
                 if(this.language == languageId){
                     styleSheet.insertRule("div:lang("+ languageId +"){display: block;}", 1);
+                    styleSheet.insertRule("textarea:lang("+ languageId +"){display: block;}", 1);
+                    styleSheet.insertRule("span:lang("+ languageId +"){display: block;}", 1);
+                    styleSheet.insertRule("input:lang("+ languageId +"){display: block;}", 1);
                 }else{
                     styleSheet.insertRule("div:lang("+ languageId +"){display: none;}", 1);
+                    styleSheet.insertRule("textarea:lang("+ languageId +"){display: none;}", 1);
+                    styleSheet.insertRule("span:lang("+ languageId +"){display: none;}", 1);
+                    styleSheet.insertRule("input:lang("+ languageId +"){display: none;}", 1);
                 }
             }
         }
