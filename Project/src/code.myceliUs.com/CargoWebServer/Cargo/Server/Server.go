@@ -965,7 +965,8 @@ func (this *Server) Start() {
 								// Here the task was cancel.
 								return
 							} else {
-								panic(caught) // Something else happened, repanic!
+								//panic(caught) // Something else happened, repanic!
+								log.Println("----> panic.... ", caught.(error).Error())
 							}
 						}
 					}()

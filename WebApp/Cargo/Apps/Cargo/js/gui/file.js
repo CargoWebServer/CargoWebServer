@@ -177,6 +177,11 @@ var FilePanel = function (parent, file, filePath, fileInfo, loadCallback, readCa
             confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Voulez-vous enlever le fichier " + filePanel.fileName + "?" })
             confirmDialog.div.element.style.maxWidth = "450px"
             confirmDialog.setCentered()
+            confirmDialog.cancel.element.classList.remove("btn-default")
+            confirmDialog.ok.element.classList.remove("btn-default")
+            confirmDialog.cancel.element.classList.add("btn-danger")
+            confirmDialog.ok.element.classList.add("btn-success")
+            
             confirmDialog.ok.element.onclick = function (dialog, filePanel) {
                 return function () {
                     // I will call delete file

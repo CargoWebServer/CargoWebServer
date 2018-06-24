@@ -110,6 +110,7 @@ OrderPage.prototype.getOrder = function () {
 }
 
 OrderPage.prototype.displayOrder = function () {
+    document.getElementById("admin_page_panel").style.display = "none"
     document.getElementById("main-container").style.display = "none"
     document.getElementById("package_display_page_panel").style.display = "none"
     document.getElementById("item_display_page_panel").style.display = "none"

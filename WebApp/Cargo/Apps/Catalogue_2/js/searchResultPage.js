@@ -149,8 +149,13 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                     }
                 },
                 // error callback
-                function () {
-    
+                function (errObj, caller) {
+                    var next = caller.uuids.pop()
+                    if (caller.uuids.length == 0) {
+                        caller.callback(caller.results, caller.query, caller.itemSearchResultPage)
+                    } else {
+                        caller.getItem(next, caller.itemSearchResultPage, caller.results, caller.uuids, caller.query, caller.getItem, caller.callback)
+                    }
                 }, { "itemSearchResultPage": itemSearchResultPage, "results": results, "uuids": uuids, "query": queryTxt, "getItem": getItem, "callback": callback })
         }
     
@@ -194,7 +199,7 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                                                 },
                                                 // error callback
                                                 function (errObj, caller) {
-    
+                                                    console.log("---> searchResultPage ln 202")
                                                 }, caller)
                                         }
                                         
@@ -203,7 +208,7 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                                     },
                                     // error callback
                                     function (errObj, caller) {
-    
+                                        console.log("---> searchResultPage ln 211")
                                     }, { "itemSearchResultPage": itemSearchResultPage, "packages": packages, "results": results, "query": query, "getPackageItems": getPackageItems, "callback": callback })
                             }
                             // process the first item.
@@ -268,7 +273,11 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         		},
         		// error callback
         		function (errObj, caller) {
-        
+                    if(caller.uuids.length > 0){
+        			    caller.callback(caller.uuids, caller.itemSuppliers, caller.query, caller.itemSearchResultPage, caller.callback)
+        			}else{
+        			    caller.itemSearchResultPage.displayTabResults(caller.itemSuppliers, caller.query)
+        			}
         		}, {"uuids":uuids, "itemSuppliers":itemSuppliers, "query": query, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
         }
         
@@ -312,7 +321,9 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         		// success callback
         		function (results, caller) {
         			// return the results.
-        			caller.pacakages = results[0][0].concat(caller.pacakages)
+        			if(results[0][0] != undefined){
+        			    caller.pacakages = results[0][0].concat(caller.pacakages)
+        			}
         			if(caller.uuids.length > 0){
         			    caller.callback(caller.uuids, caller.pacakages, caller.query, caller.itemSearchResultPage, caller.callback)
         			}else{
@@ -325,7 +336,7 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         		},
         		// error callback
         		function (errObj, caller) {
-        
+                
         		}, {"uuids":uuids, "pacakages":pacakages, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
         }
         if(uuids.length > 0 && itemSupplier == 0){
@@ -379,8 +390,12 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                     }
                 },
                 // error callback
-                function(){
-                    
+                function(errObj, caller){
+                    if(caller.items.length == 0){
+                        caller.callback(caller.packages, caller.localisations)
+                    }else{
+                        getItem(caller.items, caller.packages, caller.localisations, caller.callback)
+                    }
                 },{"items":items, "packages":packages, "localisations":localisations, "callback":callback})
         }
 
@@ -406,8 +421,12 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                     }
                 },
                 // error callback
-                function(){
-                    
+                function(errObj, caller){
+                    if(caller.packages.length == 0){
+                        caller.callback(caller.inventories, caller.localisations)
+                    }else{
+                        getPackage(caller.packages, caller.inventories, caller.localisations, caller.callback)
+                    }
                 },{"packages":packages, "inventories":inventories, "localisations":localisations, "callback":callback})
         }
         
@@ -458,7 +477,11 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                     }
                 },
                 function(errObj, caller){
-                    console.log(errObj)
+                    if(caller.index == caller.inventories.length - 1){
+                        caller.callback(caller.localisations, caller.inventories)
+                    }else{
+                        getInventory(caller.index + 1, caller.inventories, caller.localisations, caller.callback)
+                    }
                 }, {"inventories":inventories, "index":index, "localisations":localisations, "callback":callback})
         }
         
@@ -801,6 +824,7 @@ var ItemSearchResultTable = function(parent, items, query, callback){
                 }
                 this.classList.add("active")
                 itemSearchResultTable.displayPage(index)
+                fireResize()
             }
         }(i, this)
         
@@ -916,15 +940,26 @@ ItemSearchResultTable.prototype.displayPage = function(index){
             }
         }(item)
 	    
-        // TODO display other type of values.
         for(var j=0; j < item.M_properties.length; j++){
-            var property = item.M_properties[j]
+            var property = entities[item.M_properties[j].UUID]
             // console.log(property.M_name)
             var row = properties.appendElement({"tag":"tr"}).down();
             row.appendElement({"tag":"td", "innerHtml":property.M_name})
-            if(property.M_stringValue.length > 0){
+
+            // Here I will display the value of the property.
+            if(property.M_kind.M_valueOf == "boolean"){
+                row.appendElement({"tag":"td", "innerHtml":property.M_booleanValue.toString()})
+            }else if(property.M_kind.M_valueOf == "numeric"){
+                row.appendElement({"tag":"td", "innerHtml":property.M_numericValue.toString()})
+            }else if(property.M_kind.M_valueOf == "dimension"){
+                // So in that particular case I will display the dimension type information.
+                var cell = row.appendElement({"tag":"td"}).down()
+                cell.appendElement({"tag":"span", "innerHtml":property.M_dimensionValue.M_valueOf.toString()})
+                cell.appendElement({"tag":"span", "innerHtml":property.M_dimensionValue.M_unitOfMeasure.M_valueOf, "style":"padding-left: 4px;"})
+            }else{
                 row.appendElement({"tag":"td", "innerHtml":property.M_stringValue})
             }
+            
         }
     }
     

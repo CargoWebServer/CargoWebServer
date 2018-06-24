@@ -311,12 +311,15 @@ SessionPanel.prototype.diplayUserSessions = function(sessions){
     
     for(var i=0; i < sessions.length; i++){
         // I will create the buttons container.
-        if(server.sessionId == sessions[i].M_id){
+        if(sessions[i] != undefined){
+            if(server.sessionId == sessions[i].M_id){
             // put at first...
             this.diplayUserSession(sessions[i], this.userSessionsDiv.prependElement({"tag":"div", "name": sessions[i].M_id, "class":"row", "style":"justify-content: left; align-items: baseline; flex-wrap: nowrap;"}).down());
-        }else{
-            this.diplayUserSession(sessions[i], this.userSessionsDiv.appendElement({"tag":"div", "id": sessions[i].M_id, "name": sessions[i].M_id, "class":"row", "style":"justify-content: left; align-items: baseline; flex-wrap: nowrap;"}).down());
+            }else{
+                this.diplayUserSession(sessions[i], this.userSessionsDiv.appendElement({"tag":"div", "id": sessions[i].M_id, "name": sessions[i].M_id, "class":"row", "style":"justify-content: left; align-items: baseline; flex-wrap: nowrap;"}).down());
+            }
         }
+        
     }
 }
 

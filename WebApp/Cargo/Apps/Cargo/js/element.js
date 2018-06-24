@@ -387,10 +387,42 @@ Element.prototype.getChildById = function (id) {
     return found
 }
 
+
+/**
+* Find a child inside the element or inside one of the child elements, 
+ * recursively with a given name. 
+ * @param {string} name The name of the element to retreive.
+* @returns {Element}
+* @stability 2
+*/
+Element.prototype.getChildsByName = function (name, childs) {
+    var keys = Object.keys(this.childs)
+        , i = 0
+        , len = keys.length
+        , found = null
+
+    if (childs == undefined) {
+        childs = []
+    }
+    if(this.element.name != undefined){
+        if (this.element.name.indexOf(name) != -1) {
+            childs.push(this)
+        }
+    }
+
+    for (i = 0; i < len; i++) {
+        child = this.childs[keys[i]]
+        // push values of child...
+        childs.concat(child.getChildsByName(name, childs));
+    }
+
+    return childs
+}
+
 /**
 * Find a child inside the element or inside one of the child elements, 
  * recursively with a given class name. 
- * @param {string} className The id of the element to retreive.
+ * @param {string} className The class name of the element to retreive.
 * @returns {Element}
 * @stability 2
 */

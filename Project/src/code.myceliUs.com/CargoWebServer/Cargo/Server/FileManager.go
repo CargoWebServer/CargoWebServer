@@ -1791,15 +1791,25 @@ func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	//get the *fileheaders
 	files := formdata.File["multiplefiles"] // grab the filenames
-	for i, _ := range files {               // loop through the files one by one
+	var path string                         // grab the filenames
+	if len(r.FormValue("path")) == 0 {
+		path = tmpPath
+	} else {
+		path = r.FormValue("path")
+		if strings.HasPrefix(path, "/") {
+			path = GetServer().GetFileManager().root + path
+		}
+	}
+
+	for i, _ := range files { // loop through the files one by one
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {
 			log.Println(w, err)
 			return
 		}
-
-		out, err := os.Create(tmpPath + "/" + files[i].Filename)
+		log.Println("--> upload file to ", path+"/"+files[i].Filename)
+		out, err := os.Create(path + "/" + files[i].Filename)
 		defer out.Close()
 		if err != nil {
 			log.Println(w, "Unable to create the file for writing. Check your write access privilege")

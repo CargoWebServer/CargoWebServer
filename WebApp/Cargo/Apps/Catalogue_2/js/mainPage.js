@@ -34,6 +34,32 @@ function deleteOrder(userId){
 }
 
 /** Text contain in the main page **/
+/** TODO ajouter cette liste a la traduction **/
+/*
+CM (centimeter)
+CM^2 (square centimeter)
+CM^3 (cubic centimeter)
+EA (each)
+FT (feet)
+FT^2 (square feet)
+FT^3 (cubic feet)
+GA (gallon)
+IN (inch)
+IN^2 (square inch)
+IN^3 (cubic inch)
+LB (pound)
+LITER (liter)
+mL (miliLiter)
+M (meter)
+M^2 (square meter)
+M^3 (cubic meter)
+MM (millimeter)
+MM^2 (square millimeter)
+MM^3 (cubic millimeter)
+WEIGHTLESS
+YD (yard)
+Micron (um)
+*/
 var mainPageText = {
     "en": {
         "quickSearchText": " Quick search",
@@ -295,6 +321,7 @@ var MainPage = function () {
     
     this.panel.getChildById("adminBtn").element.onclick = function () {
         mainPage.adminPage.displayAdminPage()
+        fireResize()
     }
     
     this.panel.getChildById("searchButton").element.onclick = function () {

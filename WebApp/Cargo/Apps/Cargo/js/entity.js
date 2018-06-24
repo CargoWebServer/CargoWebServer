@@ -575,9 +575,7 @@ function setObjectValues(object, values, lazy, callback) {
     var subObjects = []
 
     for (var property in values) {
-
         var propertyType = prototype.FieldsType[prototype.getFieldIndex(property)]
-
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
@@ -632,19 +630,20 @@ function setObjectValues(object, values, lazy, callback) {
                     var isArray_ = propertyType.startsWith("[]")
                     if (property.startsWith("[]M_") || property.startsWith("M_")) {
                         if (isArray_) {
-                            object[property] = []
-                            for (var i = 0; i < values[property].length; i++) {
-                                if (isRef) {
-                                    setRef(object, property, values[property][i], isArray_)
-                                } else {
-                                    if (!lazy) {
-                                        subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
-                                    }
-                                }
-                            }
                             if (lazy) {
                                 object[property] = values[property]
-                            }
+                            }else{
+                                object[property] = []
+                                for (var i = 0; i < values[property].length; i++) {
+                                    if (isRef) {
+                                        setRef(object, property, values[property][i], isArray_)
+                                    } else {
+                                        if (!lazy) {
+                                            subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                        }
+                                    }
+                                }
+                            }   
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
@@ -673,32 +672,35 @@ function setObjectValues(object, values, lazy, callback) {
                 if (subObject.uuid.length > 0) {
                     server.entityManager.getEntityByUuid(subObject.uuid, false,
                         function (entity, caller) {
+                            var parent = caller.parent
+                            
                             if (caller.subObject.isArray == true) {
-                                caller.parent[caller.subObject.property][caller.subObject.index] = entity
+                                parent[caller.subObject.property][caller.subObject.index] = entity
                             } else {
-                                caller.parent[caller.subObject.property] = entity
+                                parent[caller.subObject.property] = entity
                             }
                             // Get parent function.
                             entity.getParent = function (parent) {
                                 return function () {
                                     return parent
                                 }
-                            }(caller.parent)
+                            }(parent)
                             if (subObjects.length == 0) {
-                                caller.callback(caller.parent)
+                                caller.callback(parent)
                             } else {
-                                setSubObject(caller.parent, caller.subObjects, caller.callback)
+                                setSubObject(parent, caller.subObjects, caller.callback)
                             }
                         },
                         function (err, caller) {
                             console.log("err ", err)
+                            var parent = entities[caller.parent.UUID]
                             if (subObjects.length == 0) {
                                 caller.callback(caller.parent)
                             } else {
-                                setSubObject(caller.parent, caller.subObjects, caller.callback)
+                                setSubObject(parent, caller.subObjects, caller.callback)
                             }
                         },
-                        { "parent": parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
+                        {"parent":parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
                 } else {
                     setSubObject(parent, subObjects, callback)
                     if (subObjects.length == 0) {
@@ -744,6 +746,7 @@ function setObjectValues(object, values, lazy, callback) {
                         object.initCallback(object)
                         object.initCallback = undefined
                     }
+                    
                 })
             }
         }

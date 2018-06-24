@@ -1,0 +1,46 @@
+.image_picker{
+    width: 100%;
+    height: 100%;
+    border: 2px dotted #ced4da;
+    margin-bottom: 1rem!important;
+    position: relative;
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.append_picture_btn {
+    position: absolute; 
+    right: 5px; 
+    color: #495057;
+}
+
+.append_picture_btn:hover{
+    cursor: pointer;
+}
+
+.image_panel{
+    border: 1px solid #ced4da;
+    margin: 2px;
+    width: 150px;
+    height: 150px;
+    position: relative;
+}
+
+.image_panel img{
+    position:absolute;
+    max-width: 148px;
+    max-height: 148px;
+    top:0;
+    bottom:0;
+    margin:auto;
+}
+
+.dialog_delete_button{
+	color: white;
+}
+
+.dialog_delete_button i:hover {
+    cursor: pointer;
+    transition: all .2s ease;
+}

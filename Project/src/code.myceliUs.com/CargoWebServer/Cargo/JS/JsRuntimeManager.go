@@ -378,15 +378,22 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 
 				callback <- []interface{}{true} // unblock the channel...
 			case operationInfos := <-jsRuntimeManager.m_execVmOperation:
-				// Here I will execute various session action.
-				if operationInfos.m_name == "GetVar" {
-					jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "SetVar" {
-					jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "ExecuteJsFunction" {
-					jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "RunScript" {
-					jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				// Set the function on the JS runtime...
+				var sessionId = operationInfos.m_params["sessionId"].(string)
+				if jsRuntimeManager.m_executeJsFunction[sessionId] != nil {
+					// Here I will execute various session action.
+					if operationInfos.m_name == "GetVar" {
+						jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "SetVar" {
+						jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "ExecuteJsFunction" {
+						jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "RunScript" {
+						jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					}
+				} else {
+					log.Println("---> try to execute function on close channel whit id: ", sessionId)
+					// return nil, errors.New("Session " + sessionId + " is closed!")
 				}
 
 			case operationInfos := <-jsRuntimeManager.m_createVm:
@@ -1020,10 +1027,6 @@ func (this *JsRuntimeManager) InitScripts(sessionId string) {
  * Append and excute a javacript function on the JS...
  */
 func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) ([]interface{}, error) {
-	// Set the function on the JS runtime...
-	if this.m_executeJsFunction[sessionId] == nil {
-		return nil, errors.New("Session " + sessionId + " is closed!")
-	}
 
 	// Put function call information into a struct.
 	var jsFunctionInfos JsFunctionInfos
@@ -1051,9 +1054,7 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
  * Set variable value for a given session
  */
 func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interface{}) {
-	if this.m_setVariable[sessionId] == nil {
-		return
-	}
+
 	// Protectect the map access...
 	var info JsVarInfos
 	info.m_name = name
@@ -1075,10 +1076,6 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
  * Run given script for a given session.
  */
 func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} {
-	// Nothing to do with a close channel
-	if this.m_getVariable[sessionId] == nil {
-		return nil
-	}
 
 	// Protectect the map access...
 	var info JsVarInfos

@@ -27,8 +27,8 @@ var AdminSupplierPage = function(panel){
     
     this.panel.getChildById("addSupplierButton").element.onclick = function(){
       
-        mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : "newSupplier-selector","data-toggle" : "tab","href" : "#"+ "newSupplier-control","role":"tab", "innerHtml": "Nouveau fournisseur","aria-controls": "newSupplier-control"})
-         mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersAdminControl").appendElement({"tag" : "div", "class" : "tab-pane", "id" : "newSupplier-control", "role" : "tabpanel", "aria-labelledby" : "newSupplier-selector", "style" : "padding:15px;"}).down()
+        mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action active show","id" : "newSupplier-selector","data-toggle" : "tab","href" : "#"+ "newSupplier-control","role":"tab", "innerHtml": "Nouveau fournisseur","aria-controls": "newSupplier-control"})
+         mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersAdminControl").appendElement({"tag" : "div", "class" : "tab-pane active show", "id" : "newSupplier-control", "role" : "tabpanel", "aria-labelledby" : "newSupplier-selector", "style" : "padding:15px;"}).down()
         .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
         .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
         .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "ID"}).up()
@@ -107,67 +107,12 @@ AdminSupplierPage.prototype.getSuppliersFromKeyword = function(keyword){
         function(){
         },{})
     
-    
-    // First of a ll I will clear the search panel.
-    /*var dbpath = server.root + "/Data/CatalogSchema/CatalogSchema.SupplierType.glass"
-    var dbpaths = [dbpath]
-    xapian.search(
-        dbpaths,
-        keyword.toUpperCase(),
-        [],
-        "en",
-        0,
-        1000,
-        // success callback
-        function (results, caller) {
-            // Clear previous search...
-            mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersFilteredList").element.innerHTML = ""
-            mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersAdminControl").element.innerHTML = ""
-           
-            var suppliers = {}
-
-            if (results.estimate > 0) {
-                for (var i = 0; i < results.results.length; i++) {
-                    var result = results.results[i];
-                    if (result.data.TYPENAME == "CatalogSchema.SupplierType") {
-                        var uuid = results.results[i].data.UUID;
-                        if (suppliers[uuid] == null) {
-                            if(entities[uuid] != null){
-                                suppliers[uuid] = entities[uuid];
-                            }else{
-                                suppliers[uuid] = eval("new " + results.results[i].data.TYPENAME + "()")
-                                suppliers[uuid].init(results.results[i].data)
-                                entities[uuid] = suppliers[uuid];
-                            }
-                        }
-                    }
-                }
-            }else{
-                caller.searchBar.element.placeholder = "No results found for '" + caller.searchBar.element.value +"'"
-                caller.searchBar.element.value = ""
-                caller.searchBar.setTimeout(function(searchBar) {
-                    return function(){
-                        caller.searchBar.element.placeholder = "search"
-                    }
-                }(caller.searchBar), 10);
-            }
-            
-            for(var i = 0; i < suppliers.length; i++){
-                mainPage.adminPage.adminSupplierPage.panel.getChildById("suppliersFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : suppliers[i].M_id + "-selector","data-toggle" : "tab","href" : "#"+ suppliers[i].M_id + "-control","role":"tab", "innerHtml": suppliers[i].M_name,"aria-controls":  suppliers[i].M_id + "-control"})
-                mainPage.adminPage.adminSupplierPage.loadAdminControl(suppliers[i])
-            }
-            
-            fireResize()
-        },
-        // error callback
-        function () {
-
-        }, {"keyword":keyword, "searchBar":this.panel.getChildById("supplierFilterKeywords")})*/
+   
 }
 
 
 AdminSupplierPage.prototype.loadAdminControl = function(supplier){
-    console.log(supplier)
+    mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = ""
     mainPage.adminPage.adminSupplierPage.modifiedItems[supplier.M_id] = new Map()
     mainPage.adminPage.adminSupplierPage.removedItems[supplier.M_id] = new Map()
     if(mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-control") != undefined){
@@ -202,10 +147,22 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
     .up().up()
     .appendElement({"tag" : "div", "class" : "d-flex justify-content-center"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-primary disabled mr-3", "innerHtml" : "Enregistrer", "id" : supplier.M_id + "-saveBtn"})
-    .appendElement({"tag" : "button", "class" : "btn disabled", "innerHtml" : "Annuler les modifications", "id" : supplier.M_id + "-cancelBtn"})
-    
+    .appendElement({"tag" : "button", "class" : "btn disabled mr-3", "innerHtml" : "Annuler les modifications", "id" : supplier.M_id + "-cancelBtn"})
+    .appendElement({"tag" : "button", "class" : "btn btn-danger", "innerHtml" : "Supprimer l'entité", "id" : supplier.M_id + "-deleteBtn", "data-toggle" : "modal", "data-target" : "#" + supplier.M_id + "-modal"})
+    .appendElement({"tag" : "div", "class" : "modal fade", "id"  : supplier.M_id + "-modal", "tabindex" : "-1", "role"  :"dialog", "aria-labelledby" : supplier.M_id + "-modal", "aria-hidden" : "true"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-dialog", "role" : "document"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-content"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-header"}).down()
+    .appendElement({"tag" : "h5", "class" : "modal-title", "innerHtml" : "Supprimer le fournisseur"})
+    .appendElement({"tag" : "button", "class" : "close", "data-dismiss" : "modal", "aria-label" : "Close"}).down()
+    .appendElement({"tag" : "span", "aria-hidden" : "true", "innerHtml" : "&times;"}).up().up()
+    .appendElement({"tag" : "div", "class" : "modal-body", "innerHtml" : "Êtes-vous certain de vouloir supprimer ce fournisseur? Cela supprimera aussi toutes les transactions associées à celui-ci."})
+    .appendElement({"tag" : "div", "class" : "modal-footer"}).down()
+    .appendElement({"tag" : "button", "class" : "btn btn-secondary", "data-dismiss" : "modal", "innerHtml" : "Fermer", "id" : supplier.M_id + "-closeDelete"})
+    .appendElement({"tag" : "button", "type" : "button", "class" : "btn btn-danger", "id" : supplier.M_id + "-deleteConfirmBtn", "innerHtml" : "Confirmer la suppression"})
     mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-name").element.onkeyup = function(supplier){
        return function(){
+           mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.panel.getChildById(supplier.M_id + "-cancelBtn").element.classList.remove("disabled")
            var newName = mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-name").element.value
@@ -216,6 +173,43 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
        }
     }(supplier)
     
+    mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-deleteConfirmBtn").element.onclick = function(supplier){
+        return function(){
+             document.getElementById("waitingDiv").style.display = ""
+            var q = new EntityQuery()
+            q.TypeName = "CatalogSchema.ItemSupplierType"
+            q.Fields = ["M_supplier"]
+            q.Query = 'CatalogSchema.ItemSupplierType.M_supplier=="'+ supplier.UUID +'" '
+            
+            server.entityManager.getEntities("CatalogSchema.ItemSupplierType", "CatalogSchema", q, 0,-1,[],true,true, 
+                function(index,total,caller){},
+                function(item_suppliers, caller){
+                    mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.supplier.M_id + "-closeDelete").element.click()
+                   
+                
+                    for(var i = 0; i < item_suppliers.length; i++){
+                        server.entityManager.removeEntity(item_suppliers[i].UUID,
+                            function(success,caller){
+                                console.log(success)
+                                
+                            },function(){},{"length" : item_suppliers.length, "supplier" : caller.supplier})
+                        
+                    }
+                        
+                    
+                    
+                    
+                },function(){},{"supplier" : supplier})
+                
+            server.entityManager.removeEntity(supplier.UUID,
+                function(success,caller){
+                    document.getElementById("waitingDiv").style.display = "none"
+                    mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.supplier.M_id + "-control").delete()
+                    mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.supplier.M_id + "-selector").delete()
+                    console.log(success)
+                },function(){},{"supplier" : supplier})
+        }
+    }(supplier)
     
     mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-saveBtn").element.onclick = function(supplier){
         return function(){
@@ -241,6 +235,7 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
                                                 
                                                 server.entityManager.getEntityByUuid(caller.supplier.UUID, true,
                                                     function(supplier,caller){
+                                                        mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = ""
                                                         document.getElementById("waitingDiv").style.display = "none"
                                                         mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-selector").element.innerHTML = supplier.M_name
                                                         mainPage.adminPage.adminSupplierPage.loadAdminControl(supplier)
@@ -259,6 +254,7 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
                                 }else{
                                    server.entityManager.getEntityByUuid(caller.supplier.UUID, true,
                                     function(supplier,caller){
+                                        mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = ""
                                         document.getElementById("waitingDiv").style.display = "none"
                                         mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-selector").element.innerHTML = supplier.M_name
                                         mainPage.adminPage.adminSupplierPage.loadAdminControl(supplier)
@@ -275,7 +271,7 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
                         }, function () {}, {"i" : i, "length" : mainPage.adminPage.adminSupplierPage.modifiedItems[supplier.M_id].size, "supplier" : supplier})
                 }
             }else{
-                if(mainPage.adminPage.adminSupplierPage.removedItems[caller.supplier.M_id].size > 0){
+                if(mainPage.adminPage.adminSupplierPage.removedItems[supplier.M_id].size > 0){
                      document.getElementById("waitingDiv").style.display = ""
                     var j = 0
                     for(var removeObject of mainPage.adminPage.adminSupplierPage.removedItems[supplier.M_id].values()){
@@ -285,6 +281,7 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
                             if(caller.j == caller.length){
                                 server.entityManager.getEntityByUuid(caller.supplier.UUID, true,
                                 function(supplier,caller){
+                                    mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = ""
                                     document.getElementById("waitingDiv").style.display = "none"
                                     mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-selector").element.innerHTML = supplier.M_name
                                     mainPage.adminPage.adminSupplierPage.loadAdminControl(supplier)
@@ -314,7 +311,11 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
            
             mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-saveBtn").element.classList.add("disabled")
             mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-cancelBtn").element.classList.add("disabled")
-            mainPage.adminPage.adminSupplierPage.loadAdminControl(supplier)
+            server.entityManager.getEntityByUuid(supplier.UUID, false,
+                function(success, caller){
+                    mainPage.adminPage.adminSupplierPage.loadAdminControl(supplier)
+                },function(){},{})
+            
             mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-control").element.classList.add("active")
              mainPage.adminPage.adminSupplierPage.panel.getChildById(supplier.M_id + "-control").element.classList.add("show")
         }
@@ -354,76 +355,81 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
             .appendElement({"tag" : "td"}).down()
             .appendElement({"tag" : "input", "class" : "form-control", "type" : "number", "placeholder" : "0", "id" : date + "-qty"}).up()
             .appendElement({"tag" : "td"}).down()
-                    .appendElement({"tag" :"div", "class" : "input-group"}).down()
-                    .appendElement({"tag":"input", "class" : "form-control", "type" : "number", "placeholder" : "0", "id" : date + "-price"})
-                    .appendElement({"tag":"div", "class" : "input-group-append"}).down()
-                    .appendElement({"tag" :"button", "class": "btn btn-outline-dark dropdown-toggle", "type" : "button", "data-toggle" : "dropdown", "aria-haspopup" : "true", "aria-expanded":"false", "innerHtml" : "Currency", "id" : date + "-currentCurrency"})
-                    .appendElement({"tag":"div", "class":"dropdown-menu dropDown", "id" : date + "-currencyTypes"}).down()
-                    .up().up().up().up()
-                    .appendElement({"tag" : "td"}).down()
-                    .appendElement({"tag" : "input", "type" : "date", "class"  :"form-control", "id" : date + "-date"}).up()
-                     .appendElement({"tag":"td"}).down()
-                    .appendElement({"tag" : "button", "class" : "btn btn-success btn-sm", "id" : date + "-confirmBtn"}).down()
-                    .appendElement({"tag" : "i", "class" : "fa fa-check"}).up()
-                    
-                    for(var i = 0; i < mainPage.adminPage.adminSupplierPage.currencies.length; i++){
-                        mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currencyTypes").appendElement({"tag" : "a", "class" : "dropdown-item", "innerHtml" : mainPage.adminPage.adminSupplierPage.currencies[i], "id" : date + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]})
-                        
-                        mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]).element.onclick = function (divID, currency){
-                            return function(){
-                                mainPage.adminPage.adminSupplierPage.panel.getChildById(divID + "-currentCurrency").element.innerHTML = currency
-                            }
-                        }(date, mainPage.adminPage.adminSupplierPage.currencies[i])
+            .appendElement({"tag" :"div", "class" : "input-group"}).down()
+            .appendElement({"tag":"input", "class" : "form-control", "type" : "number", "placeholder" : "0", "id" : date + "-price"})
+            .appendElement({"tag":"div", "class" : "input-group-append"}).down()
+            .appendElement({"tag" :"button", "class": "btn btn-outline-dark dropdown-toggle", "type" : "button", "data-toggle" : "dropdown", "aria-haspopup" : "true", "aria-expanded":"false", "innerHtml" : "Currency", "id" : date + "-currentCurrency"})
+            .appendElement({"tag":"div", "class":"dropdown-menu dropDown", "id" : date + "-currencyTypes"}).down()
+            .up().up().up().up()
+            .appendElement({"tag" : "td"}).down()
+            .appendElement({"tag" : "input", "type" : "date", "class"  :"form-control", "id" : date + "-date"}).up()
+             .appendElement({"tag":"td"}).down()
+            .appendElement({"tag" : "button", "class" : "btn btn-success btn-sm", "id" : date + "-confirmBtn"}).down()
+            .appendElement({"tag" : "i", "class" : "fa fa-check"}).up()
+            
+            for(var i = 0; i < mainPage.adminPage.adminSupplierPage.currencies.length; i++){
+                mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currencyTypes").appendElement({"tag" : "a", "class" : "dropdown-item", "innerHtml" : mainPage.adminPage.adminSupplierPage.currencies[i], "id" : date + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]})
+                
+                mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]).element.onclick = function (divID, currency){
+                    return function(){
+                        mainPage.adminPage.adminSupplierPage.panel.getChildById(divID + "-currentCurrency").element.innerHTML = currency
                     }
+                }(date, mainPage.adminPage.adminSupplierPage.currencies[i])
+            }
+            
+            autocomplete("CatalogSchema.PackageType", mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-id"))
+            
+            mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-id").element.oncomplete = function(uuid){
+                mainPage.adminPage.adminSupplierPage.panel[date+"-id"] = uuid
+            }
                     
-        mainPage.adminPage.adminSupplierPage.panel.getChildById(date+ "-confirmBtn").element.onclick = function (date, supplier) {
+                    
+                    
+            mainPage.adminPage.adminSupplierPage.panel.getChildById(date+ "-confirmBtn").element.onclick = function (date, supplier) {
            return function(){
                 document.getElementById("waitingDiv").style.display = ""
-                var pkgName = mainPage.adminPage.adminSupplierPage.panel.getChildById(date+"-id").element.value
-                var q = new EntityQuery()
-                q.TypeName = "CatalogSchema.PackageType"
-                q.Fields = ["M_id"]
-                q.Query = 'CatalogSchema.PackageType.M_id=="'+ pkgName +'" '
-                server.entityManager.getEntities("CatalogSchema.PackageType", "CatalogSchema", q, 0, -1, [], true, false,
-                    function(index,total,caller){},
-                    function(packages, caller){
-                        if(packages.length > 0){
-                            var newItem = new CatalogSchema.ItemSupplierType()
-                            newItem.M_package = packages[0].UUID
-                            newItem.M_quantity = mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-qty").element.value
-                            newItem.M_id = mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-transactionID").element.value
-                            newItem.M_price = new CatalogSchema.PriceType()
-                            newItem.M_price.M_valueOf = mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-price").element.value
-                            newItem.M_supplier = caller.supplier.UUID
-                            if(mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-currentCurrency").element.innerHTML != "Currency"){
-                                newItem.M_price.M_currency.M_valueOf = mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-currentCurrency").element.innerHTML
-                            }
-                            
-                            newItem.M_date = mainPage.adminPage.adminSupplierPage.panel.getChildById(caller.date + "-date").element.value
-                            server.entityManager.createEntity(caller.supplier, "M_items", newItem, 
-                                function(success, caller){
-                 
-                                     caller.supplier.M_items.push(success.UUID)
-                              
-                                     server.entityManager.saveEntity(caller.supplier, 
-                                        function(result,caller){
-                                            
-                                            mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-row").delete()
-                                            document.getElementById("waitingDiv").style.display = "none"
-                                            mainPage.adminPage.adminSupplierPage.appendItemSupplier(caller.newLine, caller.supplier.M_id, caller.package)
-                                            console.log(result)
-                                        },function(){},{"supplier" : caller.supplier, "package" : caller.package, "newLine" : success})
-                                    
-                                },function(){},{"supplier" : caller.supplier, "package" : packages[0]})
+                var newPackage = mainPage.adminPage.adminSupplierPage.panel[date+"-id"]
+                var newItem = new CatalogSchema.ItemSupplierType()
+                newItem.M_package = newPackage
+                newItem.M_quantity = mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-qty").element.value
+                newItem.M_id = mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-transactionID").element.value
+                newItem.M_price = new CatalogSchema.PriceType()
+                newItem.M_price.M_valueOf = mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-price").element.value
+                newItem.M_supplier = supplier.UUID
+                if(mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currentCurrency").element.innerHTML != "Currency"){
+                    newItem.M_price.M_currency.M_valueOf = mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-currentCurrency").element.innerHTML
+                }
+                
+                newItem.M_date = mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-date").element.value
+                server.entityManager.createEntity(supplier, "M_items", newItem, 
+                    function(success, caller){
+     
+                         caller.supplier.M_items.push(success.UUID)
+                  
+                         server.entityManager.saveEntity(caller.supplier, 
+                            function(result,caller){
                                 
+                                mainPage.adminPage.adminSupplierPage.panel.getChildById(date + "-row").delete()
+                                
+                                document.getElementById("waitingDiv").style.display = "none"
+                                server.entityManager.getEntityByUuid(caller.package,false,
+                                    function(pkg,caller){
+                                        mainPage.adminPage.adminSupplierPage.appendItemSupplier(caller.newLine, caller.supplier.M_id, pkg)
+                                    },function(){}, {"newLine" : caller.newLine, "supplier" : caller.supplier})
+                                
+                                console.log(result)
+                            },function(){},{"supplier" : caller.supplier, "package" : caller.package, "newLine" : success})
+                        
+                    },function(){},{"supplier" : supplier, "package" : newPackage })
+                    
+               
+                    
+                    
+                    
+                    
+                
                            
-                                
-                                
-                                
-                                
-                            }
-                           
-                        },function(){},{"date" : date, "supplier" : supplier})
+               
                }
             }(date, supplier)
         }
@@ -494,9 +500,10 @@ AdminSupplierPage.prototype.appendItemSupplier = function(item_supplier, supplie
         //Save changes to the currency type
         mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]).element.onclick = function (item_supplier, currency, supplierID){
             return function(){
+                mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = "*"
                 mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-currentCurrency").element.innerHTML = currency
                 
-                var newitem_supplier = item_supplier
+                var newitem_supplier = jQuery.extend({},item_supplier)
                 newitem_supplier.M_price.M_currency.M_valueOf = currency
                 mainPage.adminPage.adminSupplierPage.modifiedItems[supplierID].set(newitem_supplier.M_id, newitem_supplier)
                 
@@ -510,10 +517,16 @@ AdminSupplierPage.prototype.appendItemSupplier = function(item_supplier, supplie
     //Save changes to the quantity, price
     mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id  + "-adminItemRow").element.onchange = function(item_supplier, supplierID){
             return function(){
+                mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = "*"
                 var qty = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id+"-qty").element.value
                 var price = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-price").element.value
-                var date = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-date").element.value
-                var newitem_supplier = item_supplier
+                if(mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-date").element.value != null){
+                    var date = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-date").element.value
+                }else{
+                    var date = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-date").element.innerHTML
+                }
+                
+                var newitem_supplier = jQuery.extend({}, item_supplier)
                 newitem_supplier.M_date = date
                 newitem_supplier.M_price.M_valueOf = price
                 newitem_supplier.M_quantity= qty
@@ -530,6 +543,7 @@ AdminSupplierPage.prototype.appendItemSupplier = function(item_supplier, supplie
     
     mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-deleteRowAdminBtn").element.onclick = function(item_supplier, supplierID){
         return function(){
+            mainPage.adminPage.panel.getChildById("adminSupplierSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminSupplierPage.removedItems[supplierID].set(item_supplier.M_id, item_supplier)
             var row = mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-adminItemRow")
             row.delete()

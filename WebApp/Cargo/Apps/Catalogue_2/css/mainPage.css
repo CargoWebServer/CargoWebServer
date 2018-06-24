@@ -196,11 +196,11 @@ body{
   -moz-animation-fill-mode: forwards;
 }
 
-.fade{
+/*.fade{
     opacity:0;
     left : 20px;
     transition: 2s;
-}
+}*/
 
 
 @keyframes slidenavAnimation {

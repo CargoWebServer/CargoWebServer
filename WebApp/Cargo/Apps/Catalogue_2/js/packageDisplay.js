@@ -37,40 +37,43 @@ function showPackage(itemID){
   
 
 function parsePkgImage(itemID){
-    checkImageExists("/Catalogue_2/photo/" +itemID + "/", function(existsImage) {
-        for(var i =0; i< existsImage; i++) {
-            // image exist
-            if(i == 0){
-                var child = document.createElement("li")
-                child.setAttribute("data-target", "#" + itemID + "-carousel")
-                child.setAttribute("data-slide-to" , "0")
-                child.setAttribute("class", "active")
-                document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
-                child = document.createElement("div")
-                child.setAttribute("class", "carousel-item active")
-                var picture = document.createElement("img")
-                picture.setAttribute("src", "../../Catalogue_2/photo/" + itemID + "/photo_" + Number(i+1) + ".jpg")
-                picture.setAttribute("class", "img-fluid rounded carouselImage")
-                child.appendChild(picture)
-                document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
-            }else{
-                var child = document.createElement("li")
-                child.setAttribute("data-target", "#"+ itemID + "-carousel")
-                child.setAttribute("data-slide-to", i)
-                document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
-                child = document.createElement("div")
-                child.setAttribute("class", "carousel-item")
-                var picture = document.createElement("img")
-                picture.setAttribute("src", "../../Catalogue_2/photo/" + itemID + "/photo_" + Number(i+1) + ".jpg")
-                picture.setAttribute("class", "img-fluid rounded carouselImage")
-                child.appendChild(picture)
-                document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
+    server.fileManager.readDir("/Catalogue_2/photo/" +itemID,
+    function(results, caller){
+        var photos = results[0]
+        if(photos != null){
+            for(var i=0; i < photos.length; i++){
+                if(i == 0){
+                    var child = document.createElement("li")
+                        child.setAttribute("data-target", "#" + itemID + "-carousel")
+                        child.setAttribute("data-slide-to" , "0")
+                        child.setAttribute("class", "active")
+                        document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item active")
+                        var picture = document.createElement("img")
+                        picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        picture.setAttribute("class", "img-fluid rounded carouselImage")
+                        child.appendChild(picture)
+                        document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
+                    }else{
+                        var child = document.createElement("li")
+                        child.setAttribute("data-target", "#"+ itemID + "-carousel")
+                        child.setAttribute("data-slide-to", i)
+                        document.getElementById(itemID + "_p-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item")
+                        var picture = document.createElement("img")
+                        picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        picture.setAttribute("class", "img-fluid rounded carouselImage")
+                        child.appendChild(picture)
+                        document.getElementById(itemID + "_p-carousel-inner").appendChild(child)
+                    }
             }
-            
         }
-        
-    });
-} 
+    },function(errObj,caller){
+        console.log("error")
+    },{"itemID":itemID})
+}
 
 /**
  * Display an item information.
@@ -123,6 +126,9 @@ PackageDisplayPage.prototype.displayTabItem = function (pkg) {
     .appendElement({"tag" : "div", "class" : "col-md order-1"}).down()
     .appendElement({"tag" : "div", "class" : "list-group ", "id" : packageID + "-detailsGroup"}).down()
     .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : "Détails"})
+    .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+    .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "ID", "style" : "border-right :1px solid #e9ecef;"})
+    .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "value" : pkg.M_id.toString()}).up()
     .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
     .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Description", "style" : "border-right :1px solid #e9ecef;"})
     .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "value" : pkg.M_description.toString()}).up()
@@ -222,6 +228,9 @@ PackageDisplayPage.prototype.displayTabItem = function (pkg) {
                 .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
                 .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Prix", "style" : "border-right :1px solid #e9ecef;"})
                 .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : caller.supplierInfo.M_price.M_valueOf +" " + caller.supplierInfo.M_price.M_currency.M_valueOf}).up()
+                .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Date", "style" : "border-right :1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : caller.supplierInfo.M_date}).up()
                 
                 .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex", "id":supplier.M_id + "-order-line", "style":"visibility: hidden;"}).down()
                 .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité à ajouter", "style" : "border-right:1px solid #e9ecef"})
@@ -295,16 +304,13 @@ PackageDisplayPage.prototype.displayTabItem = function (pkg) {
                 .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Stock minimal", "style" : "border-right : 1px solid #e9ecef;"})
                 .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action d-flex justify-content-center", "innerHtml" : inventory.M_safetyStock}).up()
                 .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
-                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité en commande", "style" : "border-right : 1px solid #e9ecef;"})
+                .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Quantité pour re-order", "style" : "border-right : 1px solid #e9ecef;"})
                 .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action d-flex justify-content-center", "innerHtml" : inventory.M_reorderQty}).up()
             },
             function(){
                 
             }, {"packageID" : packageID, "i" : i, "inventoryContainer" : this.packageResultPanel.getChildById(packageID + "-inventoryGroup")})
     }
-   
-   
-   
    
    
    

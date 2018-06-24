@@ -28,9 +28,10 @@ var AdminLocalisationPage = function(panel){
     
     
     this.panel.getChildById("addLocalisationButton").element.onclick = function(){
-      
-        mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : "newLocalisation-selector","data-toggle" : "tab","href" : "#"+ "newLocalisation-control","role":"tab", "innerHtml": "Nouvelle localisation","aria-controls": "newLocalisation-control"})
-         mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsAdminControl").appendElement({"tag" : "div", "class" : "tab-pane", "id" : "newLocalisation-control", "role" : "tabpanel", "aria-labelledby" : "newLocalisation-selector", "style" : "padding:15px;"}).down()
+        mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsFilteredList").removeAllChilds()
+        mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsAdminControl").removeAllChilds()
+        mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action active show","id" : "newLocalisation-selector","data-toggle" : "tab","href" : "#"+ "newLocalisation-control","role":"tab", "innerHtml": "Nouvelle localisation","aria-controls": "newLocalisation-control"})
+         mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsAdminControl").appendElement({"tag" : "div", "class" : "tab-pane active show", "id" : "newLocalisation-control", "role" : "tabpanel", "aria-labelledby" : "newLocalisation-selector", "style" : "padding:15px;"}).down()
         .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
         .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
         .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "ID"}).up()
@@ -44,6 +45,9 @@ var AdminLocalisationPage = function(panel){
         .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "Parent"}).up()
         .appendElement({"tag" : "input", "class" : "form-control", "type" : "text", "id" : "newLocalisation-parent"}).up()
         .appendElement({"tag" : "button", "class" : "btn btn-primary mr-3", "innerHtml" : "Enregistrer", "id" : "newLocalisation-saveBtn"})
+        
+        
+        autocomplete("CatalogSchema.LocalisationType",mainPage.adminPage.adminLocalisationPage.panel.getChildById("newLocalisation-parent"))
         
         mainPage.adminPage.adminLocalisationPage.panel.getChildById("newLocalisation-saveBtn").element.onclick = function(){
             document.getElementById("waitingDiv").style.display = ""
@@ -89,7 +93,7 @@ var AdminLocalisationPage = function(panel){
                                 mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsFilteredList").removeAllChilds()
                                 mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsAdminControl").removeAllChilds()
                                 mainPage.adminPage.adminLocalisationPage.panel.getChildById("localisationsFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : caller.newLocalisation.M_id + "-selector","data-toggle" : "tab","href" : "#"+ caller.newLocalisation.M_id + "-control","role":"tab", "innerHtml": caller.newLocalisation.M_id,"aria-controls":  caller.newLocalisation.M_id + "-control"})
-                                mainPage.adminPage.adminLocalisationPage.loadAdminControl(caller.newLocalisation)
+                                mainPage.adminPage.adminLocalisationPage.loadAdminControl(success)
                             
                     },function(){},{"newLocalisation" : newLocalisation})
             }
@@ -136,6 +140,7 @@ AdminLocalisationPage.prototype.getLocalisationsFromKeyword = function(keyword){
 }
 
 AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
+    mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = ""
     mainPage.adminPage.adminLocalisationPage.modifiedItems[localisation.M_id] = new Map()
     mainPage.adminPage.adminLocalisationPage.removedItems[localisation.M_id] = new Map()
      
@@ -173,7 +178,47 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
     
     .appendElement({"tag" : "div", "class" : "d-flex justify-content-center"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-primary disabled mr-3", "innerHtml" : "Enregistrer", "id" : localisation.M_id + "-saveBtn"})
-    .appendElement({"tag" : "button", "class" : "btn disabled", "innerHtml" : "Annuler les modifications", "id" : localisation.M_id + "-cancelBtn"})
+    .appendElement({"tag" : "button", "class" : "btn disabled mr-3", "innerHtml" : "Annuler les modifications", "id" : localisation.M_id + "-cancelBtn"})
+    .appendElement({"tag" : "button", "class" : "btn btn-danger", "innerHtml" : "Supprimer l'entité", "id" : localisation.M_id + "-deleteBtn", "data-toggle" : "modal", "data-target" : "#" + localisation.M_id + "-modal"})
+    .appendElement({"tag" : "div", "class" : "modal fade", "id"  : localisation.M_id + "-modal", "tabindex" : "-1", "role"  :"dialog", "aria-labelledby" : localisation.M_id + "-modal", "aria-hidden" : "true"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-dialog", "role" : "document"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-content"}).down()
+    .appendElement({"tag" : "div", "class" : "modal-header"}).down()
+    .appendElement({"tag" : "h5", "class" : "modal-title", "innerHtml" : "Supprimer la localisation"})
+    .appendElement({"tag" : "button", "class" : "close", "data-dismiss" : "modal", "aria-label" : "Close"}).down()
+    .appendElement({"tag" : "span", "aria-hidden" : "true", "innerHtml" : "&times;"}).up().up()
+    .appendElement({"tag" : "div", "class" : "modal-body", "innerHtml" : "Êtes-vous certain de vouloir supprimer cette localisation? Cela supprimera aussi toutes les sous-localisations associées à celles-ci."})
+    .appendElement({"tag" : "div", "class" : "modal-footer"}).down()
+    .appendElement({"tag" : "button", "class" : "btn btn-secondary", "data-dismiss" : "modal", "innerHtml" : "Fermer", "id" : localisation.M_id + "-closeDelete"})
+    .appendElement({"tag" : "button", "type" : "button", "class" : "btn btn-danger", "id" : localisation.M_id + "-deleteConfirmBtn", "innerHtml" : "Confirmer la suppression"})
+    
+    autocomplete("CatalogSchema.LocalisationType", mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-parent"))
+    
+    
+    
+    mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-deleteConfirmBtn").element.onclick = function(localisation){
+        return function(){
+            document.getElementById("waitingDiv").style.display = ""
+            mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-closeDelete").element.click()
+            mainPage.adminPage.adminLocalisationPage.deleteSubLocalisations(localisation.M_subLocalisations)
+            
+                
+            server.entityManager.getEntityByUuid(localisation.M_parent,false,
+                function(parent,caller){
+                    parent.M_subLocalisations.pop(caller.localisation)
+                    server.entityManager.saveEntity(parent,
+                        function(success,caller){
+                             mainPage.adminPage.adminLocalisationPage.panel.getChildById(caller.localisation.M_id + "-control").delete()
+                             mainPage.adminPage.adminLocalisationPage.panel.getChildById(caller.localisation.M_id + "-selector").delete()
+                        },function(){},{"localisation" : caller.localisation})
+                },function(){}, {"localisation" : localisation})
+                
+            server.entityManager.removeEntity(localisation.UUID,
+            function(success,caller){
+                document.getElementById("waitingDiv").style.display = "none"
+            }, function(){},{})
+        }
+    }(localisation)
     
     server.entityManager.getEntityByUuid(localisation.M_parent, false, 
     function(parentLocalisation, caller){
@@ -235,9 +280,10 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
                     newItem.M_name = localisationName
           
                     newItem.M_parent = localisation.UUID
+                    
                  
           
-                    server.entityManager.createEntity(localisation, "M_subLocalisations", newItem, 
+                    server.entityManager.createEntity(localisation.UUID, "M_subLocalisations", newItem, 
                         function(success, caller){
          
                              caller.localisation.M_subLocalisations.push(success.UUID)
@@ -278,7 +324,7 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
                 
                     server.entityManager.saveEntity(object,
                         function(result, caller){
-                           
+                           mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = ""
                             caller.i++
                              document.getElementById("waitingDiv").style.display = "none"
                             if(caller.i == caller.length){
@@ -334,6 +380,7 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
                      server.entityManager.removeEntity(removeObject.UUID,
                         function(result,caller){
                             caller.j++
+                            mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = ""
                             document.getElementById("waitingDiv").style.display = "none"
                             if(caller.j >= caller.length){
                                 server.entityManager.getEntityByUuid(caller.localisation.UUID, true,
@@ -364,7 +411,7 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
     
     mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-cancelBtn").element.onclick = function(localisation){
         return function(){
-           
+           mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = ""
             mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-saveBtn").element.classList.add("disabled")
             mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-cancelBtn").element.classList.add("disabled")
             mainPage.adminPage.adminLocalisationPage.loadAdminControl(localisation)
@@ -375,32 +422,32 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
     
     mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-name").element.onkeyup = function(localisation){
        return function(){
+           mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.panel.getChildById(localisation.M_id + "-cancelBtn").element.classList.remove("disabled")
            var newName = mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-name").element.value
-           var newLocalisation = localisation
+           var newLocalisation = jQuery.extend({}, localisation)
            newLocalisation.M_name = newName
            
            mainPage.adminPage.adminLocalisationPage.modifiedItems[localisation.M_id].set(localisation.M_id, newLocalisation)
        }
     }(localisation)
     
-    mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-parent").element.onkeyup = function(localisation){
-       return function(){
+    
+    mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-parent").element.oncomplete = function(localisation){
+        return function(uuid){
+            mainPage.adminPage.adminLocalisationPage.panel[localisation.M_id + "-parent"] = uuid
+            mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.panel.getChildById(localisation.M_id + "-cancelBtn").element.classList.remove("disabled")
-           var newParent = mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisation.M_id + "-parent").element.value
-            var q = new EntityQuery()
-            q.TypeName = "CatalogSchema.LocalisationType"
-            q.Fields = ["M_id"]
-            q.Query = 'CatalogSchema.LocalisationType.M_id=="'+ newParent +'"'
-            server.entityManager.getEntities("CatalogSchema.LocalisationType", "CatalogSchema", q, 0, -1, [], true, true,
-                function(index,total,caller){},
-                function(results,caller){
-                    if(results[0] != undefined){
+           var newParent = mainPage.adminPage.adminLocalisationPage.panel[localisation.M_id + "-parent"]
+           if(newParent != ""){
+               server.entityManager.getEntityByUuid(newParent,false,
+                function(newParent,caller){
+                    if(newParent != undefined){
                         
                          var newLocalisation = caller.localisation
-                         var newParent = results[0]
+                         
                          if(!newParent.M_subLocalisations.includes(newLocalisation.UUID)){
                             newParent.M_subLocalisations.push(newLocalisation.UUID) 
                             mainPage.adminPage.adminLocalisationPage.modifiedItems[localisation.M_id].set(newParent.M_id, newParent)
@@ -413,15 +460,16 @@ AdminLocalisationPage.prototype.loadAdminControl = function(localisation){
                                         mainPage.adminPage.adminLocalisationPage.modifiedItems[caller.localisation.M_id].set(result.M_id, result)
                                     },function(){},{"localisation" : newLocalisation})
                             }
-                        newLocalisation.M_parent = results[0].UUID
+                        newLocalisation.M_parent = newParent.UUID
                          mainPage.adminPage.adminLocalisationPage.modifiedItems[caller.localisation.M_id].set(newLocalisation.M_id, newLocalisation)
                  
                     }
                    
                 },function(){},{"localisation": localisation})
-           
-       }
+           }
+        }
     }(localisation)
+
 }
 
 AdminLocalisationPage.prototype.appendSubLocalisation = function(subLocalisation, localisationID){
@@ -434,11 +482,45 @@ AdminLocalisationPage.prototype.appendSubLocalisation = function(subLocalisation
     
      mainPage.adminPage.adminLocalisationPage.panel.getChildById(subLocalisation.M_id + "-deleteRowAdminBtn").element.onclick = function(subLocalisation, localisationID){
         return function(){
+            mainPage.adminPage.panel.getChildById("adminLocalisationSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminLocalisationPage.removedItems[localisationID].set(subLocalisation.M_id, subLocalisation)
             var row = mainPage.adminPage.adminLocalisationPage.panel.getChildById(subLocalisation.M_id + "-adminSubLocalisationRow")
             row.delete()
             mainPage.adminPage.adminLocalisationPage.panel.getChildById(localisationID + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.panel.getChildById(localisationID + "-cancelBtn").element.classList.remove("disabled")
+            if(subLocalisation.M_subLocalisations.length > 0){
+                mainPage.adminPage.adminLocalisationPage.removeSubLocalisations(subLocalisation.M_subLocalisations, localisationID)
+            }
         }
     }(subLocalisation, localisationID)
+}
+
+AdminLocalisationPage.prototype.removeSubLocalisations = function(subLocalisations, localisationID){
+    for(var i = 0; i< subLocalisations.length; i++){
+        server.entityManager.getEntityByUuid(subLocalisations[i],false,
+            function(subLocalisation, caller){
+                mainPage.adminPage.adminLocalisationPage.removedItems[caller.localisationID].set(subLocalisation.M_id, subLocalisation)
+                if(subLocalisation.M_subLocalisations.length > 0){
+                    mainPage.adminPage.adminLocalisationPage.removeSubLocalisations(subLocalisation.M_subLocalisations, localisationID)
+                }
+            },function(){},{"localisationID" : localisationID})
+        
+    }
+}
+
+AdminLocalisationPage.prototype.deleteSubLocalisations = function(subLocalisations){
+    for(var i = 0; i< subLocalisations.length; i++){
+        server.entityManager.getEntityByUuid(subLocalisations[i],false,
+            function(subLocalisation, caller){
+                
+                if(subLocalisation.M_subLocalisations.length > 0){
+                    mainPage.adminPage.adminLocalisationPage.deleteSubLocalisations(subLocalisation.M_subLocalisations)
+                }
+                server.entityManager.removeEntity(subLocalisation.UUID,
+                    function(success,caller){
+                        console.log(success)
+                    },function(){},{})
+            },function(){},{})
+        
+    }
 }

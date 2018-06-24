@@ -1717,6 +1717,11 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 		return results, nil
 	}
 
+	// The triples to save...
+	/*for i := 0; i < len(triples); i++ {
+		log.Println("------> save triple ", triples[i])
+	}*/
+
 	// So here I will index the triple...
 	for i := 0; i < len(triples); i++ {
 		// This will contain the value of the triple.

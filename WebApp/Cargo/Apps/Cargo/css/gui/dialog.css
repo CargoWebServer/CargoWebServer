@@ -10,13 +10,14 @@
 	-webkit-box-shadow: 5px 5px 12px -4px;
 	-moz-box-shadow: 5px 5px 12px -4px;
 	box-shadow: 5px 5px 12px -4px;
-	color: #657383;
+	/*color: #657383;*/
 	border: 1px solid;
 }
 
 .dialog_header{
 	width: 100%;
-	display: table;
+	display: flex;
+	justify-items: center;
 }
 
 /** The title **/
@@ -29,38 +30,26 @@
 
 /** Buttons of the dialog **/
 .dialog_buttons{
-	display: table;
-	vertical-align: middle;
-	top: 1px;
-	right: 2px;
+    height: 30px;
 }
 
 /** The title **/
 .dialog_title{
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
     width: 100%;
     padding: 1px;
+    text-align: center;
 }
 
 /** The delete button **/
 .dialog_delete_button{
-	color: gainsboro;
-    display: table-cell;
+	/*color: gainsboro;*/
 	vertical-align: middle;
 	padding-top: 2px;
 	padding-right: 2px;
 	z-index: 10;
 }
 
-
-.dialog_delete_button i {
-    height: 100%;
-}
-
 .dialog_delete_button i:hover {
-	color: rgb(66, 139, 202);
     cursor: pointer;
     transition: all .2s ease;
 }
@@ -75,7 +64,7 @@
 }
 
 .dialog_footer{
-	display: table;
+	display: flex;
 	width: 100%;
 	position: relative;
 	text-align: center;
@@ -105,19 +94,15 @@
 }
 
 .diablog_button{
-	display: table-cell;
-	height: 28px;
-	text-align: center;
-	vertical-align: middle;
-	min-width: 50px;
-	border: solid 1px transparent;
-	padding-right: 5px;
-	padding-left: 5px;
+	display: inline-flex;
+    height: 29px;
+    min-width: 60px;
+    justify-content: center;
 }
 
 .diablog_button:hover{
 	cursor: pointer;
-	color: rgb(66, 139, 202);
+	/*color: rgb(66, 139, 202);*/
 }
 
 .diablog_button:active{
