@@ -235,42 +235,113 @@ func (self *Engine) AppendFunction(name string, args []string, src string, optio
 }
 
 /**
- * Evaluate a function with a given name and arguments.
+ * Set a variable on the global context.
+ * name The name of the variable in the context.
+ * value The value of the variable, can be a string, a number,
  */
-func (self *Engine) EvalFunction(name string, args []string) error {
+func (self *Engine) SetVariable(name string, value interface{}) {
+	// first of all I will initialyse the arguments.
+	globalObject := Jerry_get_global_object()
+
+	propName := Jerry_create_string(NewUint8FromString(name))
+
+	var propValue Uint32_t
+	if reflect.TypeOf(value).Kind() == reflect.String {
+		// String value
+		propValue = Jerry_create_string(NewUint8FromString(value.(string)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
+		// Boolean value
+		propValue = Jerry_create_boolean(value.(bool))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int {
+		propValue = Jerry_create_number(float64(value.(int)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
+		propValue = Jerry_create_number(float64(value.(int8)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
+		propValue = Jerry_create_number(float64(value.(int16)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
+		propValue = Jerry_create_number(float64(value.(int32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
+		propValue = Jerry_create_number(float64(value.(int64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint {
+		propValue = Jerry_create_number(float64(value.(uint)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint8 {
+		propValue = Jerry_create_number(float64(value.(uint8)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint16 {
+		propValue = Jerry_create_number(float64(value.(uint16)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint32 {
+		propValue = Jerry_create_number(float64(value.(uint32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Uint64 {
+		propValue = Jerry_create_number(float64(value.(uint64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+		propValue = Jerry_create_number(float64(value.(float32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
+		propValue = Jerry_create_number(value.(float64))
+	}
+
+	// Set the propertie in the global context..
+	Jerry_set_property(globalObject, propName, propValue)
+
+	// Release the resource as no more needed here.
+	Jerry_release_value(propName)
+	Jerry_release_value(propValue)
+
+	Jerry_release_value(globalObject)
+
+}
+
+/**
+ * Evaluate a javascript function with a given name and arguments list.
+ * 			*The fuction must be set by AppendFunction before being use here.
+ */
+func (self *Engine) EvalFunction(name string, args []interface{}) (interface{}, error) {
 	if fct, ok := self.functions[name]; ok {
 		// Now I will test if argument are given.
 		if len(fct.Args) != len(args) {
-			return errors.New("Function named " + name + " expect " + strconv.Itoa(len(fct.Args)) + " argument(s) not " + strconv.Itoa(len(args)))
+			return nil, errors.New("Function named " + name + " expect " + strconv.Itoa(len(fct.Args)) + " argument(s) not " + strconv.Itoa(len(args)))
 		}
-
-		// first of all I will initialyse the arguments.
-		globalObject := Jerry_get_global_object()
 
 		for i := 0; i < len(args); i++ {
-			propName := Jerry_create_string(NewUint8FromString(fct.Args[i]))
-			arg := args[i]
-			propValue := Jerry_create_string(NewUint8FromString(arg))
-
-			// Set the propertie in the global context..
-			Jerry_set_property(globalObject, propName, propValue)
-
-			// Release the resource as no more needed here.
-			Jerry_release_value(propName)
-			Jerry_release_value(propValue)
+			self.SetVariable(fct.Args[i], args[i])
 		}
-
-		Jerry_release_value(globalObject)
 
 		// Now I will evaluate the function...
 		ret := Jerry_eval(NewUint8FromString(fct.Body), int64(len(fct.Body)), false)
 
+		// Get the Go value...
+		var value interface{}
+
+		typeInfo := Jerry_value_get_type(ret)
+
+		// Now I will get the result if any...
+		if typeInfo == Jerry_type_t(JERRY_TYPE_NUMBER) {
+			value = Jerry_get_number_value(ret)
+		} else if typeInfo == Jerry_type_t(JERRY_TYPE_STRING) {
+			// Size info, ptr and it value
+			sizePtr := Jerry_get_string_size(ret)
+			sizeValue := *(*uint64)(unsafe.Pointer(sizePtr.Swigcptr()))
+			var buffer Uint8
+			buffer.ptr = C.malloc(C.ulong(sizeValue)) // allocated the size.
+
+			// Test if the string is a valid utf8 string...
+
+			Jerry_string_to_char_buffer(ret, buffer, sizePtr)
+
+			// Set the slice information...
+			h := &reflect.SliceHeader{buffer.Swigcptr(), int(sizeValue), int(sizeValue)}
+			NewSlice := *(*[]byte)(unsafe.Pointer(h))
+
+			// Set the Go string value from the slice.
+			value = string(NewSlice)
+
+			// release the memory used by the buffer.
+			buffer.Free()
+		}
+
 		// Free JavaScript value, returned by eval
 		Jerry_release_value(ret)
-
-		return nil
+		return value, nil
 	} else {
-		return errors.New("No function found with name " + name)
+		return nil, errors.New("No function found with name " + name)
 	}
 }
 

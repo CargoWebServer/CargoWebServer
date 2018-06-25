@@ -19,14 +19,10 @@ func TestHelloJerry(t *testing.T) {
 	var arg4 = NewUint32FromInt(int32(JERRY_PARSE_NO_OPTS))
 
 	parsed_code := Jerry_parse(arg0, arg1, arg2, arg3, arg4)
-	log.Println("---> ", parsed_code)
 	if !Jerry_value_is_error(parsed_code) {
-		log.Println("----> no error found in script!")
 
 		/* Execute the parsed source code in the Global scope */
 		jerry_value_t := Jerry_run(parsed_code)
-
-		log.Println("----> return value: ", jerry_value_t.Swigcptr())
 
 		/* Returned value must be freed */
 		Jerry_release_value(jerry_value_t)
@@ -41,7 +37,16 @@ func TestHelloJerry(t *testing.T) {
 
 func TestEvalFunction(t *testing.T) {
 	engine := NewEngine(9696, JERRY_INIT_EMPTY)
-	engine.AppendFunction("SayHelloTo", []string{}, "print('Hello world')", JERRY_PARSE_NO_OPTS)
-	engine.EvalFunction("SayHelloTo", []string{"Jerry Script"})
+
+	// Test eval string function.
+	engine.AppendFunction("SayHelloTo", []string{"to"}, "'Hello ' + to + '!'", JERRY_PARSE_NO_OPTS)
+	str, _ := engine.EvalFunction("SayHelloTo", []interface{}{"Jerry Script"})
+	log.Println("---> ", str)
+
+	// Test numeric function
+	engine.AppendFunction("Add", []string{"a", "b"}, "a + b;", JERRY_PARSE_NO_OPTS)
+	number, _ := engine.EvalFunction("Add", []interface{}{1, 2.25})
+	log.Println("---> ", number)
+
 	engine.Clear()
 }
