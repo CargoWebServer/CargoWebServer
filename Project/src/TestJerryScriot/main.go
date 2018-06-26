@@ -10,13 +10,8 @@ import (
 func main() {
 	engine := GoJerryScript.NewEngine(9696, GoJerryScript.JERRY_INIT_EMPTY)
 
-	// eval string value
-	engine.AppendFunction("SayHelloTo", []string{"to"}, "print ('Hello ' + to);", GoJerryScript.JERRY_PARSE_NO_OPTS)
-	engine.EvalFunction("SayHelloTo", []interface{}{"Jerry"})
-
-	// eval numeric value
-	engine.AppendFunction("Add", []string{"a", "b"}, "a+b;", GoJerryScript.JERRY_PARSE_NO_OPTS)
-	engine.EvalFunction("Add", []interface{}{1, 2.25})
+	engine.AppendFunction("TestArray", []string{"arr, val"}, "function TestArray(arr, val){arr.push(val);return arr;}", GoJerryScript.JERRY_PARSE_NO_OPTS)
+	engine.EvalScript("TestArray(arr, val);", []GoJerryScript.Property{{Name: "arr", Value: []float64{1.0, 3.0, 4.0}}, {Name: "val", Value: 2.25}})
 
 	engine.Clear()
 }
