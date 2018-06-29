@@ -64,11 +64,11 @@ var SessionPanel = function(parent){
         .appendElement({"tag":"i", "class":"fa fa-user"}).up().up()
         .appendElement({"tag":"input", "id":"login-username", "type":"text", "autofocus":"autofocus", "class":"form-control", "name":"username"})
     
-    this.loginPanel.appendElement({"tag":"div", "class":"input-group", "style":"padding: 2px"}).down()
+    var pwd =  this.loginPanel.appendElement({"tag":"div", "class":"input-group", "style":"padding: 2px"}).down()
         .appendElement({"tag":"div", "class":"input-group-prepend"}).down()
         .appendElement({"tag":"span", "class":"input-group-text"}).down()
         .appendElement({"tag":"i", "class":"fa fa-lock"}).up().up()
-        .appendElement({"tag":"input", "id":"login-pwd", "class":"form-control", "type":"password", "name":"pwd"});
+        .appendElement({"tag":"input", "id":"login-pwd", "class":"form-control", "type":"password", "name":"pwd"}).down();
         
     // Now the login button.
     this.loginPanel.appendElement({"tag":"div", "class":"input-group", "style":"padding: 2px"}).down()
@@ -94,10 +94,15 @@ var SessionPanel = function(parent){
     this.conencted = null;
     
     // Now the action...
-    var loginBtn = this.loginPanel.getChildById("login-btn")
-    loginBtn.element.onclick = function(sessionPanel){
+    var loginBtn =  this.loginPanel.getChildById("login-btn")
+    loginBtn.element.onclick =  pwd.element.onkeyup = function(sessionPanel){
         return function(evt){
             // not remove the dropdown...
+            if(this.tagName == "INPUT"){
+                if(evt.keyCode != 13){
+                    return
+                }
+            }
             evt.stopPropagation()
             server.sessionManager.login(sessionPanel.loginPanel.getChildById("login-username").element.value, sessionPanel.loginPanel.getChildById("login-pwd").element.value, "SafranLdap",
             // success callback.

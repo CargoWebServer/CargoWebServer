@@ -23,8 +23,7 @@ OrderHistory.prototype.displayHistory = function (orders) {
     .appendElement({"tag" : "th", "style" : "width:10%;", "innerHtml" : "Status"})
     .up().up()
     .appendElement({"tag" : "tbody", "id" : "ordersHistoryBody"}).up()
-    
-    console.log(orders)
+
     displayOrders(orders)
 }
 
@@ -54,7 +53,6 @@ function displayOrders(orders){
                 
                 server.entityManager.getEntityByUuid(orders[i].M_items[j].M_itemSupplierRef, false, 
                     function(item_supplier, caller){
-                         console.log(item_supplier)
                         server.entityManager.getEntityByUuid(item_supplier.M_package, false,
                             function(item_package, caller){
                                

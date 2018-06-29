@@ -502,12 +502,12 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " return this\n"
     constructorSrc += "}\n\n"
 
-    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object, lazy, callback){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object, lazy){\n"
     // First of all i will set reference in the result.
     constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
     constructorSrc += "   this.UUID = object.UUID\n"
     constructorSrc += "   this.IsInit = false\n"
-    constructorSrc += "   setObjectValues(this, object, lazy, callback)\n"
+    constructorSrc += "   setObjectValues(this, object, lazy)\n"
     constructorSrc += "}\n\n"
 
     // Set the function.

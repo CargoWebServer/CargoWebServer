@@ -34,32 +34,6 @@ function deleteOrder(userId){
 }
 
 /** Text contain in the main page **/
-/** TODO ajouter cette liste a la traduction **/
-/*
-CM (centimeter)
-CM^2 (square centimeter)
-CM^3 (cubic centimeter)
-EA (each)
-FT (feet)
-FT^2 (square feet)
-FT^3 (cubic feet)
-GA (gallon)
-IN (inch)
-IN^2 (square inch)
-IN^3 (cubic inch)
-LB (pound)
-LITER (liter)
-mL (miliLiter)
-M (meter)
-M^2 (square meter)
-M^3 (cubic meter)
-MM (millimeter)
-MM^2 (square millimeter)
-MM^3 (cubic millimeter)
-WEIGHTLESS
-YD (yard)
-Micron (um)
-*/
 var mainPageText = {
     "en": {
         "quickSearchText": " Quick search",
@@ -73,7 +47,30 @@ var mainPageText = {
         "supplierSearchLnk" : "by supplier",
         "specsSearchLnk" : "by properties",
         "localisationSearchLnk":"by localisation",
-        "generalSearchLnk" : "générale"
+        "generalSearchLnk" : "générale",
+        "CM (centimeter)" : "CM (centimeter)",
+        "CM^2 (square centimeter)" : "CM^2 (square centimeter)",
+        "CM^3 (cubic centimeter)" : "CM^3 (cubic centimeter)",
+        "EA (each)" : "EA (each)",
+        "FT (feet)"  : "FT (feet)",
+        "FT^2 (square feet)" : "FT^2 (square feet)",
+        "FT^3 (cubic feet)" : "FT^3 (cubic feet)",
+        "GA (gallon)" : "GA (gallon)",
+        "IN (inch)" : "IN (inch)",
+        "IN^2 (square inch)" : "IN^2 (square inch)",
+        "IN^3 (cubic inch)" : "IN^3 (cubic inch)",
+        "LB (pound)" :  "LB (pound)",
+        "LITER (liter)" : "LITER (liter)",
+        "mL (miliLiter)" : "mL (miliLiter)",
+        "M (meter)" : "M (meter)",
+        "M^2 (square meter)" : "M^2 (square meter)",
+        "M^3 (cubic meter)" : "M^3 (cubic meter)",
+        "MM (millimeter)" : "MM (millimeter)",
+        "MM^2 (square millimeter)" : "MM^2 (square millimeter)",
+        "MM^3 (cubic millimeter)" : "MM^3 (cubic millimeter)",
+        "WEIGHTLESS" : "WEIGHTLESS",
+        "YD (yard)" : "YD (yard)",
+        "Micron (um)" : "Micron (um)"
     },
     "fr": {
         "quickSearchText": " Recherche rapide",
@@ -87,7 +84,30 @@ var mainPageText = {
         "supplierSearchLnk" : "par fournisseur",
         "localisationSearchLnk":"par localisation",
         "specsSearchLnk" : "par propriétés",
-        "generalSearchLnk" : "générale"
+        "generalSearchLnk" : "générale",
+        "CM (centimeter)" : "cm (centimètre)",
+        "CM^2 (square centimeter)" : "cm^2 (centimètre carré)",
+        "CM^3 (cubic centimeter)" : "cm^3 (centimètre cube)",
+        "EA (each)" : "CHQ (Chaque)",
+        "FT (feet)"  : "pi (Pieds)",
+        "FT^2 (square feet)" : "pi^2 (Pieds carrés)",
+        "FT^3 (cubic feet)" : "pi^3 (Pieds cubes)",
+        "GA (gallon)" : "ga (gallon)",
+        "IN (inch)" : "po (Pouces)",
+        "IN^2 (square inch)" : "po^2 (Pouces carrés)",
+        "IN^3 (cubic inch)" : "po^3 (Pouces cubes)",
+        "LB (pound)" :  "lb (Livres)",
+        "LITER (liter)" : "l (Litres)",
+        "mL (miliLiter)" : "mL (millilitres)",
+        "M (meter)" : "m (mètres)",
+        "M^2 (square meter)" : "m^2 (mètres carrés)",
+        "M^3 (cubic meter)" : "m^3 (mètres cubes)",
+        "MM (millimeter)" : "mm (millimètres)",
+        "MM^2 (square millimeter)" : "mm^2 (millimètres carrés)",
+        "MM^3 (cubic millimeter)" : "mm^3 (millimètres cubes)",
+        "WEIGHTLESS" : "SANS POIDS",
+        "YD (yard)" : "Ve (Verge)",
+        "Micron (um)" : "Micron (um)"
     },
     
     "es" : {
@@ -767,7 +787,7 @@ function goToHome(){
     document.getElementById("admin_page_panel").style.display = "none"
 }
 
-MainPage.prototype.showNotification = function (alertType, message,delay){
+MainPage.prototype.showNotification = function (alertType, message, delay){
     var id = randomUUID();
     var msg =  mainPage.panel.getChildById("notificationDiv").appendElement({"tag" : "div", "class" : "alert alert-"+alertType+" alert-dismissible", "role" : "alert"}).down()
     msg.appendElement({"tag" : "p","class" : "mb-0", "innerHtml" : message})

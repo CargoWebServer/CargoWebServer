@@ -44,12 +44,14 @@ var OrderPage = function (parent) {
         
         this.sendCmdBtn.element.onclick = function(orderPage){
             return function(){
+                
                 // save the current order.
                 // console.log(orderPage.currentOrder)
                 // When the order is save I will remove the current order
                 if(orderPage.currentOrder.M_items.length == 0){
                     mainPage.showNotification("danger", "Votre panier est vide!", 4000)
                 }else{
+                    document.getElementById("waitingDiv").style.display = ""
                     orderPage.currentOrder.M_status.M_valueOf = "Pending";
                     server.entityManager.saveEntity(orderPage.currentOrder, 
                     function(result, orderPage){
@@ -58,7 +60,7 @@ var OrderPage = function (parent) {
                         orderPage.panel.getChildById("orderTotal").element.innerHTML = ""
                         var userId = orderPage.currentOrder.M_userId;
                         orderPage.currentOrder = null;
-                        mainPage.showNotification("primary", "Votre commande a été créée avec succès!", 4000)
+                        mainPage.showNotification("success", "Votre commande a été créée avec succès!", 4000)
                         mainPage.panel.getChildById("cartCount").element.innerHTML = 0
                         
                         // Recreate a new empty order.
@@ -69,8 +71,10 @@ var OrderPage = function (parent) {
                         order.M_status.M_valueOf = "Open";
                         order.M_total = new CatalogSchema.PriceType()
                         order.M_total.M_valueOf = 0
+                        document.getElementById("waitingDiv").style.display = "none"
                         server.entityManager.createEntity(catalog.UUID, "M_orders", order, 
                             function (order,orderPage){
+                                
                                 orderPage.setOrder(order)
                             },function(errObj,caller){
                                 
@@ -120,7 +124,10 @@ OrderPage.prototype.displayOrder = function () {
     }
    
     document.getElementById("order_page_panel").style.display = ""
-    document.getElementById("order_history_page_panel").style.display = "none"
+    if(document.getElementById("order_history_page_panel") != null){
+      document.getElementById("order_history_page_panel").style.display = "none"  
+    }
+    
     
    
     

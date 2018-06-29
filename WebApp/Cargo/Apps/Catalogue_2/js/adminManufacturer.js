@@ -445,7 +445,7 @@ AdminManufacturerPage.prototype.loadAdminControl = function(manufacturer){
 
 AdminManufacturerPage.prototype.appendPackage = function(pkg, manufacturer){
     mainPage.adminPage.adminManufacturerPage.panel.getChildById(manufacturer.M_id +"-packagesList").appendElement({"tag" : "tr", "id" : pkg.M_id + "-adminPackageRow"}).down()
-    .appendElement({"tag" :"td","innerHtml" : pkg.M_id, "id" : pkg.M_id + "-packageID"})
+    .appendElement({"tag" :"td","innerHtml" : pkg.M_id, "id" : pkg.M_id + "-packageID", "class" : "tabLink"})
     .appendElement({"tag" : "td", "innerHtml" : pkg.M_name, "id" : pkg.M_id + "-packageName"})
     .appendElement({"tag":"td"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : pkg.M_id + "-deletePkgRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
@@ -462,11 +462,17 @@ AdminManufacturerPage.prototype.appendPackage = function(pkg, manufacturer){
         }
     }(pkg, manufacturer)
     
+    mainPage.adminPage.adminManufacturerPage.panel.getChildById(pkg.M_id + "-packageID").element.onclick = function(item_package){
+        return function(){
+            mainPage.packageDisplayPage.displayTabItem(item_package)
+        }
+    }(pkg)
+    
 }
 
 AdminManufacturerPage.prototype.appendItem = function(item, manufacturer){
     mainPage.adminPage.adminManufacturerPage.panel.getChildById(manufacturer.M_id +"-itemsList").appendElement({"tag" : "tr", "id" : item.M_id + "-adminItemRow"}).down()
-    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID"})
+    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID", "class" : "tabLink"})
     .appendElement({"tag" : "td", "innerHtml" : item.M_name, "id" : item.M_id + "-itemName"})
     .appendElement({"tag":"td"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : item.M_id + "-deleteItemRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
@@ -483,6 +489,12 @@ AdminManufacturerPage.prototype.appendItem = function(item, manufacturer){
 
         }
     }(item, manufacturer)
+    
+    mainPage.adminPage.adminManufacturerPage.panel.getChildById(item.M_id + "-itemID").element.onclick = function(item){
+        return function(){
+            mainPage.itemDisplayPage.displayTabItem(item)
+        }
+    }(item)
     
 }
 

@@ -1,0 +1,68 @@
+<html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<head>
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/BrowserPrint-1.0.4.min.js"></script>
+<script type="text/javascript" src="js/DevDemo.js"></script>
+
+<script type="text/javascript">
+$(document).ready(setup_web_print);
+</script>
+</head>
+<body style="background-color:#D8D8D8; font-size:24px;">
+	<div class="navbar navbar-inverse " role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#"><p style="font-size: 150%;">Zebra Browser Print Demo</p></a>
+        <script type="text/javascript">
+var OSName="Unknown OS";
+if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
+//{
+//OSName="Windows";
+//document.write('<a href="ZebraWebPrint.exe" class="navbar-brand" href="#">Download the '+OSName+' App</a>');
+//}
+if (navigator.appVersion.indexOf("Mac")!=-1) OSName="MacOS";
+if (navigator.appVersion.indexOf("X11")!=-1) OSName="UNIX";
+if (navigator.appVersion.indexOf("Linux")!=-1) OSName="Linux";
+
+        </script>
+			
+      </div><!-- /navbar-header -->
+    </div><!-- /container -->
+  </div><!-- /navigation -->
+  <div class="container" style="width:500px">
+    <div id="main">
+      <div id="printer_data_loading" style="display:none"><span id="loading_message">Loading Printer Details...</span><br/>
+        <div class="progress" style="width:100%">
+          <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      </div> <!-- /printer_data_loading -->
+      <div id="printer_details" style="display:none">
+        <span id="selected_printer">No data</span> 
+        <button type="button" class="btn btn-success" onclick="changePrinter()">Change</button>
+      </div><br /> <!-- /printer_details -->
+      <div id="printer_select" style="display:none">
+        Zebra Printer Options<br />
+        Printer: <select id="printers"></select>
+      </div> <!-- /printer_select -->
+      <div id="print_form" style="display:none">
+        Enter Name: <input type="text" id="entered_name"></input>
+        <br /><br />
+        <button type="button" class="btn btn-lg btn-primary" onclick="sendData();" value="Print">Print Label</button>
+      </div> <!-- /print_form -->
+    </div> <!-- /main -->
+    <div id="error_div" style="width:500px; display:none"><div id="error_message"></div>
+      <button type="button" class="btn btn-lg btn-success" onclick="trySetupAgain();">Try Again</button>
+    </div><!-- /error_div -->
+	</div><!-- /container -->
+</body>
+</html>

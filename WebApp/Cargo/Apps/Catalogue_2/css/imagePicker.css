@@ -27,7 +27,16 @@
     position: relative;
 }
 
-.image_panel img{
+.image_panel img {
+    position:absolute;
+    max-width: 148px;
+    max-height: 148px;
+    top:0;
+    bottom:0;
+    margin:auto;
+}
+
+.image_panel  video{
     position:absolute;
     max-width: 148px;
     max-height: 148px;

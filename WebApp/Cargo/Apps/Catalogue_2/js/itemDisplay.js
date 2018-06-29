@@ -8,7 +8,7 @@ var ItemDisplayPage = function (parent) {
     // The result content.
     this.panel = new Element(parent, { "tag": "div", "id": "item_display_page_panel", "class": "item_display container-fluid" , "style" :"margin-top : 15px;"})
 
-    this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs querynav","id" : "itemqueries"}).down()
+    this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs querynav printHide","id" : "itemqueries"}).down()
     // Now I will display the list of results...
     this.navbar.appendElement({"tag":"button","class":"btn btn-dark toggleBtn", "onclick" : "itemSwitchContext()","innerHtml" :"Voir les recherches"})
     
@@ -42,36 +42,75 @@ function parseImage(itemID){
         if(photos != null){
             for(var i=0; i < photos.length; i++){
                 if(i == 0){
-                    var child = document.createElement("li")
-                    child.setAttribute("data-target", "#" + itemID + "-carousel")
-                    child.setAttribute("data-slide-to" , "0")
-                    child.setAttribute("class", "active")
-                    document.getElementById(itemID + "-carousel-indicators").appendChild(child)
+                    if(photos[i].endsWith(".jpg") || photos[i].endsWith(".png")){
+                        var child = document.createElement("li")
+                        child.setAttribute("data-target", "#" + itemID + "-carousel")
+                        child.setAttribute("data-slide-to" , "0")
+                        child.setAttribute("class", "active")
+                        document.getElementById(itemID + "-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item active")
+                        var picture = document.createElement("img")
+                        picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        picture.setAttribute("class", "img-fluid rounded carouselImage")
+                        child.appendChild(picture)
+                        document.getElementById(itemID + "-carousel-inner").appendChild(child)
+                    }else{
+                        var child = document.createElement("li")
+                        child.setAttribute("data-target", "#" + itemID + "-carousel")
+                        child.setAttribute("data-slide-to" , "0")
+                        child.setAttribute("class", "active")
+                        document.getElementById(itemID + "-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item active")
+                        var video = document.createElement("video")
+                        video.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        video.setAttribute("type", "video/mp4")
+                        video.setAttribute("class", "img-fluid rounded carouselImage")
+                        video.autoplay = true
+                        video.muted = true
+                        video.controls = true
+                        video.load()
+                        child.appendChild(video)
+                        document.getElementById(itemID + "-carousel-inner").appendChild(child)
+                    }
                     
-                    child = document.createElement("div")
-                    child.setAttribute("class", "carousel-item active")
-                    var picture = document.createElement("img")
-                    picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
-                    picture.setAttribute("class", "img-fluid rounded carouselImage")
-                    child.appendChild(picture)
-                    document.getElementById(itemID + "-carousel-inner").appendChild(child)
                 }else{
-                    var child = document.createElement("li")
-                    child.setAttribute("data-target", "#"+ itemID + "-carousel")
-                    child.setAttribute("data-slide-to", i)
-                    document.getElementById(itemID + "-carousel-indicators").appendChild(child)
-                    child = document.createElement("div")
-                    child.setAttribute("class", "carousel-item")
-                    var picture = document.createElement("img")
-                    picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
-                    picture.setAttribute("class", "img-fluid rounded carouselImage")
-                    child.appendChild(picture)
-                    document.getElementById(itemID + "-carousel-inner").appendChild(child)
+                    if(photos[i].endsWith(".jpg") || photos[i].endsWith(".png")){
+                       var child = document.createElement("li")
+                        child.setAttribute("data-target", "#"+ itemID + "-carousel")
+                        child.setAttribute("data-slide-to", i)
+                        document.getElementById(itemID + "-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item")
+                        var picture = document.createElement("img")
+                        picture.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        picture.setAttribute("class", "img-fluid rounded carouselImage")
+                        child.appendChild(picture)
+                        document.getElementById(itemID + "-carousel-inner").appendChild(child)
+                    }else{
+                         var child = document.createElement("li")
+                        child.setAttribute("data-target", "#"+ itemID + "-carousel")
+                        child.setAttribute("data-slide-to", i)
+                        document.getElementById(itemID + "-carousel-indicators").appendChild(child)
+                        child = document.createElement("div")
+                        child.setAttribute("class", "carousel-item")
+                        var video = document.createElement("video")
+                        video.setAttribute("src", "/Catalogue_2/photo/" +itemID+"/" + photos[i])
+                        video.setAttribute("type", "video/mp4")
+                        video.setAttribute("class", "img-fluid rounded carouselImage")
+                        video.autoplay = true
+                        video.muted = true
+                        video.controls = true
+                        video.load()
+                        child.appendChild(video)
+                        document.getElementById(itemID + "-carousel-inner").appendChild(child)
+                    }
+                    
                 }
             }
         }
     },function(errObj,caller){
-        console.log("error")
     },{"itemID":itemID})
 } 
 
@@ -105,29 +144,36 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
     
     this.itemResultPanel.appendElement({"tag" : "div","class" : "tab-pane show result-tab-content", "style" : "position:relative; background-color : white;", "id" : item.M_id + "-itemquery", "role" : "tabpanel", "aria-labelledby" :item.M_id + "-tab" }).down()
     .appendElement({"tag" : "div", "class" : "jumbotron"}).down()
-    .appendElement({"tag" : "div", "class": "d-flex justify-content-around"}).down()
-    .appendElement({"tag" : "h1", "style" : "text-align:center;", "innerHtml" : item.M_name})
-    .appendElement({"tag" : "button", "class" : "btn btn-outline-dark", "id" : item.M_id + "-packageButton"}).down()
-    .appendElement({"tag" : "span","style" : "font-size : 1.75rem;","innerHtml" : "Aller aux paquets "})
-    .appendElement({"tag" : "i", "class" : "fa fa-object-group","style" : "font-size:1.75rem;"}).up().up()
+    .appendElement({"tag" : "div", "class": "d-flex justify-content-center flex-row"}).down()
+    .appendElement({"tag" : "span"}).down()
+    .appendElement({"tag" : "h1", "style" : "text-align:center;", "innerHtml" : item.M_name}).up()
+    .appendElement({"tag" : "span", "class" : "d-flex align-items-center"}).down()
+    .appendElement({"tag" : "button", "class" : "btn btn-outline-dark ml-3", "id" : item.M_id + "-loadItemAdminEdit"}).down()
+    .appendElement({"tag" : "span",  "innerHtml" : "Modifier l'item"})
+    .appendElement({"tag" : "i", "class" : "fa fa-wrench ml-1"}).up()
+    .appendElement({"tag" : "button", "class" : "btn btn-outline-dark ml-3", "id" : item.M_id + "-printBtn"}).down()
+    .appendElement({"tag" : "i", "class" : "fa fa-print", "title" : "Imprimer l'item"}).up().up().up()
     .appendElement({"tag" : "hr", "class" : "my-4"})
     .appendElement({"tag" :"div", "class" : "container-fluid"}).down()
     .appendElement({"tag" : "span", "class" : "row"}).down()
-    .appendElement({"tag" : "div", "class" : "col-md order-0"}).down()
+    .appendElement({"tag" : "div", "class" : "col-md order-0 printHide"}).down()
     .appendElement({"tag" : "div", "class" : "row paddedhor"}).down()
     .appendElement({"tag" : "div", "id" : item.M_id + "-carousel", "class" : "carousel slide d-flex justify-content-center ", "data-ride": "carousel"}).down()
-    .appendElement({"tag" : "ol", "class" : "carousel-indicators", "id" : item.M_id + "-carousel-indicators"})
+    .appendElement({"tag" : "ol", "class" : "carousel-indicators printHide", "id" : item.M_id + "-carousel-indicators"})
     .appendElement({"tag" : "div", "class" : "carousel-inner rounded", "id" : item.M_id + "-carousel-inner"})
-    .appendElement({"tag" : "a", "class" : "carousel-control-prev", "href" : "#" + item.M_id + "-carousel", "role" : "button","data-slide" :"prev" , "id" : item.M_id + "-carousel-control-prev"}).down()
+    .appendElement({"tag" : "a", "class" : "carousel-control-prev printHide", "href" : "#" + item.M_id + "-carousel", "role" : "button","data-slide" :"prev" , "id" : item.M_id + "-carousel-control-prev"}).down()
     .appendElement({"tag" : "span", "class" : "carousel-control-prev-icon", "aria-hidden" : "true"})
     .appendElement({"tag" : "span", "class" : "sr-only", "innerHtml" : "Previous"}).up()
-    .appendElement({"tag" : "a", "class" : "carousel-control-next", "href" : "#" + item.M_id + "-carousel", "role" : "button","data-slide" :"next" , "id" : item.M_id + "-carousel-control-next"}).down()
+    .appendElement({"tag" : "a", "class" : "carousel-control-next printHide", "href" : "#" + item.M_id + "-carousel", "role" : "button","data-slide" :"next" , "id" : item.M_id + "-carousel-control-next"}).down()
     .appendElement({"tag" : "span", "class" : "carousel-control-next-icon", "aria-hidden" : "true"})
     .appendElement({"tag" : "span", "class" : "sr-only", "innerHtml" : "Previous"}).up().up().up().up()
     
     .appendElement({"tag" : "div", "class" : "col-md order-1"}).down()
     .appendElement({"tag" : "div", "class" : "list-group ", "id" : item.M_id + "-detailsGroup"}).down()
     .appendElement({"tag" : "h4", "class" : "row d-flex justify-content-center list-group-item bg-dark text-light", "innerHtml" : "Détails"})
+    .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
+    .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "ID", "style" : "border-right :1px solid #e9ecef;"})
+    .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : item.M_id}).up()
     .appendElement({"tag" : "div", "class" :"row list-group-item itemRow d-flex"}).down()
     .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Description", "style" : "border-right :1px solid #e9ecef;"})
     .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action ", "innerHtml" : item.M_description}).up()
@@ -137,7 +183,7 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
     .appendElement({"tag" : "div", "class" :"row list-group-item  itemRow d-flex"}).down()
     .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Équivalents", "style" : "border-right : 1px solid #e9ecef;"})
     .appendElement({"tag" : "div", "class" : "col  largeCol list-group-item-action"}).down()
-    .appendElement({"tag" : "ul", "class" : "list-group borderless", "id": item.M_id + "-equivalent"}).up().up()
+    .appendElement({"tag" : "ul", "class" : "list-group borderless ", "id": item.M_id + "-equivalent"}).up().up()
     .appendElement({"tag" : "div", "class" :"row list-group-item  itemRow d-flex"}).down()
     .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Commentaires", "style" : "border-right :1px solid #e9ecef;"})
     .appendElement({"tag" : "div", "class" : "col  largeCol list-group-item-action", "innerHtml" : item.M_comments}).up()
@@ -155,19 +201,29 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
     .appendElement({"tag" : "hr", "class" : "my-4", "style" : "margin:1.5rem;opacity:0;"})
     
     .appendElement({"tag" : "div", "id" : item.M_id + "-packages", "class" : "border rounded border-dark"}).down()
-    .appendElement({"tag" : "div", "class" : "text-light d-flex justify-content-center align-items-center flex-direction-row", "style"  : "font-size : 2rem; background-color:#868e96;"}).down()
-    .appendElement({"tag" : "i", "class" : "fa fa-object-group", "style" : "margin:10px;"})
-    .appendElement({"tag" : "span", "innerHtml" : " Paquets"}).up()
-    .appendElement({"tag" : "ul", "class" : "nav nav-tabs", "id" : item.M_id + "-packagesNav"})
+    .appendElement({"tag" : "div", "class" : "text-light d-flex justify-content-center align-items-center flex-direction-row bg-dark text-light list-group-item printNoBorder printNoPadding", "style"  : "font-size : 1.5rem;"}).down()
+    .appendElement({"tag" : "span", "innerHtml" : " Paquets"})
+    .appendElement({"tag" : "i", "class" : "fa fa-object-group ml-3"}).up()
     
-    .appendElement({"tag": "div","class" : "tab-content", "id" : item.M_id  + "-packagesContent"})
+    .appendElement({"tag": "div","class" : "tab-content", "id" : item.M_id  + "-packageSection"})
     
     parseImage(item.M_id)
     
-    this.itemResultPanel.getChildById(item.M_id + "-packageButton").element.addEventListener('click', function(){
-        showPackage(item.M_id)
-    })
     
+    this.itemResultPanel.getChildById(item.M_id  + "-printBtn").element.onclick = function(){
+        window.print()
+    }
+    
+    this.itemResultPanel.getChildById(item.M_id + "-loadItemAdminEdit").element.onclick = function(item){
+        return function(){
+             mainPage.adminPage.adminItemPage.searchBar.element.value = item.M_id 
+            mainPage.adminPage.adminItemPage.searchFct()
+             document.getElementById("item_display_page_panel").style.display = "none"
+              document.getElementById("admin_page_panel").style.display = ""
+              document.getElementById("item-adminTab").click()
+        }
+    }(item)
+
     // Display the equivalent list.
     var equivalents = this.itemResultPanel.getChildById(item.M_id + "-equivalent")
     for(var i=0; i < item.M_equivalents.length; i++){
@@ -176,7 +232,7 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
         getEntityIdsFromUuid(uuid, function(lst, uuid){
             return function(ids){
                 // So here I will set the lnk to the item...
-                var li = lst.appendElement({"tag":"li", "class":"list-group-item"}).down()
+                var li = lst.appendElement({"tag":"li", "class":"list-group-item printNoBorder"}).down()
                 var lnk = li.appendElement({"tag":"a", "href":"#", "innerHtml":ids[1]}).down()
                 // Now the lnk action...
                 lnk.element.onclick = function(uuid){
@@ -215,7 +271,40 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
         }
     }
     
-    for(var i = 0; i< item.M_packaged.length; i++){
+    
+    for(var i  = 0; i < item.M_packaged.length; i++){
+       server.entityManager.getEntityByUuid(item.M_packaged[i], false, 
+       function(pkg, caller){
+           caller.packageSection.appendElement({"tag" : "div", "class" :"list-group-item row itemRow d-flex innerShadow printNoBorder", "id" : pkg.M_id + "-itemRow", "style" : "margin-left : 0px; margin-right:0px;"}).down()
+           .appendElement({"tag" : "div", "class" : "col-md-3 d-flex justify-content-center align-items-center"}).down()
+           .appendElement({"tag": "img", "src" : "../../Catalogue_2/photo/" + pkg.M_id + "/photo_1.jpg","class" : "img-fluid rounded printHide", "style" : "margin:10px;"}).up()
+           .appendElement({"tag" : "div", "class" : "col-md largeCol"}).down()
+           .appendElement({"tag" : "div", "class" : "list-group"}).down()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "ID"})
+           .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action", "innerHtml" : pkg.M_id}).up()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Nom"})
+           .appendElement({"tag" : "div", "class" : "col largeCol list-group-item-action", "innerHtml" : pkg.M_name}).up()
+           .appendElement({"tag" : "div", "class" : "row list-group-item itemRow d-flex"}).down()
+           .appendElement({"tag" : "div", "class" : "col largeCol", "innerHtml" : "Description"})
+           .appendElement({"tag" : "div", "class" : "col largeCol  list-group-item-action", "innerHtml" : pkg.M_description}).up().up().up()
+           .appendElement({"tag" : "div", "class" : "col-md-2 largeCol d-flex justify-content-center align-items-center"}).down()
+           .appendElement({"tag" : "button", "class" : "btn btn-outline-dark", "id" : pkg.M_id + "-showPackageButton"}).down()
+           .appendElement({"tag" : "span", "innerHtml" : "Voir le paquet"})
+           .appendElement({"tag" : "i", "class" : "fa fa-object-ungroup", "style" : "margin:10px;"}).up()
+           
+        caller.packageSection.getChildById(pkg.M_id + "-showPackageButton").element.addEventListener('click', function(){
+            mainPage.packageDisplayPage.displayTabItem(pkg)
+        })
+          
+           
+       }, function (){
+           
+       }, {"packageSection" : this.itemResultPanel.getChildById(item.M_id + "-packageSection")})
+   }
+    
+    /*for(var i = 0; i< item.M_packaged.length; i++){
          server.entityManager.getEntityByUuid(item.M_packaged[i], false,
         //success callback
         function(item_package,caller){
@@ -349,7 +438,7 @@ ItemDisplayPage.prototype.displayTabItem = function (item, callback) {
             "pkgNav" : this.itemResultPanel.getChildById(item.M_id + "-packagesNav"), "pkgContent" : this.itemResultPanel.getChildById(item.M_id + "-packagesContent"), "callback":callback
         })
     
-    }
+    }*/
    
     
     document.getElementById("item_display_page_panel").scrollIntoView()

@@ -60,14 +60,11 @@ var AdminPackagePage = function(panel){
           
             server.entityManager.createEntity(catalog.UUID, "M_packages", newPackage,
                 function(success,caller){
-                    
-          
                             document.getElementById("waitingDiv").style.display = "none"
                             mainPage.adminPage.adminPackagePage.panel.getChildById("packagesFilteredList").removeAllChilds()
                             mainPage.adminPage.adminPackagePage.panel.getChildById("packagesAdminControl").removeAllChilds()
                             mainPage.adminPage.adminPackagePage.panel.getChildById("packagesFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : caller.newPackage.M_id + "-selector","data-toggle" : "tab","href" : "#"+ caller.newPackage.M_id + "-control","role":"tab", "innerHtml": caller.newPackage.M_name,"aria-controls":  caller.newPackage.M_id + "-control"})
                             mainPage.adminPage.adminPackagePage.loadAdminControl(caller.newPackage)
-                            console.log(success)
                         
                 },function(){},{"newPackage" : newPackage})
            
@@ -108,7 +105,12 @@ AdminPackagePage.prototype.getPackagesFromKeyword = function(keyword){
                             server.entityManager.getEntityByUuid(result.data.UUID,false,
                                 function(pkg, caller){
                                     mainPage.adminPage.adminPackagePage.panel.getChildById("packagesFilteredList").appendElement({"tag":"a", "class" : "list-group-item list-group-item-action","id" : pkg.M_id + "-selector","data-toggle" : "tab","href" : "#"+ pkg.M_id + "-control","role":"tab", "innerHtml": pkg.M_name,"aria-controls":  pkg.M_id + "-control"})
-                                    mainPage.adminPage.adminPackagePage.loadAdminControl(pkg)
+                                    
+                                    mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-selector").element.onclick = function(pkg){
+                                        return function(){
+                                            mainPage.adminPage.adminPackagePage.loadAdminControl(pkg)
+                                        }
+                                    }(pkg)
                                 },function(){},{})
                         }
                     }
@@ -135,20 +137,22 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
         mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-control").delete()
     }
     mainPage.adminPage.adminPackagePage.panel.getChildById("packagesAdminControl").appendElement({"tag" : "div", "class" : "tab-pane", "id" : pkg.M_id + "-control", "role" : "tabpanel", "aria-labelledby" : pkg.M_id + "-selector", "style" : "padding:15px;"}).down()
-    .appendElement({"tag" : "div", "class" : "row"}).down()
+    .appendElement({"tag" : "div", "class" : "row mb-3"}).down()
     .appendElement({"tag":  "div" , "class" : "col-7"}).down()
     .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
     .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
     .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "ID"}).up()
-    .appendElement({"tag" : "span", "class" : "form-control",  "innerHtml" : pkg.M_id}).up()
+    .appendElement({"tag" : "span", "class" : "form-control",  "innerHtml" : pkg.M_id})
+    .appendElement({"tag":"div","class":"input-group-append"}).down()
+    .appendElement({"tag":"span", "class":"input-group-text", "id":"print_label_btn", "title":"imprimer les étiquettes."}).down()
+    .appendElement({"tag":"i", "class":"fa fa-print", "style":"color: #495057;"}).up().up().up()
     .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
     .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
     .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "Nom"}).up()
     .appendElement({"tag" : "input", "class" : "form-control", "type" : "text", "value" : pkg.M_name, "id" : pkg.M_id + "-name"}).up()
-    .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
+    .appendElement({"tag" : "div", "class" : "input-group mb-3", "id" : pkg.M_id  + "-descriptionInput"}).down()
     .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
-    .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "Description"}).up()
-    .appendElement({"tag" : "textarea", "class" : "form-control", "type" : "text", "innerHtml" : pkg.M_description, "id" : pkg.M_id + "-description"}).up()
+    .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "Description"}).up().up()
     .appendElement({"tag" : "div", "class" : "input-group mb-3"}).down()
     .appendElement({"tag" : "div", "class" : "input-group-prepend"}).down()
     .appendElement({"tag" : "span", "class" : "input-group-text", "innerHtml" : "Quantité"}).up()
@@ -158,7 +162,24 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
     .appendElement({"tag" : "div", "class" : "dropdown-menu dropDownEnum", "id" : pkg.M_id + "-unitOfMeasureEnum"}).up().up().up()
     
     .appendElement({"tag" : "div", "class" : "col-5"}).down()
-    .appendElement({"tag" : "div", "id" : pkg.M_id + "-picture_div"}).up().up()
+    .appendElement({"tag" : "div", "id" : pkg.M_id + "-picture_div", "style" : "height:100%;"}).up().up()
+    
+    .appendElement({"tag" : "div", "class" : "row"}).down()
+    .appendElement({"tag":"label", "for" : pkg.M_id + "-packagesList", "innerHtml" : "Paquets","class" : "col-3 d-flex align-items-center"})
+    .appendElement({"tag": "input", "class" : "form-control col-5 m-1", "id" : pkg.M_id + "-filterPackages","type" :"text", "placeholder" : "Filtrer.."}).up()
+    
+    .appendElement({"tag" : "div"}).down()
+    .appendElement({"tag":"table", "class":"table table-hover table-condensed"}).down()
+    .appendElement({"tag":"thead"}).down()
+    .appendElement({"tag" : "tr"}).down()
+    .appendElement({"tag" : "th", "innerHtml" : "ID Paquet", "style" : "width:30%;"})
+    .appendElement({"tag" : "th", "innerHtml" : "Nom", "style":"width:60%;"})
+    .appendElement({"tag" : "th", "style" : "width:10%;"}).down()
+    .appendElement({"tag" : "button", "class" : "btn btn-success btn-sm", "id" : pkg.M_id +"-addPackageButton", "style":"display: inline-flex; height: 29px;"}).down()
+    .appendElement({"tag" : "i", "class" : "fa fa-plus"}).up().up()
+    .up().up()
+    .appendElement({"tag" : "tbody", "id" : pkg.M_id + "-packagesList"})
+    .up().up()
     
     .appendElement({"tag" : "div", "class" : "row"}).down()
     .appendElement({"tag":"label", "for" : pkg.M_id + "-itemsList", "innerHtml" : "Items","class" : "col-3 d-flex align-items-center"})
@@ -233,8 +254,48 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
     .appendElement({"tag" : "button", "class" : "btn btn-secondary", "data-dismiss" : "modal", "innerHtml" : "Fermer", "id" : pkg.M_id + "-closeDelete"})
     .appendElement({"tag" : "button", "type" : "button", "class" : "btn btn-danger", "id" : pkg.M_id + "-deleteConfirmBtn", "innerHtml" : "Confirmer la suppression"})
     
+    var printBtn = this.panel.getChildById("print_label_btn")
+    printBtn.element.onmouseenter = function(){
+        this.style.cursor = "pointer"
+    }
+     
+    printBtn.element.onmouseleave = function(){
+        this.style.cursor = "default"
+    }
+    
+    // Here the code to print the items label on zebra printer.
+    printBtn.element.onclick = function(pkg){
+        return function(){
+            printPackagesLabels([pkg])
+        }
+    }(pkg)
+    
+    server.languageManager.refresh()
+        
     var pictureDiv = this.panel.getChildById(pkg.M_id + "-picture_div")
     new ImagePicker(pictureDiv,"/Catalogue_2/photo/" + pkg.M_id)
+    var editors = initMultilanguageInput(this.panel.getChildById(pkg.M_id + "-descriptionInput"), "textarea", pkg, "M_description")
+    for(var id in editors){
+
+        editors[id].element.onchange = function(pkg){
+            return function(){
+                mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
+                mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
+                mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
+     
+                if(mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id) != undefined){
+                    var newPkg = jQuery.extend({},mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id))
+                    newPkg.M_description = pkg.M_description
+                    mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+                }else{
+                    var newPkg = jQuery.extend({},pkg)
+                    newPkg.M_description = pkg.M_description
+                 mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+                }
+            }
+        }(pkg)
+    }
+
     
     mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-deleteConfirmBtn").element.onclick = function(pkg){
         return function(){
@@ -247,7 +308,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                         item.M_packaged.pop(caller.pkg)
                         server.entityManager.saveEntity(item,
                             function(success, caller){
-                                console.log(success)
                             },function(){},{})
                     },function(){},{"pkg" : pkg})
             }
@@ -255,7 +315,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
             for(var i = 0; i < pkg.M_inventoried.length; i++){
                 server.entityManager.removeEntity(pkg.M_inventoried[i],
                     function(success,caller){
-                        console.log(success)
                     },function(){},{})
             }
             
@@ -267,21 +326,18 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                                 supplier.M_items.pop(caller.transaction)
                                 server.entityManager.saveEntity(supplier,
                                     function(success,caller){
-                                        console.log(success)
                                     },function(){},{})
                             },function(){}, {"transaction" : transaction})
                     },function(){}, {})
                 
                 server.entityManager.removeEntity(pkg.M_supplied[i], 
                     function(success,caller){
-                        console.log(success)
                     },function(){},{})
                 
             }
             
             server.entityManager.removeEntity(pkg.UUID,
                 function(success,caller){
-                    console.log(success)
                      mainPage.adminPage.adminPackagePage.panel.getChildById(caller.pkg.M_id + "-control").delete()
                     mainPage.adminPage.adminPackagePage.panel.getChildById(caller.pkg.M_id + "-selector").delete()
                     document.getElementById("waitingDiv").style.display = "none"
@@ -296,6 +352,48 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                 mainPage.adminPage.adminPackagePage.panel.getChildById(caller.pkg.M_id + "-selector").delete()
                 document.getElementById("waitingDiv").style.display = "none"
             }, function(){},{"pkg" : pkg})*/
+        }
+    }(pkg)
+    
+    mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-addPackageButton").element.onclick = function(pkg){
+        return function(){
+            var date = new Date()
+            mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-packagesList").prependElement({"tag" : "tr", "id" : date + "-row"}).down()
+            .appendElement({"tag" : "th", "scope" : "row"}).down()
+            .appendElement({"tag" : "input", "class" : "form-control", "type" : "text", "placeholder" : "ID", "id" : date  + "-packageID"}).up()
+            .appendElement({"tag" : "td", "scope" : "row"})
+             .appendElement({"tag":"td"}).down()
+            .appendElement({"tag" : "button", "class" : "btn btn-success btn-sm", "id" : date + "-confirmBtn"}).down()
+            .appendElement({"tag" : "i", "class" : "fa fa-check"}).up()
+            
+            autocomplete("CatalogSchema.PackageType", mainPage.adminPage.adminPackagePage.panel.getChildById(date + "-packageID"))
+            
+            mainPage.adminPage.adminPackagePage.panel.getChildById(date + "-packageID").element.oncomplete = function(uuid){
+                mainPage.adminPage.adminPackagePage.panel[date+"-packageID"] = uuid
+            }
+            
+             mainPage.adminPage.adminPackagePage.panel.getChildById(date+ "-confirmBtn").element.onclick = function (date, pkg) {
+            return function(){
+                document.getElementById("waitingDiv").style.display = ""
+                    var pkgToAdd = mainPage.adminPage.adminPackagePage.panel[date+"-packageID"]
+
+                    pkg.M_packages.push(pkgToAdd)
+                   
+                    server.entityManager.saveEntity(pkg,
+                        function(success,caller){
+                            mainPage.adminPage.adminPackagePage.panel.getChildById(date + "-row").delete()
+                                document.getElementById("waitingDiv").style.display = "none"
+                                server.entityManager.getEntityByUuid(caller.pkgToAdd,false,
+                                    function(pkgToAdd,caller){
+                                        mainPage.adminPage.adminPackagePage.appendPackage(pkgToAdd, caller.success)
+                                    },function(){}, { "success" : success})
+                                
+                        },function(){},{"pkgToAdd" : pkgToAdd})
+
+                            
+
+               }
+            }(date, pkg)
         }
     }(pkg)
     
@@ -322,8 +420,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                     var newItem = mainPage.adminPage.adminPackagePage.panel[date+"-itemID"]
                     server.entityManager.getEntityByUuid(newItem,false,
                         function(newItem,caller){
-                            
-                        
                              var newPkg = caller.pkg
                             newPkg.M_items.push(newItem)
                             newItem.M_packaged.push(newPkg)
@@ -331,7 +427,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                                 function(newItem,caller){
                                     server.entityManager.saveEntity(caller.newPkg,
                                     function(success,caller){
-                                     
                                         mainPage.adminPage.adminPackagePage.panel.getChildById(date + "-row").delete()
                                             document.getElementById("waitingDiv").style.display = "none"
                                             mainPage.adminPage.adminPackagePage.appendItem(caller.item, success)
@@ -339,12 +434,8 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                                 },function(){}, {"newPkg" : newPkg})
                             
                         },function(){}, {"pkg" : pkg})
-                   
-                   
                }
             }(date, pkg)
-             
-                
         }
     }(pkg)
     
@@ -485,7 +576,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                                         
                                         document.getElementById("waitingDiv").style.display = "none"
                                         mainPage.adminPage.adminPackagePage.appendItemSupplier(caller.newLine, caller.pkg)
-                                        console.log(result)
                                     },function(){},{"pkg" : caller.pkg, "newLine" : success})
                                 
                             },function(){},{"pkg" : pkg}) 
@@ -520,6 +610,13 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
         }(pkg.M_id + "-currentUnitOfMeasure", this.unitOfMeasure[i].Value, pkg)
     }
     
+    for(var i = 0 ; i < pkg.M_packages.length; i++){
+        server.entityManager.getEntityByUuid(pkg.M_packages[i],false,
+            function(pkg, caller){
+                mainPage.adminPage.adminPackagePage.appendPackage(pkg, caller.package)
+            }, function(){}, {"package" : pkg})
+    }
+    
     for(var i = 0 ; i < pkg.M_items.length; i++){
         server.entityManager.getEntityByUuid(pkg.M_items[i],false,
             function(item, caller){
@@ -540,6 +637,28 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                 mainPage.adminPage.adminPackagePage.appendItemSupplier(supplier, caller.package)
             },function(){},{"package" : pkg})
     }
+    
+    mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-filterPackages").element.onkeyup = function(packageID){
+        return function(){
+            var input, filter, table, tr, td, i;
+            input = document.getElementById(packageID+"-filterPackages");
+            filter = input.value.toUpperCase();
+            table = document.getElementById(packageID + "-packagesList");
+            tr = table.getElementsByTagName("tr");
+        
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+       }
+    }(pkg.M_id)
     
      mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-filterItems").element.onkeyup = function(packageID){
         return function(){
@@ -612,31 +731,35 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
            mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
-            var newPkg = jQuery.extend({},pkg)
-            newPkg.M_name = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-name").element.value
-            mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            if(mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id) != undefined){
+                var newPkg = jQuery.extend({},mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id))
+                newPkg.M_name = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-name").element.value
+                mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            }else{
+                var newPkg = jQuery.extend({},pkg)
+                newPkg.M_name = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-name").element.value
+                mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            }
+
        }
     }(pkg)
     
-    mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-description").element.onkeyup = function(pkg){
-       return function(){
-           mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
-            mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
-            mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
-            var newPkg = jQuery.extend({},pkg)
-            newPkg.M_description = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-description").element.value
-            mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
-       }
-    }(pkg)
-    
+ 
     mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-quantity").element.onchange = function(pkg){
        return function(){
            mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
-            var newPkg = jQuery.extend({},pkg)
-            newPkg.M_quantity = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-quantity").element.value
-            mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            if(mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id) != undefined){
+                var newPkg = jQuery.extend({},mainPage.adminPage.adminPackagePage.modifiedItems[pkg.M_id].get(pkg.M_id))
+                newPkg.M_quantity = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-quantity").element.value
+                mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            }else{
+                var newPkg = jQuery.extend({},pkg)
+                 newPkg.M_quantity = mainPage.adminPage.adminPackagePage.panel.getChildById(newPkg.M_id + "-quantity").element.value
+                mainPage.adminPage.adminPackagePage.modifiedItems[newPkg.M_id].set(newPkg.M_id, newPkg)
+            }
+
        }
     }(pkg)
     
@@ -741,11 +864,6 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
                 }
                 
             }
-            
-            
-            
-           
-        
         }
     }(pkg)
     
@@ -754,7 +872,7 @@ AdminPackagePage.prototype.loadAdminControl = function(pkg){
 
 AdminPackagePage.prototype.appendItem = function(item, pkg){
     mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id +"-itemsList").appendElement({"tag" : "tr", "id" : item.M_id + "-adminItemRow"}).down()
-    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID"})
+    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID", "class" : "tabLink"})
     .appendElement({"tag" : "td", "innerHtml" : item.M_name, "id" : item.M_id + "-itemName"})
     .appendElement({"tag":"td"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : item.M_id + "-deleteItemRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
@@ -768,9 +886,41 @@ AdminPackagePage.prototype.appendItem = function(item, pkg){
             row.delete()
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
-            console.log( mainPage.adminPage.adminPackagePage.removedItems[pkg.M_id])
         }
     }(item, pkg)
+    
+  mainPage.adminPage.adminPackagePage.panel.getChildById(item.M_id + "-itemID").element.onclick = function(item){
+        return function(){
+            mainPage.itemDisplayPage.displayTabItem(item)
+        }
+    }(item)
+    
+}
+
+AdminPackagePage.prototype.appendPackage = function(pkgToAdd, pkg){
+    mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id +"-packagesList").appendElement({"tag" : "tr", "id" : pkgToAdd.M_id + "-adminPackageRow"}).down()
+    .appendElement({"tag" :"td","innerHtml" : pkgToAdd.M_id, "id" : pkgToAdd.M_id + "-packageID", "class" : "tabLink"})
+    .appendElement({"tag" : "td", "innerHtml" : pkgToAdd.M_name, "id" : pkgToAdd.M_id + "-packageName"})
+    .appendElement({"tag":"td"}).down()
+    .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : pkgToAdd.M_id + "-deletePackageRowBtn", "style":"display: inline-flex; height: 29px;"}).down()
+    .appendElement({"tag" : "i", "class" : "fa fa-trash-o"}).up()
+    
+    mainPage.adminPage.adminPackagePage.panel.getChildById(pkgToAdd.M_id + "-deletePackageRowBtn").element.onclick = function(pkgToAdd, pkg){
+        return function(){
+            mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
+            mainPage.adminPage.adminPackagePage.removedItems[pkg.M_id].set(pkgToAdd.M_id + "-package", pkgToAdd)
+            var row = mainPage.adminPage.adminPackagePage.panel.getChildById(pkgToAdd.M_id + "-adminPackageRow")
+            row.delete()
+            mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
+            mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
+        }
+    }(pkgToAdd, pkg)
+    
+    mainPage.adminPage.adminPackagePage.panel.getChildById(pkgToAdd.M_id + "-packageID").element.onclick = function(item_package){
+        return function(){
+            mainPage.packageDisplayPage.displayTabItem(item_package)
+        }
+    }(pkgToAdd)
 }
 
 AdminPackagePage.prototype.appendInventory = function(inventory, pkg){
@@ -819,7 +969,6 @@ AdminPackagePage.prototype.appendInventory = function(inventory, pkg){
             row.delete()
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-saveBtn").element.classList.remove("disabled")
             mainPage.adminPage.adminPackagePage.panel.getChildById(pkg.M_id + "-cancelBtn").element.classList.remove("disabled")
-            console.log( mainPage.adminPage.adminPackagePage.removedItems[pkg.M_id])
         }
     }(inventory, pkg)
     
@@ -853,8 +1002,8 @@ AdminPackagePage.prototype.appendItemSupplier = function(supplier, pkg){
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : supplier.M_id + "-deleteRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
     .appendElement({"tag" : "i", "class" : "fa fa-trash-o"}).up()
     
-     if(moment(supplier.M_date).format('DD/MM/YYYY') != "Invalid date"){
-        mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-dateSelector").appendElement({"tag" : "span", "innerHtml":moment(supplier.M_date).format('DD/MM/YYYY'), "id" : supplier.M_id + "-date"})
+     if(moment(supplier.M_date).format('MM/DD/YYYY') != "Invalid date"){
+        mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-dateSelector").appendElement({"tag" : "span", "innerHtml":moment(supplier.M_date).format('MM/DD/YYYY'), "id" : supplier.M_id + "-date"})
     }else{
         mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-dateSelector") .appendElement({"tag" : "input", "type" : "date", "class"  :"form-control", "id" : supplier.M_id + "-date"})
     }
@@ -886,24 +1035,29 @@ AdminPackagePage.prototype.appendItemSupplier = function(supplier, pkg){
     
     //Save changes to the quantity, price
     mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id  + "-adminItemRow").element.onchange = function(supplier, packageID){
-            return function(){
-                mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
-                var qty = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id+"-qty").element.value
-                var price = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-price").element.value
+        return function(){
+            mainPage.adminPage.panel.getChildById("adminPackageSaveState").element.innerHTML = "*"
+            var qty = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id+"-qty").element.value
+            var price = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-price").element.value
+            if(mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-date").element.value != undefined){
                 var date = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-date").element.value
-                var newsupplier = jQuery.extend({}, supplier)
-                newsupplier.M_date = date
-                newsupplier.M_price.M_valueOf = price
-                newsupplier.M_quantity= qty
-                mainPage.adminPage.adminPackagePage.modifiedItems[packageID].set(newsupplier.M_id, newsupplier)
-
-                mainPage.adminPage.adminPackagePage.panel.getChildById(packageID + "-saveBtn").element.classList.remove("disabled")
-                mainPage.adminPage.adminPackagePage.panel.getChildById(packageID + "-cancelBtn").element.classList.remove("disabled")
-                
+            }else{
+                var date = mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-date").element.innerHTML
             }
             
+            var newsupplier = jQuery.extend({}, supplier)
+            newsupplier.M_date = date
+            newsupplier.M_price.M_valueOf = price
+            newsupplier.M_quantity= qty
+            mainPage.adminPage.adminPackagePage.modifiedItems[packageID].set(newsupplier.M_id, newsupplier)
+
+            mainPage.adminPage.adminPackagePage.panel.getChildById(packageID + "-saveBtn").element.classList.remove("disabled")
+            mainPage.adminPage.adminPackagePage.panel.getChildById(packageID + "-cancelBtn").element.classList.remove("disabled")
             
-        }(supplier, pkg.M_id)
+        }
+        
+        
+    }(supplier, pkg.M_id)
         
     
     mainPage.adminPage.adminPackagePage.panel.getChildById(supplier.M_id + "-deleteRowAdminBtn").element.onclick = function(supplier, packageID){

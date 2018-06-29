@@ -134,7 +134,7 @@ func (this *ServiceManager) registerService(service Service) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// WS or TCP services...
+// WS services...
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Get the list of channel id's and connect listener.
@@ -613,8 +613,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "			}\n"
 								clientSrc += "			for (var i = 0; i < caller.results[0].length; i++) {\n"
 								clientSrc += "				var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
+								clientSrc += "				entity.initCallbacks = []\n"
 								clientSrc += "				if (i == caller.results[0].length - 1) {\n"
-								clientSrc += "					entity.initCallback = function (caller) {\n"
+								clientSrc += "					var initCallback = function (caller) {\n"
 								clientSrc += "						return function (entity) {\n"
 								clientSrc += "							server.entityManager.setEntity(entity)\n"
 								clientSrc += "							if(caller.successCallback != undefined){\n"
@@ -623,10 +624,12 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "							}\n"
 								clientSrc += "						}\n"
 								clientSrc += "					} (caller)\n"
+								clientSrc += "					entity.initCallbacks.push(initCallback)\n"
 								clientSrc += "				}else{\n"
-								clientSrc += "					entity.initCallback = function (entity) {\n"
+								clientSrc += "					var initCallback = function (entity) {\n"
 								clientSrc += "						server.entityManager.setEntity(entity)\n"
 								clientSrc += "					}\n"
+								clientSrc += "					entity.initCallbacks.push(initCallback)\n"
 								clientSrc += "				}\n"
 								clientSrc += "				entities.push(entity)\n"
 								clientSrc += "				entity.init(caller.results[0][i], false)\n"
@@ -645,9 +648,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "				}\n"
 								clientSrc += "				return // break it here.\n"
 								clientSrc += "			}\n\n"
-
 								clientSrc += "			var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
-								clientSrc += "				entity.initCallback = function () {\n"
+								clientSrc += "			entity.initCallbacks = []\n"
+								clientSrc += "			var initCallback = function () {\n"
 								clientSrc += "					return function (entity) {\n"
 								clientSrc += "					if(caller.successCallback != undefined){\n"
 								clientSrc += "						caller.successCallback(entity, caller.caller)\n"
@@ -655,6 +658,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "					}\n"
 								clientSrc += "				}\n"
 								clientSrc += "			}(caller)\n"
+								clientSrc += "			entity.initCallbacks.push(initCallback)\n"
 								clientSrc += "			entity.init(caller.results[0], false)\n"
 							}
 

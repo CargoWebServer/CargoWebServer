@@ -461,7 +461,7 @@ AdminCategoryPage.prototype.appendSubCategory = function(subCategory, category){
 
 AdminCategoryPage.prototype.appendItem = function(item, category){
     mainPage.adminPage.adminCategoryPage.panel.getChildById(category.M_id +"-itemsList").appendElement({"tag" : "tr", "id" : item.M_id + "-adminItemRow"}).down()
-    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID"})
+    .appendElement({"tag" :"td","innerHtml" : item.M_id, "id" : item.M_id + "-itemID", "class" : "tabLink"})
     .appendElement({"tag" : "td", "innerHtml" : item.M_name, "id" : item.M_id + "-itemName"})
     .appendElement({"tag":"td"}).down()
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : item.M_id + "-deleteItemRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
@@ -478,6 +478,12 @@ AdminCategoryPage.prototype.appendItem = function(item, category){
             console.log( mainPage.adminPage.adminCategoryPage.removedItems[category.M_id])
         }
     }(item, category)
+    
+     mainPage.adminPage.adminCategoryPage.panel.getChildById(item.M_id + "-itemID").element.onclick = function(item){
+        return function(){
+            mainPage.itemDisplayPage.displayTabItem(item)
+        }
+    }(item)
     
 }
 

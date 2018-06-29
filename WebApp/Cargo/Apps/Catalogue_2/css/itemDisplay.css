@@ -53,3 +53,38 @@
     max-width: 100%;
 }
 }
+
+@media print{
+    #item_display_page_panel * {
+        visibility: visible;
+        border-radius:0;
+    }
+    
+    #item_display_page_panel{
+        position: fixed;
+        left: 0;
+        right:0;
+        top: 0;
+        width:100%;
+    }
+    
+    #item_display_page_panel .btn{
+        display:none;
+    }
+
+    #item_display_page_panel .col-md-3{
+        width:0%;
+        display:none!important;
+    }
+    #item_display_page_panel .col-md-2{
+        width:0%;
+        display:none!important;
+    }
+    #item_display_page_panel .border {
+        border:none!important;
+    }
+    
+
+
+
+}

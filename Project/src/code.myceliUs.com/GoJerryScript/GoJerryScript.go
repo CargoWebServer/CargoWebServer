@@ -364,7 +364,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 	} else if typeInfo == Jerry_type_t(JERRY_TYPE_BOOLEAN) {
 		value = Jerry_get_boolean_value(input)
 	} else if Jerry_value_is_typedarray(input) {
-		/** Not made use of type array **/
+		/** Not made use of typed array **/
 	} else if Jerry_value_is_array(input) {
 		countPtr := Jerry_get_array_length(input)
 		count := *(*uint64)(unsafe.Pointer(countPtr.Swigcptr()))

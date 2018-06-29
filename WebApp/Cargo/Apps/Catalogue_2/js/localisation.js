@@ -8,8 +8,33 @@ function displayLocalisation(parent, localisationId, onClick){
                 getLocalisationIds(localisation.M_parent, caller.localisations, caller.callback, caller.div, caller.onClick)
             }else{
                 var div = caller.div
+                
                 var breadcrumb = div.appendElement({"tag" : "nav", "aria-label" : "breadcrumb"}).down()
                 .appendElement({"tag" : "ol", "class" : "breadcrumb", "style" : "background-color : transparent;"}).down()
+                
+                // The position
+                div.element.style.position = "relative"
+                
+                var packages = []
+                // I will also append the print label button.
+                var printBtn = div.appendElement({"tag":"div", "style":"position:absolute; right: 10px; top: 5px;", "title":"imprimer les étiquettes."}).down()
+                    .appendElement({"tag":"i", "class":"fa fa-print"}).down()
+                
+                printBtn.element.onmouseenter = function(){
+                    this.style.cursor = "pointer"
+                }
+                 
+                printBtn.element.onmouseleave = function(){
+                    this.style.cursor = "default"
+                }
+                
+                printBtn.element.onclick = function(localisation){
+                    return function(){
+                        // print the localisation information.
+                        printLocalisationLabels(localisation)
+                    }
+                }(caller.localisations[caller.localisations.length-1])
+                    
                 for(var i=0; i < caller.localisations.length; i++){
                     var id = caller.localisations[i].getEscapedUuid() + "_localisation_display"
                     var lnk = breadcrumb.appendElement({"tag" : "li", "class" : "breadcrumb-item"}).down()

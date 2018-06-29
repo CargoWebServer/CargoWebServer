@@ -258,6 +258,13 @@ body{
     color: #ffbd41
 }
 
+.Cancel{
+    color:red;
+}
+
+.Completed{
+    color:green;
+}
 
 .simpleLink{
     text-decoration:underline;

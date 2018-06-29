@@ -218,6 +218,8 @@ var AdminItemPage = function(panel){
         }
     }(searchFct, itemFilterLst, this.itemsPanel)
     
+    this.searchFct = searchFct
+    
     return this
 }
 
@@ -241,6 +243,7 @@ function setSaveCancelBtn(item){
     cancelBtn.classList.remove("disabled")
 }  
 
+
 AdminItemPage.prototype.setItem = function(item){
        
     var itemPanel = this.loadAdminControl(item)
@@ -262,6 +265,7 @@ AdminItemPage.prototype.setItem = function(item){
     .appendElement({"tag":"div","class":"input-group-prepend"}).down()
     .appendElement({"tag":"a","href":"#", "class":"input-group-text", "innerHtml":"id", "id":"item_lnk"}).up()
     .appendElement({"tag":"span", "class":"form-control", "innerHtml":item.M_id})
+
     
     // Link to the item.
     generalInfoDiv.getChildById("item_lnk").element.onclick = function(item){
@@ -304,13 +308,13 @@ AdminItemPage.prototype.setItem = function(item){
     
     // Now the alias...
     itemPanel.appendElement({"tag":"div", "class":"row mb-3"}).down()
-    .appendElement({"tag":"div", "class":"col-sm-2", "style":"padding-right: 0px; padding-left: 0px;"}).down()
+    .appendElement({"tag":"div", "class":"col-sm-6 col-md-2", "style":"padding-right: 0px; padding-left: 0px;"}).down()
     .appendElement({"tag":"ul", "class":"list-group borderless", "id":"alias"}).up()
-    .appendElement({"tag":"div", "class":"col-sm-3", "style":"padding-right: 0px; padding-left: 0px;"}).down()
+    .appendElement({"tag":"div", "class":"col-sm-6 col-md-3", "style":"padding-right: 0px; padding-left: 0px;"}).down()
     .appendElement({"tag":"ul", "class":"list-group borderless", "id":"keywords"}).up()
-    .appendElement({"tag":"div", "class":"col-sm-5", "style":"padding-right: 0px; padding-left: 0px;"}).down()
+    .appendElement({"tag":"div", "class":"col-sm-6 col-md-5", "style":"padding-right: 0px; padding-left: 0px;"}).down()
     .appendElement({"tag":"ul", "class":"list-group borderless", "id":"comments"}).up()
-    .appendElement({"tag":"div", "class":"col-sm-2", "style":"padding-right: 0px; padding-left: 0px;"}).down()
+    .appendElement({"tag":"div", "class":"col-sm-6 col-md-2", "style":"padding-right: 0px; padding-left: 0px;"}).down()
     .appendElement({"tag":"ul", "class":"list-group borderless", "id":"equivalents"})
     
     // List of alia(s)
@@ -774,7 +778,7 @@ AdminItemPage.prototype.setItem = function(item){
             .appendElement({"tag":"select", "class":"form-control"}).down()
     
         for(var i=0; i < unitOfMesure.Restrictions.length; i++){
-            unitSelector.appendElement({"tag":"option", "value":unitOfMesure.Restrictions[i].Value, "innerHtml":unitOfMesure.Restrictions[i].Value})
+            unitSelector.appendElement({"tag":"option", "id":unitOfMesure.Restrictions[i].Value, "value":unitOfMesure.Restrictions[i].Value, "innerHtml":unitOfMesure.Restrictions[i].Value})
         }
         
         unitSelector.element.onchange = function(propertie, item){
@@ -984,6 +988,7 @@ AdminItemPage.prototype.setItem = function(item){
                     spinner.panel.element.style.display = "";
                     // So here I will create the new item...
                     copy.M_id = idInput.element.value;
+
                     server.entityManager.createEntity(copy.ParentUuid, copy.ParentLnk, copy, 
                          // The success callback.
                         function(item, caller){

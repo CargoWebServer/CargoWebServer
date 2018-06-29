@@ -25,6 +25,13 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
     }
     var currentIndex = -1
 
+    control.element.onblur = function(div){
+        return function(){
+            div.autocompleteDiv.element.style.display = "none"
+        }
+        
+        
+    }(control)
     /* Save the key down event **/
     control.element.addEventListener("keyup", function (control, autocompleteDiv, elementLst, autoComplete, selectValue) {
         return function (evt) {

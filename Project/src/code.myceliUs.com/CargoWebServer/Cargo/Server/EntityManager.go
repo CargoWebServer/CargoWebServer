@@ -758,13 +758,21 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 
 	// Send event message...
 	var eventDatas []*MessageData
-	evtData := new(MessageData)
-	evtData.TYPENAME = "Server.MessageData"
-	evtData.Name = "entity"
+	evtData_0 := new(MessageData)
+	evtData_0.TYPENAME = "Server.MessageData"
+	evtData_0.Name = "entity"
 	// I will send only necessary entity properties.
-	evtData.Value = map[string]interface{}{"UUID": entity.GetUuid(), "TYPENAME": entity.GetTypeName()}
+	evtData_0.Value = map[string]interface{}{"UUID": entity.GetUuid(), "TYPENAME": entity.GetTypeName()}
 
-	eventDatas = append(eventDatas, evtData)
+	eventDatas = append(eventDatas, evtData_0)
+
+	evtData_1 := new(MessageData)
+	evtData_1.TYPENAME = "Server.MessageData"
+	evtData_1.Name = "prototype"
+	// I will send only necessary entity properties.
+	evtData_1.Value = prototype
+	eventDatas = append(eventDatas, evtData_1)
+
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
@@ -1303,14 +1311,6 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //                 entity.initCallbacks = []
 //             }
 //             entity.initCallbacks.push(initCallback)
-//             entity.initCallback = function(entity){
-//                 return function(){
-//                     while(entity.initCallbacks.length > 0){
-//                         var initCallback = entity.initCallbacks.pop();
-//                         initCallback(entity);
-//                     }
-//                 }
-//             }(entity)
 //             entity.init(evt.dataMap["entity"], false)
 //         } else {
 //             // update the object values.
@@ -1330,14 +1330,6 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 //                 entity.initCallbacks = []
 //             }
 //             entity.initCallbacks.push(initCallback)
-//             entity.initCallback = function(entity){
-//                 return function(){
-//                     while(entity.initCallbacks.length > 0){
-//                         var initCallback = entity.initCallbacks.pop();
-//                         initCallback(entity);
-//                     }
-//                 }
-//             }(entity)
 //             setObjectValues(entity, evt.dataMap["entity"])
 //         }
 //     } else if (evt.code == DeleteEntityEvent) {
@@ -1462,14 +1454,6 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //                 entity.initCallbacks = []
 //             }
 //             entity.initCallbacks.push(initCallback)
-//             entity.initCallback = function (entity) {
-//                 return function () {
-//                     while (entity.initCallbacks.length > 0) {
-//                         var initCallback = entity.initCallbacks.pop();
-//                         initCallback(entity);
-//                     }
-//                 }
-//             }(entity)
 //             entity.init(result[0], false)
 //         },
 //         function (errMsg, caller) {
@@ -1564,14 +1548,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //                 entity.initCallbacks = []
 //             }
 //             entity.initCallbacks.push(initCallback)
-//             entity.initCallback = function (entity) {
-//                 return function () {
-//                     while (entity.initCallbacks.length > 0) {
-//                         var initCallback = entity.initCallbacks.pop();
-//                         initCallback(entity);
-//                     }
-//                 }
-//             }(entity)
 //             entity.init(result[0], false)
 //         },
 //         function (errMsg, caller) {
@@ -1746,36 +1722,21 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                                         entity.initCallbacks = []
 //                                     }
 //                                     entity.initCallbacks.push(initCallback)
-//                                     entity.initCallback = function (entity) {
-//                                         return function () {
-//                                             while (entity.initCallbacks.length > 0) {
-//                                                 var initCallback = entity.initCallbacks.pop();
-//                                                 initCallback(entity);
-//                                             }
-//                                         }
-//                                     }(entity)
 //                                     entity.init(value, lazy)
 //                                 } else {
-//                                     var initCallback = function (entity) {
-//                                         server.entityManager.setEntity(entity)
-//                                     }
+//                                     var initCallback = function(values, caller, entities, initEntitiesFct){
+//											return function (entity) {
+//                                         		server.entityManager.setEntity(entity)
+//												initEntitiesFct(values, caller, entities)
+//                                     		}
+//									   }(values, caller, entities, initEntitiesFct)
+//
 //                                     if (entity.initCallbacks == undefined) {
 //                                         entity.initCallbacks = []
 //                                     }
+//
 //                                     entity.initCallbacks.push(initCallback)
-//                                     entity.initCallback = function (entity) {
-//                                         return function () {
-//                                             while (entity.initCallbacks.length > 0) {
-//                                                 var initCallback = entity.initCallbacks.pop();
-//                                                 initCallback(entity);
-//                                             }
-//                                         }
-//                                     }(entity)
-//                                     entity.init(value, lazy, function (values, caller, entities) {
-//                                         return function () {
-//                                             initEntitiesFct(values, caller, entities)
-//                                         }
-//                                     }(values, caller, entities))
+//                                     entity.init(value, lazy)
 //                                 }
 //                             }
 //                             initEntitiesFct(values, caller, entities)
@@ -1937,14 +1898,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query *E
 //                         entity.initCallbacks = []
 //                     }
 //                     entity.initCallbacks.push(initCallback)
-//                     entity.initCallback = function (entity) {
-//                         return function () {
-//                             while (entity.initCallbacks.length > 0) {
-//                                 var initCallback = entity.initCallbacks.pop();
-//                                 initCallback(entity);
-//                             }
-//                         }
-//                     }(entity)
 //                     if (entity.IsInit == false) {
 //                         entity.init(result[0], lazy)
 //                     } else {
@@ -2068,14 +2021,6 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 //                         entity.initCallbacks = []
 //                     }
 //                     entity.initCallbacks.push(initCallback)
-//                     entity.initCallback = function (entity) {
-//                         return function () {
-//                             while (entity.initCallbacks.length > 0) {
-//                                 var initCallback = entity.initCallbacks.pop();
-//                                 initCallback(entity);
-//                             }
-//                         }
-//                     }(entity)
 //                     entity.init(result[0], lazy)
 //                 },
 //                 function (errMsg, caller) {

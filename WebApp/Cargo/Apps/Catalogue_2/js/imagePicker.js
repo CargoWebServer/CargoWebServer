@@ -116,8 +116,14 @@ var ImagePanel = function(parent, path){
     this.path = path
     this.panel = parent.appendElement({"tag":"div", "class":"image_panel"}).down()
     
-    this.image = this.panel.appendElement({"tag":"img", "src":"http://" + server.hostName + ":"+ server.port + path}).down()
-
+    
+    // Supported video.
+    if(path.endsWith(".mp4") || path.endsWith(".mp3") || path.endsWith(".avi") || path.endsWith(".mpeg")){
+        this.video = this.panel.appendElement({"tag":"video", "src":"http://" + server.hostName + ":"+ server.port + path, "type":"video/mp4", "controls":""}).down()
+    }else{
+        this.image = this.panel.appendElement({"tag":"img", "src":"http://" + server.hostName + ":"+ server.port + path}).down()
+    }
+    
     // Now the delete button...
     this.deleteBtn = this.panel.appendElement({"tag":"button", "class":"btn btn-danger btn-sm", "style":"position: absolute; top:2px; right:2px; display: none;"}).down()
     this.deleteBtn.appendElement({"tag":"i", "class":"fa fa-trash"})

@@ -77,8 +77,8 @@ var Restriction = function () {
  * Return the entity title (ids string from it uuid)
  */
 function getEntityIdsFromUuid(uuid, callback) {
-    if(!isObjectReference(uuid)){
-        if(callback!==undefined){
+    if (!isObjectReference(uuid)) {
+        if (callback !== undefined) {
             callback()
         }
         return
@@ -471,9 +471,8 @@ function setRef(owner, property, refValue, isArray) {
  * @param {object} object The object to initialyse.
  * @param {object} values The plain JSON object that contain values.
  * @param {bool} lazy If the value is at false child must be intialyse from te server, if not only childs uuid's are set.
- * @param {bool} callback Use by external function to initalyse collection in correct oreder.
  */
-function setObjectValues(object, values, lazy, callback) {
+function setObjectValues(object, values, lazy) {
 
     // Get the entity prototype.
     var prototype = getEntityPrototype(object["TYPENAME"])
@@ -486,6 +485,9 @@ function setObjectValues(object, values, lazy, callback) {
         lazy = false;
     }
 
+    // Set the initialisation state to false.
+    object.IsInit = false;
+    
     ////////////////////////////////////////////////////////////////////////
     // Set back the reference...
     if (values == undefined) {
@@ -597,7 +599,6 @@ function setObjectValues(object, values, lazy, callback) {
                                         entities[uuid][property] = val
                                     }
                                 }(object.UUID, property)
-
                                 obj.init(jsonObj)
                             } else {
                                 for (var i = 0; i < jsonObj.length; i++) {
@@ -632,7 +633,7 @@ function setObjectValues(object, values, lazy, callback) {
                         if (isArray_) {
                             if (lazy) {
                                 object[property] = values[property]
-                            }else{
+                            } else {
                                 object[property] = []
                                 for (var i = 0; i < values[property].length; i++) {
                                     if (isRef) {
@@ -643,13 +644,12 @@ function setObjectValues(object, values, lazy, callback) {
                                         }
                                     }
                                 }
-                            }   
+                            }
                         } else {
                             if (isRef) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
                                 if (!lazy) {
-                                    //console.log("-----> ", property, values[property], "is Array ", isArray_)
                                     subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
                                 } else {
                                     object[property] = values[property]
@@ -662,99 +662,81 @@ function setObjectValues(object, values, lazy, callback) {
         }
     }
 
-    /**
-     * Set object, that function call setObjectValues in this path so it's recursive.
-     */
-    function setSubObject(parent, subObjects, callback) {
+    // That function is use to initialyse sub-objects.
+    function setSubObject(parent, subObjects) {
         if (subObjects.length > 0) {
             var subObject = subObjects.shift()
+            parent.IsInit = false;
+            
             if (isString(subObject.uuid)) {
                 if (subObject.uuid.length > 0) {
                     server.entityManager.getEntityByUuid(subObject.uuid, false,
                         function (entity, caller) {
-                            var parent = caller.parent
+                            // var parent = entities[caller.parent.UUID]
+                            entity.getParent = function(parent){
+                                return function(){
+                                    return parent;
+                                }
+                            }(parent)
                             
                             if (caller.subObject.isArray == true) {
                                 parent[caller.subObject.property][caller.subObject.index] = entity
                             } else {
                                 parent[caller.subObject.property] = entity
                             }
-                            // Get parent function.
-                            entity.getParent = function (parent) {
-                                return function () {
-                                    return parent
-                                }
-                            }(parent)
-                            if (subObjects.length == 0) {
-                                caller.callback(parent)
-                            } else {
-                                setSubObject(parent, caller.subObjects, caller.callback)
+                           
+                            if(caller.subObjects.length == 0){
+                                parent.IsInit = true
+                                initCallback(entity)
+                            }else{
+                                setSubObject(parent, caller.subObjects)
                             }
                         },
                         function (err, caller) {
-                            console.log("err ", err)
                             var parent = entities[caller.parent.UUID]
-                            if (subObjects.length == 0) {
-                                caller.callback(caller.parent)
-                            } else {
-                                setSubObject(parent, caller.subObjects, caller.callback)
+                            if(caller.subObjects.length == 0){
+                                parent.IsInit = true
+                                initCallback(parent)
+                            }else{
+                                setSubObject(parent, caller.subObjects)
                             }
                         },
-                        {"parent":parent, "subObjects": subObjects, "subObject": subObject, "callback": callback })
+                        { "parent": parent, "subObjects": subObjects, "subObject": subObject})
                 } else {
-                    setSubObject(parent, subObjects, callback)
-                    if (subObjects.length == 0) {
-                        if (callback != undefined) {
-                            callback(parent)
-                        }
-                    }
+                    setSubObject(parent, subObjects)
                 }
             } else if (isObject(subObject)) {
                 // skip to the next object.
-                setSubObject(parent, subObjects, callback)
-                if (subObjects.length == 0) {
-                    if (callback != undefined) {
-                        callback(parent)
-                    }
+                setSubObject(parent, subObjects)
+            }
+        }
+    }
+    
+    function initCallback(object){
+        if(object.IsInit == true){
+            if(object.initCallbacks != undefined){
+                while (object.initCallbacks.length > 0) {
+                    var initCallback_ = object.initCallbacks.pop();
+                    initCallback_(object);
+                    // Set the initialyse object.
+                    server.entityManager.setEntity(object)
                 }
             }
-        }
-    }
-
-    // Call the init callback. // TODO correct me!
-    if (subObjects.length == 0) {
-        if (object.initCallback != undefined) {
-            object.initCallback(object)
-            object.initCallback = undefined
-        }
-        // No subitem to initialyse but a callback...
-        if (callback != undefined) {
-            callback(object)
-        }
-    } else if (subObjects.length > 0) {
-        if (lazy) {
-            if (object.initCallback != undefined) {
-                object.initCallback(object)
-                object.initCallback = undefined
-            }
-        } else {
-            if (callback != undefined) {
-                setSubObject(object, subObjects, callback)
-            } else {
-                setSubObject(object, subObjects, function (object) {
-                    if (object.initCallback != undefined) {
-                        object.initCallback(object)
-                        object.initCallback = undefined
-                    }
-                    
-                })
+            if(object.getParent() != undefined){
+                initCallback(object.getParent())
             }
         }
     }
-
-    // Set the initialyse object.
-    server.entityManager.setEntity(object)
-
+    
+    // set the object in the map.
+    if (lazy || subObjects.length == 0) {
+        // simply call it callback function.
+        object.IsInit = true
+        initCallback(object)
+    } else {
+        // Set the list of sub object.
+        setSubObject(object, subObjects)
+    }
 }
 
 /**

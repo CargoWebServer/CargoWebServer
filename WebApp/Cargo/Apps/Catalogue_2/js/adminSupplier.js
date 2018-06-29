@@ -332,14 +332,16 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
         
             // Loop through all table rows, and hide those who don't match the search query
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("th")[0];
-                if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                th = tr[i].getElementsByTagName("th")[0];
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td && th) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || th.innerHTML.toUpperCase().indexOf(filter) > -1 ) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
                     }
                 } 
+                
             }
        }
     }(supplier.M_id)
@@ -470,9 +472,8 @@ AdminSupplierPage.prototype.loadAdminControl = function(supplier){
 
 AdminSupplierPage.prototype.appendItemSupplier = function(item_supplier, supplierID, item_package){
     mainPage.adminPage.adminSupplierPage.panel.getChildById(supplierID+"-itemsList").appendElement({"tag" : "tr", "id" : item_supplier.M_id + "-adminItemRow"}).down()
-    .appendElement({"tag" :"td"}).down()
-    .appendElement({"tag" : "span","innerHtml" : item_supplier.M_id, "id" : item_supplier.M_id + "-transactionID"}).up()
-    .appendElement({"tag" : "th", "scope" : "row", "innerHtml" : item_package.M_id, "id" : item_supplier.M_id + "-id"})
+    .appendElement({"tag" :"td","innerHtml" : item_supplier.M_id, "id" : item_supplier.M_id + "-transactionID"})
+    .appendElement({"tag" : "th", "scope" : "row" ,"innerHtml" : item_package.M_id, "id" : item_supplier.M_id + "-id", "class" : "tabLink"})
     .appendElement({"tag" :"td"}).down()
     .appendElement({"tag" : "input", "class" : "form-control", "type" : "number", "value" : item_supplier.M_quantity, "id" : item_supplier.M_id + "-qty"}).up()
     .appendElement({"tag" : "td"}).down()
@@ -487,12 +488,18 @@ AdminSupplierPage.prototype.appendItemSupplier = function(item_supplier, supplie
     .appendElement({"tag" : "button", "class" : "btn btn-danger btn-sm", "id" : item_supplier.M_id + "-deleteRowAdminBtn", "style":"display: inline-flex; height: 29px;"}).down()
     .appendElement({"tag" : "i", "class" : "fa fa-trash-o"}).up()
     
-     if(moment(item_supplier.M_date).format('DD/MM/YYYY') != "Invalid date"){
-        mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-dateSelector").appendElement({"tag" : "span", "innerHtml":moment(item_supplier.M_date).format('DD/MM/YYYY'), "id" : item_supplier.M_id + "-date"})
+     if(moment(item_supplier.M_date).format('MM/DD/YYYY') != "Invalid date"){
+        mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-dateSelector").appendElement({"tag" : "span", "innerHtml":moment(item_supplier.M_date).format('MM/DD/YYYY'), "id" : item_supplier.M_id + "-date"})
     }else{
         mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-dateSelector") .appendElement({"tag" : "input", "type" : "date", "class"  :"form-control", "id" : item_supplier.M_id + "-date"})
     }
 
+
+    mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-id").element.onclick = function(item_package){
+        return function(){
+            mainPage.packageDisplayPage.displayTabItem(item_package)
+        }
+    }(item_package)
     
     for(var i = 0; i < mainPage.adminPage.adminSupplierPage.currencies.length; i++){
         mainPage.adminPage.adminSupplierPage.panel.getChildById(item_supplier.M_id + "-currencyTypes").appendElement({"tag" : "a", "class" : "dropdown-item", "innerHtml" : mainPage.adminPage.adminSupplierPage.currencies[i], "id" : item_supplier.M_id + "-currencyTypes-" + mainPage.adminPage.adminSupplierPage.currencies[i]})
