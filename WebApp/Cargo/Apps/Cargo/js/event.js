@@ -22,58 +22,57 @@
 
 // Default channels and events
 // TODO revoir cette section
-AccountEvent = "AccountEvent";
-AccountRegisterSuccessEvent = 0
+AccountEvent                   = "AccountEvent"
+AccountRegisterSuccessEvent    = 0
 AccountConfirmationSucessEvent = 1
-SessionEvent = "SessionEvent"
-LoginEvent = 4
-LogoutEvent = 5
-StateChangeEvent = 6
-BpmnEvent = "BpmnEvent"
-NewProcessInstanceEvent = 7
-UpdateProcessInstanceEvent = 8
-NewDefinitionsEvent = 9
-DeleteDefinitionsEvent = 10
-UpdateDefinitionsEvent = 11
-EntityEvent = "EntityEvent"
-NewEntityEvent = 12
-UpdateEntityEvent = 13
-DeleteEntityEvent = 14
-OpenEntityEvent = 15
-CloseEntityEvent = 16
-FileEvent = "FileEvent"
-NewFileEvent = 17
-DeleteFileEvent = 18
-UpdateFileEvent = 19
-OpenFileEvent = 20
-CloseFileEvent = 21
-FileEditEvent = 22
-DataEvent = "DataEvent"
-DeleteRowEvent = 23
-NewRowEvent = 24
-UpdateRowEvent = 25
-NewDataStoreEvent = 26
-DeleteDataStoreEvent = 27
-SecurityEvent = "SecurityEvent"
-NewRoleEvent = 28
-DeleteRoleEvent = 29
-UpdateRoleEvent = 30
-PrototypeEvent = "PrototypeEvent"
-NewPrototypeEvent = 31
-UpdatePrototypeEvent = 32
-DeletePrototypeEvent = 33
-ProjectEvent = "ProjectEvent"
-EmailEvent = "EmailEvent"
-ServiceEvent = "ServiceEvent"
-ConfigurationEvent = "ConfigurationEvent"
-NewTaskEvent = 34
-UpdateTaskEvent = 35
-EventEvent = "EventEvent"
-LdapEvent = "LdapEvent"
-OAuth2Event = "OAuth2Event"
-SchemaEvent = "SchemaEvent"
-WorkflowEvent = "WorkflowEvent"
-
+SessionEvent                   = "SessionEvent"
+LoginEvent                     = 4
+LogoutEvent                    = 5
+StateChangeEvent               = 6
+WorkflowEvent                  = "WorkflowEvent"
+NewBpmsInstanceEvent           = 7
+UpdateBpmsInstanceEvent        = 8
+DeleteBpmsInstanceEvent        = 9
+NewBpmnDefinitionsEvent        = 10
+DeleteBpmnDefinitionsEvent     = 11
+UpdateBpmnDefinitionsEvent     = 12
+EntityEvent                    = "EntityEvent"
+NewEntityEvent                 = 13
+UpdateEntityEvent              = 14
+DeleteEntityEvent              = 15
+OpenEntityEvent                = 16
+CloseEntityEvent               = 17
+FileEvent                      = "FileEvent"
+NewFileEvent                   = 18
+DeleteFileEvent                = 19
+UpdateFileEvent                = 20
+OpenFileEvent                  = 21
+CloseFileEvent                 = 22
+FileEditEvent                  = 23
+DataEvent                      = "DataEvent"
+DeleteRowEvent                 = 24
+NewRowEvent                    = 25
+UpdateRowEvent                 = 26
+NewDataStoreEvent              = 27
+DeleteDataStoreEvent           = 28
+SecurityEvent                  = "SecurityEvent"
+NewRoleEvent                   = 29
+DeleteRoleEvent                = 30
+UpdateRoleEvent                = 31
+PrototypeEvent                 = "PrototypeEvent"
+NewPrototypeEvent              = 32
+UpdatePrototypeEvent           = 33
+DeletePrototypeEvent           = 34
+ProjectEvent                   = "ProjectEvent"
+EmailEvent                     = "EmailEvent"
+ServiceEvent                   = "ServiceEvent"
+ConfigurationEvent             = "ConfigurationEvent"
+NewTaskEvent                   = 35
+UpdateTaskEvent                = 36
+EventEvent                     = "EventEvent"
+LdapEvent                      = "LdapEvent"
+OAuth2Event                    = "OAuth2Event"
+SchemaEvent                    = "SchemaEvent"
 
 /**
 * EventHub contructor
@@ -84,7 +83,7 @@ WorkflowEvent = "WorkflowEvent"
 * @public true
 */
 var EventHub = function (channelId) {
-    if (channelId == undefined) {
+    if (channelId === undefined) {
         return null
     }
 
@@ -121,12 +120,12 @@ EventHub.prototype.registerListener = function () {
 EventHub.prototype.attach = function (observer, eventId, updateFct) {
     observer.observable = this
 
-    if (observer.id == undefined) {
+    if (observer.id === undefined) {
         // observer needs a UUID
         observer.id = randomUUID()
     }
 
-    if (this.observers[eventId] == undefined) {
+    if (this.observers[eventId] === undefined) {
         this.observers[eventId] = []
     }
 
@@ -142,7 +141,7 @@ EventHub.prototype.attach = function (observer, eventId, updateFct) {
         this.observers[eventId].push(observer)
     }
 
-    if (observer.updateFunctions == undefined) {
+    if (observer.updateFunctions === undefined) {
         observer.updateFunctions = {}
     }
 

@@ -55,6 +55,12 @@ type Entity interface{
 	 */
 	 SetEntityGetter(func(uuid string) (interface{}, error))
 
+	/** Use it the set the entity on the cache. **/
+	SetEntitySetter(fct func(entity interface{}))
+
+	/** Use that function to generate the entity UUID**/
+	SetUuidGenerator(fct func(entity interface{}) string)
+
 
 GetId()string
 SetId(val string)

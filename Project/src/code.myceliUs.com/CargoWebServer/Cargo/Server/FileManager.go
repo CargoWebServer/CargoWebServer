@@ -999,6 +999,11 @@ func (this *FileManager) ReadTextFile(filePath string, messageId string, session
 		return ""
 	}
 
+	// relative to the sever root if it start with a /
+	if strings.HasPrefix(filePath, "/") {
+		filePath = this.root + "/" + filePath
+	}
+
 	b, err := ioutil.ReadFile(filePath) // just pass the file name
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)

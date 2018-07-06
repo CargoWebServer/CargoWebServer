@@ -442,13 +442,13 @@ function loadjscssfile(filePath, filetype, callback) {
         var func = new Function("return " + callback)();
     }
 
-    if (filetype == "js") { //if filePath is a external JavaScript file
+    if (filetype == "js" || filetype == "application/javascript") { //if filePath is a external JavaScript file
         var fileref = document.createElement('script')
-        fileref.setAttribute("type", "text/javascript")
+        fileref.setAttribute("type", "application/javascript")
         fileref.setAttribute("src", filePath)
         fileref.onload = func
     }
-    else if (filetype == "css") { //if filePath is an external CSS file
+    else if (filetype == "css" || filetype == "text/css") { //if filePath is an external CSS file
         var fileref = document.createElement("link")
         fileref.setAttribute("rel", "stylesheet")
         fileref.setAttribute("type", "text/css")

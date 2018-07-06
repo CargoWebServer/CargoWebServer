@@ -144,6 +144,239 @@ type JsRuntimeManager struct {
 	m_stopVm            map[string]chan (bool)
 }
 
+// The main processing loop...
+func run(jsRuntimeManager *JsRuntimeManager) {
+	// That function will process api call's
+	for {
+		select {
+		case intervalInfo := <-jsRuntimeManager.m_setInterval:
+			// Keep the intervals info in the map.
+			jsRuntimeManager.m_intervals[intervalInfo.uuid] = intervalInfo
+			// Wait util the timer ends...
+			go func(intervalInfo *IntervalInfo) {
+				// Set the variable as function.
+				functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
+				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].Run("var " + functionName + "=" + intervalInfo.callback)
+				// I must run the script one and at interval after it...
+				if err == nil {
+					if intervalInfo.ticker != nil {
+						// setInterval function.
+						for t := range intervalInfo.ticker.C {
+							// So here I will call the callback.
+							// The callback contain unamed function...
+							_, err := GetJsRuntimeManager().GetSession(intervalInfo.sessionId).Run(functionName + "()")
+							if err != nil {
+								log.Println("---> Run interval callback error: ", err, t)
+							}
+						}
+					} else if intervalInfo.timer != nil {
+						// setTimeout function
+						<-intervalInfo.timer.C
+						_, err := GetJsRuntimeManager().RunScript(intervalInfo.sessionId, functionName+"()")
+						if err != nil {
+							log.Println("---> Run timeout callback error: ", err)
+						}
+					}
+				} else {
+					log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
+				}
+
+			}(intervalInfo)
+		case uuid := <-jsRuntimeManager.m_clearInterval:
+			intervalInfo := jsRuntimeManager.m_intervals[uuid]
+			if intervalInfo != nil {
+				if intervalInfo.ticker != nil {
+					intervalInfo.ticker.Stop()
+				} else if intervalInfo.timer != nil {
+					intervalInfo.timer.Stop()
+				}
+				// Remove the interval/timeout information.
+				delete(jsRuntimeManager.m_intervals, uuid)
+			} else {
+				// In that case the uuid is a session id and not an interval id.
+				for _, intervalInfo_ := range jsRuntimeManager.m_intervals {
+					if intervalInfo_.sessionId == uuid {
+						if intervalInfo_.ticker != nil {
+							intervalInfo_.ticker.Stop()
+						} else if intervalInfo_.timer != nil {
+							intervalInfo_.timer.Stop()
+						}
+						// Remove the interval/timeout information.
+						delete(jsRuntimeManager.m_intervals, intervalInfo_.uuid)
+					}
+				}
+			}
+		case functionInfo := <-jsRuntimeManager.m_setFunction:
+			jsRuntimeManager.m_functions[functionInfo.m_functionId] = functionInfo.m_function
+		case sessionInfo := <-jsRuntimeManager.m_getSession:
+			sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
+		case operationInfos := <-jsRuntimeManager.m_appendScript:
+			callback := operationInfos.m_returns
+			path := operationInfos.m_params["path"].(string)
+			script := operationInfos.m_params["script"].(string)
+			jsRuntimeManager.appendScript(path, script)
+			// In case the script must be run...
+			if operationInfos.m_params["run"].(bool) {
+				for _, session := range jsRuntimeManager.m_sessions {
+					log.Println(script)
+					session.Run(script)
+				}
+			}
+			callback <- []interface{}{true} // unblock the channel...
+		case operationInfos := <-jsRuntimeManager.m_execVmOperation:
+			// Set the function on the JS runtime...
+			var sessionId = operationInfos.m_params["sessionId"].(string)
+
+			if jsRuntimeManager.m_sessions[sessionId] != nil {
+				// Here I will execute various session action.
+				if operationInfos.m_name == "GetVar" {
+					jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "SetVar" {
+					jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "ExecuteJsFunction" {
+					jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "RunScript" {
+					jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				}
+			} else {
+				log.Println("---> try to execute function on close channel whit id: ", sessionId)
+				// return nil, errors.New("Session " + sessionId + " is closed!")
+			}
+
+		case operationInfos := <-jsRuntimeManager.m_createVm:
+			callback := operationInfos.m_returns
+			sessionId := operationInfos.m_params["sessionId"].(string)
+			if jsRuntimeManager.m_sessions[sessionId] == nil {
+				// Create one JS engine by session, or task...
+				jsRuntimeManager.createVm(sessionId)
+
+				// Create the list of channel to communicate with the
+				// JS engine.
+				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
+
+				// The session processing loop...
+				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
+					// The session was interrupt!
+					defer func() {
+						// Stahp mean the VM was kill by the admin.
+						if caught := recover(); caught != nil {
+							if caught.(error).Error() == "Stahp" {
+								// Here the task was cancel.
+								log.Println("---> session: ", sessionId, " is now closed")
+								return
+							} else {
+								panic(caught) // Something else happened, repanic!
+							}
+						}
+					}()
+
+				process:
+					for {
+						select {
+						case operationInfos := <-setVariable:
+							callback := operationInfos.m_returns
+							if operationInfos.m_params["varInfos"] != nil {
+								varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
+								vm.Set(varInfos.m_name, varInfos.m_val)
+							}
+							callback <- []interface{}{true} // unblock the channel...
+						case operationInfos := <-getVariable:
+							callback := operationInfos.m_returns
+							var varInfos JsVarInfos
+							if operationInfos.m_params["varInfos"] != nil {
+								varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
+								value, err := vm.Get(varInfos.m_name)
+								if err == nil {
+									varInfos.m_val = value
+								}
+							}
+							callback <- []interface{}{varInfos} // unblock the channel...
+						case operationInfos := <-executeJsFunction:
+							callback := operationInfos.m_returns
+							var jsFunctionInfos JsFunctionInfos
+							if operationInfos.m_params["jsFunctionInfos"] != nil {
+								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
+								vm.Set("messageId", jsFunctionInfos.m_messageId)
+								vm.Set("sessionId", jsFunctionInfos.m_sessionId)
+								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+							}
+							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
+						case operationInfos := <-runScript:
+							callback := operationInfos.m_returns
+							var results otto.Value
+							var err error
+							if operationInfos.m_params["script"] != nil {
+								results, err = vm.Run(operationInfos.m_params["script"].(string))
+							}
+							callback <- []interface{}{results, err} // unblock the channel...
+						case stop := <-stopVm:
+							if stop {
+								break process // exit the processing loop.
+							}
+						}
+					}
+				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
+			}
+			// Close vm callback...
+			callback <- []interface{}{true} // unblock the channel...
+
+		case operationInfos := <-jsRuntimeManager.m_closeVm:
+			sessionId := operationInfos.m_params["sessionId"].(string)
+			callback := operationInfos.m_returns
+			if jsRuntimeManager.m_sessions[sessionId] != nil {
+				callback <- []interface{}{true} // unblock the channel...
+				// here I will not wait for the session to clean before retrun.
+				go func() {
+					// Wait until the vm is stop
+					wait := make(chan string, 1)
+					timer := time.NewTimer(5 * time.Second)
+
+					// Call the interupt function on the VM.
+					jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
+						return func() {
+							timer.Stop()
+							// Continue the processing.
+							wait <- "--> Interrupt execution of VM with id " + sessionId
+							// The panic error will actually kill the vm
+							panic(errors.New("Stahp"))
+						}
+					}(sessionId, wait, timer)
+
+					// If nothing append for 1 second I will return.
+					go func(wait chan string, timer *time.Timer) {
+						// simply ignore the error here.
+						defer func() {
+							// Stahp mean the VM was kill by the admin.
+							if caught := recover(); caught != nil {
+								log.Println("---> session: ", sessionId, " is now closed")
+								return
+							}
+						}()
+
+						<-timer.C
+						wait <- "--> Stop execution of VM with id " + sessionId
+						if jsRuntimeManager.m_sessions[sessionId] != nil {
+							jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
+						}
+					}(wait, timer)
+
+					// Synchronyse exec of interuption here.
+					log.Println(<-wait)
+
+					jsRuntimeManager.removeVm(sessionId)
+				}()
+			} else {
+				// simply call the callback if the sesion is already close.
+				callback <- []interface{}{true} // unblock the channel...
+			}
+		}
+	}
+}
+
 func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// The singleton.
 	jsRuntimeManager = new(JsRuntimeManager)
@@ -298,227 +531,16 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// Load the script from the script repository...
 	jsRuntimeManager.appendScriptFiles()
 
-	// That function will process api call's
-	go func(jsRuntimeManager *JsRuntimeManager) {
-		for {
-			select {
-			case intervalInfo := <-jsRuntimeManager.m_setInterval:
-				// Keep the intervals info in the map.
-				jsRuntimeManager.m_intervals[intervalInfo.uuid] = intervalInfo
-				// Wait util the timer ends...
-				go func(intervalInfo *IntervalInfo) {
-					// Set the variable as function.
-					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-					_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].Run("var " + functionName + "=" + intervalInfo.callback)
-					// I must run the script one and at interval after it...
-					if err == nil {
-						if intervalInfo.ticker != nil {
-							// setInterval function.
-							for t := range intervalInfo.ticker.C {
-								// So here I will call the callback.
-								// The callback contain unamed function...
-								_, err := GetJsRuntimeManager().GetSession(intervalInfo.sessionId).Run(functionName + "()")
-								if err != nil {
-									log.Println("---> Run interval callback error: ", err, t)
-								}
-							}
-						} else if intervalInfo.timer != nil {
-							// setTimeout function
-							<-intervalInfo.timer.C
-							_, err := GetJsRuntimeManager().RunScript(intervalInfo.sessionId, functionName+"()")
-							if err != nil {
-								log.Println("---> Run timeout callback error: ", err)
-							}
-						}
-					} else {
-						log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
-					}
-
-				}(intervalInfo)
-			case uuid := <-jsRuntimeManager.m_clearInterval:
-				intervalInfo := jsRuntimeManager.m_intervals[uuid]
-				if intervalInfo != nil {
-					if intervalInfo.ticker != nil {
-						intervalInfo.ticker.Stop()
-					} else if intervalInfo.timer != nil {
-						intervalInfo.timer.Stop()
-					}
-					// Remove the interval/timeout information.
-					delete(jsRuntimeManager.m_intervals, uuid)
-				} else {
-					// In that case the uuid is a session id and not an interval id.
-					for _, intervalInfo_ := range jsRuntimeManager.m_intervals {
-						if intervalInfo_.sessionId == uuid {
-							if intervalInfo_.ticker != nil {
-								intervalInfo_.ticker.Stop()
-							} else if intervalInfo_.timer != nil {
-								intervalInfo_.timer.Stop()
-							}
-							// Remove the interval/timeout information.
-							delete(jsRuntimeManager.m_intervals, intervalInfo_.uuid)
-						}
-					}
-				}
-			case functionInfo := <-jsRuntimeManager.m_setFunction:
-				jsRuntimeManager.m_functions[functionInfo.m_functionId] = functionInfo.m_function
-			case sessionInfo := <-jsRuntimeManager.m_getSession:
-				sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
-			case operationInfos := <-jsRuntimeManager.m_appendScript:
-				callback := operationInfos.m_returns
-				path := operationInfos.m_params["path"].(string)
-				script := operationInfos.m_params["script"].(string)
-				jsRuntimeManager.appendScript(path, script)
-				// In case the script must be run...
-				if operationInfos.m_params["run"].(bool) {
-					for _, session := range jsRuntimeManager.m_sessions {
-						log.Println(script)
-						session.Run(script)
-					}
-				}
-
-				callback <- []interface{}{true} // unblock the channel...
-			case operationInfos := <-jsRuntimeManager.m_execVmOperation:
-				// Set the function on the JS runtime...
-				var sessionId = operationInfos.m_params["sessionId"].(string)
-				if jsRuntimeManager.m_executeJsFunction[sessionId] != nil {
-					// Here I will execute various session action.
-					if operationInfos.m_name == "GetVar" {
-						jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-					} else if operationInfos.m_name == "SetVar" {
-						jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-					} else if operationInfos.m_name == "ExecuteJsFunction" {
-						jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-					} else if operationInfos.m_name == "RunScript" {
-						jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-					}
-				} else {
-					log.Println("---> try to execute function on close channel whit id: ", sessionId)
-					// return nil, errors.New("Session " + sessionId + " is closed!")
-				}
-
-			case operationInfos := <-jsRuntimeManager.m_createVm:
-				callback := operationInfos.m_returns
-				sessionId := operationInfos.m_params["sessionId"].(string)
-				if jsRuntimeManager.m_sessions[sessionId] == nil {
-					jsRuntimeManager.createVm(sessionId)
-					jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
-					jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
-					jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
-					jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
-					jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
-
-					// The vm processing loop...
-					go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
-						// The session was interrupt!
-						defer func() {
-							// Stahp mean the VM was kill by the admin.
-							if caught := recover(); caught != nil {
-								if caught.(error).Error() == "Stahp" {
-									// Here the task was cancel.
-									log.Println("---> session: ", sessionId, " is now closed")
-									return
-								} else {
-									panic(caught) // Something else happened, repanic!
-								}
-							}
-						}()
-
-					process:
-						for {
-							select {
-							case operationInfos := <-setVariable:
-								callback := operationInfos.m_returns
-								if operationInfos.m_params["varInfos"] != nil {
-									varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
-									vm.Set(varInfos.m_name, varInfos.m_val)
-								}
-								callback <- []interface{}{true} // unblock the channel...
-							case operationInfos := <-getVariable:
-								callback := operationInfos.m_returns
-								var varInfos JsVarInfos
-								if operationInfos.m_params["varInfos"] != nil {
-									varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
-									value, err := vm.Get(varInfos.m_name)
-									if err == nil {
-										varInfos.m_val = value
-									}
-								}
-								callback <- []interface{}{varInfos} // unblock the channel...
-							case operationInfos := <-executeJsFunction:
-								callback := operationInfos.m_returns
-								var jsFunctionInfos JsFunctionInfos
-								if operationInfos.m_params["jsFunctionInfos"] != nil {
-									jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
-									vm.Set("messageId", jsFunctionInfos.m_messageId)
-									vm.Set("sessionId", jsFunctionInfos.m_sessionId)
-									jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
-								}
-								callback <- []interface{}{jsFunctionInfos} // unblock the channel...
-							case operationInfos := <-runScript:
-								callback := operationInfos.m_returns
-								var results otto.Value
-								var err error
-								if operationInfos.m_params["script"] != nil {
-									log.Println("---> run script ", sessionId)
-									results, err = vm.Run(operationInfos.m_params["script"].(string))
-									log.Println("---> finish run script ", sessionId)
-								}
-								callback <- []interface{}{results, err} // unblock the channel...
-							case stop := <-stopVm:
-								if stop {
-									log.Println("---> session: ", sessionId, " is now closed")
-									break process // exit the processing loop.
-								}
-							}
-						}
-
-						log.Println("---> stop processing loop for ", sessionId)
-					}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
-				}
-				// Close vm callback...
-				callback <- []interface{}{true} // unblock the channel...
-
-			case operationInfos := <-jsRuntimeManager.m_closeVm:
-				sessionId := operationInfos.m_params["sessionId"].(string)
-				callback := operationInfos.m_returns
-				if jsRuntimeManager.m_sessions[sessionId] != nil {
-					callback <- []interface{}{true} // unblock the channel...
-					// here I will not wait for the session to clean before retrun.
-					go func() {
-						// Wait until the vm is stop
-						wait := make(chan string, 1)
-						timer := time.NewTimer(5 * time.Second)
-
-						// Call the interupt function on the VM.
-						jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
-							return func() {
-								timer.Stop()
-								// Continue the processing.
-								wait <- "--> Interrupt execution of VM with id " + sessionId
-								// The panic error will actually kill the vm
-								panic(errors.New("Stahp"))
-							}
-						}(sessionId, wait, timer)
-
-						// If nothing append for 1 second I will return.
-						go func(wait chan string, timer *time.Timer) {
-							<-timer.C
-							wait <- "--> Stop execution of VM with id " + sessionId
-							jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
-						}(wait, timer)
-
-						// Synchronyse exec of interuption here.
-						log.Println(<-wait)
-
-						jsRuntimeManager.removeVm(sessionId)
-					}()
-				} else {
-					// simply call the callback if the sesion is already close.
-					callback <- []interface{}{true} // unblock the channel...
-				}
-			}
+	// Bypass error here and try to loop again...
+	defer func(jsRuntimeManager *JsRuntimeManager) {
+		if caught := recover(); caught != nil {
+			log.Println("----> error caught at line 539 of JsRuntimeManager. ", caught.(error).Error())
+			go run(jsRuntimeManager)
 		}
 	}(jsRuntimeManager)
+
+	// Run the main processing loop.
+	go run(jsRuntimeManager)
 
 	return jsRuntimeManager
 }
@@ -810,6 +832,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	// I will also clear intervals for the
 	// the session.
 	this.m_clearInterval <- sessionId
+
 	// Execute channel id
 	if this.m_executeJsFunction[sessionId] != nil {
 		close(this.m_executeJsFunction[sessionId])

@@ -57,3 +57,23 @@
 	cursor: pointer;
 	color: #428bca;
 }
+
+.instanceListTable{
+    color:white;
+    border-collapse:collapse;
+    width:100%;
+}
+
+.instanceListRow{
+    cursor:pointer;
+}
+.instanceListRow:hover{
+    background-color:#646464;
+}
+
+.instanceListHeader{
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+

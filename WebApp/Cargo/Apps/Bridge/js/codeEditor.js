@@ -93,7 +93,6 @@ var CodeEditor = function (parent) {
             if (editor !== undefined && file.M_data.length > 0) {
                 // Supend the change event propagation
                 codeEditor.quiet = true;
-                // TODO multiple users synch to be applied here...
                 editor.setValue(decode64(file.M_data), -1);
                 editor.clearSelection();
                 if (codeEditor.lastCursorPosition !== undefined) {
@@ -211,47 +210,11 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     if (this.files[diagram.UUID] !== undefined) {
         // Set the tab active...
         this.setActiveFile(diagram.UUID)
-        this.diagram.canvas.initWorkspace()
         return
     }
-    
-    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.UUID + "_editor" }).down()
-    this.diagram = new SvgDiagram(filePanel, diagram)
-    this.diagram.init(function (codeEditor, diagram, filePanel) {
-        return function () {
-            codeEditor.diagram.drawDiagramElements()
-            codeEditor.files[diagram.UUID] = diagram
-            codeEditor.filesPanel[diagram.UUID] = filePanel
-            codeEditor.setActiveFile(diagram.UUID)
 
-            // Now the resize element...
-            codeEditor.diagram.canvas.initWorkspace = function (workspace) {
-                return function () {
-                    if (workspace.lastChild === undefined) {
-                        return
-                    }
-                    if (workspace.lastChild.lastChild !== undefined) {
-                        for (var childId in workspace.childs) {
-                            var child = workspace.childs[childId];
-                            if (child.element.viewBox !== null) {
-                                if (child.resize != undefined) {
-                                    child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight);
-                                }
-                            }
-                        }
-                    }
-                }
-            }(filePanel)
-            
-            window.addEventListener("resize", function (canvas) {
-                return function () {
-                    canvas.initWorkspace()
-                }
-            }(codeEditor.diagram.canvas))
-
-            codeEditor.diagram.canvas.initWorkspace()
-        }
-    }(this, diagram, filePanel))
+    // Create the Bpmn diagram and instance view.
+    new BpmnView(this, diagram)
 }
 
 CodeEditor.prototype.appendFile = function (file, coord) {
@@ -403,7 +366,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         // TODO 
         // - get the user information from the session id.
         // - Associate a color with that user (marker color ace_step)
-        console.log("Im open! ", evt.dataMap.FileEditEvent)
+        // console.log("Im open! ", evt.dataMap.FileEditEvent)
     })
 
     // Event received when one participant close a file.
@@ -412,7 +375,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         // Cancel editEvent modification made by sessiondId hint 'codeEditor.networkEvents'
         // remove the marker 
         // reset the marker color for that session.
-        console.log("Im close! ", evt)
+        // console.log("Im close! ", evt)
     })
 
     // That function is use to set the editor file in correct state in respect of 
@@ -659,4 +622,5 @@ CodeEditor.prototype.setActiveFile = function (uuid, coord) {
         editor.renderer.scrollToRow(coord.ln - 3); // minus 3 to see couple line before...
     }
     
+    fireResize()
 }

@@ -9,8 +9,7 @@ var BpmnExplorer = function (parent) {
     this.definitions = {}
 
     this.header = this.panel.appendElement({ "tag": "div", "class": "bpmn_explorer_header", "style":"text-align: left;" }).down()
-    // this.header = this.panel.appendElement({ "tag": "div","innerHtml":"definitions" }).down()
-    
+
     // Now the definitions upload button...
     this.uploadDefintionsBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button", "style":"width: 20px;" }).down()
     this.uploadDefintionsBtn.appendElement({ "tag": "i", "class": "fa fa-folder" })
@@ -48,18 +47,24 @@ var BpmnExplorer = function (parent) {
                     var bodyElement = new Element(body, { "tag": "div", "style": "height: 100%; width: 100%;" });
                     var svgSrc = e.target.result;
                     var svgfiltersDiv = bodyElement.appendElement({ "tag": "div", "id": "SvgfiltersDiv", "innerHtml": svgSrc }).down
-                    server.workflowManager.getAllDefinitions(
-                        function (results, caller) {
-                            for (var i = 0; i < results.length; i++) {
-                                // append the defintions to the bpmnExplorer.
-                                bpmnExplorer.appendDefinitions(results[i])
-                            }
-                        },
-                        // The error callback.
-                        function (result, caller) {
 
-                        },
-                        bpmnExplorer)
+                    server.entityManager.getEntities("BPMN20.Definitions", "BPMN20", "", 0, -1, [], true, false,
+                    // index, total
+                    function(index, total, caller){
+                        
+                    },
+                    // success callback
+                    function(results, caller){
+                        for (var i = 0; i < results.length; i++) {
+                            // append the defintions to the bpmnExplorer.
+                            initDefinitions(results[i])
+                            bpmnExplorer.appendDefinitions(results[i])
+                        }
+                    },
+                    // error callback
+                    function(errObj, caller){
+                        
+                    }, bpmnExplorer)
                 }
             }(caller)
             // Read the blob as a text file...
@@ -70,7 +75,7 @@ var BpmnExplorer = function (parent) {
         this)
 
     // Now the append definition event handeler...
-    server.workflowManager.attach(this, NewDefinitionsEvent, function (bpmnExplorer) {
+    server.workflowManager.attach(this, NewBpmnDefinitionsEvent, function (bpmnExplorer) {
         return function (evt) {
             if (evt.dataMap["definitionsInfo"] !== undefined) {
                 var definition = entities[evt.dataMap["definitionsInfo"].UUID]

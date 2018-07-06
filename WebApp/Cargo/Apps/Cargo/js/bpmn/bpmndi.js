@@ -37,18 +37,69 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 
 	// That function is use to refresh the size of the svg canva.
 	this.canvas.resize = function (canvas) {
-		return function (widht, height) {
-			canvas.setSvgAttribute("width", widht)
+		return function (width, height) {
+			canvas.setSvgAttribute("width", width)
 			canvas.setSvgAttribute("height", height)
 
 			var viewBox = canvas.element.viewBox
 			// TODO the pan here
 
 			// Set the new width and height with respect to the scaleFactor...
-			viewBox.baseVal.width = widht * (1 / canvas.scaleFactor)
+			viewBox.baseVal.width = width * (1 / canvas.scaleFactor)
 			viewBox.baseVal.height = height * (1 / canvas.scaleFactor)
 		}
 	}(this.canvas)
+	
+	
+	this.plane.element.onmousedown = function(plane){
+	    return function(){
+	        dragMouseDown(window.event)
+	        function dragMouseDown(e){
+        	    e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                pos5 = 0;
+                pos6 = 0;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+        	}
+        	
+        	function elementDrag(e) {
+        	    
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                if(plane.element.getAttribute("transform") != undefined){
+                    pos5 = Number(-1 * plane.element.getAttribute("transform").substring(
+                        plane.element.getAttribute("transform").lastIndexOf("translate(") + 10, 
+                        plane.element.getAttribute("transform").lastIndexOf(",")
+                    ));
+                    pos6 =plane.element.getAttribute("transform").substring(
+                        plane.element.getAttribute("transform").lastIndexOf("translate(") + 10, 
+                        plane.element.getAttribute("transform").lastIndexOf(")")
+                    );
+                    pos6 = Number(-1 * pos6.slice(pos6.lastIndexOf(",") + 1));
+                }
+                
+                plane.element.setAttribute("transform", "translate(" + -(pos1+pos5) + "," + -(pos2+pos6)  + ")")
+              }
+            
+              function closeDragElement() {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+              }
+        	    }
+    	}(this.plane)
+	
+	
 
 	// Now the zoom in and out ...
 	this.canvas.element.addEventListener("wheel",
@@ -72,10 +123,8 @@ var SvgDiagram = function (parent, bpmnDiagram) {
  */
 SvgDiagram.prototype.init = function (callback) {
 	var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
-	for (var index = 0; index < diagramElements.length; index++) {
-		// Here I will call the same function on the next element.
-		var diagramElement = diagramElements[index]
-
+	function initBpmnElement(elements, index, callback){
+	    var diagramElement = elements[index]
 		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement, false,
 			// success callback
 			function (bpmnElement, caller) {
@@ -83,20 +132,22 @@ SvgDiagram.prototype.init = function (callback) {
 					return function () {
 						return diagramElement
 					}
-				}(diagramElement)
-				if (caller.callback != undefined) {
-					// init completed!
-					callback()
+				}(caller.diagramElement)
+				
+				if(caller.index < caller.elements.length - 1){
+				    initBpmnElement(caller.elements, caller.index + 1, caller.callback)
+				}else{
+				    caller.callback()
 				}
 			},
 			// error callback
 			function (errObj, caller) {
 
-			}, { "callback": callback })
-
+			}, {"index":index, "diagramElement":diagramElement, "elements":elements, "callback": callback })
 	}
 
-	this.instanceListView = new InstanceListView(this.parent, this)
+    initBpmnElement(diagramElements, 0, callback)
+	
 }
 
 /*
@@ -104,19 +155,25 @@ SvgDiagram.prototype.init = function (callback) {
  */
 SvgDiagram.prototype.drawDiagramElements = function () {
 	var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
-	for (var index = 0; index < diagramElements.length; index++) {
-		// Here I will call the same function on the next element.
-		var diagramElement = diagramElements[index]
-		// Here I will create a function to get the diagram element...
+	function drawDiagramElements(diagramElements, index, svgDiagram){
+	    var diagramElement = diagramElements[index]
+	
 		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement, false,
 			function (bpmnElement, caller) { 
+			    // Draw the element.
 				caller.svgDiagram.drawDiagramElement(caller.diagramElement, bpmnElement)
+				
+				if(caller.index < caller.diagramElements.length - 1){
+				    drawDiagramElements(caller.diagramElements, caller.index + 1, caller.svgDiagram)
+				}
 			},
 			function (errObj, caller) { 
 
 			},
-			{"svgDiagram":this, "diagramElement":diagramElement})
+			{"svgDiagram":svgDiagram, "diagramElement":diagramElement, "index":index, "diagramElements":diagramElements})
 	}
+	
+	drawDiagramElements(diagramElements, 0, this)
 }
 
 
@@ -131,22 +188,31 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 		svgElement = this.drawScriptTask(diagramElement)
 	} else if (typeName == "BPMN20.Task_impl") {
 		svgElement = this.drawTask(diagramElement, " bpmndi_task")
+		svgElement.element.classList.add("Task", "activity")
 	} else if (typeName == "BPMN20.UserTask") {
 		svgElement = this.drawUserTask(diagramElement)
+		svgElement.element.classList.add("UserTask", "activity")
 	} else if (typeName == "BPMN20.ReceiveTask") {
 		svgElement = this.drawReceiveTask(diagramElement)
+		svgElement.element.classList.add("ReceiveTask", "activity")
 	} else if (typeName == "BPMN20.SendTask") {
 		svgElement = this.drawSendTask(diagramElement)
+		svgElement.element.classList.add("SendTask", "activity")
 	} else if (typeName == "BPMN20.ServiceTask") {
 		svgElement = this.drawServiceTask(diagramElement)
+		svgElement.element.classList.add("ServiceTask", "activity")
 	} else if (typeName == "BPMN20.StartEvent") {
 		svgElement = this.drawStartEvent(diagramElement)
+		svgElement.element.classList.add("StartEvent", "event")
 	} else if (typeName == "BPMN20.EndEvent") {
 		svgElement = this.drawEndEvent(diagramElement)
+		svgElement.element.classList.add("EndEvent", "event")
 	} else if (typeName == "BPMN20.IntermediateCatchEvent" || typeName == "BPMN20.IntermediateThrowEvent") {
 		svgElement = this.drawIntermediateEvent(diagramElement)
+		svgElement.element.classList.add("IntermediateCatchEvent", "event")
 	} else if (typeName == "BPMN20.EventBasedGateway") {
 		svgElement = this.drawEventBasedGateway(diagramElement)
+		
 	} else if (typeName == "BPMN20.InclusiveGateway") {
 		svgElement = this.drawInclusiveGateway(diagramElement)
 	} else if (typeName == "BPMN20.ExclusiveGateway") {
@@ -909,6 +975,11 @@ SvgDiagram.prototype.drawBoundaryEvent = function (diagramElement) {
 	return group
 }
 
+// That function is called when the user click on the start event.
+SvgDiagram.prototype.startEventClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){
+    
+}
+
 SvgDiagram.prototype.drawStartEvent = function (diagramElement) {
 	var group = this.drawEvent(diagramElement)
 	var bpmnElement = entities[diagramElement.M_bpmnElement]
@@ -921,36 +992,11 @@ SvgDiagram.prototype.drawStartEvent = function (diagramElement) {
 	}
 
 	// Here i will create the event...
-	group.element.firstElementChild.onclick = function (parent, diagramElement) {
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
 		return function (event) {
-
-			// Get the menu position
-			var x = event.offsetX - 5;     // Get the horizontal coordinate
-			var y = event.offsetY - 5;     // Get the vertical coordinate
-
-			var popup = parent.appendElement({ "tag": "div", "class": "popupMenu", "style": "top:" + y + "px; left:" + x + "px;" }).down()
-
-			popup.element.onmouseout = function () {
-				if (this.parentNode != null) {
-					this.parentNode.removeChild(this)
-				}
-			}
-
-			// Now I will append the menu element...
-			startMenu = popup.appendElement({ "tag": "div", "class": "popupMenuItem", "innerHtml": "Start" }).down()
-			startMenu.element.onclick = function (popup, parent, diagramElement) {
-				return function () {
-					var startEvent = entities[diagramElement.M_bpmnElement]
-					// Remove the menu.
-					popup.element.parentNode.removeChild(popup.element)
-
-					// Create a new process instance wizard...
-					new ProcessWizard(parent, startEvent)
-				}
-			}(popup, parent, diagramElement)
-
+            svgDiagram.startEventClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
 		}
-	}(this.parent, diagramElement)
+	}(this.parent, diagramElement,group, this)
 
 	return group
 }
@@ -965,8 +1011,7 @@ SvgDiagram.prototype.drawEndEvent = function (diagramElement) {
 		// Here I will draw the definition element...
 		this.drawEventDefintion(diagramElement, group)
 	}
-
-
+	
 	return group
 }
 

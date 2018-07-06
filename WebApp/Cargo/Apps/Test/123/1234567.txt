@@ -3,3 +3,4 @@
 https://bootsnipp.com/snippets/featured/responsive-shopping-cart
 
 jQuery.extend({},item_supplier)
+

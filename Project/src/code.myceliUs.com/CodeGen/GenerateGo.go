@@ -830,6 +830,12 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	 */\n"
 	classStr += "	 SetEntityGetter(func(uuid string) (interface{}, error))\n\n"
 
+	classStr += "	/** Use it the set the entity on the cache. **/\n"
+	classStr += "	SetEntitySetter(fct func(entity interface{}))\n\n"
+
+	classStr += "	/** Use that function to generate the entity UUID**/\n"
+	classStr += "	SetUuidGenerator(fct func(entity interface{}) string)\n\n"
+
 	for j := 0; j < len(class.Attributes); j++ {
 		attribute := class.Attributes[j]
 		if attribute.Type == "cmof:Property" {

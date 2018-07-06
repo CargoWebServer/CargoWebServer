@@ -149,9 +149,8 @@
 	cursor: pointer;
 }
 
-.workflow-viewer .event.StartEvent ellipse,
-.workflow-viewer .event.EndEvent ellipse {
-	/*fill: hsl(206, 9%, 80%); /* grey */
+.workflow-viewer .event.StartEvent circle,
+.workflow-viewer .event.EndEvent circle {
 	stroke: gray;
 	stroke-width: 2;
 }
@@ -163,14 +162,13 @@
 .workflow-viewer .activity.ScriptTask rect,
 .workflow-viewer .activity.Task rect,
 .workflow-viewer .activity.UserTask rect {
-	/**fill: hsl(206, 9%, 80%); /* grey */
 	stroke: gray;
 	stroke-width: 2;
 }
 
 /** Completed state **/
-.workflow-viewer .event.StartEvent ellipse:hover,
-.workflow-viewer .event.EndEvent ellipse:hover{
+.workflow-viewer .event.StartEvent circle:hover,
+.workflow-viewer .event.EndEvent circle:hover{
 	cursor: pointer;
 	stroke: black;
 }
@@ -188,17 +186,18 @@
 
 .workflow-viewer .completed{
     border: 2px solid gray;
-    fill: url(#greyGradient);
+    /*fill: url(#greyGradient);*/
+    fill: rgb(45, 45, 45); /* grey */
 }
 
-.workflow-viewer .event.completed.StartEvent ellipse{
+.workflow-viewer .event.completed.StartEvent circle{
     stroke: hsl(121, 32%, 40%); /* Green */
     fill: url(#greenGradient);
     stroke-width: 3;
 
 }
 
-.workflow-viewer .event.completed.EndEvent ellipse {
+.workflow-viewer .event.completed.EndEvent circle {
     stroke: hsl(348, 32%, 40%); /* Red */
     fill: url(#redGradient);
     stroke-width: 3;
@@ -213,7 +212,8 @@
 .workflow-viewer .activity.completed.Task rect,
 .workflow-viewer .activity.completed.UserTask rect {
 	stroke: gray; /* gray */
-	fill: url(#greyGradient);
+	/*fill: url(#greyGradient);*/
+	fill: rgb(45, 45, 45); /* grey */
 }
 
 /** Canceled state **/
@@ -221,8 +221,8 @@
     border: 2px solid hsl(350, 92%, 50%);
 }
 
-.workflow-viewer .event.canceled.StartEvent ellipse,
-.workflow-viewer .event.canceled.EndEvent ellipse{
+.workflow-viewer .event.canceled.StartEvent circle,
+.workflow-viewer .event.canceled.EndEvent circle{
 	stroke: hsl(350, 92%, 50%); /* red */
 	-webkit-animation: canceled-pulse 3s infinite;
 	-moz-animation: canceled-pulse 3s infinite;
@@ -261,8 +261,8 @@
     border: 2px solid hsl(30, 92%, 50%);
 }
 
-.workflow-viewer .event.waiting.StartEvent ellipse,
-.workflow-viewer .event.waiting.EndEvent ellipse{
+.workflow-viewer .event.waiting.StartEvent circle,
+.workflow-viewer .event.waiting.EndEvent circle{
 	stroke: hsl(30, 92%, 50%); /* red */
 	-webkit-animation: waiting-pulse 3s infinite;
 	-moz-animation: waiting-pulse 3s infinite;
@@ -302,8 +302,8 @@
     border: 2px solid hsl(121, 62%, 73%);
 }
 
-.workflow-viewer .event.ready.StartEvent ellipse,
-.workflow-viewer .event.ready.EndEvent ellipse{
+.workflow-viewer .event.ready.StartEvent circle,
+.workflow-viewer .event.ready.EndEvent circle{
 	stroke: hsl(121, 62%, 73%); /* green */
 	-webkit-animation: ready-pulse 3s infinite;
 	-moz-animation: ready-pulse 3s infinite;
@@ -343,8 +343,8 @@
     border: 2px solid hsl(194, 66%, 70%);
 }
 
-.workflow-viewer .event.active.StartEvent ellipse,
-.workflow-viewer .event.active.EndEvent ellipse{
+.workflow-viewer .event.active.StartEvent circle,
+.workflow-viewer .event.active.EndEvent circle{
 	stroke: hsl(194, 66%, 70%); /* blue */
 	-webkit-animation: active-pulse 3s infinite;
 	-moz-animation: active-pulse 3s infinite;

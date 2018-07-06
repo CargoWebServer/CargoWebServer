@@ -64,7 +64,7 @@ var Dialog = function (id, parent, isModal, title) {
                 dialog.isMoving = true
                 dialog.offsetX = evt.offsetX
                 dialog.offsetY = evt.offsetY
-                dialog.div.element.parentNode.className = "unselectable"
+                dialog.div.element.parentNode.classList.add("unselectable")
                 dialog.div.element.style.cursor = "move"
             }
         }
@@ -78,7 +78,7 @@ var Dialog = function (id, parent, isModal, title) {
                 dialog.offsetY = 0
                 dialog.div.element.style.cursor = ""
                 if (dialog.div.element.parentNode != null) {
-                    dialog.div.element.parentNode.className = ""
+                    dialog.div.element.parentNode.classList.remove("unselectable")
                 }
             }
         }

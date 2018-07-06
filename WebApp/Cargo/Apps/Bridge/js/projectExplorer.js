@@ -127,7 +127,9 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
         for (var i = 0; i < dir.M_files.length; i++) {
             var file = dir.M_files[i]
             level = level + 1
-            folderDiv.childsDiv.push(this.initFilesView(folderDiv, file, level))
+            if(file != undefined){
+                folderDiv.childsDiv.push(this.initFilesView(folderDiv, file, level))
+            }
         }
     }
 

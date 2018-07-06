@@ -640,7 +640,9 @@ function setObjectValues(object, values, lazy) {
                                         setRef(object, property, values[property][i], isArray_)
                                     } else {
                                         if (!lazy) {
-                                            subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                            if(values[property][i].length > 0){
+                                                subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                            }
                                         }
                                     }
                                 }
@@ -650,7 +652,9 @@ function setObjectValues(object, values, lazy) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
                                 if (!lazy) {
-                                    subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                    if(values[property].length > 0){
+                                        subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                    }
                                 } else {
                                     object[property] = values[property]
                                 }
