@@ -567,14 +567,30 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 
 	// Set the position of the task...
 	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
+	
+	// Here i will create the event...
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.taskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
 
 	return group
 }
+
+
 
 SvgDiagram.prototype.drawUserTask = function (diagramElement) {
 	// Here this is a rectange...
 	var group = this.drawTask(diagramElement, "bpmndi_task bpmndi_user_task")
 	var userIco = new SVG_Image(group, "user_ico", "", "/Cargo/svg/user-ico.svg", 3, 3, 20, 20)
+	
+		// Here i will create the event...
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.userTaskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
 	return group
 }
 
@@ -582,7 +598,12 @@ SvgDiagram.prototype.drawScriptTask = function (diagramElement) {
 	// Here this is a rectange...
 	var group = this.drawTask(diagramElement, "bpmndi_task bpmndi_script_task")
 	var scriptIco = new SVG_Image(group, "script_ico", "", "/Cargo/svg/script-ico.svg", 3, 3, 20, 20)
-
+    group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.scriptTaskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
+	
 	return group
 }
 
@@ -604,6 +625,12 @@ SvgDiagram.prototype.drawReceiveTask = function (diagramElement) {
 	enveloppePath.setSvgAttribute("fill", 'black')
 	enveloppePath.setSvgAttribute("stroke", 'white')
 
+    group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.receiveTaskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
+
 	return group
 }
 
@@ -621,12 +648,26 @@ SvgDiagram.prototype.drawSendTask = function (diagramElement) {
 	});
 
 	var enveloppePath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_send_enveloppe", [pathStr])
+	
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.sendTaskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
+	
 	return group
 }
 
 SvgDiagram.prototype.drawServiceTask = function (diagramElement) {
 	var group = this.drawTask(diagramElement, "bpmndi_task bpmndi_service_task")
 	var serviceIco = new SVG_Image(group, "service_ico", "", "/Cargo/svg/service-ico.svg", 3, 3, 32, 32)
+	
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.drawTaskClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
+	
 	return group
 }
 
@@ -950,6 +991,8 @@ SvgDiagram.prototype.drawEvent = function (diagramElement) {
 	shape.setSvgAttribute("name", bpmnElement.UUID)
 
 	this.svgElements[bpmnElement.UUID] = group
+	
+	
 
 	return group
 }
@@ -975,10 +1018,7 @@ SvgDiagram.prototype.drawBoundaryEvent = function (diagramElement) {
 	return group
 }
 
-// That function is called when the user click on the start event.
-SvgDiagram.prototype.startEventClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){
-    
-}
+
 
 SvgDiagram.prototype.drawStartEvent = function (diagramElement) {
 	var group = this.drawEvent(diagramElement)
@@ -1011,6 +1051,13 @@ SvgDiagram.prototype.drawEndEvent = function (diagramElement) {
 		// Here I will draw the definition element...
 		this.drawEventDefintion(diagramElement, group)
 	}
+	
+	// Here i will create the event...
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.endEventClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
 	
 	return group
 }
@@ -1263,11 +1310,17 @@ SvgDiagram.prototype.drawDataObjectReference = function (diagramElement) {
 			}
 		}(label)
 	}
+	
+	group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.dataObjectReferenceClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
 	return group
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Gateway elements.
+// Gateway elements.    
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawGateway = function (diagramElement) {
 
@@ -1435,3 +1488,21 @@ SvgDiagram.prototype.drawCallableActivity = function (diagramElement) {
 
 	return group
 }
+
+
+SvgDiagram.prototype.taskClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.userTaskClick =  function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.scriptTaskClick =  function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.startEventClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.receiveTaskClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.sendTaskClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.serviceTaskClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.dataObjectReferenceClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+

@@ -25,6 +25,25 @@
 
 window.URL = window.URL || window.webkitURL;  // Take care of vendor prefixes.
 
+var mousePositionX = null;
+var mousePositionY = null;
+  
+function onMouseUpdate(e) {
+  mousePositionX = e.pageX;
+  mousePositionY = e.pageY;
+}
+
+document.addEventListener('mousemove', onMouseUpdate, false);
+document.addEventListener('mouseenter', onMouseUpdate, false);
+
+function getMouseX() {
+  return mousePositionX;
+}
+
+function getMouseY() {
+  return mousePositionY;
+}
+
 function fireResize() {
     if (document.createEvent) { // W3C
         var ev = document.createEvent('Event');

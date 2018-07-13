@@ -284,6 +284,10 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		return entity, nil
 	}
 
+	if !Utility.IsValidEntityReferenceName(uuid) {
+		return nil, NewError(Utility.FileLine(), INVALID_REFERENCE_NAME_ERROR, SERVER_ERROR_CODE, errors.New(uuid+" is not a valid reference!"))
+	}
+
 	// Todo get the entity from the datastore.
 	typeName := strings.Split(uuid, "%")[0]
 	storeId := typeName[0:strings.Index(typeName, ".")]

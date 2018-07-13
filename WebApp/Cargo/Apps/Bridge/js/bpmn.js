@@ -78,8 +78,16 @@ var BpmnExplorer = function (parent) {
     server.workflowManager.attach(this, NewBpmnDefinitionsEvent, function (bpmnExplorer) {
         return function (evt) {
             if (evt.dataMap["definitionsInfo"] !== undefined) {
-                var definition = entities[evt.dataMap["definitionsInfo"].UUID]
-                bpmnExplorer.appendDefinitions(definition)
+                // Get the definition.
+                server.entityManager.getEntityByUuid(evt.dataMap["definitionsInfo"].UUID, false, 
+                    function(definition, bpmnExplorer){
+                        bpmnExplorer.appendDefinitions(definition)
+                    },
+                    function(){
+                        
+                    },bpmnExplorer)
+                
+                
             }
         }
     }(this))

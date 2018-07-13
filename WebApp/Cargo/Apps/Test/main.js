@@ -28,6 +28,14 @@ function main() {
      )
  
 */
+    server.sessionManager.login("admin", "adminadmin", "localhost",
+        function () {
+            // Create the dynamic entity here.
+            testDynamicEntity()
+        },
+        function () {
+            // Nothing to do here.
+        }, {})
     /* server.eventHandler.appendEventFilter(
           "CatalogSchema.",
           "EntityEvent",
@@ -52,15 +60,6 @@ function main() {
         //dataTests()
     
         //entityTests()
-    
-        /*server.sessionManager.login("admin", "adminadmin", "localhost",
-            function () {
-                // Create the dynamic entity here.
-                testDynamicEntity()
-            },
-            function () {
-                // Nothing to do here.
-            }, {})*/
 
     // entityDump("item_1", "Test.Item")
     // entityDump("1", "dt_methode_development.dbo.DT_STATE")

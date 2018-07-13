@@ -47,22 +47,14 @@ BpmnDataView.prototype.init = function () {
                     setEntityPrototype(prototype)
 
                     // So here with the entity prototype i will generate the entity panel.
-                    dataView.dataInputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")
-                    dataView.dataInputsPanel.maximizeBtn.element.click()
-
-                    // Set an empty entity.
-                    var entity = eval("new " + prototype.TypeName + "()")
-                    entity.UUID =  "BpmnsData.DataInput%" + dataView.dataInputsPanel.id
-                    entities[entity.UUID] = entity
-
-                    entity.onChange = function (dataView) {
-                        return function (entity) {
-                            dataView.dataInputsPanel.setEntity(entity)
+                    dataView.dataInputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function (prototype) { 
+                        return function(panel){
+                            // Set an empty entity.
+                            var entity = eval("new " + prototype.TypeName + "()")
+                            entity.UUID = typeName  + "%" + randomUUID()
+                            panel.setEntity(entity)
                         }
-                    } (dataView)
-
-                    dataView.dataInputsPanel.setEntity(entity)
-
+                    }(prototype), null, true, null, "")
                 }
             } (this))
     }
@@ -76,24 +68,16 @@ BpmnDataView.prototype.init = function () {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
                     setEntityPrototype(prototype)
-
+                    
                     // So here with the entity prototype i will generate the entity panel.
-                    dataView.dataOutputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")
-                    dataView.dataOutputsPanel.maximizeBtn.element.click()
-
-                    // Set an empty entity.
-                    var entity = eval("new " + prototype.TypeName + "()")
-                    entity.UUID =  "BpmnsData.DataOutput%" + dataView.dataOutputsPanel.id
-                    entities[entity.UUID] = entity
-
-                    entity.onChange = function (dataView) {
-                        return function (entity) {
-                            dataView.dataOutputsPanel.setEntity(entity)
+                    dataView.dataOutputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function (prototype) { 
+                        return function(panel){
+                            // Set an empty entity.
+                            var entity = eval("new " + prototype.TypeName + "()")
+                            entity.UUID = typeName  + "%" + randomUUID()
+                            panel.setEntity(entity)
                         }
-                    } (dataView)
-
-                    dataView.dataOutputsPanel.setEntity(entity)
-
+                    }(prototype), null, true, null, "")
                 }
             } (this))
     }
@@ -109,7 +93,34 @@ BpmnDataView.prototype.generateEntityPrototype = function (data, typeName, callb
     prototype.ClassName = typeName.split(".")[1]
     // use to keep track of the associated data.
     prototype.FieldsId = []
+    
+    prototype.Fields.unshift("ParentLnk")
+    prototype.FieldsType.unshift("xs.string")
+    prototype.FieldsVisibility.unshift(false)
+    prototype.FieldsNillable.unshift(false)
+    prototype.FieldsDocumentation.unshift("Relation with it parent.")
+    prototype.FieldsOrder.push(prototype.FieldsOrder.length)
+    prototype.FieldsDefaultValue.unshift("")
+        
+    // Append parent uuid if none is define.
+    prototype.Fields.unshift("ParentUuid")
+    prototype.FieldsType.unshift("xs.string")
+    prototype.FieldsVisibility.unshift(false)
+    prototype.FieldsNillable.unshift(false)
+    prototype.FieldsDocumentation.unshift("The parent object UUID")
+    prototype.FieldsOrder.push(prototype.FieldsOrder.length)
+    prototype.FieldsDefaultValue.unshift("")
 
+    // append the uuid...
+    prototype.Fields.unshift("UUID")
+    prototype.FieldsType.unshift("xs.string")
+    prototype.FieldsVisibility.unshift(false)
+    prototype.FieldsOrder.push(prototype.FieldsOrder.length)
+    prototype.FieldsNillable.unshift(false)
+    prototype.FieldsDocumentation.unshift("The object UUID")
+    prototype.FieldsDefaultValue.unshift("")
+    prototype.Ids.unshift("UUID")
+        
     for (var i = 0; i < data.length; i++) {
         // I will retreive it item definition...
         if (isObjectReference(data[i].M_itemSubjectRef)) {
@@ -170,7 +181,8 @@ BpmnDataView.prototype.save = function (callback) {
     function saveData(entity, callback) {
         var prototype = entity.getPrototype()
         var itemAwareInstances = []
-        for (var i = 0; i < prototype.Fields.length; i++) {
+        // The first tree field are not needed..
+        for (var i = 3; i < prototype.Fields.length; i++) {
             var data = entity[prototype.Fields[i]]
             var fieldType = prototype.FieldsType[i]
             var isArray = fieldType.startsWith("[]")
@@ -196,7 +208,7 @@ BpmnDataView.prototype.save = function (callback) {
             }
 
             // Now I will create the itemaware element...
-            server.workflowProcessor.newItemAwareElementInstance(prototype.FieldsId[i], dataStr,
+            server.workflowProcessor.newItemAwareElementInstance(prototype.FieldsId[i-3], dataStr,
                 function (result, caller) {
                     caller.itemAwareInstances.push(result)
                     if (caller.itemAwareInstances.length == caller.count) {
@@ -204,7 +216,7 @@ BpmnDataView.prototype.save = function (callback) {
                     }
                 },
                 function () { /* Nothing here */ },
-                { "itemAwareInstances": itemAwareInstances, "count": prototype.Fields.length, "callback":callback })
+                { "itemAwareInstances": itemAwareInstances, "count": prototype.Fields.length - 3, "callback":callback })
 
         }
     }

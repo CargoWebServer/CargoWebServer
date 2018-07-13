@@ -138,7 +138,9 @@ var HomePage = function () {
 
         // I will set class values with theme class value
         changePropertyByClassName("background-color", ".navigation_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".bpmn_instances_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".navigation_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".bpmn_instances_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".header", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".header", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".vertical_submenu", "." + evt.dataMap.themeClass)
@@ -206,6 +208,7 @@ var HomePage = function () {
             changePropertyByClassName("background", ".contextSelector img:hover", "." + evt.dataMap.themeClass)
 
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".bpmn_instances_panel", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".vertical_menu", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".vertical_submenu", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".vertical_submenu_items", "." + evt.dataMap.themeClass)
@@ -233,8 +236,10 @@ var HomePage = function () {
             changePropertyByClassName("color", ".body_cell", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".dialog", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
-            changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass )
+
         } else {
             localStorage.setItem("isDark", false)
             changePropertyByClassName("color", ".definitionsDiv", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -243,13 +248,14 @@ var HomePage = function () {
             changePropertyByClassName("fill", ".bpmndi_task", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".bpmndi_text_box span", "." + evt.dataMap.themeClass + " .ace_gutter")
 
-
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background-color", ".contextSelector i:hover", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".contextSelector img:hover", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".bpmn_instances_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
+            
             changePropertyByClassName("color", ".vertical_menu", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".vertical_submenu", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".vertical_submenu_items", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -273,6 +279,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".dialog", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity_panel_header_button", "." + evt.dataMap.themeClass)
         }
@@ -927,20 +934,13 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 }
 
                 div.element.style.display = ""
-
                 var buttons = document.getElementsByClassName("navigation_btn")
                 for (var i = 0; i < buttons.length; i++) {
                     buttons[i].firstChild.className = buttons[i].firstChild.className.replace(" active", "")
-                    if (buttons[i].firstChild.id == "workflowImg") {
-                        buttons[i].firstChild.src = "img/workflow.svg"
-                    }
                 }
 
                 this.firstChild.className += " active"
-                if (this.firstChild.id == "workflowImg") {
-                    this.firstChild.src = "img/workflow_blue.svg"
-                }
-
+                
                 // Set the size of absolute panel.
                 fireResize()
             }
@@ -960,20 +960,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         // The bpmn explorer...
         this.bpmnDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
         this.bpmnContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Workflow Manager" })
-            .appendElement({ "tag": "img", "id": "workflowImg", "src": "img/workflow.svg" })
+            .appendElement({ "tag": "i", "id": "workflowImg", "class": "icon-workflow" })
 
-        var workflowImg = this.bpmnContext.getChildById("workflowImg")
-        workflowImg.element.onmouseover = function () {
-            if (this.className.indexOf("active") == -1) {
-                this.src = "img/workflow_hover.svg"
-            }
-        }
-
-        workflowImg.element.onmouseleave = function () {
-            if (this.className.indexOf("active") == -1) {
-                this.src = "img/workflow.svg"
-            }
-        }
         setSelectAction(this.bpmnContext, this.bpmnDiv)
         this.bpmnExplorer = new BpmnExplorer(this.bpmnDiv)
     }

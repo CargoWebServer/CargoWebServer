@@ -719,8 +719,9 @@ function setObjectValues(object, values, lazy) {
     function initCallback(object){
         if(object.IsInit == true){
             if(object.initCallbacks != undefined){
-                while (object.initCallbacks.length > 0) {
-                    var initCallback_ = object.initCallbacks.pop();
+                var initCallbacks = object.initCallbacks
+                while (initCallbacks.length > 0) {
+                    var initCallback_ = initCallbacks.pop();
                     initCallback_(object);
                     // Set the initialyse object.
                     server.entityManager.setEntity(object)

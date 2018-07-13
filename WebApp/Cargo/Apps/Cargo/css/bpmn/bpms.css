@@ -59,7 +59,6 @@
 }
 
 .instanceListTable{
-    color:white;
     border-collapse:collapse;
     width:100%;
 }
@@ -71,9 +70,13 @@
     background-color:#646464;
 }
 
+
 .instanceListHeader{
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
+    text-decoration: none;
+    cursor:default;
 }
 
+.instanceListHeader:hover{
+    text-decoration: underline;
+    cursor:pointer;
+}

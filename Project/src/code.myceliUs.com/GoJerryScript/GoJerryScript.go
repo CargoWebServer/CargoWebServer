@@ -10,8 +10,15 @@ package GoJerryScript
 #include "jerryscript-ext/handler.h"
 #include "jerryscript-debugger.h"
 
-void register_print_handler() {
-     jerryx_handler_register_global ((const jerry_char_t *) "print", jerryx_handler_print);
+// External function call.
+static jerry_value_t
+handler (const jerry_value_t function_obj,
+         const jerry_value_t this_val,
+         const jerry_value_t args_p[],
+         const jerry_length_t args_cnt)
+{
+	// So here I will call the go function.
+
 }
 
 */
@@ -21,17 +28,11 @@ import "unsafe"
 import "errors"
 import "encoding/binary"
 import "math"
+import "encoding/json"
+import "code.myceliUs.com/Utility"
 
 //import "strconv"
-
-//import "log"
-
-/**
- * Register the print handler.
- */
-func RegisterPrintHandler() {
-	C.register_print_handler()
-}
+import "log"
 
 // Various type conversion functions.
 func unsafeStrToByte(s string) []byte {
@@ -181,7 +182,7 @@ type Function struct {
 /**
  * Property are variable with name and value.
  */
-type Property struct {
+type Variable struct {
 	Name  string
 	Value interface{}
 }
@@ -214,9 +215,6 @@ func (self *Engine) start(port int, options int) {
 
 	/* Init the script engine. */
 	Jerry_init(Jerry_init_flag_t(options))
-
-	/* Register 'print' function  */
-	RegisterPrintHandler()
 }
 
 /**
@@ -245,7 +243,7 @@ func (self *Engine) AppendFunction(name string, args []string, src string, optio
 
 	if !Jerry_value_is_error(parsed_code) {
 		self.functions[name] = Function{Name: name, Args: args, Body: src, Obj: parsed_code}
-		_, err := self.EvalScript(src, []Property{})
+		_, err := self.EvalScript(src, []Variable{})
 		return err
 	} else {
 		Jerry_release_value(parsed_code)
@@ -254,11 +252,18 @@ func (self *Engine) AppendFunction(name string, args []string, src string, optio
 }
 
 /**
+ * Register a go type to be usable as JS type.
+ */
+func (self *Engine) RegisterGoType(value interface{}) {
+	Utility.RegisterType(value)
+}
+
+/**
  * Set a variable on the global context.
  * name The name of the variable in the context.
  * value The value of the variable, can be a string, a number,
  */
-func (self *Engine) SetProperty(name string, value interface{}) {
+func (self *Engine) SetGlobalVariable(name string, value interface{}) {
 	// first of all I will initialyse the arguments.
 	globalObject := Jerry_get_global_object()
 
@@ -325,11 +330,52 @@ func goToJs(value interface{}) Uint32_t {
 			// Release memory
 			Jerry_release_value(v)
 		}
+	} else if reflect.TypeOf(value).Kind() == reflect.Struct {
+
 	}
 
 	return propValue
 }
 
+const sizeOfUintPtr = unsafe.Sizeof(uintptr(0))
+
+func uintptrToBytes(u *uintptr) []byte {
+	return (*[sizeOfUintPtr]byte)(unsafe.Pointer(u))[:]
+}
+
+/**
+ * Create a go string from a JS string pointer.
+ */
+func jsStrToGoStr(input Uint32_t) string {
+	// Size info, ptr and it value
+	sizePtr := Jerry_get_string_size(input)
+	sizeValue := *(*uint64)(unsafe.Pointer(sizePtr.Swigcptr()))
+	var buffer Uint8
+	buffer.ptr = C.malloc(C.ulong(sizeValue)) // allocated the size.
+
+	// Test if the string is a valid utf8 string...
+	isUtf8 := Jerry_is_valid_utf8_string(input, sizePtr)
+	if isUtf8 {
+		Jerry_string_to_utf8_char_buffer(input, buffer, sizePtr)
+	} else {
+		Jerry_string_to_char_buffer(input, buffer, sizePtr)
+	}
+	// Set the slice information...
+	h := &reflect.SliceHeader{buffer.Swigcptr(), int(sizeValue), int(sizeValue)}
+	NewSlice := *(*[]byte)(unsafe.Pointer(h))
+
+	// Set the Go string value from the slice.
+	value := string(NewSlice)
+
+	// release the memory used by the buffer.
+	buffer.Free()
+
+	return value
+}
+
+/**
+ * Return equivalent value of a 32 bit c pointer.
+ */
 func jsToGo(input Uint32_t) (interface{}, error) {
 
 	// the Go value...
@@ -339,28 +385,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 	if typeInfo == Jerry_type_t(JERRY_TYPE_NUMBER) {
 		value = Jerry_get_number_value(input)
 	} else if typeInfo == Jerry_type_t(JERRY_TYPE_STRING) {
-		// Size info, ptr and it value
-		sizePtr := Jerry_get_string_size(input)
-		sizeValue := *(*uint64)(unsafe.Pointer(sizePtr.Swigcptr()))
-		var buffer Uint8
-		buffer.ptr = C.malloc(C.ulong(sizeValue)) // allocated the size.
-
-		// Test if the string is a valid utf8 string...
-		isUtf8 := Jerry_is_valid_utf8_string(input, sizePtr)
-		if isUtf8 {
-			Jerry_string_to_utf8_char_buffer(input, buffer, sizePtr)
-		} else {
-			Jerry_string_to_char_buffer(input, buffer, sizePtr)
-		}
-		// Set the slice information...
-		h := &reflect.SliceHeader{buffer.Swigcptr(), int(sizeValue), int(sizeValue)}
-		NewSlice := *(*[]byte)(unsafe.Pointer(h))
-
-		// Set the Go string value from the slice.
-		value = string(NewSlice)
-
-		// release the memory used by the buffer.
-		buffer.Free()
+		value = jsStrToGoStr(input)
 	} else if typeInfo == Jerry_type_t(JERRY_TYPE_BOOLEAN) {
 		value = Jerry_get_boolean_value(input)
 	} else if Jerry_value_is_typedarray(input) {
@@ -383,9 +408,43 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			Jerry_release_value(e)
 		}
 
+	} else if Jerry_value_is_object(input) {
+		// The go object will be a copy of the Js object.
+		stringified := Jerry_json_stringfy(input)
+		// if there is no error
+		if !Jerry_value_is_error(stringified) {
+			jsonStr := jsStrToGoStr(stringified)
+			data := make(map[string]interface{}, 0)
+			err := json.Unmarshal([]byte(jsonStr), &data)
+
+			if err == nil {
+				if data["TYPENAME"] != nil {
+					relfectValue := Utility.MakeInstance(data["TYPENAME"].(string), data)
+					value = relfectValue.Interface()
+				} else {
+					// Here map[string]interface{} will be use.
+					value = data
+				}
+
+			} else {
+				return nil, err
+			}
+		}
 	}
 
 	return value, nil
+}
+
+/**
+ * That function is use to give access to a native golang function
+ * from inside JerryScript.
+ * name The name of the go function to be call.
+ *
+ */
+//export CallFunction
+func CallFunction(name string) {
+	//
+	log.Println("---> call funt", name)
 }
 
 /**
@@ -394,10 +453,10 @@ func jsToGo(input Uint32_t) (interface{}, error) {
  * variables Contain the list of variable to set on the global context before
  * running the script.
  */
-func (self *Engine) EvalScript(script string, variables []Property) (interface{}, error) {
-
+func (self *Engine) EvalScript(script string, variables []Variable) (interface{}, error) {
+	// Here the values are put on the global contex before use in the function.
 	for i := 0; i < len(variables); i++ {
-		self.SetProperty(variables[i].Name, variables[i].Value)
+		self.SetGlobalVariable(variables[i].Name, variables[i].Value)
 	}
 
 	// Now I will evaluate the function...

@@ -306,11 +306,10 @@ var FieldPanel = function (entityPanel, index, callback) {
 
 	// Display label if is not valueOf or listOf...
 	if (this.fieldName != "M_valueOf" && this.fieldName != "M_listOf") {
-		//this.isNillable = false
 		this.label = this.panel.appendElement({ "tag": "div", "innerHtml": title, "style": "min-width: 100px;" }).down();
 		if (!this.fieldType.startsWith("xs.")) {
 			if (!this.fieldType.startsWith("[]") && this.isNillable && getBaseTypeExtension(this.fieldType).length == 0) {
-
+				
 				this.createBtn = this.label.appendElement({ "tag": "div", "class": "row_button", "style": "font-size: 10pt; padding-left: 5px; display: inline;" }).down()
 					.appendElement({ "tag": "i", "class": "fa fa-plus" });
 
@@ -318,22 +317,69 @@ var FieldPanel = function (entityPanel, index, callback) {
 					.appendElement({ "tag": "i", "class": "fa fa-trash" });
 
 				// The button to append a new entity inside a cell.
-				this.createBtn.element.onclick = function (fieldName, fieldType, entityPanel) {
+				this.createBtn.element.onclick = function (fieldName, fieldType, fieldPanel) {
 					return function () {
-						var parent = entityPanel.getEntity()
-						// Here I will create a new entity
-						var entity = eval("new " + fieldType + "()")
-						entity.ParentUuid = parent.UUID
-						entity.ParentLnk = fieldName
-						server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
-							function (results, caller) {
-
-							},
-							function (errObj, caller) {
-
-							}, {})
+					    // If the parent is not undefined.
+						var parent = fieldPanel.parent.getEntity()
+						var isArray = fieldType.startsWith("[]")
+						var isRef = fieldType.endsWith(":Ref")
+						
+						// The field typeName
+						var typeName = fieldType.replace(":Ref", "").replace("[]", "")
+						
+						if(!isRef){
+						    // Here The field is not a reference.
+    						var entity = eval("new " + typeName + "()")
+    						
+    						entity.ParentLnk = fieldName
+    						// If the parent is not undefined
+    						if(parent.UUID != undefined){
+        						// Here I will create a new entity
+        						entity.ParentUuid = parent.UUID
+        						server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity,
+        							function (results, caller) {
+        
+        							},
+        							function (errObj, caller) {
+        
+        							}, {})
+    						}else{
+    						    // I will put inside it parent.
+    						    if(isArray){
+    						        if(parent[fieldName] == undefined){
+    						            parent[fieldName] = []
+    						        }
+    						        // Append the newly created entity.
+    						        parent[fieldName].push(entity)
+    						    }else{
+    						        // Set the newly created entity.
+    						        parent[fieldName] = entity
+    						    }
+    						    
+    						    // I will update the parent panel.
+    						    
+    						    // so here I will render the entity inside it parent.
+    						    fieldPanel.parent.fields[entity.ParentLnk].value.element.appendChild(fieldPanel.parent.fields[entity.ParentLnk].renderer.renderer.panel.element)
+				                fieldPanel.parent.setEntity(parent)
+    						}
+						}else{
+						    // The value is a reference.
+						    console.log("---> the field is a reference!")
+						    if(fieldPanel.editor == null){
+						        // Here I will create the field editor.
+						        fieldPanel.editor = new FieldEditor(fieldPanel, function (fieldPanel, editor) {
+                					if (editor.editor != null) {
+            							// clear the content.
+            							
+            							fieldPanel.value.element.style.display = "none"
+            							fieldPanel.editor = editor
+            							
+            						}
+                				})
+						    }
+						}
 					}
-				}(this.fieldName, this.fieldType, entityPanel)
+				}(this.fieldName, this.fieldType, this)
 
 				// Now the create and delete action...
 				this.deleteBtn.element.onclick = function (entityPanel, fieldName) {
@@ -774,11 +820,81 @@ var FieldEditor = function (fieldPanel, callback) {
 				}
 			}
 		}(fieldPanel)
+	}else if (fieldType.endsWith(":Ref")){
+	    if(fieldType.startsWith("[]")){
+	        // An array of reference
+	    }else{
+	        // A single reference
+	        // So here I will display the auto complete input.
+	        this.editor = this.parent.panel.appendElement({ "tag": "input", "id": id }).down()
+	        
+	        
+	        var typeName = fieldType.replace(":Ref","") // Remove the :Ref
+    		server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+    			// success callback.
+    			function (prototype, caller) {
+    				var q = {};
+    				q.TypeName = prototype.TypeName;
+    				q.Fields = [];
+    				var fieldsType = [];
+    				for (var i = 0; i < prototype.Ids.length; i++) {
+    					q.Fields.push(prototype.Ids[i])
+    					fieldsType.push(prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])]);
+    				}
+    				server.dataManager.read(prototype.TypeName.split(".")[0], JSON.stringify(q), fieldsType, [],
+    					// success callback
+    					function (results, caller) {
+    						var results = results[0];
+    						if (results == null) {
+    							return
+    						}
+    						var elementLst = [];
+    						var idUuid = {};
+    						for (var i = 0; i < results.length; i++) {
+    							elementLst.push(results[i][1])
+    							idUuid[results[i][1]] = results[i][0]
+    							/*if (caller.value == results[i][0]) {
+    								caller.editor.editor.element.value = results[i][1];
+    							}*/
+    						}
+    						// I will attach the autocomplete box.
+    						attachAutoComplete(caller.editor.editor, elementLst, true,
+    							function (caller, idUuid) {
+    								return function (id) {
+    									caller.editor.editor.element.value = id;
+    									caller.editor.editor.getValue = function (idUuid) {
+    										return function () {
+    											return idUuid[id];
+    										}
+    									}(idUuid)
+    									//caller.entity[caller.fieldName] = caller.editor.getValue()
+    									
+    									//caller.editor.element.blur(); // Call the onblur function
+    								}
+    							}(caller, idUuid));
+    					},
+    					// progress callback
+    					function (index, total, caller) {
+    
+    					},
+    					// error callback
+    					function (errObj, caller) {
+    
+    					}, caller
+    				)
+    
+    			},
+    			// error callback
+    			function (errObj, caller) {
+    
+    			}, { "editor": this, "entity" : entity, "fieldName" : this.parent.fieldName})
+	    }
+	    
 	}
 
-	if (this.editor != null) {
-		// Now the event...
-		this.editor.element.onblur = function (fieldPanel) {
+if (this.editor != null) {
+    
+    var listener = function (fieldPanel) {
 			return function (evt) {
 				var value = this.value
 
@@ -791,7 +907,12 @@ var FieldEditor = function (fieldPanel, callback) {
 				}
 
 				fieldPanel.value.element.innerText = value
-
+                fieldPanel.value.element.style.display = ""
+                this.style.display = "none"
+                if(fieldPanel.editor.editor.getValue != undefined){
+                    value = fieldPanel.editor.editor.getValue()
+                }
+                
 				// In case of date i need to transform the value into a unix time.
 				if (isXsTime(fieldPanel.fieldType) || isXsDate(fieldPanel.fieldType)) {
 					value = moment(value).unix()
@@ -808,7 +929,7 @@ var FieldEditor = function (fieldPanel, callback) {
 					entity[fieldPanel.fieldName] = value
 
 					// if it has a parent, the parent will be save in that case.
-					if (entity.getParent != undefined) {
+					if (entity.getParent() != undefined) {
 						entity = entity.getParent()
 					}
 
@@ -850,11 +971,14 @@ var FieldEditor = function (fieldPanel, callback) {
 
 						}, {})
 				}
-
-
 			}
 		}(fieldPanel)
-
+		
+		// Now the blur event...
+		this.editor.element.addEventListener("blur", listener)
+		//this.editor.element.addEventListener("change", listener)
+        this.editor.element.onchange = listener;
+        
 		this.editor.element.focus()
 	}
 

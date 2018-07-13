@@ -34,7 +34,6 @@ func GetTypeOf(typeName string) reflect.Type {
  * Register an instance of the type.
  */
 func RegisterType(typedNil interface{}) {
-
 	t := reflect.TypeOf(typedNil).Elem()
 	index := strings.LastIndex(t.PkgPath(), "/")
 	var typeName = t.Name()
@@ -43,11 +42,11 @@ func RegisterType(typedNil interface{}) {
 
 			typeRegistry[t.PkgPath()[index+1:]+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
-			//log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
+			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
 		} else {
 			typeRegistry[t.PkgPath()+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()+"."+typeName, typedNil)
-			//log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
+			log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
 		}
 	}
 }
@@ -62,10 +61,20 @@ func toInt(value interface{}) int {
 		return 0
 	case int8:
 		return int(value.(int8))
+	case int16:
+		return int(value.(int16))
 	case int32:
 		return int(value.(int32))
 	case int64:
 		return int(value.(int64))
+	case uint8:
+		return int(value.(uint8))
+	case uint16:
+		return int(value.(uint16))
+	case uint32:
+		return int(value.(uint32))
+	case uint64:
+		return int(value.(uint64))
 	case float64:
 		return int(value.(float64))
 	case float32:

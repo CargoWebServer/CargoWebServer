@@ -6,11 +6,11 @@
 	top: 0px;
 	left: 0px;
 	min-width: 200px;
-
-	-webkit-box-shadow: 5px 5px 12px -4px;
-	-moz-box-shadow: 5px 5px 12px -4px;
-	box-shadow: 5px 5px 12px -4px;
-	/*color: #657383;*/
+	
+    -webkit-box-shadow: 0px 0px 15px 0px;
+    -moz-box-shadow: 0px 0px 15px 0px;
+    box-shadow: 0px 0px 15px 0px;
+    
 	border: 1px solid;
 }
 
@@ -28,11 +28,6 @@
     text-align: left;
 }
 
-/** Buttons of the dialog **/
-.dialog_buttons{
-    height: 30px;
-}
-
 /** The title **/
 .dialog_title{
     width: 100%;
@@ -43,9 +38,10 @@
 /** The delete button **/
 .dialog_delete_button{
 	/*color: gainsboro;*/
-	vertical-align: middle;
-	padding-top: 2px;
-	padding-right: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 16px;
 	z-index: 10;
 }
 
@@ -65,10 +61,10 @@
 
 .dialog_footer{
 	display: flex;
-	width: 100%;
 	position: relative;
 	text-align: center;
 	vertical-align: middle;
+	justify-content: flex-end;
 	padding: 1px;
 }
 
@@ -93,16 +89,19 @@
 	padding: 10px;
 }
 
+/** Buttons of the dialog **/
 .diablog_button{
 	display: inline-flex;
     height: 29px;
     min-width: 60px;
     justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
 }
 
 .diablog_button:hover{
 	cursor: pointer;
-	/*color: rgb(66, 139, 202);*/
+	border-color: white;
 }
 
 .diablog_button:active{

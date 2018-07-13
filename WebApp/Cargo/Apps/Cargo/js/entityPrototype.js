@@ -396,7 +396,7 @@ EntityPrototype.prototype.generateConstructor = function () {
                 if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " this." + fieldName + " = 0\n"
                 } else {
-                    if (this.isNillable[i]) {
+                    if (this.FieldsNillable[i]) {
                         constructorSrc += " this." + fieldName + " = null\n"
                     } else {
                         constructorSrc += " try{\n";

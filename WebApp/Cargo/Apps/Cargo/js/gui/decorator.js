@@ -6,6 +6,7 @@
  * @param control The associated control where the message came from...
  * @param selectValue if definied that function is call when the value is selected.
  */
+var autocompleteDiv = null
 function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
     if (control.element.parentNode != undefined) {
         control.element.parentNode.style.position = "relative"
@@ -15,36 +16,58 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
     if (autoComplete == undefined) {
         autoComplete = true
     }
-
-    // I will always append the auto complete inside the body element.
-
-    if (control.autocompleteDiv != undefined) {
-        control.autocompleteDiv.removeAllChilds()
-    } else {
-        control.autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "autoCompleteDiv", "style": " display:none; z-index: 10;" })
-    }
-    var currentIndex = -1
-
-    control.element.onblur = function(div){
-        return function(){
-            div.autocompleteDiv.element.style.display = "none"
+    
+    control.element.addEventListener("blur", 
+        function(selectValue){
+            return function(evt){
+                if(this.style.display == "none" && autocompleteDiv != null){
+                    // if the mouse is not over the autocompleteDiv...
+                    var box = autocompleteDiv.element.getBoundingClientRect();
+                    // If the mouse i not over the box.
+                    var isOver = getMouseX() > box.left && getMouseX() < box.right && getMouseY() < box.bottom && getMouseY() > box.top;
+                    if(!isOver){
+                        var isSelect = false;
+                        for(var id in autocompleteDiv.childs){
+                            var c = autocompleteDiv.childs[id];
+                            if(c.element.style.backgroundColor == "darkgrey"){
+                                c.element.click()
+                                isSelect = true
+                                break;
+                            }
+                        }
+                        // if  no selection is made...
+                        if(!isSelect){
+                            autocompleteDiv.removeAllChilds()
+                            autocompleteDiv.element.style.display = "none"
+                            this.value = "";
+                        }
+                    }
+                }
         }
+    }(selectValue), true)
         
-        
-    }(control)
+    var currentIndex = -1
+    
     /* Save the key down event **/
-    control.element.addEventListener("keyup", function (control, autocompleteDiv, elementLst, autoComplete, selectValue) {
+    control.element.addEventListener("keyup", function (control,elementLst, autoComplete, selectValue) {
         return function (evt) {
 
             /* The div that contain items **/
             var coord = getCoords(control.element)
             var minWidth = control.element.offsetWidth + "px"
-            autocompleteDiv.element.style.minWidth = minWidth
-            autocompleteDiv.element.style.top = coord.top + control.element.offsetHeight + "px";
-            autocompleteDiv.element.style.left = coord.left + -1 + "px";
-            autocompleteDiv.removeAllChilds()
-
             if (control.element.value.length >= 1) {
+                if(autocompleteDiv == null){
+                    autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div","id":"autocompleteDiv", "class": "autoCompleteDiv", "style": "z-index: 10;" })
+                }else{
+                    autocompleteDiv.removeAllChilds()
+                    autocompleteDiv.element.style.display = "none";
+                }
+                
+                autocompleteDiv.element.style.minWidth = minWidth
+                autocompleteDiv.element.style.top = coord.top + control.element.offsetHeight + "px";
+                autocompleteDiv.element.style.left = coord.left + -1 + "px";
+                autocompleteDiv.element.style.display = "";
+                
                 // Filter the values...
                 values = _.select(elementLst, function (val) {
                     return function (inputValue) {
@@ -64,14 +87,15 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                         if (!isString(value)) {
                             value = value.toString()
                         }
-                        var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": value, "style": "display: block;", "id": i }).down()
+                        var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": value, "contenteditable":"true", "style": "display: block;", "id": i }).down()
                         // Here i will append the click event...
                         elementDiv.element.onclick = function (control, autocompleteDiv, value, selectValue) {
-                            return function () {
+                            return function (evt) {
+                                evt.stopPropagation()
+                                
                                 if (control.element.value != value) {
-                                    if (selectValue == undefined) {
-                                        control.element.value = value
-                                    } else {
+                                     control.element.value = value
+                                    if (selectValue != undefined) {
                                         // Here the caller want to get control...
                                         selectValue(value)
                                     }
@@ -100,7 +124,8 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                     autocompleteDiv.element.style.display = "none"
                     currentIndex = -1
                 }
-            } else {
+            } else if (autocompleteDiv != undefined) {
+                autocompleteDiv.removeAllChilds();
                 autocompleteDiv.element.style.display = "none"
             }
 
@@ -131,9 +156,16 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                     }
                     currentIndex = index
                 }
+            }else if(evt.keyCode == 27){
+                for(var id in autocompleteDiv.childs){
+                    var c = autocompleteDiv.childs[id];
+                    c.element.style.backgroundColor = ""
+                }
+                // exit the selection.
+                control.element.blur()
             }
         }
-    }(control, control.autocompleteDiv, elementLst, autoComplete, selectValue), true)
+    }(control, elementLst, autoComplete, selectValue), true)
 
 }
 

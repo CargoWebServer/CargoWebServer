@@ -476,9 +476,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 	serverSrc += "require(\"Cargo/utility\")\n\n"
 
 	var eventTypename = strings.Replace(serviceId, "Manager", "Event", -1)
-	/*if strings.Index(serviceId, "Processor") > -1 {
+	if strings.Index(serviceId, "Processor") > -1 {
 		eventTypename = strings.Replace(serviceId, "Processor", "Event", -1)
-	}*/
+	}
 
 	// Here I will generate the javascript code use by client side.
 	clientSrc = "// ============================= " + serviceId + " ========================================\n"
