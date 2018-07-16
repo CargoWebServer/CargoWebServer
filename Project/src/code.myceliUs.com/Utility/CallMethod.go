@@ -2,7 +2,8 @@ package Utility
 
 import (
 	"errors"
-	//"log"
+	"log"
+
 	//"os"
 	"reflect"
 	"strconv"
@@ -117,4 +118,51 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 
 	// return or panic, method not found of either type
 	return "", nil
+}
+
+func SetProperty(i interface{}, field string, value interface{}) error {
+	// pointer to struct - addressable
+	ps := reflect.ValueOf(i)
+	// struct
+	s := ps.Elem()
+
+	if s.Kind() == reflect.Struct {
+		// exported field
+		f := s.FieldByName(field)
+		if f.IsValid() {
+			// A Value can be changed only if it is
+			// addressable and was not obtained by
+			// the use of unexported struct fields.
+			if f.CanSet() {
+				// change value of N
+				if f.Kind() == reflect.TypeOf(value).Kind() {
+					f.Set(reflect.ValueOf(value))
+					log.Println("---> ", i)
+				} else {
+					log.Println("---> field ", field, " has type ", f.Kind(), " not ", reflect.TypeOf(value).Kind())
+				}
+			} else {
+				log.Println("---> field ", field, " can not be set!")
+			}
+		} else {
+			log.Println("---> field ", field, " is no valid!")
+		}
+	}
+	return nil
+}
+
+func GetProperty(i interface{}, field string) interface{} {
+
+	ps := reflect.ValueOf(i)
+	// struct
+	s := ps.Elem()
+
+	// exported field
+	f := s.FieldByName(field)
+	if f.IsValid() {
+		// Return value as interface.
+		return f.Interface()
+	}
+
+	return nil
 }

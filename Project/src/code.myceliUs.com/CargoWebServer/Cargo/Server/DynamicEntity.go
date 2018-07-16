@@ -62,6 +62,10 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	return nil
 }
 
+func (this *DynamicEntity) SetFieldValue(field string, value interface{}) error {
+	return this.setValue(field, value)
+}
+
 /**
  * Thread safe function
  */
@@ -75,6 +79,10 @@ func (this *DynamicEntity) getValue(field string) interface{} {
 	cache.m_operations <- infos
 	value := <-infos["getValue"].(chan interface{})
 	return value
+}
+
+func (this *DynamicEntity) GetFieldValue(field string) interface{} {
+	return this.getValue(field)
 }
 
 /**

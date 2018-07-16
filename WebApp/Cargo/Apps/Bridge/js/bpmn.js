@@ -81,6 +81,7 @@ var BpmnExplorer = function (parent) {
                 // Get the definition.
                 server.entityManager.getEntityByUuid(evt.dataMap["definitionsInfo"].UUID, false, 
                     function(definition, bpmnExplorer){
+                        initDefinitions(definition)
                         bpmnExplorer.appendDefinitions(definition)
                     },
                     function(){

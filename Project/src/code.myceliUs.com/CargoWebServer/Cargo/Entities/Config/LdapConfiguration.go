@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type LdapConfiguration struct{
@@ -67,6 +68,14 @@ func (this *LdapConfiguration) GetUuid() string{
 }
 func (this *LdapConfiguration) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *LdapConfiguration) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *LdapConfiguration) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

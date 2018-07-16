@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type OAuth2Access struct{
@@ -65,6 +66,14 @@ func (this *OAuth2Access) GetUuid() string{
 }
 func (this *OAuth2Access) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *OAuth2Access) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *OAuth2Access) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

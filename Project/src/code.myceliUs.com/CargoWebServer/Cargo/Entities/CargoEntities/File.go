@@ -80,6 +80,14 @@ func (this *File) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+func (this *File) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *File) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
+}
+
 /** Return the array of entity id's without it uuid **/
 func (this *File) Ids() []interface{} {
 	ids := make([]interface{}, 0)

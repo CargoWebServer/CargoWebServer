@@ -93,4 +93,14 @@ type Entity interface {
 	 * That function control the way the uuid is generated.
 	 */
 	SetUuidGenerator(func(entity interface{}) string)
+
+	/**
+	 * Set the field value
+	 */
+	SetFieldValue(field string, value interface{}) error
+
+	/**
+	 * Get the field value
+	 */
+	GetFieldValue(field string) interface{}
 }

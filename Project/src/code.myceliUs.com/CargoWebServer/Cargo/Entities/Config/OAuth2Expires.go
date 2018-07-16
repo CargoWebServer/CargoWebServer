@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type OAuth2Expires struct{
@@ -50,6 +51,14 @@ func (this *OAuth2Expires) GetUuid() string{
 }
 func (this *OAuth2Expires) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *OAuth2Expires) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *OAuth2Expires) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

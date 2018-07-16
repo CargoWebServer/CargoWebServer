@@ -50,6 +50,15 @@ type Entity interface{
 	GetChildsUuid() []string
 
 	/**
+	 * Set a given field
+	 */
+	SetFieldValue(field string, value interface{}) error
+	/**
+	 * Return the value of a given field
+	 */
+	GetFieldValue(field string) interface{}
+
+	/**
 	 * Set the function GetEntityByUuid as a pointer. The entity manager can't
 	 * be access by Entities package...
 	 */

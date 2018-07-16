@@ -825,6 +825,16 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	GetChildsUuid() []string\n\n"
 
 	classStr += "	/**\n"
+	classStr += "	 * Set a given field\n"
+	classStr += "	 */\n"
+	classStr += "	SetFieldValue(field string, value interface{}) error\n"
+
+	classStr += "	/**\n"
+	classStr += "	 * Return the value of a given field\n"
+	classStr += "	 */\n"
+	classStr += "	GetFieldValue(field string) interface{}\n\n"
+
+	classStr += "	/**\n"
 	classStr += "	 * Set the function GetEntityByUuid as a pointer. The entity manager can't\n"
 	classStr += "	 * be access by Entities package...\n"
 	classStr += "	 */\n"
@@ -930,6 +940,14 @@ func generateGoClassCode(packageId string) {
 
 				classStr += "func (this *" + className + ") SetUuid(uuid string){\n"
 				classStr += "	this.UUID = uuid\n"
+				classStr += "}\n\n"
+
+				classStr += "func (this *" + className + ") SetFieldValue(field string, value interface{}) error{\n"
+				classStr += "	return Utility.SetProperty(this, field, value)\n"
+				classStr += "}\n\n"
+
+				classStr += "func (this *" + className + ") GetFieldValue(field string) interface{}{\n"
+				classStr += "	return Utility.GetProperty(this, field)\n"
 				classStr += "}\n\n"
 
 				classStr += "/** Return the array of entity id's without it uuid **/\n"

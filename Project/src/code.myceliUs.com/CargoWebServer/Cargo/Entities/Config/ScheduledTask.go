@@ -4,6 +4,8 @@ package Config
 
 import (
 	"encoding/xml"
+
+	"code.myceliUs.com/Utility"
 )
 
 type ScheduledTask struct {
@@ -65,6 +67,14 @@ func (this *ScheduledTask) GetUuid() string {
 }
 func (this *ScheduledTask) SetUuid(uuid string) {
 	this.UUID = uuid
+}
+
+func (this *ScheduledTask) SetFieldValue(field string, value interface{}) error {
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *ScheduledTask) GetFieldValue(field string) interface{} {
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

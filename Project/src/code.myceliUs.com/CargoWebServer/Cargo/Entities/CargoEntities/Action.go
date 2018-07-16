@@ -60,6 +60,14 @@ func (this *Action) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+func (this *Action) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *Action) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
+}
+
 /** Return the array of entity id's without it uuid **/
 func (this *Action) Ids() []interface{} {
 	ids := make([]interface{}, 0)

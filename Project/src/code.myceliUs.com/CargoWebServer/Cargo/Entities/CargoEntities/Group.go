@@ -4,6 +4,7 @@ package CargoEntities
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type Group struct{
@@ -57,6 +58,14 @@ func (this *Group) GetUuid() string{
 }
 func (this *Group) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *Group) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *Group) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type SmtpConfiguration struct{
@@ -65,6 +66,14 @@ func (this *SmtpConfiguration) GetUuid() string{
 }
 func (this *SmtpConfiguration) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *SmtpConfiguration) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *SmtpConfiguration) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

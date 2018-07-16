@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type ApplicationConfiguration struct{
@@ -55,6 +56,14 @@ func (this *ApplicationConfiguration) GetUuid() string{
 }
 func (this *ApplicationConfiguration) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *ApplicationConfiguration) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *ApplicationConfiguration) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/

@@ -126,6 +126,10 @@
     filter: url(#shadow);
 }
 
+.workflow-viewer .activity rect{
+    fill: white;
+}
+
 .workflow-viewer .activity:hover {
 	/** The style are define in the filters file... **/
 	filter: url(#glow);

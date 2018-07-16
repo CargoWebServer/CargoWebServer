@@ -82,6 +82,14 @@ func (this *OAuth2Configuration) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+func (this *OAuth2Configuration) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *OAuth2Configuration) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
+}
+
 /** Return the array of entity id's without it uuid **/
 func (this *OAuth2Configuration) Ids() []interface{} {
 	ids := make([]interface{}, 0)

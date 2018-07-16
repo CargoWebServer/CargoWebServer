@@ -4,6 +4,7 @@ package Config
 
 import(
 	"encoding/xml"
+	"code.myceliUs.com/Utility"
 )
 
 type ServiceConfiguration struct{
@@ -65,6 +66,14 @@ func (this *ServiceConfiguration) GetUuid() string{
 }
 func (this *ServiceConfiguration) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *ServiceConfiguration) SetFieldValue(field string, value interface{}) error{
+	return Utility.SetProperty(this, field, value)
+}
+
+func (this *ServiceConfiguration) GetFieldValue(field string) interface{}{
+	return Utility.GetProperty(this, field)
 }
 
 /** Return the array of entity id's without it uuid **/
