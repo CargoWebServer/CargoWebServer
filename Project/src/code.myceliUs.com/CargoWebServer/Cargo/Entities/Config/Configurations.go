@@ -235,7 +235,8 @@ func (this *Configurations) GetServerConfig()*ServerConfiguration{
 }
 
 func (this *Configurations) SetServerConfig(val *ServerConfiguration){
-	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 {
+	this.M_serverConfig= val.GetUuid()
+	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _:= this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -249,7 +250,6 @@ func (this *Configurations) SetServerConfig(val *ServerConfiguration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_serverConfig")
   this.setEntity(val)
-	this.M_serverConfig= val.GetUuid()
 	this.setEntity(this)
 }
 
@@ -268,7 +268,8 @@ func (this *Configurations) GetOauth2Configuration()*OAuth2Configuration{
 }
 
 func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
-	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 {
+	this.M_oauth2Configuration= val.GetUuid()
+	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _:= this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -282,7 +283,6 @@ func (this *Configurations) SetOauth2Configuration(val *OAuth2Configuration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_oauth2Configuration")
   this.setEntity(val)
-	this.M_oauth2Configuration= val.GetUuid()
 	this.setEntity(this)
 }
 
@@ -306,7 +306,8 @@ func (this *Configurations) GetServiceConfigs()[]*ServiceConfiguration{
 func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
 	this.M_serviceConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -319,7 +320,6 @@ func (this *Configurations) SetServiceConfigs(val []*ServiceConfiguration){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_serviceConfigs")
-		this.M_serviceConfigs=append(this.M_serviceConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -332,7 +332,8 @@ func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -346,7 +347,6 @@ func (this *Configurations) AppendServiceConfigs(val *ServiceConfiguration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_serviceConfigs")
   this.setEntity(val)
-	this.M_serviceConfigs = append(this.M_serviceConfigs, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -376,7 +376,8 @@ func (this *Configurations) GetDataStoreConfigs()[]*DataStoreConfiguration{
 func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
 	this.M_dataStoreConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -389,7 +390,6 @@ func (this *Configurations) SetDataStoreConfigs(val []*DataStoreConfiguration){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_dataStoreConfigs")
-		this.M_dataStoreConfigs=append(this.M_dataStoreConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -402,7 +402,8 @@ func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -416,7 +417,6 @@ func (this *Configurations) AppendDataStoreConfigs(val *DataStoreConfiguration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_dataStoreConfigs")
   this.setEntity(val)
-	this.M_dataStoreConfigs = append(this.M_dataStoreConfigs, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -446,7 +446,8 @@ func (this *Configurations) GetSmtpConfigs()[]*SmtpConfiguration{
 func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
 	this.M_smtpConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -459,7 +460,6 @@ func (this *Configurations) SetSmtpConfigs(val []*SmtpConfiguration){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_smtpConfigs")
-		this.M_smtpConfigs=append(this.M_smtpConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -472,7 +472,8 @@ func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -486,7 +487,6 @@ func (this *Configurations) AppendSmtpConfigs(val *SmtpConfiguration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_smtpConfigs")
   this.setEntity(val)
-	this.M_smtpConfigs = append(this.M_smtpConfigs, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -516,7 +516,8 @@ func (this *Configurations) GetLdapConfigs()[]*LdapConfiguration{
 func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
 	this.M_ldapConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -529,7 +530,6 @@ func (this *Configurations) SetLdapConfigs(val []*LdapConfiguration){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_ldapConfigs")
-		this.M_ldapConfigs=append(this.M_ldapConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -542,7 +542,8 @@ func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -556,7 +557,6 @@ func (this *Configurations) AppendLdapConfigs(val *LdapConfiguration){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_ldapConfigs")
   this.setEntity(val)
-	this.M_ldapConfigs = append(this.M_ldapConfigs, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -586,7 +586,8 @@ func (this *Configurations) GetApplicationConfigs()[]*ApplicationConfiguration{
 func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguration){
 	this.M_applicationConfigs= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -599,7 +600,6 @@ func (this *Configurations) SetApplicationConfigs(val []*ApplicationConfiguratio
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_applicationConfigs")
-		this.M_applicationConfigs=append(this.M_applicationConfigs, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -612,7 +612,8 @@ func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfigurati
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -626,7 +627,6 @@ func (this *Configurations) AppendApplicationConfigs(val *ApplicationConfigurati
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_applicationConfigs")
   this.setEntity(val)
-	this.M_applicationConfigs = append(this.M_applicationConfigs, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -656,7 +656,8 @@ func (this *Configurations) GetScheduledTasks()[]*ScheduledTask{
 func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
 	this.M_scheduledTasks= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -669,7 +670,6 @@ func (this *Configurations) SetScheduledTasks(val []*ScheduledTask){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_scheduledTasks")
-		this.M_scheduledTasks=append(this.M_scheduledTasks, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -682,7 +682,8 @@ func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -696,7 +697,6 @@ func (this *Configurations) AppendScheduledTasks(val *ScheduledTask){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_scheduledTasks")
   this.setEntity(val)
-	this.M_scheduledTasks = append(this.M_scheduledTasks, val.GetUuid())
 	this.setEntity(this)
 }
 

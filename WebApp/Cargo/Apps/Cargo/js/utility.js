@@ -218,10 +218,13 @@ function isXsInt(fieldType) {
     if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
         return false
     }
+
     if (fieldType.endsWith("byte") || fieldType.endsWith("long") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
         || fieldType.endsWith("unsignedInt") || fieldType.endsWith("unsignedBtype") || fieldType.endsWith("unsignedShort") || fieldType.endsWith("unsignedLong")  // XML
         || fieldType.endsWith("negativeInteger") || fieldType.endsWith("nonNegativeInteger") || fieldType.endsWith("nonPositiveInteger") || fieldType.endsWith("positiveInteger") // XML
-        || fieldType.endsWith("tinyint") || fieldType.endsWith("smallint") || fieldType.endsWith("bigint"))// SQL
+        || fieldType.endsWith("tinyint") || fieldType.endsWith("smallint") || fieldType.endsWith("bigint")// SQL
+        || fieldType.endsWith("time") || fieldType.endsWith("Time")  // XML
+        || fieldType.endsWith("timestampNumeric") || fieldType.endsWith("timestamp")) // SQL
     {
         return true
     }
@@ -315,11 +318,6 @@ function isXsDate(fieldType) {
 function isXsTime(fieldType) {
     if(!fieldType.startsWith("xs") || fieldType.startsWith("sqltypes")){
         return false
-    }
-    if (fieldType.endsWith("time") || fieldType.endsWith("Time")  // XML
-        || fieldType.endsWith("timestampNumeric") || fieldType.endsWith("timestamp") // SQL
-    ) {
-        return true
     }
     return false
 }

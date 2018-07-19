@@ -80,3 +80,8 @@
     text-decoration: underline;
     cursor:pointer;
 }
+
+.borderHeader{
+    border:1px solid white;
+    
+}

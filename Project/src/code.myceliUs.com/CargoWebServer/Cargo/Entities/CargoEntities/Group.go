@@ -166,7 +166,6 @@ func (this *Group) GetMembersRef()[]*User{
 func (this *Group) SetMembersRef(val []*User){
 	this.M_membersRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_membersRef=append(this.M_membersRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)

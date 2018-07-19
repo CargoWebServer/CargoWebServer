@@ -62,7 +62,7 @@ type Message interface{
 	 * Set the function GetEntityByUuid as a pointer. The entity manager can't
 	 * be access by Entities package...
 	 */
-	 SetEntityGetter(func(uuid string) (interface{}, error))
+	SetEntityGetter(func(uuid string) (interface{}, error))
 
 	/** Use it the set the entity on the cache. **/
 	SetEntitySetter(fct func(entity interface{}))

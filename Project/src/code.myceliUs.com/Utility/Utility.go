@@ -1006,6 +1006,8 @@ func ToString(value interface{}) string {
 		str += strconv.FormatFloat(value.(float64), 'f', -1, 64)
 	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
 		str += strconv.FormatBool(value.(bool))
+	} else if reflect.TypeOf(value).String() == "[]uint8" {
+		str += string(value.([]uint8))
 	} else {
 		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to string")
 	}

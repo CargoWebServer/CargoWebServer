@@ -186,6 +186,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 	
 	if (typeName == "BPMN20.ScriptTask") {
 		svgElement = this.drawScriptTask(diagramElement)
+		svgElement.element.classList.add("ScriptTask", "activity")
 	} else if (typeName == "BPMN20.Task_impl") {
 		svgElement = this.drawTask(diagramElement, " bpmndi_task")
 		svgElement.element.classList.add("Task", "activity")
@@ -1218,9 +1219,20 @@ SvgDiagram.prototype.drawDataInput = function (diagramElement) {
 		}
 	});
 
-	evtDefPath = new SVG_Path(group, bpmnElement.UUID + "_path", "bpmndi_data_input", [pathStr])
-	group.setSvgAttribute("name", bpmnElement.UUID)
+    group.setSvgAttribute("name", bpmnElement.UUID)
 	group.setSvgAttribute("transform", "translate(" + (diagramElement.M_Bounds.M_x - 2) + "," + diagramElement.M_Bounds.M_y + ")")
+
+
+	evtDefPath = new SVG_Path(group, bpmnElement.UUID + "_path", "bpmndi_data_input", [pathStr])
+	
+	group.parentElement.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+        return function (event) {
+            svgDiagram.dataInputClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+        }
+	}(this.parent, diagramElement,group, this)
+	
+
+
 
 	return group
 }
@@ -1250,6 +1262,12 @@ SvgDiagram.prototype.drawDataOutput = function (diagramElement) {
 	evtDefPath = new SVG_Path(group, bpmnElement.UUID + "_path", "", [pathStr])
 	group.setSvgAttribute("name", bpmnElement.UUID)
 	group.setSvgAttribute("transform", "translate(" + (diagramElement.M_Bounds.M_x - 2) + "," + diagramElement.M_Bounds.M_y + ")")
+
+    group.parentElement.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+        return function (event) {
+            svgDiagram.dataOutputClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+        }
+	}(this.parent, diagramElement,group, this)
 
 	return group
 }
@@ -1505,4 +1523,8 @@ SvgDiagram.prototype.sendTaskClick = function(parent, diagramElement, group, svg
 SvgDiagram.prototype.serviceTaskClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
 
 SvgDiagram.prototype.dataObjectReferenceClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.dataInputClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.dataOutputClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
 

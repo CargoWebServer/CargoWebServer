@@ -161,7 +161,6 @@ func (this *Permission) GetAccountsRef()[]*Account{
 func (this *Permission) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)

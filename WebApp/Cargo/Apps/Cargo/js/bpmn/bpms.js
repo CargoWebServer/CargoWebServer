@@ -89,6 +89,10 @@ var InstanceListView = function (parent, svgDiagram) {
     		svgDiagram.scriptTaskClick = function(){}
         	
         	svgDiagram.dataObjectReferenceClick = function(){}
+        	
+        	svgDiagram.dataInputClick = function(){}
+	
+	        svgDiagram.dataOutputClick = function(){}
 	    }
 	}(svgDiagram,this)
 	
@@ -103,6 +107,10 @@ var InstanceListView = function (parent, svgDiagram) {
 	svgDiagram.taskClick = function(){}
 	
 	svgDiagram.dataObjectReferenceClick = function(){}
+	
+	svgDiagram.dataInputClick = function(){}
+	
+	svgDiagram.dataOutputClick = function(){}
 	
 	svgDiagram.startEventClick = function(parent, diagramElement,group,svgDiagram,event,bpmnElement){
 	    event.preventDefault();
@@ -187,40 +195,110 @@ InstanceListView.prototype.loadProcessInstance = function(instance,instanceListV
        }
    }(instance,instanceListView)
    
+   //Attach a listener for updated entities in the process instance
+        server.entityManager.attach(instance, UpdateEntityEvent, function (svgDiagram,instance) {
+            return function(evt, element){
+                 var entity = evt.dataMap.entity 
+                if (entity  !== undefined) {
+                    if(entity.ParentUuid == instance.UUID){
+                       var element = document.getElementsByName(entity.M_bpmnElementId)[0]
+                        //Lifecycle state handler, sets the CSS class to the equivalent state
+                        switch(entity.M_lifecycleState){
+                            case 1:
+                                element.parentElement.classList.add("completed")
+                                element.parentElement.classList.remove("ready")
+                                element.parentElement.classList.remove("active")
+                                break;
+                            case 9:
+                                element.parentElement.classList.add("ready")
+                                element.parentElement.classList.remove("completed")
+                                element.parentElement.classList.remove("active")
+                                break;
+                            case 10:
+                                element.parentElement.classList.add("active")
+                                element.parentElement.classList.remove("ready")
+                                element.parentElement.classList.remove("completed")
+                                break;
+                            default:
+                                break;
+                        }
+                        if(entity.TYPENAME == "BPMS.ActivityInstance" && entity.M_lifecycleState == 1){
+                            //Override the click function of a generic task
+                        	instanceListView.svgDiagram.userTaskClick = function(instance){
+                                return function(parent, diagramElement,group,svgDiagram,event,bpmnElement){
+                            	    event.preventDefault();
+                                    event.stopPropagation();
+                                    
+                                	// Get the menu position
+                                	var x = event.offsetX - 5;     // Get the horizontal coordinate
+                                	var y = event.offsetY - 5;     // 
+                                    
+                                    //Menu item for the log info
+                                    var getLogInfoItem = new MenuItem("loginfo_startevent", "Info", {}, 0, function (diagramElement,parent,instance) {
+                                        return function () {
+                                            //Check that the entity actually exists first
+                                            if(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                                                console.log(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID))
+                                                logInfos = instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID).M_logInfoRef
+                                                //Check if the log infos were fully loaded
+                                                if(logInfos[0].M_action != undefined){
+                                                    loadLogInfosDialog(logInfos,parent,diagramElement)
+                                                }else{
+                                                    //If not, loop through each log info and load their attributes
+                                                    function drawLogInfo(logInfos, index,parent){
+                                                	    var logInfo = logInfos[index]
+                                                		server.entityManager.getEntityByUuid(logInfo, false,
+                                                			function (logInfo, caller) { 
+                                                				caller.logInfos[caller.index] = logInfo
+                                                				if(caller.index < caller.logInfos.length - 1){
+                                                				    drawLogInfo(caller.logInfos, caller.index + 1)
+                                                				}else{
+                                                				    loadLogInfosDialog(caller.logInfos,caller.parent,caller.diagramElement)
+                                                				}
+                                                			},
+                                                			function (errObj, caller) { 
+                                                
+                                                			},
+                                                			{ "index":index, "logInfos":logInfos, "parent" : parent, "diagramElement" : diagramElement})
+                                                	}
+                                                	drawLogInfo(logInfos, 0,parent)
+                                                }
+                                            }
+                                        }
+                                    }(diagramElement,parent,instance), "fa fa-book")
+                                    
+                                    //Menu item for the log info
+                                    var getDataInputInfoItem = new MenuItem("data_objectreference", "Data", {}, 0, function (diagramElement,parent,instance) {
+                                        return function () {
+                                           
+                                            if(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                                                data = instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID)
+                                                
+                                                loadDataDialog(data.M_data,parent,diagramElement)
+                                                
+                                            }
+                                            
+                                            
+                                        }
+                                    }(diagramElement,parent,instance), "fa fa-database")
+                        
+                                	var popup = parent.appendElement({ "tag": "div", "style": "top:" + y + "px; left:" + x + "px;" }).down()
+                                	var contextMenu = new PopUpMenu(group, [ getLogInfoItem,getDataInputInfoItem], event)
+                                }
+                        	  
+                        	}(instance)
+                        }
+                        
+                    }
+                }
+            }
+	    }(instanceListView.svgDiagram,instance))
+   
     for(var i = 0; i < instance.M_flowNodeInstances.length; i++){
         var element = document.getElementsByName(instance.M_flowNodeInstances[i].M_bpmnElementId)[0]
         element.flowNodeInstance = instance.M_flowNodeInstances[i]
         element.instanceListView = instanceListView
-        //Attach a listener for updated entities in the process instance
-        server.entityManager.attach(element, UpdateEntityEvent, function (evt, element) {
-            var entity = evt.dataMap.entity 
-             console.log("---> entity update: ", entity)
-            if (entity  !== undefined) {
-                if(entity.UUID == element.flowNodeInstance.UUID){
-                   
-                    //Lifecycle state handler, sets the CSS class to the equivalent state
-                    switch(entity.M_lifecycleState){
-                        case 1:
-                            element.parentElement.classList.add("completed")
-                            element.parentElement.classList.remove("ready")
-                            element.parentElement.classList.remove("active")
-                            break;
-                        case 9:
-                            element.parentElement.classList.add("ready")
-                            element.parentElement.classList.remove("completed")
-                            element.parentElement.classList.remove("active")
-                            break;
-                        case 10:
-                            element.parentElement.classList.add("active")
-                            element.parentElement.classList.remove("ready")
-                            element.parentElement.classList.remove("completed")
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-	    })
+        
 	    
         //Lifecycle state handler, sets the CSS class to the equivalent state
         switch(instance.M_flowNodeInstances[i].M_lifecycleState){
@@ -255,12 +333,77 @@ InstanceListView.prototype.loadProcessInstance = function(instance,instanceListV
         	var y = event.offsetY - 5;     // 
             
             //Menu item for the log info
-            var getDataInfoItem = new MenuItem("data_objectreference", "Data", {}, 0, function (diagramElement,parent,instance,diagramElement) {
+            var getDataInfoItem = new MenuItem("data_objectreference", "Data", {}, 0, function (diagramElement,parent,instance) {
                 return function () {
                     //Check that the entity actually exists first
        
                     if(instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.M_dataObjectRef.UUID) != undefined){
                         data = instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.M_dataObjectRef.UUID)
+                        server.entityManager.getEntityByUuid(data.M_bpmnElementId,false,
+                            function(entity,caller){
+                                data.M_bpmnElement = entity
+                                loadDataDialog(caller.data,caller.parent,caller.diagramElement)
+                            },function(){}, {"data" : data, "parent" : parent, "diagramElement" : diagramElement})
+                        
+                        
+                    }
+                    
+                    
+                }
+            }(diagramElement,parent,instance), "fa fa-database")
+
+        	var popup = parent.appendElement({ "tag": "div", "style": "top:" + y + "px; left:" + x + "px;" }).down()
+        	var contextMenu = new PopUpMenu(group, [ getDataInfoItem], event)
+        }
+	  
+	}(instance)
+	
+	instanceListView.svgDiagram.dataInputClick = function(instance){
+        return function(parent, diagramElement,group,svgDiagram,event,bpmnElement){
+    	    event.preventDefault();
+            event.stopPropagation();
+            
+        	// Get the menu position
+        	var x = event.offsetX - 5;     // Get the horizontal coordinate
+        	var y = event.offsetY - 5;     // 
+            
+            //Menu item for the log info
+            var getDataInfoItem = new MenuItem("data_input", "Data", {}, 0, function (diagramElement,parent,instance,diagramElement) {
+                return function () {
+                    //Check that the entity actually exists first
+                    if(instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                        data = instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.UUID)
+                        server.entityManager.getEntityByUuid(data.M_bpmnElementId,false,
+                            function(entity,caller){
+                                data.M_bpmnElement = entity
+                                loadDataDialog(caller.data,caller.parent,caller.diagramElement)
+                            },function(){}, {"data" : data, "parent" : parent, "diagramElement" : diagramElement})
+                    }
+                }
+            }(diagramElement,parent,instance,diagramElement), "fa fa-database")
+
+        	var popup = parent.appendElement({ "tag": "div", "style": "top:" + y + "px; left:" + x + "px;" }).down()
+        	var contextMenu = new PopUpMenu(group, [ getDataInfoItem], event)
+        }
+	  
+	}(instance)
+	
+	instanceListView.svgDiagram.dataOutputClick = function(instance){
+        return function(parent, diagramElement,group,svgDiagram,event,bpmnElement){
+    	    event.preventDefault();
+            event.stopPropagation();
+            
+        	// Get the menu position
+        	var x = event.offsetX - 5;     // Get the horizontal coordinate
+        	var y = event.offsetY - 5;     // 
+            
+            //Menu item for the log info
+            var getDataInfoItem = new MenuItem("data_output", "Data", {}, 0, function (diagramElement,parent,instance,diagramElement) {
+                return function () {
+                    //Check that the entity actually exists first
+       
+                    if(instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                        data = instance.M_data.find(x => x.M_bpmnElementId == bpmnElement.UUID)
                         server.entityManager.getEntityByUuid(data.M_bpmnElementId,false,
                             function(entity,caller){
                                 data.M_bpmnElement = entity
@@ -469,13 +612,87 @@ InstanceListView.prototype.loadProcessInstance = function(instance,instanceListV
             }(diagramElement,parent,instance), "fa fa-book")
             
             //Menu item to play the user task
-            var playItem = new MenuItem("play_activity", "Play", {}, 0, function(){}, "fa fa-play")
+            var playItem = new MenuItem("play_activity", "Play", {}, 0, function(diagramElement,parent,instance,bpmnElement){
+                return function() {
+                    var activityInstance;
+                    if(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                        activityInstance = instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID)
+                        
+                    }
+                    new UserTaskWizard(parent, bpmnElement,activityInstance)
+                }
+            }(diagramElement,parent,instance,bpmnElement), "fa fa-play")
             
             //Menu item to cancel the user task
             var cancelItem = new MenuItem("cancel_activity", "Cancel", {}, 0, function(){}, "fa fa-close")
 
         	var popup = parent.appendElement({ "tag": "div", "style": "top:" + y + "px; left:" + x + "px;" }).down()
-        	var contextMenu = new PopUpMenu(group, [ getLogInfoItem, playItem, cancelItem], event)
+        	var contextMenu = new PopUpMenu(group, [playItem, cancelItem,getLogInfoItem], event)
+        }
+	  
+	}(instance)
+	
+	//Override the click function of a generic task
+	instanceListView.svgDiagram.scriptTaskClick = function(instance){
+        return function(parent, diagramElement,group,svgDiagram,event,bpmnElement){
+    	    event.preventDefault();
+            event.stopPropagation();
+            
+        	// Get the menu position
+        	var x = event.offsetX - 5;     // Get the horizontal coordinate
+        	var y = event.offsetY - 5;     // 
+            
+            //Menu item for the log info
+            var getLogInfoItem = new MenuItem("loginfo_startevent", "Info", {}, 0, function (diagramElement,parent,instance) {
+                return function () {
+                    //Check that the entity actually exists first
+                    if(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                        console.log(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID))
+                        logInfos = instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID).M_logInfoRef
+                        //Check if the log infos were fully loaded
+                        if(logInfos[0].M_action != undefined){
+                            loadLogInfosDialog(logInfos,parent,diagramElement)
+                        }else{
+                            //If not, loop through each log info and load their attributes
+                            function drawLogInfo(logInfos, index,parent){
+                        	    var logInfo = logInfos[index]
+                        		server.entityManager.getEntityByUuid(logInfo, false,
+                        			function (logInfo, caller) { 
+                        				caller.logInfos[caller.index] = logInfo
+                        				if(caller.index < caller.logInfos.length - 1){
+                        				    drawLogInfo(caller.logInfos, caller.index + 1)
+                        				}else{
+                        				    loadLogInfosDialog(caller.logInfos,caller.parent,caller.diagramElement)
+                        				}
+                        			},
+                        			function (errObj, caller) { 
+                        
+                        			},
+                        			{ "index":index, "logInfos":logInfos, "parent" : parent, "diagramElement" : diagramElement})
+                        	}
+                        	drawLogInfo(logInfos, 0,parent)
+                        }
+                    }
+                }
+            }(diagramElement,parent,instance), "fa fa-book")
+            
+            //Menu item for the log info
+            var getDataInputInfoItem = new MenuItem("data_objectreference", "Data", {}, 0, function (diagramElement,parent,instance) {
+                return function () {
+                   
+                    if(instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID) != undefined){
+                        data = instance.M_flowNodeInstances.find(x => x.M_bpmnElementId == bpmnElement.UUID)
+                        
+                        loadDataDialog(data.M_data,parent,diagramElement)
+                        
+                    }
+                    
+                    
+                }
+            }(diagramElement,parent,instance), "fa fa-database")
+
+        	var popup = parent.appendElement({ "tag": "div", "style": "top:" + y + "px; left:" + x + "px;" }).down()
+        	var contextMenu = new PopUpMenu(group, [ getLogInfoItem,getDataInputInfoItem], event)
         }
 	  
 	}(instance)
@@ -484,21 +701,82 @@ InstanceListView.prototype.loadProcessInstance = function(instance,instanceListV
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-// Load and display a data instance
+// Load and display a data instance by creating a dialog
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 function loadDataDialog(data, parent, diagramElement){
-    var dialog = new Dialog(randomUUID(),parent,false, data.M_id)
-   
+    
+    //Initialize the dialog element and set its position
+    var dialog = new Dialog(randomUUID(),parent,false, diagramElement.M_id)
     var x = diagramElement.M_Bounds.M_x
 	var y = diagramElement.M_Bounds.M_y + diagramElement.M_Bounds.M_height + 5
+	dialog.content.appendElement({"tag" : "table", "id" : "dataInfosTable", "class" : "instanceListTable"}).down()
+    dialog.setPosition(x, y)
+    
+    //If the data we received is not part of an array, just force it into one so we can iterate it
+	if(data.length == undefined){
+	    data = [data]
+	}
 	
-	console.log(data)
-	
-	dialog.content.appendElement({"tag" : "table", "id" : "logInfosTable", "class" : "instanceListTable"}).down()
-	.appendElement({"tag" : "tr"}).down()
-	.appendElement({"tag" : "th","class" : "", "innerHtml" : data.M_bpmnElement.M_name})
-	dialog.setPosition(x, y)
-	
+	//Iterate through the data array
+    for(var i = 0; i < data.length; i++){
+        //Verify if the data is contained inside a map
+        if(decode64(data[i].M_data).startsWith("{") && decode64(data[i].M_data).endsWith("}")){
+            //Try to parse it into a JSON object
+            if(JSON.parse(decode64(data[i].M_data)).UUID != undefined){
+                //Create an entity using the JSON we parsed
+                var entityData = JSON.parse(decode64(data[i].M_data))
+                var entity = eval("new " + entityData.TYPENAME + "()")
+                entity.init(entityData,false)
+                var entityPanelParent = dialog.content.getChildById("dataInfosTable").appendElement({"tag" : "tr"}).down()
+            	.appendElement({"tag" : "th","class" : "borderHeader", "innerHtml" : data[i].M_name})
+            	.appendElement({"tag" : "th", "class" : "borderHeader", "style" : "overflow-y: auto;max-height: 350px;display: block;" }).down()
+                //Create an entity panel with the entity we loaded
+                new EntityPanel(entityPanelParent,entity.TYPENAME,
+                    function(entity){
+                       return function(panel){
+                         panel.setEntity(entity)
+                        } 
+                    }(entity))
+                    
+            }
+        }else{
+            //Verify if the data is an UUID by splitting the string
+            var prototype = ""
+            if(decode64(data[i].M_data).split(".").length > 1){
+                if(decode64(data[i].M_data).split(".")[1].split("%").length > 1){
+                    prototype = "CargoEntities." + decode64(data[i].M_data).split(".")[1].split("%")[0]
+                }
+            }
+            
+            //Try to get the entity prototype from the string we splitted
+            server.entityManager.getEntityPrototype(prototype ,false,
+                //If we enter this function, the string was an UUID, therefore we can load an entity panel
+                function(result,caller){
+                    //Get the entity from the server
+                    server.entityManager.getEntityByUuid(caller.entityUUID, false,
+                        function(entity,caller){
+                             var entityPanelParent = caller.dialog.content.getChildById("dataInfosTable").appendElement({"tag" : "tr"}).down()
+                        	.appendElement({"tag" : "th","class" : "borderHeader", "innerHtml" : caller.data.M_name})
+                        	.appendElement({"tag" : "th", "class" : "borderHeader", "style" : "overflow-y: auto;max-height: 350px;max-width:600px;display: block;" }).down()
+                        	//Create the entity panel from the entity we loaded
+                            new EntityPanel(entityPanelParent,entity.TYPENAME,
+                                function(entity){
+                                   return function(panel){
+                                     panel.setEntity(entity)
+                                    } 
+                                }(entity))
+                        },function(){}, {"dialog" : caller.dialog, "data" : caller.data})
+                  
+                },
+                //If we enter this function, the server cannot get the entity prototype, so the string is not an UUID
+                function(error,caller){
+                    //Simply inject data into the table
+                    dialog.content.getChildById("dataInfosTable").appendElement({"tag" : "tr"}).down()
+                	.appendElement({"tag" : "th","class" : "borderHeader", "innerHtml" : caller.data.M_name})
+                	.appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : decode64(caller.data.M_data)})
+                },{"data" : data[i], "dialog" : dialog, "entityUUID" : decode64(data[i].M_data)})
+        }
+	}
 }
 
 
@@ -513,9 +791,9 @@ function loadDataDialog(data, parent, diagramElement){
 	
 	dialog.content.appendElement({"tag" : "table", "id" : "logInfosTable", "class" : "instanceListTable"}).down()
 	.appendElement({"tag" : "tr"}).down()
-	.appendElement({"tag" : "th","class" : "", "innerHtml" : "Date"})
-	.appendElement({"tag" : "th","class" : "", "innerHtml" : "Actor"})
-	.appendElement({"tag" : "th","class" : "","innerHtml" : "Action"})
+	.appendElement({"tag" : "th","class" : "borderHeader", "innerHtml" : "Date"})
+	.appendElement({"tag" : "th","class" : "borderHeader", "innerHtml" : "Actor"})
+	.appendElement({"tag" : "th","class" : "borderHeader","innerHtml" : "Action"})
 	dialog.setPosition(x, y)
 	
 	dialog.ok.element.onclick = function (dialog) {
@@ -536,14 +814,14 @@ function loadDataDialog(data, parent, diagramElement){
             function(account,caller){
                 if(account.M_name != ""){
                     dialog.content.getChildById("logInfosTable").appendElement({"tag" : "tr"}).down()
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : caller.date})
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : account.M_name})
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : caller.action}) 
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : caller.date})
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : account.M_name})
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : caller.action}) 
                 }else{
                      dialog.content.getChildById("logInfosTable").appendElement({"tag" : "tr"}).down()
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : caller.date})
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : account.M_id})
-                    .appendElement({"tag" : "th", "class" : "", "innerHtml" : caller.action})
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : caller.date})
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : account.M_id})
+                    .appendElement({"tag" : "th", "class" : "borderHeader", "innerHtml" : caller.action})
                 }
                
             },function(){},{"dialog" : dialog, "date" : date, "action" : logInfos[i].M_action})
@@ -570,7 +848,7 @@ var ProcessWizard = function (parent, startEvent) {
 	this.content = this.dialog.content.appendElement({ "tag": "div", "class": "process_wizard_content" }).down()
 
 	// That will contain the values ask by the user...
-	this.dataView = new BpmnDataView(this.content, startEvent)
+	this.dataView = new BpmnDataView(this.content, [], startEvent.M_dataOutput)
 
 	this.dialog.ok.element.onclick = function (dataView, process, dialog) {
 		return function () {
@@ -597,3 +875,43 @@ var ProcessWizard = function (parent, startEvent) {
 
 	return this
 }
+
+var UserTaskWizard = function (parent, userTask,instance) {
+    this.parent = parent
+	this.id = randomUUID()
+
+	// The wizard dialog...
+	this.dialog = new Dialog(this.id, this.parent, false, "User Task")
+
+	// Set the dialog position...
+	var diagramElement = userTask.getDiagramElement()
+	var x = diagramElement.M_Bounds.M_x
+	var y = diagramElement.M_Bounds.M_y + diagramElement.M_Bounds.M_height + 5
+	this.dialog.setPosition(x, y)
+
+	this.content = this.dialog.content.appendElement({ "tag": "div", "class": "process_wizard_content" }).down()
+
+	// That will contain the values ask by the user...
+	this.dataView = new BpmnDataView(this.content, userTask.M_ioSpecification.M_dataInput, userTask.M_ioSpecification.M_dataOutput, userTask.M_property, instance)
+	
+	this.dialog.ok.element.onclick = function (dataView, dialog) {
+		return function () {
+			// I will close the dialogue first...
+			dialog.close()
+
+			// I will save the data view...
+			dataView.save(function (itemAwareElements, activity) {
+    			server.workflowProcessor.runActivity(activity,
+				    function(success,caller){
+				        console.log(success)
+				    },function(){},{})
+			})
+			
+		}
+	} (this.dataView, this.dialog)
+	
+	return this
+
+}
+
+

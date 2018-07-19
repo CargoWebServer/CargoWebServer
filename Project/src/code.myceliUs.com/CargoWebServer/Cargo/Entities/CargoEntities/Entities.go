@@ -216,7 +216,8 @@ func (this *Entities) GetEntities()[]Entity{
 func (this *Entities) SetEntities(val []Entity){
 	this.M_entities= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_entities=append(this.M_entities, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -229,7 +230,6 @@ func (this *Entities) SetEntities(val []Entity){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entities")
-		this.M_entities=append(this.M_entities, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -242,7 +242,8 @@ func (this *Entities) AppendEntities(val Entity){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_entities = append(this.M_entities, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -256,7 +257,6 @@ func (this *Entities) AppendEntities(val Entity){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_entities")
   this.setEntity(val)
-	this.M_entities = append(this.M_entities, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -286,7 +286,8 @@ func (this *Entities) GetRoles()[]*Role{
 func (this *Entities) SetRoles(val []*Role){
 	this.M_roles= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_roles=append(this.M_roles, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -299,7 +300,6 @@ func (this *Entities) SetRoles(val []*Role){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_roles")
-		this.M_roles=append(this.M_roles, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -312,7 +312,8 @@ func (this *Entities) AppendRoles(val *Role){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_roles = append(this.M_roles, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -326,7 +327,6 @@ func (this *Entities) AppendRoles(val *Role){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_roles")
   this.setEntity(val)
-	this.M_roles = append(this.M_roles, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -356,7 +356,8 @@ func (this *Entities) GetPermissions()[]*Permission{
 func (this *Entities) SetPermissions(val []*Permission){
 	this.M_permissions= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -369,7 +370,6 @@ func (this *Entities) SetPermissions(val []*Permission){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_permissions")
-		this.M_permissions=append(this.M_permissions, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -382,7 +382,8 @@ func (this *Entities) AppendPermissions(val *Permission){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_permissions = append(this.M_permissions, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -396,7 +397,6 @@ func (this *Entities) AppendPermissions(val *Permission){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_permissions")
   this.setEntity(val)
-	this.M_permissions = append(this.M_permissions, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -426,7 +426,8 @@ func (this *Entities) GetActions()[]*Action{
 func (this *Entities) SetActions(val []*Action){
 	this.M_actions= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_actions=append(this.M_actions, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -439,7 +440,6 @@ func (this *Entities) SetActions(val []*Action){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_actions")
-		this.M_actions=append(this.M_actions, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -452,7 +452,8 @@ func (this *Entities) AppendActions(val *Action){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_actions = append(this.M_actions, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -466,7 +467,6 @@ func (this *Entities) AppendActions(val *Action){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_actions")
   this.setEntity(val)
-	this.M_actions = append(this.M_actions, val.GetUuid())
 	this.setEntity(this)
 }
 

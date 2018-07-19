@@ -219,7 +219,6 @@ func (this *User) GetMemberOfRef()[]*Group{
 func (this *User) SetMemberOfRef(val []*Group){
 	this.M_memberOfRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_memberOfRef=append(this.M_memberOfRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -262,7 +261,6 @@ func (this *User) GetAccounts()[]*Account{
 func (this *User) SetAccounts(val []*Account){
 	this.M_accounts= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_accounts=append(this.M_accounts, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)

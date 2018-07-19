@@ -150,7 +150,6 @@ func (this *Role) GetAccountsRef()[]*Account{
 func (this *Role) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_accountsRef=append(this.M_accountsRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -193,7 +192,6 @@ func (this *Role) GetActionsRef()[]*Action{
 func (this *Role) SetActionsRef(val []*Action){
 	this.M_actionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_actionsRef=append(this.M_actionsRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)

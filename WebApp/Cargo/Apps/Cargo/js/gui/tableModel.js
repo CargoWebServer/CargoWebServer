@@ -162,7 +162,7 @@ TableModel.prototype.getColumnClass = function (column) {
  * @param {int} column The column index
  */
 TableModel.prototype.isCellEditable = function (column) {
-    return this.editable[column]
+    return true //this.editable[column] TODO uncomment!
 }
 
 TableModel.prototype.setIsCellEditable = function (column, val) {
@@ -376,7 +376,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     }(this.table, this)
 
     // Now the edit permission...
-    if (server.sessionId != undefined) {
+    /*if (server.sessionId != undefined) {
         server.accountManager.me(server.sessionId,
             function (result, caller) {
                 if (result.M_id == "admin") {
@@ -387,7 +387,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             }, function (errObj, caller) {
 
             }, this)
-    }
+    }*/
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Event listener connection here.

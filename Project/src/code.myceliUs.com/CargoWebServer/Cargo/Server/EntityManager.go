@@ -32,6 +32,10 @@ var setEntityFct func(interface{})
 var (
 	generateUuidFct = func(entity interface{}) string {
 		// Here If the entity id's is not set I will set it...
+		if len(entity.(Entity).GetFieldValue("UUID").(string)) > 0 {
+			return entity.(Entity).GetFieldValue("UUID").(string)
+		}
+
 		uuid := generateEntityUuid(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids())
 		return uuid
 	}
@@ -355,7 +359,8 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	fieldType := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[1])]
 	fieldType = strings.Replace(fieldType, "[]", "", -1)
 	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
-	query := "( ?, " + typeName + ":" + fieldType + ":" + prototype.Ids[1] + ", " + ids[0].(string) + ")"
+
+	query := "( ?, " + typeName + ":" + fieldType + ":" + prototype.Ids[1] + ", " + Utility.ToString(ids[0]) + ")"
 
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)

@@ -339,7 +339,8 @@ func (this *OAuth2Configuration) GetClients()[]*OAuth2Client{
 func (this *OAuth2Configuration) SetClients(val []*OAuth2Client){
 	this.M_clients= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_clients=append(this.M_clients, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -352,7 +353,6 @@ func (this *OAuth2Configuration) SetClients(val []*OAuth2Client){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_clients")
-		this.M_clients=append(this.M_clients, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -365,7 +365,8 @@ func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_clients = append(this.M_clients, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -379,7 +380,6 @@ func (this *OAuth2Configuration) AppendClients(val *OAuth2Client){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_clients")
   this.setEntity(val)
-	this.M_clients = append(this.M_clients, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -409,7 +409,8 @@ func (this *OAuth2Configuration) GetAuthorize()[]*OAuth2Authorize{
 func (this *OAuth2Configuration) SetAuthorize(val []*OAuth2Authorize){
 	this.M_authorize= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_authorize=append(this.M_authorize, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -422,7 +423,6 @@ func (this *OAuth2Configuration) SetAuthorize(val []*OAuth2Authorize){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_authorize")
-		this.M_authorize=append(this.M_authorize, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -435,7 +435,8 @@ func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_authorize = append(this.M_authorize, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -449,7 +450,6 @@ func (this *OAuth2Configuration) AppendAuthorize(val *OAuth2Authorize){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_authorize")
   this.setEntity(val)
-	this.M_authorize = append(this.M_authorize, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -479,7 +479,8 @@ func (this *OAuth2Configuration) GetAccess()[]*OAuth2Access{
 func (this *OAuth2Configuration) SetAccess(val []*OAuth2Access){
 	this.M_access= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_access=append(this.M_access, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -492,7 +493,6 @@ func (this *OAuth2Configuration) SetAccess(val []*OAuth2Access){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_access")
-		this.M_access=append(this.M_access, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -505,7 +505,8 @@ func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_access = append(this.M_access, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -519,7 +520,6 @@ func (this *OAuth2Configuration) AppendAccess(val *OAuth2Access){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_access")
   this.setEntity(val)
-	this.M_access = append(this.M_access, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -549,7 +549,8 @@ func (this *OAuth2Configuration) GetIds()[]*OAuth2IdToken{
 func (this *OAuth2Configuration) SetIds(val []*OAuth2IdToken){
 	this.M_ids= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_ids=append(this.M_ids, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -562,7 +563,6 @@ func (this *OAuth2Configuration) SetIds(val []*OAuth2IdToken){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_ids")
-		this.M_ids=append(this.M_ids, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -575,7 +575,8 @@ func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_ids = append(this.M_ids, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -589,7 +590,6 @@ func (this *OAuth2Configuration) AppendIds(val *OAuth2IdToken){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_ids")
   this.setEntity(val)
-	this.M_ids = append(this.M_ids, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -619,7 +619,8 @@ func (this *OAuth2Configuration) GetRefresh()[]*OAuth2Refresh{
 func (this *OAuth2Configuration) SetRefresh(val []*OAuth2Refresh){
 	this.M_refresh= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_refresh=append(this.M_refresh, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -632,7 +633,6 @@ func (this *OAuth2Configuration) SetRefresh(val []*OAuth2Refresh){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_refresh")
-		this.M_refresh=append(this.M_refresh, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -645,7 +645,8 @@ func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_refresh = append(this.M_refresh, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -659,7 +660,6 @@ func (this *OAuth2Configuration) AppendRefresh(val *OAuth2Refresh){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_refresh")
   this.setEntity(val)
-	this.M_refresh = append(this.M_refresh, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -689,7 +689,8 @@ func (this *OAuth2Configuration) GetExpire()[]*OAuth2Expires{
 func (this *OAuth2Configuration) SetExpire(val []*OAuth2Expires){
 	this.M_expire= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_expire=append(this.M_expire, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -702,7 +703,6 @@ func (this *OAuth2Configuration) SetExpire(val []*OAuth2Expires){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_expire")
-		this.M_expire=append(this.M_expire, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -715,7 +715,8 @@ func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_expire = append(this.M_expire, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -729,7 +730,6 @@ func (this *OAuth2Configuration) AppendExpire(val *OAuth2Expires){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_expire")
   this.setEntity(val)
-	this.M_expire = append(this.M_expire, val.GetUuid())
 	this.setEntity(this)
 }
 

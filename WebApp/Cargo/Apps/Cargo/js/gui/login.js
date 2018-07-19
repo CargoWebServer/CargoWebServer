@@ -240,7 +240,20 @@ var LoginPage = function (loginCallback, serverId) {
 		}
 	}(this.rememeberMe)
 
-	if (localStorage.getItem("_remember_me_") != undefined) {
+    if(localStorage.getItem("_remember_me_") == "true"){
+        this.rememeberMe.element.checked = true
+    }else{
+        this.rememeberMe.element.checked = false
+        localStorage.removeItem("accountUuid")
+    }
+
+	if (localStorage.getItem("accountUuid") != undefined) {
+	    server.entityManager.getEntityByUuid(localStorage.getItem("accountUuid"),false,
+			function(account,caller){
+				caller.usernameInput.element.value = account.M_name
+				caller.passwordInput.element.value = account.M_password
+				caller.passwordInput.element.focus()
+			},function(){},this)
 		// Here I will retreive the session info create an event and send it to the server.
 		/*	TODO use get ressource instead!!!
 		var loginInfo = JSON.parse(localStorage.getItem("_remember_me_"))
@@ -254,8 +267,8 @@ var LoginPage = function (loginCallback, serverId) {
 			function (err, caller) {
 
 			}
-			, { "loginCallback": this.loginCallback, "userName": loginInfo.userName, "password": loginInfo.password })
-		*/
+			, { "loginCallback": this.loginCallback, "userName": loginInfo.userName, "password": loginInfo.password })*/
+		
 	}
 
 	return this

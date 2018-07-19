@@ -283,7 +283,8 @@ func (this *File) GetFiles()[]*File{
 func (this *File) SetFiles(val []*File){
 	this.M_files= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_files=append(this.M_files, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -296,7 +297,6 @@ func (this *File) SetFiles(val []*File){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_files")
-		this.M_files=append(this.M_files, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -309,7 +309,8 @@ func (this *File) AppendFiles(val *File){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_files = append(this.M_files, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -323,7 +324,6 @@ func (this *File) AppendFiles(val *File){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_files")
   this.setEntity(val)
-	this.M_files = append(this.M_files, val.GetUuid())
 	this.setEntity(this)
 }
 

@@ -168,6 +168,12 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 							case map[string]interface{}:
 								if v_["TYPENAME"] != nil {
 									fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
+									if fv.IsValid() {
+										// Here I got an dynamic data type.
+										setMethodName := strings.Replace(name, "M_", "", -1)
+										setMethodName = "Append" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
+										CallMethod(v.Interface(), setMethodName, []interface{}{fv.Interface()})
+									}
 								}
 							default:
 								// A base type...
@@ -188,12 +194,11 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 								} else {
 									fv = initializeBaseTypeValue(reflect.TypeOf(v_), v_)
 								}
-
+								if fv.IsValid() {
+									v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+								}
 							}
 
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
 						}
 					} else if reflect.TypeOf(value).String() == "[]string" {
 						values := value.([]string)
@@ -305,7 +310,10 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 						if _, ok := typeRegistry[typeName_.(string)]; ok {
 							fv, _ := InitializeStructure(value.(map[string]interface{}))
 							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(fv.Elem())
+								// Here I got an dynamic data type.
+								setMethodName := strings.Replace(name, "M_", "", -1)
+								setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
+								CallMethod(v.Interface(), setMethodName, []interface{}{fv.Interface()})
 							}
 						} else {
 							// Here it's a dynamic entity...

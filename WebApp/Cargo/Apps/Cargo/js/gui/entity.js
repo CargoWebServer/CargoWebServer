@@ -181,8 +181,18 @@ EntityPanel.prototype.setEntity = function (entity) {
 		if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
 			if (entityPanel.getEntity().UUID == evt.dataMap["entity"].ParentUuid) {
 				var parent = entities[entityPanel.getEntity().UUID]
-				parent[evt.dataMap["entity"].ParentLnk] = entities[evt.dataMap["entity"].UUID]
-				entityPanel.fields[evt.dataMap["entity"].ParentLnk].value.element.appendChild(entityPanel.fields[evt.dataMap["entity"].ParentLnk].renderer.renderer.panel.element)
+				var parentLnk = evt.dataMap["entity"].ParentLnk
+				
+				// The entity to display.
+				var entity = entities[evt.dataMap["entity"].UUID]
+				parent[parentLnk] = entity
+				
+				var renderer = entityPanel.fields[parentLnk].renderer
+                if(renderer.header != undefined){
+                    // In that case I will maximize the table...
+                    renderer.header.maximizeBtn.element.click();
+                }
+				// refresh the panel.
 				entityPanel.setEntity(parent)
 			}
 		}

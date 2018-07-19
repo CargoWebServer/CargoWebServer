@@ -64,6 +64,7 @@ func newCache() *Cache {
 			case operation := <-cache.m_operations:
 				if operation["name"] == "getEntity" {
 					uuid := operation["uuid"].(string)
+					//log.Println("--->cache get entity: ", uuid)
 					getEntity := operation["getEntity"].(chan Entity)
 					typeName := strings.Split(uuid, "%")[0]
 					var entity Entity
@@ -96,6 +97,7 @@ func newCache() *Cache {
 					entity := operation["entity"].(Entity)
 					// Append in the map: setObject set the value for DynamicEntity...
 					if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
+						//log.Println("--->cache set entity: ", entity.GetUuid())
 						var bytes, err = Utility.ToBytes(entity)
 						if err == nil {
 							// By id
@@ -114,16 +116,19 @@ func newCache() *Cache {
 						id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 						cache.m_cache.Delete(id)
 					}
+					//log.Println("--->cache delete entity: ", entity.GetUuid())
 					// Remove from the cache.
 					cache.m_cache.Delete(entity.GetUuid())
 					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
 				} else if operation["name"] == "remove" {
 					uuid := operation["uuid"].(string)
 					// Remove from the cache.
+					//log.Println("--->cache remove ", uuid)
 					cache.m_cache.Delete(uuid)
 				} else if operation["name"] == "getValue" {
 					uuid := operation["uuid"].(string)
 					field := operation["field"].(string)
+					//log.Println("--->cache getValue ", uuid)
 					getValue := operation["getValue"].(chan interface{})
 					var value interface{}
 					typeName := strings.Split(uuid, "%")[0]
@@ -137,8 +142,10 @@ func newCache() *Cache {
 					getValue <- value
 
 				} else if operation["name"] == "getValues" {
+
 					uuid := operation["uuid"].(string)
 					getValues := operation["getValues"].(chan map[string]interface{})
+					//log.Println("--->cache getValues ", uuid)
 					var values map[string]interface{}
 					typeName := strings.Split(uuid, "%")[0]
 					if entry, err := cache.m_cache.Get(uuid); err == nil {
@@ -150,6 +157,7 @@ func newCache() *Cache {
 					// Return the found values.
 					getValues <- values
 				} else if operation["name"] == "setValues" {
+					//log.Println("--->cache setValues ")
 					values := operation["values"].(map[string]interface{})
 					var bytes, err = Utility.ToBytes(values)
 					if err == nil {
@@ -165,6 +173,7 @@ func newCache() *Cache {
 					uuid := operation["uuid"].(string)
 					field := operation["field"].(string)
 					value := operation["value"].(interface{})
+					//log.Println("--->cache setValue: ", uuid)
 					typeName := strings.Split(uuid, "%")[0]
 					if entry, err := cache.m_cache.Get(uuid); err == nil {
 						val, err := Utility.FromBytes(entry, typeName)
@@ -184,8 +193,10 @@ func newCache() *Cache {
 						}
 					}
 				} else if operation["name"] == "deleteValue" {
+
 					uuid := operation["uuid"].(string)
 					field := operation["field"].(string)
+					// log.Println("--->cache deleteValue: ", uuid)
 					typeName := strings.Split(uuid, "%")[0]
 					if entry, err := cache.m_cache.Get(uuid); err == nil {
 						val, err := Utility.FromBytes(entry, typeName)

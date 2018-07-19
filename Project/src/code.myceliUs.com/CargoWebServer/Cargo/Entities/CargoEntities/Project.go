@@ -166,7 +166,6 @@ func (this *Project) GetFilesRef()[]*File{
 func (this *Project) SetFilesRef(val []*File){
 	this.M_filesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		this.M_filesRef=append(this.M_filesRef, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)

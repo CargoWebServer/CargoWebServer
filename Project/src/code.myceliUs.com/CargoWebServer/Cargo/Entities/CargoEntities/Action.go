@@ -182,7 +182,8 @@ func (this *Action) GetParameters()[]*Parameter{
 func (this *Action) SetParameters(val []*Parameter){
 	this.M_parameters= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_parameters=append(this.M_parameters, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -195,7 +196,6 @@ func (this *Action) SetParameters(val []*Parameter){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_parameters")
-		this.M_parameters=append(this.M_parameters, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -208,7 +208,8 @@ func (this *Action) AppendParameters(val *Parameter){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_parameters = append(this.M_parameters, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -222,7 +223,6 @@ func (this *Action) AppendParameters(val *Parameter){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_parameters")
   this.setEntity(val)
-	this.M_parameters = append(this.M_parameters, val.GetUuid())
 	this.setEntity(this)
 }
 
@@ -252,7 +252,8 @@ func (this *Action) GetResults()[]*Parameter{
 func (this *Action) SetResults(val []*Parameter){
 	this.M_results= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_results=append(this.M_results, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -265,7 +266,6 @@ func (this *Action) SetResults(val []*Parameter){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_results")
-		this.M_results=append(this.M_results, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -278,7 +278,8 @@ func (this *Action) AppendResults(val *Parameter){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_results = append(this.M_results, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -292,7 +293,6 @@ func (this *Action) AppendResults(val *Parameter){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_results")
   this.setEntity(val)
-	this.M_results = append(this.M_results, val.GetUuid())
 	this.setEntity(this)
 }
 

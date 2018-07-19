@@ -164,7 +164,8 @@ func (this *Log) GetEntries()[]*LogEntry{
 func (this *Log) SetEntries(val []*LogEntry){
 	this.M_entries= make([]string,0)
 	for i:=0; i < len(val); i++{
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {
+		this.M_entries=append(this.M_entries, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -177,7 +178,6 @@ func (this *Log) SetEntries(val []*LogEntry){
 		}
 		val[i].SetParentUuid(this.GetUuid())
 		val[i].SetParentLnk("M_entries")
-		this.M_entries=append(this.M_entries, val[i].GetUuid())
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -190,7 +190,8 @@ func (this *Log) AppendEntries(val *LogEntry){
 			return
 		}
 	}
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {
+	this.M_entries = append(this.M_entries, val.GetUuid())
+	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -204,7 +205,6 @@ func (this *Log) AppendEntries(val *LogEntry){
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_entries")
   this.setEntity(val)
-	this.M_entries = append(this.M_entries, val.GetUuid())
 	this.setEntity(this)
 }
 

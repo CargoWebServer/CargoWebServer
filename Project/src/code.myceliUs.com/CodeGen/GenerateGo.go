@@ -578,9 +578,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				setterStr += "	this.M_" + attributeName + "= make([]string,0)\n"
 				setterStr += "	for i:=0; i < len(val); i++{\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
-
+					setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
 					// Remove from it original parent
-					setterStr += "		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 {\n"
+					setterStr += "		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){\n"
 					setterStr += "			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())\n"
 					setterStr += "			if parent != nil {\n"
 					// In that case I will use reflexion to remove the object from it actual parent.
@@ -596,14 +596,14 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					setterStr += "		val[i].SetParentUuid(this.GetUuid())\n"
 					setterStr += "		val[i].SetParentLnk(\"M_" + attributeName + "\")\n"
 				}
-				setterStr += "		this.M_" + attributeName + "=append(this.M_" + attributeName + ", val[i].GetUuid())\n"
 				setterStr += "		this.setEntity(val[i])\n"
 				setterStr += "	}\n"
 				setterStr += "	this.setEntity(this)\n"
 			} else {
+				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
 					// Remove from it original parent
-					setterStr += "	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 {\n"
+					setterStr += "	if len(val.GetParentUuid()) > 0  &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {\n"
 					setterStr += "		parent, _:= this.getEntityByUuid(val.GetParentUuid())\n"
 					setterStr += "		if parent != nil {\n"
 					// In that case I will use reflexion to remove the object from it actual parent.
@@ -620,7 +620,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					setterStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
 					setterStr += "  this.setEntity(val)\n"
 				}
-				setterStr += "	this.M_" + attributeName + "= val.GetUuid()\n"
 				setterStr += "	this.setEntity(this)\n"
 			}
 
@@ -655,9 +654,11 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				appendStr += "		}\n"
 				appendStr += "	}\n"
 
+				appendStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
+
 				if !IsRef(attribute) && enumMap[attribute.Name] == nil && attribute.IsComposite == "true" {
 					// Remove from it original parent
-					appendStr += "	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 {\n"
+					appendStr += "	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {\n"
 					appendStr += "		parent, _ := this.getEntityByUuid(val.GetParentUuid())\n"
 					appendStr += "		if parent != nil {\n"
 
@@ -675,7 +676,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					appendStr += "	val.SetParentLnk(\"M_" + attributeName + "\")\n"
 					appendStr += "  this.setEntity(val)\n"
 				}
-				appendStr += "	this.M_" + attributeName + " = append(this.M_" + attributeName + ", val.GetUuid())\n"
 				appendStr += "	this.setEntity(this)\n"
 			}
 			appendStr += "}\n"
@@ -838,7 +838,7 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	classStr += "	 * Set the function GetEntityByUuid as a pointer. The entity manager can't\n"
 	classStr += "	 * be access by Entities package...\n"
 	classStr += "	 */\n"
-	classStr += "	 SetEntityGetter(func(uuid string) (interface{}, error))\n\n"
+	classStr += "	SetEntityGetter(func(uuid string) (interface{}, error))\n\n"
 
 	classStr += "	/** Use it the set the entity on the cache. **/\n"
 	classStr += "	SetEntitySetter(fct func(entity interface{}))\n\n"

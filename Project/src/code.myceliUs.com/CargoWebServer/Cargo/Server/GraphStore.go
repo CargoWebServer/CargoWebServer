@@ -2267,9 +2267,9 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 			this.removeIndex(triple.Predicate, uuid, "P")
 
-			if triple.IsIndex {
-				this.removeIndex(Utility.ToString(triple.Object), uuid, "O")
-			}
+			//if triple.IsIndex {
+			this.removeIndex(Utility.ToString(triple.Object), uuid, "O")
+			//}
 
 			sp := Utility.GenerateUUID(triple.Subject + ":" + triple.Predicate)
 			this.removeIndex(sp, uuid, "SP")
