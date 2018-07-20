@@ -394,6 +394,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 					var valMap map[string]interface{}
 					err = json.Unmarshal([]byte(val), &valMap)
 					if err == nil {
+						log.Println("----> MessageProcessor line 397: ", valMap)
 						p, err := Utility.InitializeStructure(valMap, setEntityFct)
 						if err != nil {
 							log.Println("Error:", err)

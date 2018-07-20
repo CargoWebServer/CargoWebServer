@@ -278,9 +278,8 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 
 		// Verify if the password is correct
 		if _, ok := GetServer().GetLdapManager().getConfigsInfo()[serverId]; ok {
-			if GetServer().GetLdapManager().authenticate(serverId, account.M_id, psswd) == false {
-				if account.M_password != psswd {
-
+			if account.M_password != psswd {
+				if GetServer().GetLdapManager().authenticate(serverId, account.M_id, psswd) == false {
 					// Create the error message
 					cargoError := NewError(Utility.FileLine(), PASSWORD_MISMATCH_ERROR, SERVER_ERROR_CODE, errors.New("The password '"+psswd+"' does not match the account name '"+accountName+"'. "))
 					GetServer().reportErrorMessage(messageId, sessionId, cargoError)
