@@ -17,6 +17,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
+
 	//"github.com/skratchdot/open-golang/open"
 	"os/exec"
 	"runtime"
@@ -442,7 +443,7 @@ func (this *Server) Start() {
 
 							err = json.Unmarshal([]byte(val), &values)
 							if err == nil {
-								p, err := Utility.InitializeStructures(values.([]interface{}), param.GetTypeName())
+								p, err := Utility.InitializeStructures(values.([]interface{}), param.GetTypeName(), setEntityFct)
 								if err == nil {
 									results = append(results, p.Interface())
 								} else {
@@ -456,7 +457,7 @@ func (this *Server) Start() {
 							var valMap map[string]interface{}
 							err = json.Unmarshal([]byte(val), &valMap)
 							if err == nil {
-								p, err := Utility.InitializeStructure(valMap)
+								p, err := Utility.InitializeStructure(valMap, setEntityFct)
 								if err != nil {
 									log.Println("Error:", err)
 									results = append(results, valMap)

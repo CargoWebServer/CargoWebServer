@@ -173,7 +173,7 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 
 				// Set the TYPENAME property here.
 				results[0]["TYPENAME"] = "Server.EntityPrototype"
-				value, err := Utility.InitializeStructure(results[0])
+				value, err := Utility.InitializeStructure(results[0], setEntityFct)
 				if err != nil {
 					resultsChan <- err
 				} else {
@@ -304,7 +304,7 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 
 				// Set the TYPENAME property here.
 				results[0]["TYPENAME"] = "Server.EntityPrototype"
-				value, err := Utility.InitializeStructure(results[0])
+				value, err := Utility.InitializeStructure(results[0], setEntityFct)
 				if err != nil {
 					resultsChan <- err
 				} else {
@@ -1297,7 +1297,7 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 
 				// Set the TYPENAME property here.
 				results[0]["TYPENAME"] = "Server.EntityPrototype"
-				value, err := Utility.InitializeStructure(results[0])
+				value, err := Utility.InitializeStructure(results[0], setEntityFct)
 				if err != nil {
 					resultsChan <- err
 				} else {
@@ -1408,7 +1408,7 @@ func (this *GraphStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 				for i := 0; i < len(results[0]); i++ {
 					// Set the TYPENAME property here.
 					results[0][i]["TYPENAME"] = "Server.EntityPrototype"
-					values, err := Utility.InitializeStructure(results[0][i])
+					values, err := Utility.InitializeStructure(results[0][i], setEntityFct)
 					if err == nil {
 						prototypes = append(prototypes, values.Interface().(*EntityPrototype))
 					}
@@ -1539,7 +1539,7 @@ func (this *GraphStore) Connect() error {
 					return
 				}
 				results[0]["TYPENAME"] = "CargoEntities.Session"
-				values, err := Utility.InitializeStructure(results[0])
+				values, err := Utility.InitializeStructure(results[0], setEntityFct)
 
 				if err == nil {
 					resultsChan <- values.Interface().(*CargoEntities.Session)

@@ -1047,7 +1047,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 	var entities []Entity
 	for i := 0; i < len(infos.Data); i++ {
 		values := infos.Data[i].(map[string]interface{})
-		value, err := Utility.InitializeStructure(values)
+		value, err := Utility.InitializeStructure(values, setEntityFct)
 		obj := value.Interface()
 
 		if err == nil {

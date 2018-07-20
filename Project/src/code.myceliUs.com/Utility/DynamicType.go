@@ -137,15 +137,15 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 /**
  * Create an instance of the type with it name.
  */
-func MakeInstance(typeName string, data map[string]interface{}) reflect.Value {
-	value := initializeStructureValue(typeName, data)
+func MakeInstance(typeName string, data map[string]interface{}, setEntity func(interface{})) reflect.Value {
+	value := initializeStructureValue(typeName, data, setEntity)
 	return value
 }
 
 /**
  * Intialyse the struct fields with the values contain in the map.
  */
-func initializeStructureValue(typeName string, data map[string]interface{}) reflect.Value {
+func initializeStructureValue(typeName string, data map[string]interface{}, setEntity func(interface{})) reflect.Value {
 	// Here I will create the value...
 	t := typeRegistry[typeName]
 	if t == nil {
@@ -167,12 +167,12 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 							// Here i have a sub-value.
 							case map[string]interface{}:
 								if v_["TYPENAME"] != nil {
-									fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
+									fv = initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
 									if fv.IsValid() {
 										// Here I got an dynamic data type.
-										setMethodName := strings.Replace(name, "M_", "", -1)
-										setMethodName = "Append" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
-										CallMethod(v.Interface(), setMethodName, []interface{}{fv.Interface()})
+										setEntity(fv.Interface())
+										// I will set the reference in the parent object.
+										v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), reflect.ValueOf(v_["UUID"].(string))))
 									}
 								}
 							default:
@@ -294,12 +294,12 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 					}
 				}
 			case reflect.Struct:
-				fv, _ := InitializeStructure(value.(map[string]interface{}))
+				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 				if fv.IsValid() {
 					v.Elem().FieldByName(name).Set(fv.Elem())
 				}
 			case reflect.Ptr:
-				fv, _ := InitializeStructure(value.(map[string]interface{}))
+				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 				if fv.IsValid() {
 					v.Elem().FieldByName(name).Set(fv)
 				}
@@ -308,12 +308,12 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 				if reflect.TypeOf(value).String() == "map[string]interface {}" {
 					if typeName_, ok := value.(map[string]interface{})["TYPENAME"]; ok {
 						if _, ok := typeRegistry[typeName_.(string)]; ok {
-							fv, _ := InitializeStructure(value.(map[string]interface{}))
+							fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 							if fv.IsValid() {
 								// Here I got an dynamic data type.
-								setMethodName := strings.Replace(name, "M_", "", -1)
-								setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
-								CallMethod(v.Interface(), setMethodName, []interface{}{fv.Interface()})
+								setEntity(fv.Interface())
+								// I will set the reference in the parent object.
+								v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
 							}
 						} else {
 							// Here it's a dynamic entity...
@@ -324,14 +324,14 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 					}
 				}
 			case reflect.Map:
-				fv, _ := InitializeStructure(value.(map[string]interface{}))
+				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 				if fv.IsValid() {
 					v.Elem().FieldByName(name).Set(fv.Elem())
 				}
 
 			default:
 				if reflect.TypeOf(value).String() == "map[string]interface {}" {
-					fv, _ := InitializeStructure(value.(map[string]interface{}))
+					fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 					if fv.IsValid() {
 						v.Elem().FieldByName(name).Set(fv.Elem())
 					}
@@ -355,7 +355,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
  * Initialyse an array of structures, return it as interface (array of the actual
  * objects)
  */
-func InitializeStructures(data []interface{}, typeName string) (reflect.Value, error) {
+func InitializeStructures(data []interface{}, typeName string, setEntity func(interface{})) (reflect.Value, error) {
 	// Here I will get the type name, only dynamic type can be use here...
 	var values reflect.Value
 	if len(data) > 0 {
@@ -364,7 +364,7 @@ func InitializeStructures(data []interface{}, typeName string) (reflect.Value, e
 			if typeName_, ok := data[0].(map[string]interface{})["TYPENAME"]; ok {
 				// Now I will create empty structure and initialyse it with the value found in the map values.
 				for i := 0; i < len(data); i++ {
-					obj := MakeInstance(typeName_.(string), data[i].(map[string]interface{}))
+					obj := MakeInstance(typeName_.(string), data[i].(map[string]interface{}), setEntity)
 					if i == 0 {
 						if len(typeName) == 0 {
 							values = reflect.MakeSlice(reflect.SliceOf(obj.Type()), 0, 0)
@@ -429,12 +429,12 @@ func FromBytes(data []byte, typeName string) (interface{}, error) {
 /**
  * Initialyse a single object from it value.
  */
-func InitializeStructure(data map[string]interface{}) (reflect.Value, error) {
+func InitializeStructure(data map[string]interface{}, setEntity func(interface{})) (reflect.Value, error) {
 	// Here I will get the type name, only dynamic type can be use here...
 	var value reflect.Value
 	if typeName, ok := data["TYPENAME"]; ok {
 		if _, ok := typeRegistry[typeName.(string)]; ok {
-			value = MakeInstance(typeName.(string), data)
+			value = MakeInstance(typeName.(string), data, setEntity)
 			return value, nil
 		} else {
 			// Return the value itself...

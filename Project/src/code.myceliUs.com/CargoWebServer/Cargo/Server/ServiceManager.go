@@ -778,7 +778,7 @@ func (this *ServiceManager) registerAction(methodName string, parameters []inter
 	var results_ []*CargoEntities.Parameter
 
 	// Initialyse the parameters object of not already intialyse.
-	values, err := Utility.InitializeStructures(parameters, "CargoEntities.Parameter")
+	values, err := Utility.InitializeStructures(parameters, "CargoEntities.Parameter", setEntityFct)
 
 	if err == nil {
 		parameters_ = values.Interface().([]*CargoEntities.Parameter)
@@ -788,7 +788,7 @@ func (this *ServiceManager) registerAction(methodName string, parameters []inter
 		}
 	}
 
-	values, err = Utility.InitializeStructures(results, "CargoEntities.Parameter")
+	values, err = Utility.InitializeStructures(results, "CargoEntities.Parameter", setEntityFct)
 	if err == nil {
 		results_ = values.Interface().([]*CargoEntities.Parameter)
 	} else {

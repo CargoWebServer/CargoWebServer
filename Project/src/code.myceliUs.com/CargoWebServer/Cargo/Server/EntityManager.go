@@ -307,7 +307,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 	// Create a triple...
 	values := FromTriples(results)
-	obj, err := Utility.InitializeStructure(values)
+	obj, err := Utility.InitializeStructure(values, setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.
 	// prototype, _ := this.getEntityPrototype(typeName, storeId)
@@ -839,7 +839,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 	// Cast it as needed...
 	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
 		prototype.(map[string]interface{})["TYPENAME"] = "Server.EntityPrototype"
-		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
+		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}), setEntityFct)
 		if err == nil {
 			prototype = values.Interface()
 		}
@@ -917,7 +917,7 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 	// Cast it as needed...
 	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
 		prototype.(map[string]interface{})["TYPENAME"] = "Server.EntityPrototype"
-		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
+		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}), setEntityFct)
 		if err == nil {
 			prototype = values.Interface()
 		} else {
@@ -1483,7 +1483,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 	}
 
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
-		obj, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		obj, err := Utility.InitializeStructure(values.(map[string]interface{}), setEntityFct)
 		if err == nil {
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.
@@ -1578,7 +1578,7 @@ func (this *EntityManager) SaveEntity(values interface{}, messageId string, sess
 	}
 
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
-		obj, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		obj, err := Utility.InitializeStructure(values.(map[string]interface{}), setEntityFct)
 		if err == nil {
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.

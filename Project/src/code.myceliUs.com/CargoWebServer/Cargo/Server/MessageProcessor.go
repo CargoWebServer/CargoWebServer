@@ -368,7 +368,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 					err = json.Unmarshal([]byte(val), &values)
 					if err == nil {
-						p, err := Utility.InitializeStructures(values.([]interface{}), param.GetTypeName())
+						p, err := Utility.InitializeStructures(values.([]interface{}), param.GetTypeName(), setEntityFct)
 						if err == nil {
 							a.Params = append(a.Params, p.Interface())
 						} else {
@@ -394,7 +394,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 					var valMap map[string]interface{}
 					err = json.Unmarshal([]byte(val), &valMap)
 					if err == nil {
-						p, err := Utility.InitializeStructure(valMap)
+						p, err := Utility.InitializeStructure(valMap, setEntityFct)
 						if err != nil {
 							log.Println("Error:", err)
 							a.Params = append(a.Params, valMap)
