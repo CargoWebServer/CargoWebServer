@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"time"
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/BPMS"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
 )
@@ -20,50 +21,48 @@ const (
 	LoginEvent                     = 4
 	LogoutEvent                    = 5
 	StateChangeEvent               = 6
-	WorkflowEvent                  = "WorkflowEvent"
-	NewBpmsInstanceEvent           = 7
-	UpdateBpmsInstanceEvent        = 8
-	DeleteBpmsInstanceEvent        = 9
-	NewBpmnDefinitionsEvent        = 10
-	DeleteBpmnDefinitionsEvent     = 11
-	UpdateBpmnDefinitionsEvent     = 12
 	EntityEvent                    = "EntityEvent"
-	NewEntityEvent                 = 13
-	UpdateEntityEvent              = 14
-	DeleteEntityEvent              = 15
-	OpenEntityEvent                = 16
-	CloseEntityEvent               = 17
+	NewEntityEvent                 = 7
+	UpdateEntityEvent              = 8
+	DeleteEntityEvent              = 9
+	OpenEntityEvent                = 10
+	CloseEntityEvent               = 11
 	FileEvent                      = "FileEvent"
-	NewFileEvent                   = 18
-	DeleteFileEvent                = 19
-	UpdateFileEvent                = 20
-	OpenFileEvent                  = 21
-	CloseFileEvent                 = 22
-	FileEditEvent                  = 23
+	NewFileEvent                   = 12
+	DeleteFileEvent                = 13
+	UpdateFileEvent                = 14
+	OpenFileEvent                  = 15
+	CloseFileEvent                 = 16
+	FileEditEvent                  = 17
 	DataEvent                      = "DataEvent"
-	DeleteRowEvent                 = 24
-	NewRowEvent                    = 25
-	UpdateRowEvent                 = 26
-	NewDataStoreEvent              = 27
-	DeleteDataStoreEvent           = 28
+	DeleteRowEvent                 = 18
+	NewRowEvent                    = 19
+	UpdateRowEvent                 = 20
+	NewDataStoreEvent              = 21
+	DeleteDataStoreEvent           = 22
 	SecurityEvent                  = "SecurityEvent"
-	NewRoleEvent                   = 29
-	DeleteRoleEvent                = 30
-	UpdateRoleEvent                = 31
+	NewRoleEvent                   = 23
+	DeleteRoleEvent                = 24
+	UpdateRoleEvent                = 25
 	PrototypeEvent                 = "PrototypeEvent"
-	NewPrototypeEvent              = 32
-	UpdatePrototypeEvent           = 33
-	DeletePrototypeEvent           = 34
+	NewPrototypeEvent              = 26
+	UpdatePrototypeEvent           = 27
+	DeletePrototypeEvent           = 28
 	ProjectEvent                   = "ProjectEvent"
 	EmailEvent                     = "EmailEvent"
 	ServiceEvent                   = "ServiceEvent"
 	ConfigurationEvent             = "ConfigurationEvent"
-	NewTaskEvent                   = 35
-	UpdateTaskEvent                = 36
+	NewTaskEvent                   = 29
+	UpdateTaskEvent                = 30
 	EventEvent                     = "EventEvent"
 	LdapEvent                      = "LdapEvent"
 	OAuth2Event                    = "OAuth2Event"
 	SchemaEvent                    = "SchemaEvent"
+	WorkflowEvent                  = "WorkflowEvent"
+	NewBpmnDefinitionsEvent        = 31
+	DeleteBpmnDefinitionsEvent     = 32
+	UpdateBpmnDefinitionsEvent     = 33
+	StartProcessEvent              = 34
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +148,6 @@ func newEventManager() *EventManager {
 				} else if op["op"] == "GetFileEditEvents" {
 					uuid := op["uuid"].(string)
 					op["events"].(chan interface{}) <- eventManager.m_fileEditEvents[uuid+"_editor"]
-
 				} else if op["op"] == "removeClosedListener" {
 					for _, channel := range eventManager.m_channels {
 						for _, listener := range channel.m_listeners {
@@ -209,6 +207,17 @@ func newEventManager() *EventManager {
 
 									// Keep the edit event in memory.
 									eventManager.m_fileEditEvents[evt.GetName()] = append(eventManager.m_fileEditEvents[evt.GetName()], data0)
+								}
+							}
+						} else if eventNumber == StartProcessEvent {
+							for i := 0; i < len(evt.GetEvtData()); i++ {
+								var trigger BPMS.Trigger
+								err := json.Unmarshal(evt.GetEvtData()[i].GetDataBytes(), &trigger)
+								GetServer().GetEntityManager().setEntity(&trigger)
+								if err == nil {
+									// So from the start event data i will create the item aware element
+									// and set is data...
+									GetServer().GetWorkflowProcessor().triggerChan <- &trigger
 								}
 							}
 						}
@@ -333,10 +342,13 @@ func (this *EventManager) removeClosedListener() {
 type EventListener struct {
 	// uuid
 	m_id string
+
 	// the type of event, use by channel
 	m_eventName string
+
 	// the listener addresse...
-	m_addr    *WebSocketConnection
+	m_addr *WebSocketConnection
+
 	m_filters []string
 
 	m_opChannel chan map[string]interface{}
@@ -594,7 +606,7 @@ func (this *EventManager) RemoveEventListener(id string, name string) {
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @scope {public}
-func (this *EventManager) BroadcastEventData(eventNumber int64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
+func (this *EventManager) BroadcastNetworkEvent(eventNumber int64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
 	// Create the new event objet...
 	evt, _ := NewEvent(int32(eventNumber), channelId, eventDatas.([]*MessageData))
 

@@ -1,5 +1,5 @@
 // Contain various object constructor function for bpmn data
-BpmnsData = {}
+BpmsData = {}
 
 /**
  * That class is use to create bpmn data view.
@@ -43,7 +43,7 @@ BpmnDataView.prototype.init = function () {
     // first of all I will generate an entity prototype
     // from the data array.
     if (this.dataInputs != undefined) {
-        var typeName = "BpmnsData.DataInput_" + this.UUID.replaceAll("-", "_")
+        var typeName = "BpmsData.DataInput_" + this.UUID.replaceAll("-", "_")
         this.generateEntityPrototype(this.dataInputs, typeName,
             // The callback...
             function (dataView) {
@@ -66,7 +66,7 @@ BpmnDataView.prototype.init = function () {
     }
 
     if (this.dataOutputs != undefined) {
-        var typeName = "BpmnsData.DataOutput_" + this.UUID.replaceAll("-", "_")
+        var typeName = "BpmsData.DataOutput_" + this.UUID.replaceAll("-", "_")
         this.generateEntityPrototype(this.dataOutputs, typeName,
             // The callback...
             function (dataView) {
@@ -89,7 +89,7 @@ BpmnDataView.prototype.init = function () {
     }
     
     if (this.properties != undefined) {
-        var typeName = "BpmnsData.Properties_" + this.UUID.replaceAll("-", "_")
+        var typeName = "BpmsData.Properties_" + this.UUID.replaceAll("-", "_")
         this.generateEntityPrototype(this.properties, typeName,
             // The callback...
             function (dataView) {
@@ -210,7 +210,7 @@ BpmnDataView.prototype.save = function (callback) {
     function saveData(bpmnView,entity, callback) {
         
         function saveField(ids,fields,fieldType, index, callback, itemAwareInstances){
-             var data = entity[fields[index+3]]
+            var data = entity[fields[index+3]]
             var fieldType = fieldType[index+3]
             var isArray = fieldType.startsWith("[]")
             var dataStr = ""
@@ -233,17 +233,10 @@ BpmnDataView.prototype.save = function (callback) {
                     dataStr = data
                 }
             }
-            if(itemAwareInstances.find(x => x.M_name == fields[index+3].substring(2)) != undefined){
-                var itemAwareElementInstance = itemAwareInstances.find(x => x.M_name == fields[index+3].substring(2))
-                itemAwareElementInstance.M_data = dataStr
-                if (index == fields.length - 4) {
-                    callback(itemAwareInstances,bpmnView.instance)
-                }else{
-                    saveField(ids,fields,fieldType, index + 1, callback, itemAwareInstances)
-                }
-                
-            }else{
-                 // Now I will create the itemaware element...
+            
+            var itemAwareElementInstance
+            if(itemAwareInstances.find(x => x.M_name == fields[index+3].substring(2)) == undefined){
+                // Now I will create the itemaware element...
                 server.workflowProcessor.newItemAwareElementInstance(ids[index], dataStr,
                     function (result, caller) {
                         caller.itemAwareInstances.push(result)
@@ -255,7 +248,17 @@ BpmnDataView.prototype.save = function (callback) {
                     },
                     function () { },
                     { "itemAwareInstances": itemAwareInstances, "instance" : bpmnView.instance, "index" : index, "fields" : fields, "callback":callback,"ids" :ids, "fieldType" : fieldType })
+            }else{
+                itemAwareElementInstance = itemAwareInstances.find(x => x.M_name == fields[index+3].substring(2))
+                itemAwareElementInstance.M_data = dataStr
+                if (index == fields.length - 4) {
+                    callback(itemAwareInstances,bpmnView.instance)
+                }else{
+                    saveField(ids,fields,fieldType, index + 1, callback, itemAwareInstances)
+                }
             }
+            
+ 
            
         }
         

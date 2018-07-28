@@ -632,7 +632,17 @@ function setObjectValues(object, values, lazy) {
                     if (property.startsWith("[]M_") || property.startsWith("M_")) {
                         if (isArray_) {
                             if (lazy) {
-                                object[property] = values[property]
+                               // object[property] = values[property]
+                               for(var i=0; i < values[property].length; i++){
+                                    object[property][i] = values[property][i]
+                                    // Set with local object if there is one available.
+                                    if(isObjectReference(values[property][i])){
+                                        var uuid = values[property][i]
+                                        if(entities[uuid]!=undefined){
+                                            object[property][i] = entities[uuid]
+                                        }
+                                    }
+                               }
                             } else {
                                 object[property] = []
                                 for (var i = 0; i < values[property].length; i++) {
@@ -657,6 +667,13 @@ function setObjectValues(object, values, lazy) {
                                     }
                                 } else {
                                     object[property] = values[property]
+                                    // Try to set the entity if is an object.
+                                    if(isObjectReference(values[property])){
+                                        var uuid = values[property]
+                                        if(entities[uuid]!=undefined){
+                                            object[property] = entities[uuid]
+                                        }
+                                    }
                                 }
                             }
                         }

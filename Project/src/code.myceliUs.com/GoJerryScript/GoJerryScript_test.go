@@ -16,9 +16,6 @@ func TestHelloJerry(t *testing.T) {
 	// Init the script engine.
 	Jerry_init(Jerry_init_flag_t(JERRY_INIT_EMPTY))
 
-	/* Register 'print' function  */
-	RegisterPrintHandler()
-
 	//str := "function add(a, b){return a+b;}; add(1, 2);"
 	str := "print ('Hello, World!');"
 	var arg0 Uint8                     // nil pointer

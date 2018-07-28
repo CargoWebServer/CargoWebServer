@@ -233,7 +233,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 							}
 
 							action.SetDoc(doc)
-							actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_actions", action)
+							actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_actions", action)
 
 							// Now the parameters.
 							parameterInfos := actionInfos[k].(map[string]interface{})["parameters"].([]interface{})
@@ -244,7 +244,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 								isArray, _ := strconv.ParseBool(parameterInfo.(map[string]interface{})["isArray"].(string))
 								parameter.SetIsArray(isArray)
 								parameter.SetType(parameterInfo.(map[string]interface{})["type"].(string))
-								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_parameters", parameter)
+								GetServer().GetEntityManager().createEntity(action, "M_parameters", parameter)
 								action.AppendParameters(parameter)
 							}
 
@@ -257,7 +257,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 								isArray, _ := strconv.ParseBool(resultInfo.(map[string]interface{})["isArray"].(string))
 								result.SetIsArray(isArray)
 								result.SetType(resultInfo.(map[string]interface{})["type"].(string))
-								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_results", result)
+								GetServer().GetEntityManager().createEntity(action, "M_results", result)
 								action.AppendResults(result)
 							}
 
@@ -365,7 +365,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 					action.SetDoc(m.Doc)
 					if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 						// Set the uuid if is not set...
-						actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_actions", action)
+						actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_actions", action)
 
 						// The input
 						for j := 0; j < method.Type.NumIn(); j++ {
@@ -391,7 +391,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 								parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 								parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
-								GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_parameters", parameter)
+								GetServer().GetEntityManager().createEntity(action, "M_parameters", parameter)
 								action.AppendParameters(parameter)
 
 							}
@@ -413,7 +413,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 							parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 							parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
-							GetServer().GetEntityManager().createEntity(action.GetUuid(), "M_results", parameter)
+							GetServer().GetEntityManager().createEntity(action, "M_results", parameter)
 							action.AppendResults(parameter)
 						}
 

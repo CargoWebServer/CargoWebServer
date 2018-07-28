@@ -109,7 +109,9 @@ func newEntityManager() *EntityManager {
 	}
 
 	setEntityFct = func(entity interface{}) {
-		GetServer().GetEntityManager().setEntity(entity.(Entity))
+		if v, ok := entity.(Entity); ok {
+			GetServer().GetEntityManager().setEntity(v)
+		}
 	}
 
 	// The Cache...
@@ -374,7 +376,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 				idsStr += ", "
 			}
 		}
-		log.Println("---> fail to retrieve: ", query)
+		//log.Println("---> fail to retrieve: ", query)
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
 		return "", errObj
 	}
@@ -382,17 +384,10 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	return results[0][0].(string), nil
 }
 
-func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *CargoEntities.Error {
+func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]interface{}) *CargoEntities.Error {
 
-	var parent Entity
 	var cargoError *CargoEntities.Error
 	var parentPrototype *EntityPrototype
-
-	// Set the parent if he is loaded in the cache.
-	parent = this.getEntity(entity.GetParentUuid())
-	if parent == nil {
-		return nil
-	}
 
 	parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
 	fieldIndex := parentPrototype.getFieldIndex(entity.GetParentLnk())
@@ -466,7 +461,7 @@ func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *Car
 		}
 	}
 
-	// I will also append the parent relationship...
+	// I will also append the parent relationship to the list of triple to be save (help to save calculation time)
 	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), true}
 	*triples = append(*triples, parentLnkTriple)
 
@@ -486,12 +481,12 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 /**
  * Create an new entity.
  */
-func (this *EntityManager) createEntity(parentUuid string, attributeName string, entity Entity) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) createEntity(parent Entity, attributeName string, entity Entity) (Entity, *CargoEntities.Error) {
 
 	// Set the entity values here.
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 	entity.SetParentLnk(attributeName)
-	entity.SetParentUuid(parentUuid)
+	entity.SetParentUuid(parent.GetUuid())
 
 	// Here I will set the entity on the cache...
 	this.setEntity(entity)
@@ -522,8 +517,9 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 		return nil, cargoError
 	}
+
 	// I will set the entity parent.
-	cargoError := this.setParent(entity, &triples)
+	cargoError := this.setParent(parent, entity, &triples)
 	if cargoError != nil {
 		return nil, cargoError
 	}
@@ -561,6 +557,30 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Set it childs...
 	this.saveChilds(entity, prototype)
 
+	// I will save the parent here.
+	if parent != nil {
+		// Also save it parent.
+		// The event data...
+		eventData := make([]*MessageData, 2)
+		msgData0 := new(MessageData)
+		msgData0.Name = "entity"
+		if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+			msgData0.Value = parent.(*DynamicEntity).getValues()
+		} else {
+			msgData0.Value = parent
+		}
+
+		eventData[0] = msgData0
+
+		msgData1 := new(MessageData)
+		msgData1.Name = "prototype"
+		msgData1.Value = prototype
+		eventData[1] = msgData1
+
+		evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+
 	return entity, nil
 }
 
@@ -596,7 +616,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Set parent entity stuff...
 	if len(entity.GetParentUuid()) > 0 {
-		cargoError := this.setParent(entity, &triples)
+		var cargoError *CargoEntities.Error
+		cargoError = this.setParent(this.getEntity(entity.GetParentUuid()), entity, &triples)
 		if cargoError != nil {
 			return cargoError
 		}
@@ -671,7 +692,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Save the changed/new triples.
 	if len(triples) > 0 {
-		log.Println("---> save entity ", entity.GetUuid())
 		_, err = store.Create("", triples)
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -1488,7 +1508,8 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.
 			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
-				_, errObj = this.createEntity(parentUuid, attributeName, obj.Interface().(Entity))
+
+				_, errObj = this.createEntity(this.getEntity(parentUuid), attributeName, obj.Interface().(Entity))
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1497,7 +1518,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			} else {
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
-				_, errObj = this.createEntity(parentUuid, attributeName, entity)
+				_, errObj = this.createEntity(this.getEntity(parentUuid), attributeName, entity)
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1510,7 +1531,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			return nil
 		}
 	} else {
-		result, errObj := this.createEntity(parentUuid, attributeName, values.(Entity))
+		result, errObj := this.createEntity(this.getEntity(parentUuid), attributeName, values.(Entity))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil

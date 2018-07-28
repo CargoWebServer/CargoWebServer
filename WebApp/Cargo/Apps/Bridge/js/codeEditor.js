@@ -503,7 +503,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
                     }
                     // Also broadcast the event over the network...
                     //server.eventHandler.broadcastEvent(evt)
-                    server.eventManager.broadcastEventData(
+                    server.eventManager.broadcastNetworkEvent(
                         FileEditEvent,
                         fileUUID + "_editor",
                         [entityInfo],

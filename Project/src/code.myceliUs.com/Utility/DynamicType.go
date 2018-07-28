@@ -139,6 +139,9 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
  */
 func MakeInstance(typeName string, data map[string]interface{}, setEntity func(interface{})) reflect.Value {
 	value := initializeStructureValue(typeName, data, setEntity)
+	if setEntity != nil {
+		setEntity(value.Interface())
+	}
 	return value
 }
 
@@ -169,10 +172,15 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 								if v_["TYPENAME"] != nil {
 									fv = initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
 									if fv.IsValid() {
-										// Here I got an dynamic data type.
-										setEntity(fv.Interface())
 										// I will set the reference in the parent object.
-										v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), reflect.ValueOf(v_["UUID"].(string))))
+										setEntity(fv.Interface())
+										if strings.HasPrefix(name, "M_") {
+											if v_["UUID"] != nil {
+												v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), reflect.ValueOf(v_["UUID"].(string))))
+											}
+										} else {
+											v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+										}
 									}
 								}
 							default:
@@ -290,10 +298,8 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 							// So here a conversion is necessary...
 							if ft.Type.String() == "[]uint8" || ft.Type.String() == "[]byte" || fv.Type().String() == "string" {
 								val := fv.String()
-								log.Println("----> encode value found: ", name, val)
 								val_, err := b64.StdEncoding.DecodeString(val)
 								if err == nil {
-									log.Println("----> decoded value: ", name, val)
 									val = string(val_)
 								}
 								// Set the value...
@@ -321,8 +327,15 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 						if _, ok := typeRegistry[typeName_.(string)]; ok {
 							fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 							if fv.IsValid() {
+								setEntity(fv.Interface())
 								// I will set the reference in the parent object.
-								v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
+								if strings.HasPrefix(name, "M_") {
+									if value.(map[string]interface{})["UUID"] != nil {
+										v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
+									}
+								} else {
+									v.Elem().FieldByName(name).Set(fv)
+								}
 							}
 						} else {
 							// Here it's a dynamic entity...
@@ -344,8 +357,15 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 						if _, ok := typeRegistry[typeName_.(string)]; ok {
 							fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
 							if fv.IsValid() {
+								setEntity(fv.Interface())
 								// I will set the reference in the parent object.
-								v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
+								if strings.HasPrefix(name, "M_") {
+									if value.(map[string]interface{})["UUID"] != nil {
+										v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
+									}
+								} else {
+									v.Elem().FieldByName(name).Set(fv)
+								}
 							}
 						} else {
 							// Here it's a dynamic entity...

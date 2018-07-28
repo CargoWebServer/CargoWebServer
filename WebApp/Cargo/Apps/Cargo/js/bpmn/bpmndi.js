@@ -218,6 +218,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement)
 		svgElement = this.drawInclusiveGateway(diagramElement)
 	} else if (typeName == "BPMN20.ExclusiveGateway") {
 		svgElement = this.drawExclusiveGateway(diagramElement)
+		svgElement.element.classList.add("ExclusiveGateway", "gateway")
 	} else if (typeName == "BPMN20.ParallelGateway") {
 		svgElement = this.drawParallelGateway(diagramElement)
 	} else if (typeName == "BPMN20.ComplexGateway") {
@@ -1110,6 +1111,8 @@ SvgDiagram.prototype.drawConnector = function (id, className, waypoints, attrs) 
 	sequenceFlow.setSvgAttribute("name", id)
 
 	group.setSvgAttribute("transform", "translate(" + startX + "," + startY + ")")
+	
+	
 	return group
 }
 
@@ -1171,6 +1174,12 @@ SvgDiagram.prototype.drawSequenceFlow = function (diagramElement) {
 			connector.element.firstElementChild.className.baseVal += " bpmndi_sequence_flow_default"
 		}
 	}
+	
+	/*connector.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+        return function (event) {
+            svgDiagram.connectorClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+        }
+	}(this.parent, diagramElement,connector, this)*/
 
 	return connector
 }
@@ -1344,7 +1353,7 @@ SvgDiagram.prototype.drawGateway = function (diagramElement) {
 
 	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
 	var bpmnElement = entities[diagramElement.M_bpmnElement]
-	group.setSvgAttribute("name", bpmnElement.UUID)
+	
 
 	var x = 0
 	var y = 0
@@ -1361,8 +1370,15 @@ SvgDiagram.prototype.drawGateway = function (diagramElement) {
 	pt3_y = y
 
 	var polygon = new SVG_Polygon(group, diagramElement.UUID, "bpmndi_shape bpmndi_gateway", [pt0_x, pt0_y, pt1_x, pt1_y, pt2_x, pt2_y, pt3_x, pt3_y])
+	polygon.setSvgAttribute("name", bpmnElement.UUID)
 	this.svgElements[bpmnElement.UUID] = polygon
 	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
+
+    group.element.firstElementChild.onclick = function (parent, diagramElement,group,svgDiagram) {
+		return function (event) {
+            svgDiagram.gatewayClick(parent, diagramElement, group, svgDiagram, event, entities[diagramElement.M_bpmnElement])
+		}
+	}(this.parent, diagramElement,group, this)
 
 	return group
 }
@@ -1527,4 +1543,8 @@ SvgDiagram.prototype.dataObjectReferenceClick = function(parent, diagramElement,
 SvgDiagram.prototype.dataInputClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
 
 SvgDiagram.prototype.dataOutputClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.connectorClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
+
+SvgDiagram.prototype.gatewayClick = function(parent, diagramElement, group, svgDiagram, event, bpmnElement){}
 

@@ -85,3 +85,7 @@
     border:1px solid white;
     
 }
+
+.passedConnector{
+    stroke:grey!important;
+}

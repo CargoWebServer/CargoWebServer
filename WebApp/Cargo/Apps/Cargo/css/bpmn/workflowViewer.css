@@ -3,6 +3,11 @@
 	padding: 10px*/
 	height: auto;
 }
+.inactive{
+    fill: rgb(59, 59, 59)!important;
+    stroke:black!important;
+}
+
 
 .workflow-definition-view {
 	padding: 20px 10px 20px 10px;
@@ -145,6 +150,16 @@
 	filter: url(#glow);
 }
 
+.workflow-viewer .gateway {
+	/** The style are define in the filters file... **/
+	filter: url(#shadow);
+}
+
+.workflow-viewer .gateway:hover {
+	/** The style are define in the filters file... **/
+	filter: url(#glow);
+}
+
 .workflow-viewer .svg_text{
 
 }
@@ -155,7 +170,13 @@
 
 .workflow-viewer .event.StartEvent circle,
 .workflow-viewer .event.EndEvent circle {
-	stroke: gray;
+	stroke:gray;
+	stroke-width: 2;
+}
+
+.workflow-viewer .gateway.ExclusiveGateway polygon,
+.workflow-viewer .gateway.InclusiveGateway polygon {
+	stroke:gray;
 	stroke-width: 2;
 }
 
@@ -166,13 +187,18 @@
 .workflow-viewer .activity.ScriptTask rect,
 .workflow-viewer .activity.Task rect,
 .workflow-viewer .activity.UserTask rect {
-	stroke: gray;
+	stroke:gray;
 	stroke-width: 2;
 }
 
-/** Completed state **/
 .workflow-viewer .event.StartEvent circle:hover,
 .workflow-viewer .event.EndEvent circle:hover{
+	cursor: pointer;
+	stroke: black;
+}
+
+.workflow-viewer .gateway.ExclusiveGateway polygon:hover,
+.workflow-viewer .gateway.InclusiveGateway polygon:hover{
 	cursor: pointer;
 	stroke: black;
 }
@@ -191,7 +217,7 @@
 .workflow-viewer .completed{
     border: 2px solid gray;
     /*fill: url(#greyGradient);*/
-    fill: rgb(45, 45, 45); /* grey */
+    fill: rgb(45, 45, 45)!important; /* grey */
 }
 
 .workflow-viewer .event.completed.StartEvent circle{
@@ -215,9 +241,16 @@
 .workflow-viewer .activity.completed.ScriptTask rect,
 .workflow-viewer .activity.completed.Task rect,
 .workflow-viewer .activity.completed.UserTask rect {
-	stroke: gray; /* gray */
-	/*fill: url(#greyGradient);*/
-	fill: rgb(45, 45, 45); /* grey */
+	stroke:gray!important; /* gray */
+	fill: rgb(45, 45, 45)!important; /* grey */
+	fill-opacity: 1!important;
+}
+
+.workflow-viewer .gateway.completed.ExclusiveGateway polygon,
+.workflow-viewer .gateway.completed.InclusiveGateway polygon {
+	stroke:gray!important; /* gray */
+	fill: rgb(45, 45, 45)!important; /* grey */
+	fill-opacity: 1!important;
 }
 
 /** Canceled state **/
@@ -246,6 +279,19 @@
 	-moz-animation: canceled-pulse 3s infinite;
 	animation: canceled-pulse 3s infinite;
 	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
+}
+
+.workflow-viewer .gateway.canceled.ExclusiveGateway polygon,
+.workflow-viewer .gateway.canceled.InclusiveGateway polygon{
+	stroke: hsl(350, 92%, 50%); /* red */
+	-webkit-animation: canceled-pulse 3s infinite;
+	-moz-animation: canceled-pulse 3s infinite;
+	animation: canceled-pulse 3s infinite;
+	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
 }
 
 @keyframes canceled-pulse {
@@ -286,6 +332,19 @@
 	-moz-animation: waiting-pulse 3s infinite;
 	animation: waiting-pulse 3s infinite;
 	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
+}
+
+.workflow-viewer .gateway.waiting.ExclusiveGateway polygon,
+.workflow-viewer .gateway.waiting.InclusiveGateway polygon{
+	stroke: hsl(30, 92%, 50%); /* red */
+	-webkit-animation: waiting-pulse 3s infinite;
+	-moz-animation: waiting-pulse 3s infinite;
+	animation: waiting-pulse 3s infinite;
+	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
 }
 
 @keyframes waiting-pulse {
@@ -327,6 +386,19 @@
 	-moz-animation: ready-pulse 3s infinite;
 	animation: ready-pulse 3s infinite;
 	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
+}
+
+.workflow-viewer .gateway.ready.ExclusiveGateway polygon,
+.workflow-viewer .gateway.ready.InclusiveGateway polygon{
+	stroke: hsl(121, 62%, 73%); /* green */
+	-webkit-animation: ready-pulse 3s infinite;
+	-moz-animation: ready-pulse 3s infinite;
+	animation: ready-pulse 3s infinite;
+	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
 }
 
 @keyframes ready-pulse {
@@ -368,6 +440,19 @@
 	-moz-animation: active-pulse 3s infinite;
 	animation: active-pulse 3s infinite;
 	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
+}
+
+.workflow-viewer .gateway.active.ExclusiveGateway polygon,
+.workflow-viewer .gateway.active.InclusiveGateway polygon{
+	stroke: hsl(194, 66%, 70%); /* blue */
+	-webkit-animation: active-pulse 3s infinite;
+	-moz-animation: active-pulse 3s infinite;
+	animation: active-pulse 3s infinite;
+	stroke-width: 3;
+	fill-opacity: 1!important;
+	fill: white!important;
 }
 
 @keyframes active-pulse {
@@ -400,3 +485,5 @@
 .tabbable{
 	border: 1px solid lightgray;
 }
+
+

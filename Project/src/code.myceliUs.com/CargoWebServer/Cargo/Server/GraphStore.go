@@ -2254,7 +2254,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {
-			log.Println("remove triple: ", triples[i])
+			//log.Println("remove triple: ", triples[i])
 			err = this.removeTriple(uuid)
 			if err != nil {
 				log.Println("---> fail to remove triple, ", triples[i])

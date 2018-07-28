@@ -54,7 +54,7 @@ func (this *AccountManager) initialize() {
 		account.M_password = "adminadmin"
 		account.M_name = "admin"
 		account.M_email = ""
-		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", account)
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", account)
 		if err != nil {
 			log.Panicln("--> create account admin: ", err)
 		}
@@ -69,7 +69,7 @@ func (this *AccountManager) initialize() {
 		account.M_password = "guest"
 		account.M_name = "guest"
 		account.M_email = ""
-		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", account)
+		_, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", account)
 		if err != nil {
 			log.Panicln("--> create account admin: ", err)
 		}

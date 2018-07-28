@@ -375,7 +375,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 							//log.Println("Error:", err)
 							// Here I will try to create a the array of object.
 							if err.Error() == "NotDynamicObject" {
-								//log.Println("-----> value: ", values, "type name: ", param.GetTypeName())
 								p, err := Utility.InitializeArray(values.([]interface{}))
 								if err == nil {
 									if p.IsValid() {
@@ -394,7 +393,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 					var valMap map[string]interface{}
 					err = json.Unmarshal([]byte(val), &valMap)
 					if err == nil {
-						log.Println("----> MessageProcessor line 397: ", valMap)
 						p, err := Utility.InitializeStructure(valMap, setEntityFct)
 						if err != nil {
 							log.Println("Error:", err)

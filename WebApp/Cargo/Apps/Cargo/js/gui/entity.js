@@ -224,7 +224,7 @@ var EntityPanelHeader = function (parent) {
 	this.shrinkBtn.appendElement({ "tag": "i", "class": "fa fa-caret-down" }).down()
 	this.title = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_title" }).down()
 	this.deleteBtn = this.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button enabled"/*, "style": "display: none;"*/ }).down()
-	this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-trash" })
+	.appendElement({ "tag": "i", "class": "fa fa-trash" })
 
 	// Now the event...
 	this.expandBtn.element.onclick = function (header, entityPanel) {
@@ -249,34 +249,36 @@ var EntityPanelHeader = function (parent) {
 		}
 	}(this, parent)
 
-	this.deleteBtn.element.onclick = function (entityPanel) {
+	this.deleteBtn.element.firstElementChild.onclick = function (entityPanel) {
 		return function () {
+		    
 			// Here I will save the entity...
-			if (entityPanel.getEntity() != null) {
+			if (entityPanel.entityUuid != null) {
 				// Here I will ask the user if here realy want to remove the entity...
 				var confirmDialog = new Dialog(randomUUID(), undefined, true)
 				confirmDialog.div.element.style.maxWidth = "450px"
 				confirmDialog.setCentered()
 				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.getEntity().getTitles() + "?" })
+				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.header.title.element.innerText + "?" })
 
+                
+                
 				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
 					return function () {
-						// I will call delete file
-						server.entityManager.removeEntity(entityPanel.getEntity().UUID,
-							// Success callback 
-							function (result, caller) {
-							},
-							// Error callback
-							function (errMsg, caller) {
-
-							}, entityPanel)
-						dialog.close()
+					    server.entityManager.getEntityByUuid(entityPanel.entityUuid,false,
+					        function(entity,entityPanel){
+					            var evt = { "code": DeleteEntityEvent, "name": EntityEvent, "dataMap": { "entity": entity, "prototype" : getEntityPrototype(entityPanel.typeName) } }
+        				        server.eventHandler.broadcastLocalEvent(evt)
+        						dialog.close()
+					        },function(){}, entityPanel)
+					    
 					}
 				}(confirmDialog, entityPanel)
 			}
 		}
 	}(parent)
+	
+
 
 	return this;
 }
@@ -833,6 +835,7 @@ var FieldEditor = function (fieldPanel, callback) {
 	}else if (fieldType.endsWith(":Ref")){
 	    if(fieldType.startsWith("[]")){
 	        // An array of reference
+	        alert("ooooo")
 	    }else{
 	        // A single reference
 	        // So here I will display the auto complete input.

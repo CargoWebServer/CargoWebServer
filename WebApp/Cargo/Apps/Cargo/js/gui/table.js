@@ -1144,7 +1144,11 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
  * @param {*} ref 
  */
 function renderRef(div, ref, fieldName, refOwner) {
-	var refDiv = div.appendElement({ "tag": "div", "style": "width: 100%;" }).down()
+    
+    if(div.getChildById(ref) != null){
+        return;
+    }
+	var refDiv = div.appendElement({ "tag": "div", "style": "width: 100%;", "id" : ref }).down()
 	var typeName = ref.split("%")[0]
 	new EntityPanel(refDiv, typeName,
 		function (ref, fieldName, refOwner) {
@@ -1290,14 +1294,20 @@ function createAppendRefBtn(parent, fieldName, fieldType, refOwner) {
 						} else {
 							refOwner[fieldName] = uuid
 						}
-						// So here if the value has change in the reference owner it will be saved.
-						server.entityManager.saveEntity(refOwner,
-							function () {
-
-							},
-							function () {
-
-							}, {})
+						if(refOwner.TYPENAME.startsWith("BpmsData")){
+						    var evt = { "code": UpdateEntityEvent, "name": EntityEvent, "dataMap": { "entity": refOwner, "prototype" : getEntityPrototype(refOwner.TYPENAME) } }
+				            server.eventHandler.broadcastLocalEvent(evt)
+						}else{
+						    // So here if the value has change in the reference owner it will be saved.
+    						server.entityManager.saveEntity(refOwner,
+    							function () {
+    
+    							},
+    							function (error) {
+                                    console.log(error)
+    							}, {})
+						}
+						
 						refSelector.element.blur()
 					}
 				}(uuidByIds, refOwner, fieldName, refSelector)

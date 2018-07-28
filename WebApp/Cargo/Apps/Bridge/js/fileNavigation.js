@@ -174,7 +174,7 @@ var FileNavigator = function (parent) {
         }
 
         // Also broadcast the event over the network...
-        server.eventManager.broadcastEventData(
+        server.eventManager.broadcastNetworkEvent(
             CloseFileEvent,
             evt.dataMap.fileId + "_editor",
             [entityInfo],

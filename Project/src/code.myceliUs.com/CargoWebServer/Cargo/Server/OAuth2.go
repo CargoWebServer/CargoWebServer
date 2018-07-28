@@ -224,7 +224,7 @@ func (this *OAuth2Manager) start() {
 		cfg.SetPrivateKey(fileName)
 
 		// Create the new configuration entity.
-		GetServer().GetEntityManager().createEntity(activeConfigurations.GetUuid(), "M_oauth2Configuration", cfg)
+		GetServer().GetEntityManager().createEntity(activeConfigurations, "M_oauth2Configuration", cfg)
 
 	} else {
 		sconfig = osin.NewServerConfig()
@@ -758,7 +758,7 @@ func addExpireAtData(code string, expireAt time.Time) error {
 		expire.SetId(code)
 
 		// append to config.
-		expireEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_expire", expire)
+		expireEntity, _ = GetServer().GetEntityManager().createEntity(configEntity, "M_expire", expire)
 
 	} else {
 		expire = expireEntity.(*Config.OAuth2Expires)
@@ -818,7 +818,7 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 				access.SetId(jr["access_token"].(string))
 
 				// set the access uuid
-				accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", access)
+				accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity, "M_access", access)
 
 				// Set the creation time.
 				access.SetCreatedAt(time.Now().Unix())
@@ -871,7 +871,7 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 					refresh.SetAccess(access)
 
 					// Set into it parent.
-					GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", refresh)
+					GetServer().GetEntityManager().createEntity(configEntity, "M_refresh", refresh)
 
 					// Set the access
 					access.SetRefreshToken(refresh)
@@ -1808,7 +1808,7 @@ func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
 	c.M_redirectUri = client.GetRedirectUri()
 
 	// append a new client.
-	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_client", c)
+	GetServer().GetEntityManager().createEntity(configEntity, "M_client", c)
 
 	return nil
 }
@@ -1854,7 +1854,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	}
 
 	// append a new Authorize.
-	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_authorize", a)
+	GetServer().GetEntityManager().createEntity(configEntity, "M_authorize", a)
 
 	// Add expire data.
 	if err := addExpireAtData(data.Code, data.ExpireAt()); err != nil {
@@ -1998,7 +1998,7 @@ func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
 		idToken.SetNonce(data.Nonce)
 
 		// Save into the config.
-		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_ids", idToken)
+		GetServer().GetEntityManager().createEntity(configEntity, "M_ids", idToken)
 	}
 	return idToken
 }
@@ -2014,7 +2014,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	if errObj != nil {
 		access = new(Config.OAuth2Access)
 		access.SetId(data.AccessToken)
-		accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", access)
+		accessEntity, _ = GetServer().GetEntityManager().createEntity(configEntity, "M_access", access)
 	}
 
 	// Cast entity to *Config.OAuth2Access
@@ -2085,7 +2085,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 			refresh = new(Config.OAuth2Refresh)
 			refresh.SetId(data.RefreshToken)
 			// save the access.
-			refreshEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", refresh)
+			refreshEntity, _ = GetServer().GetEntityManager().createEntity(configEntity, "M_refresh", refresh)
 		}
 
 		// Cast refresh entity to *Config.OAuth2Refresh

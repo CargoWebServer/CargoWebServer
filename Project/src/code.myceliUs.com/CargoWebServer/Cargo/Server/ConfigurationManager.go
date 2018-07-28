@@ -191,7 +191,7 @@ func (this *ConfigurationManager) initialize() {
 		serverConfig.M_tmpPath = "/tmp"
 		serverConfig.M_binPath = "/bin"
 
-		GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serverConfig", serverConfig)
+		GetServer().GetEntityManager().createEntity(this.m_activeConfigurations, "M_serverConfig", serverConfig)
 		this.m_activeConfigurations.SetServerConfig(serverConfig)
 	}
 
@@ -210,7 +210,7 @@ func (this *ConfigurationManager) start() {
 		_, err := GetServer().GetEntityManager().getEntityById("Config.ServiceConfiguration", "Config", []interface{}{this.m_servicesConfiguration[i].GetId()})
 		if err != nil {
 			// Set the new config...
-			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serviceConfigs", this.m_servicesConfiguration[i])
+			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations, "M_serviceConfigs", this.m_servicesConfiguration[i])
 		}
 	}
 
@@ -219,7 +219,7 @@ func (this *ConfigurationManager) start() {
 		_, err := GetServer().GetEntityManager().getEntityById("Config.DataStoreConfiguration", "Config", []interface{}{this.m_datastoreConfiguration[i].GetId()})
 		if err != nil {
 			// Set the new config...
-			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_dataStoreConfigs", this.m_datastoreConfiguration[i])
+			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations, "M_dataStoreConfigs", this.m_datastoreConfiguration[i])
 		}
 	}
 }

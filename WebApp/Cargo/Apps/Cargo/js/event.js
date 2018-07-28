@@ -22,57 +22,55 @@
 
 // Default channels and events
 // TODO revoir cette section
-AccountEvent                   = "AccountEvent"
-AccountRegisterSuccessEvent    = 0
+AccountEvent = "AccountEvent"
+AccountRegisterSuccessEvent = 0
 AccountConfirmationSucessEvent = 1
-SessionEvent                   = "SessionEvent"
-LoginEvent                     = 4
-LogoutEvent                    = 5
-StateChangeEvent               = 6
-WorkflowEvent                  = "WorkflowEvent"
-NewBpmsInstanceEvent           = 7
-UpdateBpmsInstanceEvent        = 8
-DeleteBpmsInstanceEvent        = 9
-NewBpmnDefinitionsEvent        = 10
-DeleteBpmnDefinitionsEvent     = 11
-UpdateBpmnDefinitionsEvent     = 12
-EntityEvent                    = "EntityEvent"
-NewEntityEvent                 = 13
-UpdateEntityEvent              = 14
-DeleteEntityEvent              = 15
-OpenEntityEvent                = 16
-CloseEntityEvent               = 17
-FileEvent                      = "FileEvent"
-NewFileEvent                   = 18
-DeleteFileEvent                = 19
-UpdateFileEvent                = 20
-OpenFileEvent                  = 21
-CloseFileEvent                 = 22
-FileEditEvent                  = 23
-DataEvent                      = "DataEvent"
-DeleteRowEvent                 = 24
-NewRowEvent                    = 25
-UpdateRowEvent                 = 26
-NewDataStoreEvent              = 27
-DeleteDataStoreEvent           = 28
-SecurityEvent                  = "SecurityEvent"
-NewRoleEvent                   = 29
-DeleteRoleEvent                = 30
-UpdateRoleEvent                = 31
-PrototypeEvent                 = "PrototypeEvent"
-NewPrototypeEvent              = 32
-UpdatePrototypeEvent           = 33
-DeletePrototypeEvent           = 34
-ProjectEvent                   = "ProjectEvent"
-EmailEvent                     = "EmailEvent"
-ServiceEvent                   = "ServiceEvent"
-ConfigurationEvent             = "ConfigurationEvent"
-NewTaskEvent                   = 35
-UpdateTaskEvent                = 36
-EventEvent                     = "EventEvent"
-LdapEvent                      = "LdapEvent"
-OAuth2Event                    = "OAuth2Event"
-SchemaEvent                    = "SchemaEvent"
+SessionEvent = "SessionEvent"
+LoginEvent = 4
+LogoutEvent = 5
+StateChangeEvent = 6
+EntityEvent = "EntityEvent"
+NewEntityEvent = 7
+UpdateEntityEvent = 8
+DeleteEntityEvent = 9
+OpenEntityEvent = 10
+CloseEntityEvent = 11
+FileEvent = "FileEvent"
+NewFileEvent = 12
+DeleteFileEvent = 13
+UpdateFileEvent = 14
+OpenFileEvent = 15
+CloseFileEvent = 16
+FileEditEvent = 17
+DataEvent = "DataEvent"
+DeleteRowEvent = 18
+NewRowEvent = 19
+UpdateRowEvent = 20
+NewDataStoreEvent = 21
+DeleteDataStoreEvent = 22
+SecurityEvent = "SecurityEvent"
+NewRoleEvent = 23
+DeleteRoleEvent = 24
+UpdateRoleEvent = 25
+PrototypeEvent = "PrototypeEvent"
+NewPrototypeEvent = 26
+UpdatePrototypeEvent = 27
+DeletePrototypeEvent = 28
+ProjectEvent = "ProjectEvent"
+EmailEvent = "EmailEvent"
+ServiceEvent = "ServiceEvent"
+ConfigurationEvent = "ConfigurationEvent"
+NewTaskEvent = 29
+UpdateTaskEvent = 30
+EventEvent = "EventEvent"
+LdapEvent = "LdapEvent"
+OAuth2Event = "OAuth2Event"
+SchemaEvent = "SchemaEvent"
+WorkflowEvent = "WorkflowEvent"
+NewBpmnDefinitionsEvent = 31
+DeleteBpmnDefinitionsEvent = 32
+UpdateBpmnDefinitionsEvent = 33
+StartProcessEvent = 34
 
 /**
 * EventHub contructor
@@ -396,46 +394,4 @@ EventHandler.prototype.broadcastLocalEvent = function (evt) {
     if (channel != undefined) {
         channel.broadcastEvent(evt)
     }
-}
-
-/**
-* Broadcast event over the network.
-* @param {int} evtNumber The event number.
-* @param {string} channelId The event type.
-* @param {MessageData} eventDatas An array of Message Data structures.
-* Here is an example To send a file open event over the network.
-* var entityInfo = {"TYPENAME":"Server.MessageData", "Name":"entityInfo", "Value":file.stringify()}
-* server.eventHandler.broadcastNetworkEvent(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
-*/
-EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eventDatas, successCallback, errorCallback, caller) {
-
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(evtNumber, "INTEGER", "evtNumber"))
-    params.push(createRpcData(channelId, "STRING", "channelId"))
-    params.push(createRpcData(eventDatas, "JSON_STR", "eventDatas"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "EventManagerBroadcastNetworkEvent", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            //console.log(result)
-            if (caller.successCallback != undefined) {
-                caller.successCallback(result[0], caller.caller)
-                caller.successCallback = undefined
-            }
-        },
-        function (errMsg, caller) {
-            server.errorManager.onError(errMsg)
-            if (caller.errorCallback != undefined) {
-                caller.errorCallback(errMsg, caller.caller)
-                caller.errorCallback = undefined
-            }
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
 }
