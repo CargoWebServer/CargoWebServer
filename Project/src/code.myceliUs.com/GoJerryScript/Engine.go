@@ -17,20 +17,24 @@ handler (const jerry_value_t,
          const jerry_length_t);
 
 // Define a new function handler.
-jerry_value_t setGoFct(char* name){
+void setGoFct(char* name){
 
   jerry_value_t fct_handler = jerry_create_external_function (handler);
   jerry_value_t glob_obj = jerry_get_global_object ();
   jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
 
+  // keep the name in the function object itself, so it will be use at runtime
+  // by the handler to know witch function to dynamicaly call.
+  jerry_value_t prop_name_name = jerry_create_string ((const jerry_char_t *) "name");
+  jerry_release_value (jerry_set_property (fct_handler, prop_name_name, prop_name));
+
   // set property and release the return value without any check
   jerry_release_value (jerry_set_property (glob_obj, prop_name, fct_handler));
   jerry_release_value (prop_name);
+  jerry_release_value (prop_name_name);
   jerry_release_value (glob_obj);
   jerry_release_value (fct_handler);
 
-  // return the function handler pointer reference.
-  return fct_handler;
 }
 */
 import "C"
@@ -125,10 +129,7 @@ func (self *Engine) RegisterGoFunction(name string, fct interface{}) {
 	cs := C.CString(name)
 
 	// so here the function ptr is a uint
-	ptr := C.setGoFct(cs)
-
-	// Keep the function pointer name in the map.
-	setFctPointerName(uint32(ptr), name)
+	C.setGoFct(cs)
 
 	defer C.free(unsafe.Pointer(cs))
 }

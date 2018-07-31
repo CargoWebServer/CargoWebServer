@@ -94,7 +94,6 @@ func goToJs(value interface{}) Uint32_t {
 			Jerry_release_value(v)
 		}
 	} else if reflect.TypeOf(value).Kind() == reflect.Struct {
-		// Set object on the vm.
 
 	}
 

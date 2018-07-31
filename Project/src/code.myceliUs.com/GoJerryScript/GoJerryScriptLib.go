@@ -12,8 +12,8 @@ package GoJerryScript
 
 extern uintptr_t _wrap_jerry_create_number_GoJerryScript_8ba631a7412d8d81(double arg1);
 
-static jerry_value_t create_number(float number){
-	return jerry_create_number(number);
+static bool isObject(jerry_value_t obj){
+	return jerry_value_is_object(obj);
 }
 */
 import "C"
@@ -21,7 +21,6 @@ import "reflect"
 import "unsafe"
 import "encoding/binary"
 import "math"
-import "sync"
 import "code.myceliUs.com/Utility"
 
 //import "strconv"
@@ -34,20 +33,7 @@ var (
 	SetEntity func(interface{}) = func(val interface{}) {
 		log.Println("---> set entity ", val)
 	}
-
-	fctNameMap = make(map[uint32]string, 0)
-	mu         sync.Mutex
 )
-
-func setFctPointerName(fct uint32, name string) {
-	mu.Lock()
-	defer mu.Unlock()
-	fctNameMap[fct] = name
-}
-
-func getFctPointerName(fct uint32) string {
-	return fctNameMap[fct]
-}
 
 func CallGoFunction(name string, params ...interface{}) (interface{}, error) {
 	results, err := Utility.CallFunction(name, params...)
@@ -78,28 +64,55 @@ func CallGoFunction(name string, params ...interface{}) (interface{}, error) {
 	return nil, nil
 }
 
+// The handler is call directly from Jerry script and is use to connect JS and GO
 //export handler
 func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length int) C.jerry_value_t {
 
-	name := getFctPointerName(uint32(fct))
-	params := make([]interface{}, 0)
+	// The function pointer.
+	fctPtr := (Uint32_t)(SwigcptrUint32_t(C.uintptr_t((uintptr)(unsafe.Pointer(&fct)))))
 
-	for i := 0; i < length; i++ {
-
-		val, err := jsToGo((Uint32_t)(SwigcptrUint32_t(C.uintptr_t(args))))
+	if Jerry_value_is_function(fctPtr) {
+		propName := Jerry_create_string(NewUint8FromString("name"))
+		name, err := jsToGo(Jerry_get_property(fctPtr, propName))
 		if err == nil {
-			params = append(params, val)
+			params := make([]interface{}, 0)
+			for i := 0; i < length; i++ {
+				val, err := jsToGo((Uint32_t)(SwigcptrUint32_t(C.uintptr_t(args))))
+				if err == nil {
+					params = append(params, val)
 
+				} else {
+					jsError := Jerry_create_error(Jerry_error_t(JERRY_ERROR_COMMON), NewUint8FromString(err.Error()))
+					val := (*uintptr)(unsafe.Pointer(jsError.Swigcptr()))
+					return C.jerry_value_t(*val)
+				}
+				args += 4
+			}
+
+			// This is the owner of the function.
+			thisPtr := (Uint32_t)(SwigcptrUint32_t(C.uintptr_t((uintptr)(unsafe.Pointer(&this)))))
+			if Jerry_value_is_object(thisPtr) {
+				log.Println("---> The value is an object!")
+
+			} else {
+				// There is no function owner I will simply call go function.
+				result, err := CallGoFunction(name.(string), params...)
+				if err == nil && result != nil {
+					jsVal := goToJs(result)
+					val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
+					return C.jerry_value_t(*val)
+				} else if err != nil {
+					jsError := Jerry_create_error(Jerry_error_t(JERRY_ERROR_COMMON), NewUint8FromString(err.Error()))
+					val := (*uintptr)(unsafe.Pointer(jsError.Swigcptr()))
+					return C.jerry_value_t(*val)
+				}
+			}
+
+		} else if err != nil {
+			jsError := Jerry_create_error(Jerry_error_t(JERRY_ERROR_COMMON), NewUint8FromString(err.Error()))
+			val := (*uintptr)(unsafe.Pointer(jsError.Swigcptr()))
+			return C.jerry_value_t(*val)
 		}
-		args += 4
-	}
-
-	result, err := CallGoFunction(name, params...)
-
-	if err == nil && result != nil {
-		jsVal := goToJs(result)
-		val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
-		return C.jerry_value_t(*val)
 	}
 
 	// here i will retrun a null value
@@ -107,6 +120,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 
 	// So here the result value must be dereference before return
 	val := (*uintptr)(unsafe.Pointer(null.Swigcptr()))
+
 	return C.jerry_value_t(*val)
 }
 
@@ -267,16 +281,4 @@ const sizeOfUintPtr = unsafe.Sizeof(uintptr(0))
 
 func uintptrToBytes(u *uintptr) []byte {
 	return (*[sizeOfUintPtr]byte)(unsafe.Pointer(u))[:]
-}
-
-/**
- * That function is use to give access to a native golang function
- * from inside JerryScript.
- * name The name of the go function to be call.
- *
- */
-//export CallFunction
-func CallFunction(name string) {
-	//
-	log.Println("---> call funt", name)
 }

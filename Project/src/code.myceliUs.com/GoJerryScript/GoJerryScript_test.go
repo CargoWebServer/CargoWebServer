@@ -42,7 +42,7 @@ func TestHelloJerry(t *testing.T) {
 }
 
 // Simple function to test adding tow number in Go
-// that function will be call inside JS via the go_handler.
+// that function will be call inside JS via the handler.
 func AddNumber(a float64, b float64) float64 {
 	return a + b
 }
