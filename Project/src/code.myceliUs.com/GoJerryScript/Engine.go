@@ -1,11 +1,64 @@
 package GoJerryScript
 
-import (
-	"C"
-	"errors"
+/*
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-	"code.myceliUs.com/Utility"
-)
+#include "jerryscript.h"
+#include "jerryscript-ext/handler.h"
+#include "jerryscript-debugger.h"
+
+
+extern  jerry_value_t
+handler (const jerry_value_t,
+         const jerry_value_t,
+         const jerry_value_t[],
+         const jerry_length_t);
+
+// Define a new function handler.
+jerry_value_t setGoFct(char* name){
+
+  jerry_value_t fct_handler = jerry_create_external_function (handler);
+  jerry_value_t glob_obj = jerry_get_global_object ();
+  jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
+
+  // set property and release the return value without any check
+  jerry_release_value (jerry_set_property (glob_obj, prop_name, fct_handler));
+  jerry_release_value (prop_name);
+  jerry_release_value (glob_obj);
+  jerry_release_value (fct_handler);
+
+  // return the function handler pointer reference.
+  return fct_handler;
+}
+*/
+import "C"
+import "errors"
+import "code.myceliUs.com/Utility"
+import "unsafe"
+
+/**
+ * The JerryScript JS engine.
+ */
+type Engine struct {
+	// The debugger port.
+	port int
+
+	// Java script functions.
+	functions map[string]Function
+}
+
+func NewEngine(port int, options int) *Engine {
+	// The engine.
+	engine := new(Engine)
+
+	// keep function pointer here.
+	engine.functions = make(map[string]Function, 0)
+
+	engine.start(port, options)
+	return engine
+}
 
 /**
  * Init and start the engine.
@@ -29,7 +82,7 @@ func (self *Engine) start(port int, options int) {
  * src  The body of the function
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
  */
-func (self *Engine) AppendFunction(name string, args []string, src string, options int) error {
+func (self *Engine) AppendJsFunction(name string, args []string, src string, options int) error {
 	/* The name of the function */
 	arg0 := NewUint8FromString(name)
 	args_ := ""
@@ -59,7 +112,25 @@ func (self *Engine) AppendFunction(name string, args []string, src string, optio
  * Register a go type to be usable as JS type.
  */
 func (self *Engine) RegisterGoType(value interface{}) {
+
 	Utility.RegisterType(value)
+}
+
+/**
+ * Register a go function to bu usable in JS (in the global object)
+ */
+func (self *Engine) RegisterGoFunction(name string, fct interface{}) {
+
+	Utility.RegisterFunction(name, fct)
+	cs := C.CString(name)
+
+	// so here the function ptr is a uint
+	ptr := C.setGoFct(cs)
+
+	// Keep the function pointer name in the map.
+	setFctPointerName(uint32(ptr), name)
+
+	defer C.free(unsafe.Pointer(cs))
 }
 
 /**
