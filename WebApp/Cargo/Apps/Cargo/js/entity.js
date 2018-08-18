@@ -260,7 +260,7 @@ function resetObjectValues(object) {
         }
 
         // Remove unwanted property before send it to the server-side.
-        if (prototype.Fields.indexOf(propertyId) == -1 && propertyId != "__class__" && propertyId != "TYPENAME" && propertyId != "ParentUuid" && propertyId != "ParentLnk" && propertyId != "childsUuid" && propertyId != "references" && propertyId != "NeedSave" && propertyId != "IsInit") {
+        if (prototype.Fields.indexOf(propertyId) == -1 && propertyId != "class_name_" && propertyId != "TYPENAME" && propertyId != "ParentUuid" && propertyId != "ParentLnk" && propertyId != "childsUuid" && propertyId != "references" && propertyId != "NeedSave" && propertyId != "IsInit") {
             if (!isFunction(object[propertyId])) { // Keep object attached function.
                 delete object[propertyId]
             }
@@ -589,7 +589,7 @@ function setObjectValues(object, values, lazy) {
                         // In case of binairy object I will try to create object if information is given for it.
                         // TODO see why to decode is necessary here...
                         var strVal = decode64(decode64(values[property]))
-                        if (strVal.indexOf("TYPENAME") != -1 && strVal.indexOf("__class__") != -1) {
+                        if (strVal.indexOf("TYPENAME") != -1 && strVal.indexOf("class_name_") != -1) {
                             var jsonObj = JSON.parse(strVal)
                             if (!isArray(jsonObj)) {
                                 // In case of the object is not an array...

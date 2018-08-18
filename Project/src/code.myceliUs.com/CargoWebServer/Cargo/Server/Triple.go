@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
+	"code.myceliUs.com/GoJerryScript"
 	"code.myceliUs.com/Utility"
-	"github.com/robertkrimen/otto"
 )
 
 type Triple struct {
@@ -130,9 +130,9 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 						isIndex = Utility.Contains(prototype.Indexs, k)
 					}
 
-					// In case of otto value...
-					if reflect.TypeOf(v).String() == "otto.Value" {
-						v, _ = v.(otto.Value).Export()
+					// In case of GoJerryScript value...
+					if reflect.TypeOf(v).String() == "GoJerryScript.Value" {
+						v, _ = v.(GoJerryScript.Value).Export()
 					}
 
 					if strings.HasSuffix(fieldType, ":Ref") {

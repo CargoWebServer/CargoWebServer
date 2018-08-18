@@ -12,9 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"code.myceliUs.com/GoJerryScript"
 	"code.myceliUs.com/Utility"
-	"github.com/robertkrimen/otto"
-	_ "github.com/robertkrimen/otto/underscore"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ type OperationChannel chan (OperationInfos)
  */
 type SessionInfos struct {
 	m_sessionId string
-	m_return    chan (*otto.Otto)
+	m_return    chan (*GoJerryScript.Engine)
 }
 
 /**
@@ -105,13 +104,13 @@ type JsRuntimeManager struct {
 	m_script string
 
 	/** Each connection has it own VM. */
-	m_sessions map[string]*otto.Otto
+	m_sessions map[string]*GoJerryScript.Engine
 
 	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
 
 	/** Exported values for each file for each session **/
-	m_exports map[string]map[string]*otto.Object
+	m_exports map[string]map[string]*GoJerryScript.Object
 
 	/**Channel use for communication with vm... **/
 
@@ -156,7 +155,8 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			go func(intervalInfo *IntervalInfo) {
 				// Set the variable as function.
 				functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].Run("var " + functionName + "=" + intervalInfo.callback)
+				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript("var "+functionName+"="+intervalInfo.callback, []GoJerryScript.Variable{})
+
 				// I must run the script one and at interval after it...
 				if err == nil {
 					if intervalInfo.ticker != nil {
@@ -164,7 +164,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						for t := range intervalInfo.ticker.C {
 							// So here I will call the callback.
 							// The callback contain unamed function...
-							_, err := GetJsRuntimeManager().GetSession(intervalInfo.sessionId).Run(functionName + "()")
+							_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript(functionName+"()", []GoJerryScript.Variable{})
 							if err != nil {
 								log.Println("---> Run interval callback error: ", err, t)
 							}
@@ -207,7 +207,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 				}
 			}
 		case functionInfo := <-jsRuntimeManager.m_setFunction:
-			jsRuntimeManager.m_functions[functionInfo.m_functionId] = functionInfo.m_function
+			jsRuntimeManager.appendFunction(functionInfo.m_functionId, functionInfo.m_function)
 		case sessionInfo := <-jsRuntimeManager.m_getSession:
 			sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
 		case operationInfos := <-jsRuntimeManager.m_appendScript:
@@ -219,7 +219,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			if operationInfos.m_params["run"].(bool) {
 				for _, session := range jsRuntimeManager.m_sessions {
 					log.Println(script)
-					session.Run(script)
+					session.EvalScript(script, []GoJerryScript.Variable{})
 				}
 			}
 			callback <- []interface{}{true} // unblock the channel...
@@ -259,7 +259,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 
 				// The session processing loop...
-				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
+				go func(vm *GoJerryScript.Engine, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
 					// The session was interrupt!
 					defer func() {
 						// Stahp mean the VM was kill by the admin.
@@ -281,7 +281,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							callback := operationInfos.m_returns
 							if operationInfos.m_params["varInfos"] != nil {
 								varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
-								vm.Set(varInfos.m_name, varInfos.m_val)
+								vm.SetGlobalVariable(varInfos.m_name, varInfos.m_val)
 							}
 							callback <- []interface{}{true} // unblock the channel...
 						case operationInfos := <-getVariable:
@@ -289,7 +289,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							var varInfos JsVarInfos
 							if operationInfos.m_params["varInfos"] != nil {
 								varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
-								value, err := vm.Get(varInfos.m_name)
+								value, err := vm.GetGlobalVariable(varInfos.m_name)
 								if err == nil {
 									varInfos.m_val = value
 								}
@@ -300,17 +300,17 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							var jsFunctionInfos JsFunctionInfos
 							if operationInfos.m_params["jsFunctionInfos"] != nil {
 								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
-								vm.Set("messageId", jsFunctionInfos.m_messageId)
-								vm.Set("sessionId", jsFunctionInfos.m_sessionId)
+								vm.SetGlobalVariable("messageId", jsFunctionInfos.m_messageId)
+								vm.SetGlobalVariable("sessionId", jsFunctionInfos.m_sessionId)
 								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							}
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case operationInfos := <-runScript:
 							callback := operationInfos.m_returns
-							var results otto.Value
+							var results interface{}
 							var err error
 							if operationInfos.m_params["script"] != nil {
-								results, err = vm.Run(operationInfos.m_params["script"].(string))
+								results, err = vm.EvalScript(operationInfos.m_params["script"].(string), []GoJerryScript.Variable{})
 							}
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
@@ -336,7 +336,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					timer := time.NewTimer(5 * time.Second)
 
 					// Call the interupt function on the VM.
-					jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
+					/*jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
 						return func() {
 							timer.Stop()
 							// Continue the processing.
@@ -344,7 +344,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							// The panic error will actually kill the vm
 							panic(errors.New("Stahp"))
 						}
-					}(sessionId, wait, timer)
+					}(sessionId, wait, timer)*/
 
 					// If nothing append for 1 second I will return.
 					go func(wait chan string, timer *time.Timer) {
@@ -385,7 +385,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_searchDir = filepath.ToSlash(searchDir)
 
 	// List of vm one per connection.
-	jsRuntimeManager.m_sessions = make(map[string]*otto.Otto)
+	jsRuntimeManager.m_sessions = make(map[string]*GoJerryScript.Engine)
 
 	// The map of script with their given path.
 	jsRuntimeManager.m_scripts = make(map[string]string)
@@ -394,7 +394,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_functions = make(map[string]interface{})
 
 	// each file contain it exports.
-	jsRuntimeManager.m_exports = make(map[string]map[string]*otto.Object)
+	jsRuntimeManager.m_exports = make(map[string]map[string]*GoJerryScript.Object)
 
 	// Initialisation of channel's.
 	jsRuntimeManager.m_appendScript = make(OperationChannel)
@@ -598,6 +598,7 @@ func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
  * Append a function in the function map.
  */
 func (this *JsRuntimeManager) appendFunction(functionId string, function interface{}) {
+	log.Println("--> append function: ", functionId)
 	this.m_functions[functionId] = function
 }
 
@@ -616,7 +617,7 @@ func (this *JsRuntimeManager) appendScript(path string, src string) {
 /**
  * Part of the module/exports
  */
-func (this *JsRuntimeManager) getExports(path string, sessionId string) (*otto.Object, error) {
+func (this *JsRuntimeManager) getExports(path string, sessionId string) (*GoJerryScript.Object, error) {
 
 	// If the path begin by ./ that means the current module must be use...
 	var dir string
@@ -663,7 +664,7 @@ func (this *JsRuntimeManager) getExports(path string, sessionId string) (*otto.O
 	}
 
 	if this.m_exports[sessionId][currentPath] != nil {
-		this.m_sessions[sessionId].Set("exports", this.m_exports[sessionId][currentPath])
+		this.m_sessions[sessionId].SetGlobalVariable("exports", this.m_exports[sessionId][currentPath])
 	} else {
 		log.Panicln("---> no exports found for path ", currentPath)
 	}
@@ -701,14 +702,22 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 
 	// Get the vm.
 	vm := this.m_sessions[sessionId]
-	vm.Set("sessionId", sessionId)
 
-	// Require here I will set the require function.
-	vm.Run("function require(moduleId){return require_(moduleId, sessionId)}")
-	jsRuntimeManager.m_exports[sessionId] = make(map[string]*otto.Object)
+	// Need to be set as a global variable.
+	vm.SetGlobalVariable("sessionId", sessionId)
+
+	// I will register the require function first.
+	vm.AppendJsFunction("require", []string{"moduleId"}, "function require(moduleId){return require_(moduleId, sessionId)}")
+
+	//vm.Run("function require(moduleId){return require_(moduleId, sessionId)}")
+
+	// Create the map of exports.
+	jsRuntimeManager.m_exports[sessionId] = make(map[string]*GoJerryScript.Object)
 
 	// Exported golang JS function.
 	for name, function := range this.m_functions {
+		// CargoWebServer function are set in the global scope.
+		name = strings.Replace(name, "CargoWebServer.", "", -1)
 		if strings.Index(name, ".") != -1 {
 			// Thats means the function is part of a module so I will
 			// create the module if it not exist and append the funtion
@@ -719,17 +728,19 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			var exportPath string
 			exportPath = filepath.ToSlash(this.m_searchDir + "/src/" + moduleId)
 			if this.m_exports[sessionId][exportPath] == nil {
-				this.m_exports[sessionId][exportPath], _ = vm.Object("exports = {}")
+				this.m_exports[sessionId][exportPath] = vm.CreateObject("exports")
 				// Keep it path
-				this.m_exports[sessionId][exportPath].Set("__path__", exportPath)
-				this.m_exports[sessionId][exportPath].Set("__module_id__", moduleId)
+				this.m_exports[sessionId][exportPath].Set("path__", exportPath)
+				this.m_exports[sessionId][exportPath].Set("module_id__", moduleId)
 			}
 
-			// Set the function in the module object.
-			log.Println("-> ", exportPath, name)
+			// Set the function as part of the exports object.
 			this.m_exports[sessionId][exportPath].Set(name, function)
+
+		} else {
+			// Register go function.
+			vm.RegisterGoFunction(name, function)
 		}
-		vm.Set(name, function)
 	}
 
 	// Init srcipts.
@@ -754,7 +765,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 /**
  * Set init a script.
  */
-func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Object {
+func (this *JsRuntimeManager) initScript(path string, sessionId string) *GoJerryScript.Object {
 	vm := this.m_sessions[sessionId]
 	moduleId := this.getModuleId(path)
 	this.m_script = path
@@ -765,30 +776,24 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Ob
 	}
 
 	if jsRuntimeManager.m_exports[sessionId] == nil {
-		jsRuntimeManager.m_exports[sessionId] = make(map[string]*otto.Object)
+		jsRuntimeManager.m_exports[sessionId] = make(map[string]*GoJerryScript.Object)
 	}
 
-	var exports *otto.Object
+	var exports *GoJerryScript.Object
 	if this.m_exports[sessionId][exportPath] != nil {
 		// Here I will return the exports
 		// set the global variable exports...
 		exports = this.m_exports[sessionId][exportPath]
 	} else {
 		// create a new path
-		exports, _ = vm.Object("exports = {}")
-		exports.Set("__path__", exportPath)
-		exports.Set("__module_id__", moduleId)
+		exports = vm.CreateObject("exports")
+		exports.Set("path__", exportPath)
+		exports.Set("module_id__", moduleId)
 		this.m_exports[sessionId][exportPath] = exports
 		if src, ok := this.m_scripts[path]; ok {
-			script, err := vm.Compile("", src)
-			if err == nil {
-				// set the export as return value
-				_, err := vm.Run(script)
-				if err != nil {
-					log.Println("---> script running error:  ", path, err)
-				}
-			} else {
-				log.Println("---> script compilation error:  ", path, err)
+			_, err := vm.EvalScript(src, []GoJerryScript.Variable{})
+			if err != nil {
+				log.Panicln("---> script running error:  ", path, err)
 			}
 		}
 	}
@@ -809,14 +814,15 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	}
 
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = otto.New()
+	this.m_sessions[sessionId] = GoJerryScript.NewEngine(9696, GoJerryScript.JERRY_INIT_EMPTY)
 	if sessionId != "" {
 		this.initScripts(sessionId)
 	}
 
 	// That channel is use to interrupt vm machine, it must be created before
 	// the vm start.
-	this.m_sessions[sessionId].Interrupt = make(chan func(), 1) // The buffer prevents blocking
+
+	//this.m_sessions[sessionId].Interrupt = make(chan func(), 1) // The buffer prevents blocking
 }
 
 /**
@@ -882,7 +888,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 /**
  * Execute javascript function.
  */
-func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
+func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScript.Engine, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
 
 	if len(functionStr) == 0 {
 		return nil, errors.New("No function string.")
@@ -907,47 +913,28 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 			functionName = "fct_" + strings.Replace(Utility.GenerateUUID(functionStr), "-", "_", -1)
 			functionStr = "function " + functionName + strings.TrimSpace(functionStr)[8:]
 		}
-		script, err := vm.Compile("", functionStr)
-		if err == nil {
-			_, err = vm.Run(script)
-			if err != nil {
-				log.Println("fail to run ", functionStr)
-				return nil, err
-			}
-		} else {
-			log.Println("fail to compile  ", functionStr)
+
+		_, err = vm.EvalScript(functionStr, []GoJerryScript.Variable{})
+		if err != nil {
+			log.Println("fail to run ", functionStr)
 			return nil, err
 		}
+
 	} else {
 		functionName = functionStr
 	}
 
-	var params []interface{}
-	params = append(params, functionName)
-	params = append(params, nil)
-
-	// Now I will make otto digest the parameters...
-	for i := 0; i < len(functionParams); i++ {
-		p, err := vm.ToValue(functionParams[i])
-		if err != nil {
-			log.Println("Error binding parameter", err)
-			params = append(params, nil)
-		} else {
-			params = append(params, p)
-		}
-	}
-
-	// Call the call...
-	result, err_ := Utility.CallMethod(vm, "Call", params)
+	result, err_ := vm.CallFunction(functionName, functionParams)
 
 	if err_ != nil {
-		log.Println("Error found with function ", functionName, err_.(error), "params: ", params)
+		log.Println("Error found with function ", functionName, err_.(error), "params: ", functionParams)
 		log.Println("Src ", functionStr)
 		return nil, err_.(error)
 	}
 
 	// Return the result if there is one...
-	val, err := result.(otto.Value).Export()
+	val, err := result.Export()
+
 	if err != nil {
 		log.Panicln("---> error ", err)
 		return nil, err
@@ -962,10 +949,10 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 /**
  * Run given script for a given session.
  */
-func (this *JsRuntimeManager) GetSession(sessionId string) *otto.Otto {
+func (this *JsRuntimeManager) GetSession(sessionId string) *GoJerryScript.Engine {
 	// Protectect the map access...
 	var sessionInfo SessionInfos
-	sessionInfo.m_return = make(chan (*otto.Otto))
+	sessionInfo.m_return = make(chan (*GoJerryScript.Engine))
 	defer close(sessionInfo.m_return)
 	sessionInfo.m_sessionId = sessionId
 	this.m_getSession <- sessionInfo
@@ -992,7 +979,7 @@ func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) 
 /**
  * Run given script for a given session.
  */
-func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
+func (this *JsRuntimeManager) RunScript(sessionId string, script string) (GoJerryScript.Value, error) {
 	// Protectect the map access...
 	var op OperationInfos
 	op.m_name = "RunScript"
@@ -1006,11 +993,11 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 
 	// wait for completion
 	results := <-op.m_returns
-	var value otto.Value
+	var value GoJerryScript.Value
 	var err error
 
 	if results[0] != nil {
-		value = results[0].(otto.Value)
+		value = results[0].(GoJerryScript.Value)
 	}
 
 	if results[1] != nil {

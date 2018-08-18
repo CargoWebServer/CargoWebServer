@@ -87,7 +87,7 @@ func toInt(value interface{}) int {
 /**
  * Initialyse base type value.
  */
-func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
+func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 	if value == nil {
 		return reflect.ValueOf(nil)
 	}
@@ -189,18 +189,18 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 								// the structure.
 								if v.Elem().FieldByName(name).Type().String() == "[]string" {
 									var string_ string
-									fv = initializeBaseTypeValue(reflect.TypeOf(string_), v_)
+									fv = InitializeBaseTypeValue(reflect.TypeOf(string_), v_)
 								} else if v.Elem().FieldByName(name).Type().String() == "[]int" {
 									var int_ int
-									fv = initializeBaseTypeValue(reflect.TypeOf(int_), v_)
+									fv = InitializeBaseTypeValue(reflect.TypeOf(int_), v_)
 								} else if v.Elem().FieldByName(name).Type().String() == "[]float" {
 									var float_ float64
-									fv = initializeBaseTypeValue(reflect.TypeOf(float_), v_)
+									fv = InitializeBaseTypeValue(reflect.TypeOf(float_), v_)
 								} else if v.Elem().FieldByName(name).Type().String() == "[]bool" {
 									var bool_ bool
-									fv = initializeBaseTypeValue(reflect.TypeOf(bool_), v_)
+									fv = InitializeBaseTypeValue(reflect.TypeOf(bool_), v_)
 								} else {
-									fv = initializeBaseTypeValue(reflect.TypeOf(v_), v_)
+									fv = InitializeBaseTypeValue(reflect.TypeOf(v_), v_)
 								}
 								if fv.IsValid() {
 									v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
@@ -211,7 +211,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]string" {
 						values := value.([]string)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -219,7 +219,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]int" {
 						values := value.([]int)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -227,7 +227,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]int64" {
 						values := value.([]int64)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -235,7 +235,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]int32" {
 						values := value.([]int32)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -243,7 +243,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]int16" {
 						values := value.([]int16)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -251,7 +251,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]int8" {
 						values := value.([]int8)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -259,7 +259,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]bool" {
 						values := value.([]bool)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -267,7 +267,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]float64" {
 						values := value.([]bool)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
@@ -275,13 +275,13 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					} else if reflect.TypeOf(value).String() == "[]float32" {
 						values := value.([]float32)
 						for i := 0; i < len(values); i++ {
-							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
 							if fv.IsValid() {
 								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 							}
 						}
 					} else if reflect.TypeOf(value).String() == "[]uint8" || reflect.TypeOf(value).String() == "[]byte" {
-						fv := initializeBaseTypeValue(reflect.TypeOf(value), value)
+						fv := InitializeBaseTypeValue(reflect.TypeOf(value), value)
 						val := fv.String()
 						val_, err := b64.StdEncoding.DecodeString(val)
 						if err == nil {
@@ -292,7 +292,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 					}
 				} else {
 					// Here the value is a base type...
-					fv := initializeBaseTypeValue(reflect.TypeOf(value), value)
+					fv := InitializeBaseTypeValue(reflect.TypeOf(value), value)
 					if fv.IsValid() {
 						if ft.Type.String() != fv.Type().String() {
 							// So here a conversion is necessary...
@@ -382,7 +382,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 				} else {
 					// Convert is use to enumeration type who are int and must be convert to
 					// it const type representation.
-					fv := initializeBaseTypeValue(ft.Type, value).Convert(ft.Type)
+					fv := InitializeBaseTypeValue(ft.Type, value).Convert(ft.Type)
 					if fv.IsValid() {
 						v.Elem().FieldByName(name).Set(fv)
 					}

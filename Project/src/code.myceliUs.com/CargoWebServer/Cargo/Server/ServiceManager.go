@@ -472,8 +472,8 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 	var serverSrc string
 
 	// Now the server side function...
-	serverSrc += "require(\"Cargo/eventHub\")\n"
-	serverSrc += "require(\"Cargo/utility\")\n\n"
+	serverSrc += "require(\"Cargo/eventHub\");\n"
+	serverSrc += "require(\"Cargo/utility\");\n\n"
 
 	var eventTypename = strings.Replace(serviceId, "Manager", "Event", -1)
 	if strings.Index(serviceId, "Processor") > -1 {
@@ -482,17 +482,17 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 	// Here I will generate the javascript code use by client side.
 	clientSrc = "// ============================= " + serviceId + " ========================================\n"
-	clientSrc += "require(\"Cargo/eventHub\")\n"
-	clientSrc += "require(\"Cargo/utility\")\n\n"
+	clientSrc += "require(\"Cargo/eventHub\");\n"
+	clientSrc += "require(\"Cargo/utility\");\n\n"
 
 	serverSrc = clientSrc // same comment.
 
 	clientSrc += "\nvar " + serviceId + " = function(){\n"
 	clientSrc += "	if (server == undefined) {\n"
-	clientSrc += "		return\n"
+	clientSrc += "		return;\n"
 	clientSrc += "	}\n"
-	clientSrc += "	EventHub.call(this, " + eventTypename + ")\n\n"
-	clientSrc += "	return this\n"
+	clientSrc += "	EventHub.call(this, " + eventTypename + ");\n\n"
+	clientSrc += "	return this;\n"
 	clientSrc += "}\n\n"
 
 	clientSrc += serviceId + ".prototype = new EventHub(null);\n"
@@ -551,25 +551,25 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 				// Here I will generate the content of the function.
 				if action.M_parameters != nil {
-					clientSrc += "	var params = []\n"
+					clientSrc += "	var params = [];\n"
 					for j := 0; j < len(action.GetParameters())-2; j++ {
 						param := action.GetParameters()[j]
 						paramTypeName := param.GetType()
 						if paramTypeName == "string" {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"STRING\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"STRING\", \"" + param.GetName() + "\"));\n"
 						} else if strings.HasPrefix(paramTypeName, "interface") {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\"));\n"
 						} else if strings.HasPrefix(paramTypeName, "int") {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"INTEGER\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"INTEGER\", \"" + param.GetName() + "\"));\n"
 						} else if paramTypeName == "bool" {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"BOOLEAN\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"BOOLEAN\", \"" + param.GetName() + "\"));\n"
 						} else if paramTypeName == "double" || strings.HasPrefix(paramTypeName, "float") {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"DOUBLE\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"DOUBLE\", \"" + param.GetName() + "\"));\n"
 						} else if paramTypeName == "[]unit8" || paramTypeName == "[]byte" {
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"BYTES\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"BYTES\", \"" + param.GetName() + "\"));\n"
 						} else {
 							// Array or Object or array of object...
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\", \"" + param.GetType() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\", \"" + param.GetType() + "\"));\n"
 						}
 					}
 				}
@@ -582,7 +582,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 				if Utility.Contains(callbacks, "progressCallback") {
 					// Set the progress callback.
 					clientSrc += "	function (index, total, caller) { // Progress callback\n"
-					clientSrc += "		caller.progressCallback(index, total, caller.caller)\n"
+					clientSrc += "		caller.progressCallback(index, total, caller.caller);\n"
 					clientSrc += "	},\n"
 
 					// Set the caller.
@@ -606,72 +606,72 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 							clientSrc += "			function (prototype, caller) { // Success Callback\n"
 							// in case of an array...
 							if isArray {
-								clientSrc += "			var entities = []\n"
+								clientSrc += "			var entities = [];\n"
 								clientSrc += "			if(caller.results[0] == null){\n"
 								clientSrc += "				if(caller.successCallback != undefined){\n"
-								clientSrc += "					caller.successCallback(entities, caller.caller)\n"
-								clientSrc += "					caller.successCallback = undefined\n"
+								clientSrc += "					caller.successCallback(entities, caller.caller);\n"
+								clientSrc += "					caller.successCallback = undefined;\n"
 								clientSrc += "				}\n"
 								clientSrc += "				return\n"
 								clientSrc += "			}\n"
 								clientSrc += "			for (var i = 0; i < caller.results[0].length; i++) {\n"
-								clientSrc += "				var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
-								clientSrc += "				entity.initCallbacks = []\n"
+								clientSrc += "				var entity = eval(\"new \" + prototype.TypeName + \"()\");\n"
+								clientSrc += "				entity.initCallbacks = [];\n"
 								clientSrc += "				if (i == caller.results[0].length - 1) {\n"
 								clientSrc += "					var initCallback = function (caller) {\n"
 								clientSrc += "						return function (entity) {\n"
-								clientSrc += "							server.entityManager.setEntity(entity)\n"
+								clientSrc += "							server.entityManager.setEntity(entity);\n"
 								clientSrc += "							if(caller.successCallback != undefined){\n"
-								clientSrc += "								caller.successCallback(entities, caller.caller)\n"
-								clientSrc += "								caller.successCallback = undefined\n"
+								clientSrc += "								caller.successCallback(entities, caller.caller);\n"
+								clientSrc += "								caller.successCallback = undefined;\n"
 								clientSrc += "							}\n"
 								clientSrc += "						}\n"
 								clientSrc += "					} (caller)\n"
-								clientSrc += "					entity.initCallbacks.push(initCallback)\n"
+								clientSrc += "					entity.initCallbacks.push(initCallback);\n"
 								clientSrc += "				}else{\n"
 								clientSrc += "					var initCallback = function (entity) {\n"
-								clientSrc += "						server.entityManager.setEntity(entity)\n"
+								clientSrc += "						server.entityManager.setEntity(entity);\n"
 								clientSrc += "					}\n"
-								clientSrc += "					entity.initCallbacks.push(initCallback)\n"
+								clientSrc += "					entity.initCallbacks.push(initCallback);\n"
 								clientSrc += "				}\n"
-								clientSrc += "				entities.push(entity)\n"
-								clientSrc += "				entity.init(caller.results[0][i], false)\n"
+								clientSrc += "				entities.push(entity);\n"
+								clientSrc += "				entity.init(caller.results[0][i], false);\n"
 								clientSrc += "			}\n"
 							} else {
 								// In case of a regular entity.
 								clientSrc += "			if (caller.results[0] == null) {\n"
-								clientSrc += "				return\n"
+								clientSrc += "				return;\n"
 								clientSrc += "			}\n"
 
 								// In case of existing entity.
-								clientSrc += "			if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {\n"
+								clientSrc += "			if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].class_name_) {\n"
 								clientSrc += "				if(caller.successCallback != undefined){\n"
-								clientSrc += "					caller.successCallback(entities[caller.results[0].UUID], caller.caller)\n"
-								clientSrc += "					caller.successCallback=undefined\n"
+								clientSrc += "					caller.successCallback(entities[caller.results[0].UUID], caller.caller);\n"
+								clientSrc += "					caller.successCallback=undefined;\n"
 								clientSrc += "				}\n"
-								clientSrc += "				return // break it here.\n"
+								clientSrc += "				return; // break it here.\n"
 								clientSrc += "			}\n\n"
-								clientSrc += "			var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
-								clientSrc += "			entity.initCallbacks = []\n"
+								clientSrc += "			var entity = eval(\"new \" + prototype.TypeName + \"()\");\n"
+								clientSrc += "			entity.initCallbacks = [];\n"
 								clientSrc += "			var initCallback = function () {\n"
 								clientSrc += "					return function (entity) {\n"
 								clientSrc += "					if(caller.successCallback != undefined){\n"
-								clientSrc += "						caller.successCallback(entity, caller.caller)\n"
-								clientSrc += "						caller.successCallback=undefined\n"
+								clientSrc += "						caller.successCallback(entity, caller.caller);\n"
+								clientSrc += "						caller.successCallback=undefined;\n"
 								clientSrc += "					}\n"
 								clientSrc += "				}\n"
 								clientSrc += "			}(caller)\n"
-								clientSrc += "			entity.initCallbacks.push(initCallback)\n"
-								clientSrc += "			entity.init(caller.results[0], false)\n"
+								clientSrc += "			entity.initCallbacks.push(initCallback);\n"
+								clientSrc += "			entity.init(caller.results[0], false);\n"
 							}
 
 							clientSrc += "			},\n"
 							clientSrc += "			function (errMsg, caller) { // Error Callback\n"
 							clientSrc += "				if(caller.errorCallback != undefined){\n"
-							clientSrc += "					caller.errorCallback(errMsg, caller.caller)\n"
-							clientSrc += "					caller.errorCallback = undefined\n"
+							clientSrc += "					caller.errorCallback(errMsg, caller.caller);\n"
+							clientSrc += "					caller.errorCallback = undefined;\n"
 							clientSrc += "				}\n"
-							clientSrc += "				server.errorManager.onError(errMsg)\n"
+							clientSrc += "				server.errorManager.onError(errMsg);\n"
 							clientSrc += "			},\n"
 							caller := "{ \"caller\": caller.caller"
 
@@ -686,12 +686,12 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 						} else {
 							// Here I got a regulat type.
 							clientSrc += "		if(caller.successCallback != undefined){\n"
-							clientSrc += "			caller.successCallback(results, caller.caller)\n"
-							clientSrc += "			caller.successCallback=undefined\n"
+							clientSrc += "			caller.successCallback(results, caller.caller);\n"
+							clientSrc += "			caller.successCallback=undefined;\n"
 							clientSrc += "		}\n"
 						}
 					} else {
-						clientSrc += "		caller.successCallback(results, caller.caller)\n"
+						clientSrc += "		caller.successCallback(results, caller.caller);\n"
 					}
 
 					clientSrc += "	},\n"
@@ -704,10 +704,10 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 				if Utility.Contains(callbacks, "errorCallback") {
 					clientSrc += "	function (errMsg, caller) { // Error callback\n"
 					clientSrc += "		if(caller.errorCallback != undefined){\n"
-					clientSrc += "			caller.errorCallback(errMsg, caller.caller)\n"
-					clientSrc += "			caller.errorCallback = undefined\n"
+					clientSrc += "			caller.errorCallback(errMsg, caller.caller);\n"
+					clientSrc += "			caller.errorCallback = undefined;\n"
 					clientSrc += "		}\n"
-					clientSrc += "		server.errorManager.onError(errMsg)\n"
+					clientSrc += "		server.errorManager.onError(errMsg);\n"
 					clientSrc += "	},"
 					// Set the caller.
 					caller += "\"errorCallback\":errorCallback, "
@@ -745,15 +745,15 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 		if len(action.GetResults()) > 0 {
 			// It can be an array or not...
 			if action.GetResults()[0].IsArray() {
-				serverSrc += "	var " + action.GetResults()[0].M_name + " = []\n"
+				serverSrc += "	var " + action.GetResults()[0].M_name + " = [];\n"
 			} else {
-				serverSrc += "	var " + action.GetResults()[0].M_name + " = null\n"
+				serverSrc += "	var " + action.GetResults()[0].M_name + " = null;\n"
 			}
-			serverSrc += "	" + action.GetResults()[0].M_name + " = GetServer().Get" + serviceId + "()." + name + "(" + params_ + ")\n"
-			serverSrc += "	return " + action.GetResults()[0].M_name + "\n"
+			serverSrc += "	" + action.GetResults()[0].M_name + " = GetServer().Get" + serviceId + "()." + name + "(" + params_ + ");\n"
+			serverSrc += "	return " + action.GetResults()[0].M_name + ";\n"
 		} else {
 			// Here I will simply call the method on the service object..
-			serverSrc += "	GetServer().Get" + serviceId + "()." + name + "(" + params_ + ")\n"
+			serverSrc += "	GetServer().Get" + serviceId + "()." + name + "(" + params_ + ");\n"
 		}
 
 		serverSrc += "}\n\n"

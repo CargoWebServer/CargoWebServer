@@ -1164,19 +1164,19 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 // @src
 //FileManager.prototype.createFile = function (filename, filepath, filedata, thumbnailMaxHeight, thumbnailMaxWidth, dbFile, successCallback, progressCallback, errorCallback, caller) {
 //    // server is the client side singleton.
-//    var params = []
+//    var params = [];
 //    // The file data (filedata) will be upload with the http protocol...
-//    params.push(createRpcData(filename, "STRING", "filename"))
-//    params.push(createRpcData(filepath, "STRING", "filepath"))
-//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
-//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
-//    params.push(createRpcData(dbFile, "BOOLEAN", "dbFile"))
+//    params.push(createRpcData(filename, "STRING", "filename"));
+//    params.push(createRpcData(filepath, "STRING", "filepath"));
+//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"));
+//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"));
+//    params.push(createRpcData(dbFile, "BOOLEAN", "dbFile"));
 //    // Here I will create a new data form...
-//    var formData = new FormData()
-//    formData.append("multiplefiles", filedata, filename)
+//    var formData = new FormData();
+//    formData.append("multiplefiles", filedata, filename);
 //    // Use the post function to upload the file to the server.
-//    var xhr = new XMLHttpRequest()
-//    xhr.open('POST', '/uploads', true)
+//    var xhr = new XMLHttpRequest();
+//    xhr.open('POST', '/uploads', true);
 //    // In case of error or success...
 //    xhr.onload = function (params, xhr) {
 //        return function (e) {
@@ -1188,16 +1188,16 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 //                        params, // The parameters to pass to that function
 //                        function (index, total, caller) { // The progress callback
 //                            // Keep track of the file transfert.
-//                            caller.progressCallback(index, total, caller.caller)
+//                            caller.progressCallback(index, total, caller.caller);
 //                        },
 //                        function (result, caller) {
-//                            caller.successCallback(result[0], caller.caller)
+//                            caller.successCallback(result[0], caller.caller);
 //                        },
 //                        function (errMsg, caller) {
 //                            // call the immediate error callback.
-//                            caller.errorCallback(errMsg, caller.caller)
+//                            caller.errorCallback(errMsg, caller.caller);
 //                            // dispatch the message.
-//                            server.errorManager.onError(errMsg)
+//                            server.errorManager.onError(errMsg);
 //                        }, // Error callback
 //                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
 //                    )
@@ -1211,7 +1211,7 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 //    xhr.upload.onprogress = function (progressCallback, caller) {
 //        return function (e) {
 //            if (e.lengthComputable) {
-//                progressCallback(e.loaded, e.total, caller)
+//                progressCallback(e.loaded, e.total, caller);
 //            }
 //        }
 //    } (progressCallback, caller)
@@ -1271,17 +1271,17 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 // @src
 //FileManager.prototype.saveFile = function (file, filedata, thumbnailMaxHeight, thumbnailMaxWidth, successCallback, progressCallback, errorCallback, caller) {
 //    // server is the client side singleton.
-//    var params = []
+//    var params = [];
 //    // The file data (filedata) will be upload with the http protocol...
-//    params.push(createRpcData(file, "JSON_STR", "file"))
-//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
-//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
+//    params.push(createRpcData(file, "JSON_STR", "file"));
+//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"));
+//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"));
 //    // Here I will create a new data form...
-//    var formData = new FormData()
-//    formData.append("multiplefiles", filedata, file.M_name)
+//    var formData = new FormData();
+//    formData.append("multiplefiles", filedata, file.M_name);
 //    // Use the post function to upload the file to the server.
-//    var xhr = new XMLHttpRequest()
-//    xhr.open('POST', '/uploads', true)
+//    var xhr = new XMLHttpRequest();
+//    xhr.open('POST', '/uploads', true);
 //    // In case of error or success...
 //    xhr.onload = function (params, xhr) {
 //        return function (e) {
@@ -1293,16 +1293,16 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //                        params, // The parameters to pass to that function
 //                        function (index, total, caller) { // The progress callback
 //                            // Keep track of the file transfert.
-//                            caller.progressCallback(index, total, caller.caller)
+//                            caller.progressCallback(index, total, caller.caller);
 //                        },
 //                        function (result, caller) {
-//                            caller.successCallback(result[0], caller.caller)
+//                            caller.successCallback(result[0], caller.caller);
 //                        },
 //                        function (errMsg, caller) {
 //                            // call the immediate error callback.
-//                            caller.errorCallback(errMsg, caller.caller)
+//                            caller.errorCallback(errMsg, caller.caller);
 //                            // dispatch the message.
-//                            server.errorManager.onError(errMsg)
+//                            server.errorManager.onError(errMsg);
 //                        }, // Error callback
 //                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
 //                    )
@@ -1316,7 +1316,7 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //    xhr.upload.onprogress = function (progressCallback, caller) {
 //        return function (e) {
 //            if (e.lengthComputable) {
-//                progressCallback(e.loaded, e.total, caller)
+//                progressCallback(e.loaded, e.total, caller);
 //            }
 //        }
 //    } (progressCallback, caller)
@@ -1390,9 +1390,9 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 // @param {callback} errorCallback In case of error.
 // @src
 //FileManager.prototype.isFileExist = function (filename, filepath, successCallback, errorCallback, caller) {
-//    var params = []
-//    params.push(createRpcData(filename, "STRING", "filename"))
-//    params.push(createRpcData(filepath, "STRING", "filepath"))
+//    var params = [];
+//    params.push(createRpcData(filename, "STRING", "filename"));
+//    params.push(createRpcData(filepath, "STRING", "filepath"));
 //    // Call it on the server.
 //    server.executeJsFunction(
 //        "FileManagerIsFileExist", // The function to execute remotely on server
@@ -1402,15 +1402,15 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 //        },
 //        function (result, caller) {
 //        	if (caller.successCallback != undefined) {
-//        		caller.successCallback(result[0], caller.caller)
-//          	caller.successCallback = undefined
+//        		caller.successCallback(result[0], caller.caller);
+//          		caller.successCallback = undefined;
 //          }
 //        },
 //        function (errMsg, caller) {
-//          server.errorManager.onError(errMsg)
+//          server.errorManager.onError(errMsg);
 //         	if( caller.errorCallback != undefined){
-//          	caller.errorCallback(errMsg, caller.caller)
-//				caller.errorCallback = undefined
+//          		caller.errorCallback(errMsg, caller.caller);
+//				caller.errorCallback = undefined;
 //			}
 //        }, // Error callback
 //        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
@@ -1557,25 +1557,25 @@ func (this *FileManager) GetFileByPath(path string, messageId string, sessionId 
 // @src
 //FileManager.prototype.openFile = function (fileId, progressCallback, successCallback, errorCallback, caller) {
 //    // server is the client side singleton.
-//    var params = []
-//    params.push(createRpcData(fileId, "STRING", "fileId"))
+//    var params = [];
+//    params.push(createRpcData(fileId, "STRING", "fileId"));
 //    server.executeJsFunction(
 //        "FileManagerOpenFile", // The function to execute remotely on server
 //        params, // The parameters to pass to that function
 //        function (index, total, caller) { // The progress callback
-//            caller.progressCallback(index, total, caller.caller)
+//            caller.progressCallback(index, total, caller.caller);
 //        },
 //        function (result, caller) {
-//            var file = new CargoEntities.File()
-//            file.init(result[0])
-//            server.entityManager.setEntity(file)
-//            caller.successCallback(file, caller.caller)
-//            var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-//            server.eventHandler.broadcastLocalEvent(evt)
+//            var file = new CargoEntities.File();
+//            file.init(result[0]);
+//            server.entityManager.setEntity(file);
+//            caller.successCallback(file, caller.caller);
+//            var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } };
+//            server.eventHandler.broadcastLocalEvent(evt);
 //        },
 //        function (errMsg, caller) {
-//            caller.errorCallback(errMsg, caller.caller)
-//            server.errorHandler.onError(errMsg)
+//            caller.errorCallback(errMsg, caller.caller);
+//            server.errorHandler.onError(errMsg);
 //        }, // Error callback
 //        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
 //    )

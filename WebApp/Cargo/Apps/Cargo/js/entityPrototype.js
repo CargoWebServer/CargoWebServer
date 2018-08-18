@@ -302,25 +302,25 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += this.PackageName + "." + this.ClassName + " = function(values){\n"
 
     // Common properties share by all entity.
-    constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
-    constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
+    constructorSrc += " this.class_name_ = \"" + this.PackageName + "." + this.ClassName + "\";\n"
+    constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\";\n"
     constructorSrc += " if(values==undefined){\n"
-    constructorSrc += "     this.UUID = undefined\n"
-    constructorSrc += "     this.ParentUuid = \"\"\n"
-    constructorSrc += "     this.ParentLnk = \"\"\n"
+    constructorSrc += "     this.UUID = undefined;\n"
+    constructorSrc += "     this.ParentUuid = \"\";\n"
+    constructorSrc += "     this.ParentLnk = \"\";\n"
     constructorSrc += " }else{\n"
-    constructorSrc += "     this.UUID = values.UUID\n"
-    constructorSrc += "     this.ParentUuid = values.ParentUuid\n"
-    constructorSrc += "     this.ParentLnk = values.ParentLnk\n"
+    constructorSrc += "     this.UUID = values.UUID;\n"
+    constructorSrc += "     this.ParentUuid = values.ParentUuid;\n"
+    constructorSrc += "     this.ParentLnk = values.ParentLnk;\n"
     constructorSrc += " }\n"
 
-    constructorSrc += " this.childsUuid = []\n"
-    constructorSrc += " this.references = []\n"
-    constructorSrc += " this.NeedSave = true\n"
-    constructorSrc += " this.IsInit = false\n"
-    constructorSrc += " this.exist = false\n"
-    constructorSrc += " this.initCallback = undefined\n"
-    constructorSrc += " this.panel = null\n"
+    constructorSrc += " this.childsUuid = [];\n"
+    constructorSrc += " this.references = [];\n"
+    constructorSrc += " this.NeedSave = true;\n"
+    constructorSrc += " this.IsInit = false;\n"
+    constructorSrc += " this.exist = false;\n"
+    constructorSrc += " this.initCallback = undefined;\n"
+    constructorSrc += " this.panel = null;\n"
 
     // Remove space accent '' from the field name
     function normalizeFieldName(fieldName) {
@@ -336,24 +336,24 @@ EntityPrototype.prototype.generateConstructor = function () {
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...
             if (this.FieldsType[i].startsWith("[]")) {
-                constructorSrc += " this." + fieldName + " = []\n"
+                constructorSrc += " this." + fieldName + " = [];\n"
             } else if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = \"" + this.FieldsDefaultValue[i] + "\"\n"
+                constructorSrc += " this." + fieldName + " = \"" + this.FieldsDefaultValue[i] + "\";\n"
             } else {
                 if (this.FieldsType[i].startsWith("xs.") || this.FieldsType[i].startsWith("sqltypes.")) {
                     if (this.FieldsDefaultValue[i].length != 0) {
-                        constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + "\n"
+                        constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + ";\n"
                     } else if (isXsNumeric(this.FieldsType[i])) {
-                        constructorSrc += " this." + fieldName + " = 0.0\n"
+                        constructorSrc += " this." + fieldName + " = 0.0;\n"
                     } else if (isXsBoolean(this.FieldsType[i])) {
-                        constructorSrc += " this." + fieldName + " = false\n"
+                        constructorSrc += " this." + fieldName + " = false;\n"
                     } else if (isXsString(this.FieldsType[i])) {
-                        constructorSrc += " this." + fieldName + " = \"\"\n"
+                        constructorSrc += " this." + fieldName + " = \"\";\n"
                     } else {
-                        constructorSrc += " this." + fieldName + " = null\n"
+                        constructorSrc += " this." + fieldName + " = null;\n"
                     }
                 } else if (this.FieldsType[i].startsWith("enum:")) {
-                    constructorSrc += " this." + fieldName + " = 1\n"
+                    constructorSrc += " this." + fieldName + " = 1;\n"
                 } else {
                     if (this.FieldsType[i].endsWith(":Ref")) {
                         constructorSrc += " this." + fieldName + " = null;\n"
@@ -365,42 +365,42 @@ EntityPrototype.prototype.generateConstructor = function () {
                             constructorSrc += " }catch(err){\n  }\n"
                         } else {
                             constructorSrc += " if(getBaseTypeExtension(\"" +  this.FieldsType[i] +"\").startsWith(\"xs.\")){\n"
-                            constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                            constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "();\n"
                             constructorSrc += "     this." + fieldName + ".getParent = function(parent){\n"
-                            constructorSrc += "         return function(){return parent}\n"
+                            constructorSrc += "         return function(){return parent;}\n"
                             constructorSrc += "     }(this)\n"
                             constructorSrc += " }else{\n"
-                            constructorSrc += "     this." + fieldName + " = null\n"
+                            constructorSrc += "     this." + fieldName + " = null;\n"
                             constructorSrc += " }\n"
                         }
                     }
                 }
             }
         } else if (this.FieldsType[i].startsWith("[]")) {
-            constructorSrc += " this." + fieldName + " = []\n"
+            constructorSrc += " this." + fieldName + " = [];\n"
         } else {
             if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = \"\"\n"
+                constructorSrc += " this." + fieldName + " = \"\";\n"
             } else if (isXsInt(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = 0\n"
+                constructorSrc += " this." + fieldName + " = 0;\n"
             } else if (isXsNumeric(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = 0.0\n"
+                constructorSrc += " this." + fieldName + " = 0.0;\n"
             } else if (isXsDate(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = moment().unix()\n"
+                constructorSrc += " this." + fieldName + " = moment().unix();\n"
             } else if (isXsBoolean(this.FieldsType[i])) {
-                constructorSrc += " this." + fieldName + " = false\n"
+                constructorSrc += " this." + fieldName + " = false;\n"
             } else if (this.FieldsType[i].startsWith("enum:")) {
-                constructorSrc += " this." + fieldName + " = 1\n"
+                constructorSrc += " this." + fieldName + " = 1;\n"
             } else {
                 // Object here.
                 if (this.FieldsType[i].startsWith("enum:")) {
-                    constructorSrc += " this." + fieldName + " = 0\n"
+                    constructorSrc += " this." + fieldName + " = 0;\n"
                 } else {
                     if (this.FieldsNillable[i]) {
-                        constructorSrc += " this." + fieldName + " = null\n"
+                        constructorSrc += " this." + fieldName + " = null;\n"
                     } else {
                         constructorSrc += " try{\n";
-                        constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "()\n"
+                        constructorSrc += "     this." + fieldName + " = new " + this.FieldsType[i] + "();\n"
                          constructorSrc += " }catch(err){\n  }\n"
                     }
                 }

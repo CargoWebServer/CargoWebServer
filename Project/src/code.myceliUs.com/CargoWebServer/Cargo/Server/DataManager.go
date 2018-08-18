@@ -913,15 +913,15 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 // @src
 //DataManager.prototype.importJsonData = function (filename, filedata, successCallback, progressCallback, errorCallback, caller) {
 //    // server is the client side singleton.
-//    var params = []
+//    var params = [];
 //    // The file data (filedata) will be upload with the http protocol...
-//    params.push(createRpcData(filename, "STRING", "filename"))
+//    params.push(createRpcData(filename, "STRING", "filename"));
 //    // Here I will create a new data form...
-//    var formData = new FormData()
+//    var formData = new FormData();
 //    formData.append("multiplefiles", filedata, filename)
 //    // Use the post function to upload the file to the server.
-//    var xhr = new XMLHttpRequest()
-//    xhr.open('POST', '/uploads', true)
+//    var xhr = new XMLHttpRequest();
+//    xhr.open('POST', '/uploads', true);
 //    // In case of error or success...
 //    xhr.onload = function (params, xhr) {
 //        return function (e) {
@@ -933,17 +933,17 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 //                        params, // The parameters to pass to that function
 //                        function (index, total, caller) { // The progress callback
 //                            // Keep track of the file transfert.
-//                            caller.progressCallback(index, total, caller.caller)
+//                            caller.progressCallback(index, total, caller.caller);
 //                        },
 //                        function (result, caller) {
-//                            caller.successCallback(result[0], caller.caller)
+//                            caller.successCallback(result[0], caller.caller);
 //                        },
 //                        function (errMsg, caller) {
 //                            // display the message in the console.
 //                            // call the immediate error callback.
-//                            caller.errorCallback(errMsg, caller.caller)
+//                            caller.errorCallback(errMsg, caller.caller);
 //                            // dispatch the message.
-//                            server.errorManager.onError(errMsg)
+//                            server.errorManager.onError(errMsg);
 //                        }, // Error callback
 //                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
 //                    )
@@ -957,7 +957,7 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 //    xhr.upload.onprogress = function (progressCallback, caller) {
 //        return function (e) {
 //            if (e.lengthComputable) {
-//                progressCallback(e.loaded, e.total, caller)
+//                progressCallback(e.loaded, e.total, caller);
 //            }
 //        }
 //    } (progressCallback, caller)

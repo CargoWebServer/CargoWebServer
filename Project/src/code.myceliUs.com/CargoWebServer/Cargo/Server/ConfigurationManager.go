@@ -474,15 +474,15 @@ func (this *ConfigurationManager) GetActiveConfigurations(messageId string, sess
 //        },
 //        function (results, caller) {
 //        	if (caller.successCallback != undefined) {
-//        		caller.successCallback(results[0], caller.caller)
-//          	caller.successCallback = undefined
+//        		caller.successCallback(results[0], caller.caller);
+//          		caller.successCallback = undefined;
 //          }
 //        },
 //        function (errMsg, caller) {
 //          server.errorManager.onError(errMsg)
 //         	if( caller.errorCallback != undefined){
-//          	caller.errorCallback(errMsg, caller.caller)
-//				caller.errorCallback = undefined
+//          		caller.errorCallback(errMsg, caller.caller);
+//				caller.errorCallback = undefined;
 //			}
 //        }, // Error callback
 //        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller

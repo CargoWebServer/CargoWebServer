@@ -9,7 +9,6 @@ package GoJerryScript
 #include "jerryscript-ext/handler.h"
 #include "jerryscript-debugger.h"
 
-
 extern  jerry_value_t
 handler (const jerry_value_t,
          const jerry_value_t,
@@ -17,8 +16,8 @@ handler (const jerry_value_t,
          const jerry_length_t);
 
 // Define a new function handler.
-void setGoFct(char* name){
-
+void setGoFct(const char* name){
+  // Function will have there own handler.
   jerry_value_t fct_handler = jerry_create_external_function (handler);
   jerry_value_t glob_obj = jerry_get_global_object ();
   jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
@@ -34,13 +33,120 @@ void setGoFct(char* name){
   jerry_release_value (prop_name_name);
   jerry_release_value (glob_obj);
   jerry_release_value (fct_handler);
+}
 
+typedef jerry_value_t* jerry_value_p;
+
+// Define a new function handler.
+void setGoMethod(const char* name, jerry_value_t obj){
+
+  jerry_value_t fct_handler = jerry_create_external_function (handler);
+  jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
+
+  // keep the name in the function object itself, so it will be use at runtime
+  // by the handler to know witch function to dynamicaly call.
+  jerry_value_t prop_name_name = jerry_create_string ((const jerry_char_t *) "name");
+  jerry_release_value (jerry_set_property (fct_handler, prop_name_name, prop_name));
+
+  // set property and release the return value without any check
+  jerry_release_value (jerry_set_property (obj, prop_name, fct_handler));
+  jerry_release_value (prop_name);
+  jerry_release_value (prop_name_name);
+  jerry_release_value (fct_handler);
+}
+
+// Call a JS function.
+jerry_value_t
+call_function ( const jerry_value_t func_obj_val,
+                const jerry_value_t this_val,
+                const jerry_value_p args_p,
+                jerry_size_t args_count){
+
+	// evaluate the result
+	jerry_value_t ret = jerry_call_function ( func_obj_val, this_val,args_p, args_count );
+	return ret;
+}
+
+jerry_value_t
+parse_function (const char *resource_name_p,
+                      size_t resource_name_length,
+                      const char *arg_list_p,
+                      size_t arg_list_size,
+                      const char *source_p,
+                      size_t source_size,
+                      uint32_t parse_opts){
+
+	return jerry_parse_function (resource_name_p, resource_name_length, arg_list_p,
+		arg_list_size, source_p, source_size, parse_opts);
+}
+
+// Eval Script.
+jerry_value_t
+eval (const char *source_p,
+            size_t source_size,
+            bool is_strict){
+	return jerry_eval (source_p, source_size, is_strict);
+}
+
+// Create the error message.
+jerry_value_t
+create_error (jerry_error_t error_type,
+                    const char *message_p){
+	// Create and return the error message.
+	return jerry_create_error (error_type, message_p);
+
+}
+
+// The string helper function.
+
+// Create a string and return it value.
+jerry_value_t create_string (const char *str_p){
+	return jerry_create_string_from_utf8 (str_p);
+}
+
+jerry_size_t
+get_string_size (const jerry_value_t value){
+	return jerry_get_utf8_string_size(value);
+}
+
+jerry_size_t
+string_to_utf8_char_buffer (const jerry_value_t value, char *buffer_p, size_t buffer_size){
+
+	// Here I will set the string value inside the buffer and return
+	// the size of the written data.
+	return jerry_string_to_utf8_char_buffer (value, buffer_p, buffer_size);
+}
+
+// Simplifyed array function.
+jerry_value_t
+create_array (uint32_t size){
+	return jerry_create_array (size);
+}
+
+jerry_value_t
+set_property_by_index (const jerry_value_t obj_val,
+                             uint32_t index,
+                             const jerry_value_t value_to_set){
+	return jerry_set_property_by_index (obj_val, index, value_to_set);
+}
+
+
+jerry_value_t
+get_property_by_index (const jerry_value_t obj_val,
+                             uint32_t index){
+	return jerry_get_property_by_index (obj_val, index);
+}
+
+uint32_t
+get_array_length (const jerry_value_t value){
+	return jerry_get_array_length (value);
 }
 */
 import "C"
 import "errors"
-import "code.myceliUs.com/Utility"
 import "unsafe"
+
+//import "log"
 
 /**
  * The JerryScript JS engine.
@@ -48,19 +154,14 @@ import "unsafe"
 type Engine struct {
 	// The debugger port.
 	port int
-
-	// Java script functions.
-	functions map[string]Function
 }
 
+// Create new Javascript
 func NewEngine(port int, options int) *Engine {
 	// The engine.
 	engine := new(Engine)
-
-	// keep function pointer here.
-	engine.functions = make(map[string]Function, 0)
-
 	engine.start(port, options)
+
 	return engine
 }
 
@@ -86,51 +187,17 @@ func (self *Engine) start(port int, options int) {
  * src  The body of the function
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
  */
-func (self *Engine) AppendJsFunction(name string, args []string, src string, options int) error {
-	/* The name of the function */
-	arg0 := NewUint8FromString(name)
-	args_ := ""
-	for i := 0; i < len(args); i++ {
-		args_ += args[i]
-		if i < len(args)-1 {
-			args_ += ", "
-		}
-	}
-	arg1 := NewUint8FromString(args_)
-	arg2 := NewUint8FromString(src)
-	arg3 := NewUint32FromInt(int32(options))
-
-	parsed_code := Jerry_parse_function(arg0, int64(len(name)), arg1, int64(len(args_)), arg2, int64(len(src)), arg3)
-
-	if !Jerry_value_is_error(parsed_code) {
-		self.functions[name] = Function{Name: name, Args: args, Body: src, Obj: parsed_code}
-		_, err := self.EvalScript(src, []Variable{})
-		return err
-	} else {
-		Jerry_release_value(parsed_code)
-		return errors.New("Fail to parse function " + name)
-	}
+func (self *Engine) AppendJsFunction(name string, args []string, src string) error {
+	err := appendJsFunction(name, args, src)
+	return err
 }
 
 /**
- * Register a go type to be usable as JS type.
+ * Register a go function in JS
  */
-func (self *Engine) RegisterGoType(value interface{}) {
-
-	Utility.RegisterType(value)
-}
-
-/**
- * Register a go function to bu usable in JS (in the global object)
- */
-func (self *Engine) RegisterGoFunction(name string, fct interface{}) {
-
-	Utility.RegisterFunction(name, fct)
+func (self *Engine) RegisterGoFunction(name string) {
 	cs := C.CString(name)
-
-	// so here the function ptr is a uint
 	C.setGoFct(cs)
-
 	defer C.free(unsafe.Pointer(cs))
 }
 
@@ -140,22 +207,49 @@ func (self *Engine) RegisterGoFunction(name string, fct interface{}) {
  * value The value of the variable, can be a string, a number,
  */
 func (self *Engine) SetGlobalVariable(name string, value interface{}) {
+
 	// first of all I will initialyse the arguments.
 	globalObject := Jerry_get_global_object()
+	defer Jerry_release_value(globalObject)
 
-	propName := Jerry_create_string(NewUint8FromString(name))
+	propName := goToJs(name)
+	defer Jerry_release_value(propName)
 
 	// Take a go value and initialyse a Uint32 representation.
 	propValue := goToJs(value)
+	defer Jerry_release_value(propValue)
 
 	// Set the propertie in the global context..
-	Jerry_set_property(globalObject, propName, propValue)
+	Jerry_release_value(Jerry_set_property(globalObject, propName, propValue))
+}
 
-	// Release the resource as no more needed here.
-	Jerry_release_value(propName)
-	Jerry_release_value(propValue)
+/**
+ * Return a variable define in the global object.
+ */
+func (self *Engine) GetGlobalVariable(name string) (*Value, error) {
+	// first of all I will initialyse the arguments.
+	globalObject := Jerry_get_global_object()
+	defer Jerry_release_value(globalObject)
+	propertyName := goToJs(name)
+	defer Jerry_release_value(propertyName)
+	property := Jerry_get_property(globalObject, propertyName)
 
-	Jerry_release_value(globalObject)
+	if Jerry_value_is_error(property) {
+		return nil, errors.New("No variable found with name " + name)
+	}
+
+	value := NewValue(property)
+
+	return value, nil
+}
+
+/**
+ * Create an object with a given name.
+ */
+func (self *Engine) CreateObject(name string) *Object {
+	// Create an object and return it.
+	result := NewObject(name)
+	return result
 }
 
 /**
@@ -164,28 +258,28 @@ func (self *Engine) SetGlobalVariable(name string, value interface{}) {
  * variables Contain the list of variable to set on the global context before
  * running the script.
  */
-func (self *Engine) EvalScript(script string, variables []Variable) (interface{}, error) {
+func (self *Engine) EvalScript(script string, variables Variables) (Value, error) {
+
 	// Here the values are put on the global contex before use in the function.
 	for i := 0; i < len(variables); i++ {
 		self.SetGlobalVariable(variables[i].Name, variables[i].Value)
 	}
 
-	// Now I will evaluate the function...
-	ret := Jerry_eval(NewUint8FromString(script), int64(len(script)), false)
+	return evalScript(script)
+}
 
-	// Convert Js value to Go value.
-	value, err := jsToGo(ret)
+/**
+ * Call a Javascript function. The function must exist...
+ */
+func (self *Engine) CallFunction(name string, params []interface{}) (Value, error) {
+	globalObject := Jerry_get_global_object()
+	defer Jerry_release_value(globalObject)
 
-	// Free JavaScript value, returned by eval
-	Jerry_release_value(ret)
-	return value, err
+	// Call function on the global object here.
+	return callJsFunction(globalObject, name, params)
 }
 
 func (self *Engine) Clear() {
-	for _, fct := range self.functions {
-		Jerry_release_value(fct.Obj)
-	}
 	/* Cleanup the script engine. */
 	Jerry_cleanup()
-
 }

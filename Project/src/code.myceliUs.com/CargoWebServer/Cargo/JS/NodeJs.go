@@ -7,14 +7,14 @@ package JS
 import (
 	"log"
 
-	"github.com/robertkrimen/otto"
+	"code.myceliUs.com/GoJerryScript"
 )
 
 func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	this.appendFunction("require_", func(identifier string, sessionId string) *otto.Object {
+	this.appendFunction("require_", func(identifier string, sessionId string) *GoJerryScript.Object {
 		// resolve dependencie and return the exports.
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {

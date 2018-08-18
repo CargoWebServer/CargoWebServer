@@ -326,37 +326,37 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += this.TypeName + " = function(){\n"
 
 	// Common properties share by all entity.
-	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
-	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
-	constructorSrc += " this.UUID = \"\"\n"
-	constructorSrc += " this.ParentUuid = \"\"\n"
-	constructorSrc += " this.ParentLnk = \"\"\n"
-	constructorSrc += " this.childsUuid = []\n"
-	constructorSrc += " this.references = []\n"
-	constructorSrc += " this.IsInit = false\n"
-	constructorSrc += " this.exist = false\n"
-	constructorSrc += " this.initCallback = undefined\n"
+	constructorSrc += " this.class_name_ = \"" + this.TypeName + "\";\n"
+	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\";\n"
+	constructorSrc += " this.UUID = \"\";\n"
+	constructorSrc += " this.ParentUuid = \"\";\n"
+	constructorSrc += " this.ParentLnk = \"\";\n"
+	constructorSrc += " this.childsUuid = [];\n"
+	constructorSrc += " this.references = [];\n"
+	constructorSrc += " this.IsInit = false;\n"
+	constructorSrc += " this.exist = false;\n"
+	constructorSrc += " this.initCallback = undefined;\n"
 
 	// Create field and set her initial values.
 	for i := 3; i < len(this.Fields); i++ {
 		if len(this.FieldsDefaultValue[i]) != 0 {
 			if strings.HasPrefix(this.FieldsType[i], "[]") {
-				constructorSrc += " this." + this.Fields[i] + " = []\n"
+				constructorSrc += " this." + this.Fields[i] + " = [];\n"
 			} else {
-				constructorSrc += " this." + this.Fields[i] + " = " + this.FieldsDefaultValue[i] + "\n"
+				constructorSrc += " this." + this.Fields[i] + " = " + this.FieldsDefaultValue[i] + ";\n"
 			}
 		} else {
 			if strings.HasPrefix(this.FieldsType[i], "[]") {
-				constructorSrc += " this." + this.Fields[i] + " = []\n"
+				constructorSrc += " this." + this.Fields[i] + " = [];\n"
 			} else {
-				constructorSrc += " this." + this.Fields[i] + " = null\n"
+				constructorSrc += " this." + this.Fields[i] + " = null;\n"
 			}
 		}
 	}
 
 	// Keep the reference on the entity prototype.
-	constructorSrc += " return this\n"
-	constructorSrc += "}\n"
+	constructorSrc += " return this;\n"
+	constructorSrc += "};\n"
 
 	return constructorSrc
 }

@@ -1,5 +1,4 @@
 // The default session id.
-//FileManager = require("CargoWebServer/FileManager")
 
 /**
  * Connection class
@@ -113,7 +112,6 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
  * Create the local server object.
  */
 var server = new Server("localhost", "127.0.0.1", 9393);
-server.fileManager = new FileManager()
 
 // Export class.
 exports.server = server
