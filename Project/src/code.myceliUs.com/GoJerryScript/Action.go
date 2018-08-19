@@ -22,6 +22,9 @@ type Action struct {
 	// The same uuid as the message.
 	UUID string
 
+	// If the action must be 
+	Target string
+
 	// The name of the action.
 	Name string
 
@@ -56,6 +59,7 @@ func (self *Action) AppendParam(name string, value interface{}) {
 // Append the action results.
 func (self *Action) AppendResults(results ...interface{}) {
 	self.Results = make([]interface{}, 0)
+	log.Println("---> append results: ", results)
 	self.Results = append(self.Results, results...)
 }
 

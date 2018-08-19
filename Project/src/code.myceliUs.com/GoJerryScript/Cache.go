@@ -82,7 +82,7 @@ func newCache() {
 }
 
 // Return an object from the cache.
-func (cache *Cache) getObject(id string) interface{} {
+func (cache *Cache) GetObject(id string) interface{} {
 	// Here I will get object from the cache.
 	values := make(map[string]interface{})
 	values["name"] = "getObject"
@@ -104,7 +104,7 @@ func (cache *Cache) getJsObject(id string) Uint32_t {
 	return <-values["result"].(chan Uint32_t)
 }
 
-func (cache *Cache) setObject(id string, object interface{}) {
+func (cache *Cache) SetObject(id string, object interface{}) {
 	// Here I will set object in the cache
 	values := make(map[string]interface{})
 	values["name"] = "setObject"
@@ -122,7 +122,7 @@ func (cache *Cache) setJsObject(id string, jsObject Uint32_t) {
 	cache.m_operations <- values
 }
 
-func (cache *Cache) removeObject(id string) {
+func (cache *Cache) RemoveObject(id string) {
 	values := make(map[string]interface{})
 	values["name"] = "removeObject"
 	values["id"] = id

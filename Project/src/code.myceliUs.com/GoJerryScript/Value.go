@@ -3,26 +3,8 @@ package GoJerryScript
 import "reflect"
 import "code.myceliUs.com/Utility"
 import "errors"
-import "log"
 
-/**
- * Create a new value and set it finalyse methode.
- */
-func NewValue(ptr Uint32_t) *Value {
-
-	v := new(Value)
-	var err error
-
-	// Export the value.
-	v.Val, err = jsToGo(ptr)
-
-	if err != nil {
-		log.Println("---> error: ", err)
-		return nil
-	}
-
-	return v
-}
+//import "log"
 
 /**
  * Interface Js value as Go value.

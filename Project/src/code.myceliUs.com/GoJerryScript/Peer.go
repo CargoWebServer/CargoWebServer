@@ -94,6 +94,7 @@ func (self *Peer) run() {
 				// Process request in a separated go routine.
 				go func(self *Peer, msg *Message) {
 					action := UnmarshalAction(msg.Data)
+					log.Println("97 ---> receive action ", action.Name)
 
 					// In that case I will run the action.
 					// Set the action on the channel to be execute by the peer owner.
@@ -115,25 +116,28 @@ func (self *Peer) run() {
 				}(self, msg)
 
 			} else {
-				// Here I receive a response.
+				go func(self *Peer, msg *Message) {
+					// Here I receive a response.
+					// I will get the action...
+					action := <-self.pending_actions_chan[msg.UUID]
 
-				// I will get the action...
-				action := <-self.pending_actions_chan[msg.UUID]
+					// Get back the action from it response.
+					action = UnmarshalAction(msg.Data)
 
-				// Get back the action from it response.
-				action = UnmarshalAction(msg.Data)
-
-				// unblock the function call.
-				self.pending_actions_chan[msg.UUID] <- action
+					// unblock the function call.
+					self.pending_actions_chan[msg.UUID] <- action
+				}(self, msg)
 			}
 		case msg := <-self.send_chan:
-			// Send the message over the network.
-			data, err := json.Marshal(msg)
-			if err == nil {
-				self.conn.Write([]byte(string(data) + "\n"))
-			} else {
-				log.Println("---> marshaling error: ", err)
-			}
+			go func(self *Peer, msg *Message) {
+				// Send the message over the network.
+				data, err := json.Marshal(msg)
+				if err == nil {
+					self.conn.Write([]byte(string(data) + "\n"))
+				} else {
+					log.Println("---> marshaling error: ", err)
+				}
+			}(self, msg)
 		case <-self.stop_chan:
 			self.isRunning = false
 			break // stop the processin loop.

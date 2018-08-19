@@ -67,19 +67,6 @@ call_function ( const jerry_value_t func_obj_val,
 	return ret;
 }
 
-jerry_value_t
-parse_function (const char *resource_name_p,
-                      size_t resource_name_length,
-                      const char *arg_list_p,
-                      size_t arg_list_size,
-                      const char *source_p,
-                      size_t source_size,
-                      uint32_t parse_opts){
-
-	return jerry_parse_function (resource_name_p, resource_name_length, arg_list_p,
-		arg_list_size, source_p, source_size, parse_opts);
-}
-
 // Eval Script.
 jerry_value_t
 eval (const char *source_p,
@@ -117,6 +104,57 @@ string_to_utf8_char_buffer (const jerry_value_t value, char *buffer_p, size_t bu
 	return jerry_string_to_utf8_char_buffer (value, buffer_p, buffer_size);
 }
 
+//extern jerry_value_t create_native_object(const char* uuid);
+// Use to bind Js object and Go object lifecycle
+typedef  struct {
+	const char* uuid;
+} object_reference_t;
+
+// Return the object reference.
+const char* get_object_reference_uuid(uintptr_t ref){
+	return ((object_reference_t*)ref)->uuid;
+}
+
+void delete_object_reference(uintptr_t ref){
+	free((char*)((object_reference_t*)ref)->uuid);
+	free((object_reference_t*)ref);
+}
+
+// This is the destructor.
+extern void object_native_free_callback(void* native_p);
+
+
+// NOTE: The address (!) of type_info acts as a way to uniquely "identify" the
+// C type `native_obj_t *`.
+static const jerry_object_native_info_t native_obj_type_info =
+{
+  .free_cb = object_native_free_callback
+};
+
+jerry_value_t create_native_object(const char* uuid){
+	// Create the js object that will be back by the
+	// native object.
+	jerry_value_t object = jerry_create_object();
+
+	// Here I will create the native object reference.
+	object_reference_t *native_obj = malloc(sizeof(*native_obj));
+	native_obj->uuid = uuid;
+
+	// Set the native pointer.
+	jerry_set_object_native_pointer (object, native_obj, &native_obj_type_info);
+
+	// Set the uuid property of the newly created object.
+	jerry_value_t prop_uuid = jerry_create_string ((const jerry_char_t *) uuid);
+ 	jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) "uuid_");
+
+	// Set the uuid property.
+  	jerry_release_value (jerry_set_property (object, prop_name, prop_uuid));
+	jerry_release_value (prop_uuid);
+	jerry_release_value (prop_name);
+
+	return object;
+}
+
 // Simplifyed array function.
 jerry_value_t
 create_array (uint32_t size){
@@ -145,8 +183,6 @@ get_array_length (const jerry_value_t value){
 import "C"
 import "errors"
 import "unsafe"
-
-//import "log"
 
 /**
  * The JerryScript JS engine.
@@ -179,28 +215,7 @@ func (self *Engine) start(port int, options int) {
 	Jerry_init(Jerry_init_flag_t(options))
 }
 
-/**
- * Parse and set a function in the Javascript.
- * name The name of the function (the function will be keep in the engine for it
- *      lifetime.
- * args The argument name for that function.
- * src  The body of the function
- * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
- */
-func (self *Engine) AppendJsFunction(name string, args []string, src string) error {
-	err := appendJsFunction(name, args, src)
-	return err
-}
-
-/**
- * Register a go function in JS
- */
-func (self *Engine) RegisterGoFunction(name string) {
-	cs := C.CString(name)
-	C.setGoFct(cs)
-	defer C.free(unsafe.Pointer(cs))
-}
-
+/////////////////// Global variables //////////////////////
 /**
  * Set a variable on the global context.
  * name The name of the variable in the context.
@@ -243,29 +258,129 @@ func (self *Engine) GetGlobalVariable(name string) (*Value, error) {
 	return value, nil
 }
 
+/////////////////// Objects //////////////////////
 /**
- * Create an object with a given name.
+ * Create JavaScript object with given uuid. If name is given the object will be
+ * set a global object property.
  */
-func (self *Engine) CreateObject(name string) *Object {
-	// Create an object and return it.
-	result := NewObject(name)
-	return result
+func (self *Engine) CreateObject(uuid string, name string) {
+
+	// Keep the pointer.
+	obj := jerry_value_t_To_uint32_t(C.create_native_object(C.CString(uuid)))
+
+	// Set the object in the cache.
+	GetCache().setJsObject(uuid, obj)
+	if len(name) > 0 {
+		globalObj := Jerry_get_global_object()
+		defer Jerry_release_value(globalObj)
+
+		propName := goToJs(name)
+		defer Jerry_release_value(propName)
+
+		// Set the object as a propety in the global object.
+		Jerry_release_value(Jerry_set_property(globalObj, propName, obj))
+	}
 }
 
 /**
- * Evaluate a script.
- * script Contain the code to run.
- * variables Contain the list of variable to set on the global context before
- * running the script.
+ * Set an object property.
+ * uuid The object reference.
+ * name The name of the property to set
+ * value The value of the property
  */
-func (self *Engine) EvalScript(script string, variables Variables) (Value, error) {
-
-	// Here the values are put on the global contex before use in the function.
-	for i := 0; i < len(variables); i++ {
-		self.SetGlobalVariable(variables[i].Name, variables[i].Value)
+func (self *Engine) SetObjectProperty(uuid string, name string, value interface{}) {
+	// Get the object from the cache
+	obj := GetCache().getJsObject(uuid)
+	if obj != nil {
+		// Set the property value.
+		Jerry_release_value(Jerry_set_property(obj, goToJs(name), goToJs(value)))
 	}
+}
 
-	return evalScript(script)
+/**
+ * That function is use to get Js obeject property
+ */
+func (self *Engine) GetObjectProperty(uuid string, name string) (Value, error) {
+	// I will get the object reference from the cache.
+	obj := GetCache().getJsObject(uuid)
+	var value Value
+	if obj != nil {
+		// Return the value from an object.
+		ptr := Jerry_get_property(obj, goToJs(name))
+		defer Jerry_release_value(ptr)
+
+		if Jerry_value_is_error(ptr) {
+			return value, errors.New("no property found with name " + name)
+		}
+
+		return *NewValue(ptr), nil
+
+	} else {
+		return value, errors.New("Object " + uuid + " dosent exist!")
+	}
+}
+
+/**
+ * set object methode.
+ */
+func (self *Engine) SetGoObjectMethod(uuid, name string) error {
+	obj := GetCache().getJsObject(uuid)
+	if obj == nil {
+		return errors.New("Object " + uuid + " dosent exist!")
+	}
+	cs := C.CString(name)
+	if Jerry_value_is_object(obj) {
+		C.setGoMethod(cs, uint32_t_To_Jerry_value_t(obj))
+	}
+	defer C.free(unsafe.Pointer(cs))
+
+	return nil
+}
+
+func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
+	obj := GetCache().getJsObject(uuid)
+	if obj == nil {
+		return errors.New("Object " + uuid + " dosent exist!")
+	}
+	// In that case I want to associate a js function to the object.
+	err := appendJsFunction(obj, name, src)
+	return err
+}
+
+/**
+ * Call object methode.
+ */
+func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (Value, error) {
+	obj := GetCache().getJsObject(uuid)
+	var result Value
+	if obj == nil {
+		return result, errors.New("Object " + uuid + " dosent exist!")
+	}
+	return callJsFunction(obj, name, params)
+}
+
+/////////////////// Functions //////////////////////
+
+/**
+ * Register a go function in JS
+ */
+func (self *Engine) RegisterGoFunction(name string) {
+	cs := C.CString(name)
+	C.setGoFct(cs)
+	defer C.free(unsafe.Pointer(cs))
+}
+
+/**
+ * Parse and set a function in the Javascript.
+ * name The name of the function (the function will be keep in the engine for it
+ *      lifetime.
+ * args The argument name for that function.
+ * src  The body of the function
+ * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
+ */
+func (self *Engine) RegisterJsFunction(name string, src string) error {
+	err := appendJsFunction(nil, name, src)
+	return err
 }
 
 /**
@@ -282,4 +397,20 @@ func (self *Engine) CallFunction(name string, params []interface{}) (Value, erro
 func (self *Engine) Clear() {
 	/* Cleanup the script engine. */
 	Jerry_cleanup()
+}
+
+/**
+ * Evaluate a script.
+ * script Contain the code to run.
+ * variables Contain the list of variable to set on the global context before
+ * running the script.
+ */
+func (self *Engine) EvalScript(script string, variables Variables) (Value, error) {
+
+	// Here the values are put on the global contex before use in the function.
+	for i := 0; i < len(variables); i++ {
+		self.SetGlobalVariable(variables[i].Name, variables[i].Value)
+	}
+
+	return evalScript(script)
 }

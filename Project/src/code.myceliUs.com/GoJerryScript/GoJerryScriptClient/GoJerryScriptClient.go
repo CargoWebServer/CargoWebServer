@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"os/exec"
+	"reflect"
 
 	"code.myceliUs.com/GoJerryScript"
 	"code.myceliUs.com/Utility"
@@ -64,10 +65,8 @@ func NewClient(address string, port int) *Client {
 
 // Call a go function and return it result.
 func (self *Client) callGoFunction(name string, params ...interface{}) (interface{}, error) {
-	log.Println("---> call ", name, params)
 	results, err := Utility.CallFunction(name, params...)
 	if err != nil {
-		log.Println("192 ---> go function error: ", err)
 		return nil, err
 	}
 
@@ -101,6 +100,13 @@ func (self *Client) processActions() {
 		select {
 		case action := <-self.exec_action_chan:
 			log.Println("---> client action: ", action.Name)
+			var target interface{}
+			isJsObject := true
+			if len(action.Target) > 0 {
+				target = GoJerryScript.GetCache().GetObject(action.Target)
+				isJsObject = reflect.TypeOf(target).String() == "*GoJerryScript.Object"
+			}
+
 			params := make([]interface{}, 0)
 			for i := 0; i < len(action.Params); i++ {
 				// So here I will append the value to parameters.
@@ -108,7 +114,12 @@ func (self *Client) processActions() {
 			}
 
 			// I will call the function.
-			action.AppendResults(self.callGoFunction(action.Name, params...))
+			if isJsObject {
+				action.AppendResults(self.callGoFunction(action.Name, params...))
+			} else {
+				// Call method on the object.
+				log.Println("---> call method on object, implement me!!!")
+			}
 
 			// send back the response.
 			self.exec_action_chan <- action
@@ -155,27 +166,38 @@ func (self *Client) RegisterGoFunction(name string, fct interface{}) {
  * args The list of arguments
  * src  The function js code.
  */
-func (self *Client) AppendJsFunction(name string, args []string, src string) error {
+func (self *Client) RegisterJsFunction(name string, src string) error {
 	// Create the action.
 	action := new(GoJerryScript.Action)
 	action.UUID = Utility.RandomUUID()
 
 	// The name of the action to execute.
-	action.Name = "AppendJsFunction"
+	action.Name = "RegisterJsFunction"
 
 	action.AppendParam("name", name)
-	action.AppendParam("args", args)
 	action.AppendParam("src", src)
 
 	// Call the action.
-	log.Println("---> Go Jerry Client ", 168)
 	action = self.peer.CallRemoteAction(action)
-	log.Println("---> Go Jerry Client ", 169, action.Results)
+
 	if action.Results[0] != nil {
 		return action.Results[0].(error)
 	}
 
 	return nil
+}
+
+/**
+ * Create a new Js object.
+ */
+func (self *Client) CreatObject(name string) *GoJerryScript.Object {
+	// Create the object.
+	obj := GoJerryScript.NewObject(name)
+
+	// Give object the peer so it can register itself with the server.
+	obj.SetPeer(self.peer)
+
+	return obj
 }
 
 /**
@@ -192,6 +214,28 @@ func (self *Client) EvalScript(script string, variables GoJerryScript.Variables)
 
 	action.AppendParam("script", script)
 	action.AppendParam("variables", variables)
+
+	// Call the remote action
+	action = self.peer.CallRemoteAction(action)
+
+	var err error
+	if action.Results[1] != nil {
+		err = action.Results[1].(error)
+	}
+
+	return action.Results[0].(GoJerryScript.Value), err
+}
+
+func (self *Client) CallFunction(name string, params []interface{}) (GoJerryScript.Value, error) {
+	// So here I will create the function parameters.
+	action := new(GoJerryScript.Action)
+	action.UUID = Utility.RandomUUID()
+
+	// The name of the action to execute.
+	action.Name = "CallFunction"
+
+	action.AppendParam("name", name)
+	action.AppendParam("params", params)
 
 	// Call the remote action
 	action = self.peer.CallRemoteAction(action)

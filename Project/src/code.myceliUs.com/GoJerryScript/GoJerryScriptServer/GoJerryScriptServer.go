@@ -68,18 +68,41 @@ func (self *Server) processActions() {
 		select {
 		case action := <-self.exec_action_chan:
 			// Run action here.
-			if action.Name == "AppendJsFunction" {
-				action.AppendResults(self.engine.AppendJsFunction(action.Params[0].Value.(string), action.Params[1].Value.([]string), action.Params[2].Value.(string)))
+			if action.Name == "RegisterJsFunction" {
+				action.AppendResults(self.engine.RegisterJsFunction(action.Params[0].Value.(string), action.Params[1].Value.(string)))
 				self.exec_action_chan <- action
-
 			} else if action.Name == "EvalScript" {
 				script := action.Params[0].Value.(string)
 				variables := action.Params[1].Value.(GoJerryScript.Variables)
 				// So here I will call the function and return it value.
 				action.AppendResults(self.engine.EvalScript(script, variables))
 				self.exec_action_chan <- action
+			} else if action.Name == "CallFunction" {
+				name := action.Params[0].Value.(string)
+				params := action.Params[1].Value.([]interface{})
+				// So here I will call the function and return it value.
+				action.AppendResults(self.engine.CallFunction(name, params))
+				self.exec_action_chan <- action
 			} else if action.Name == "RegisterGoFunction" {
 				self.engine.RegisterGoFunction(action.Params[0].Value.(string))
+				self.exec_action_chan <- action
+			} else if action.Name == "CreateObject" {
+				self.engine.CreateObject(action.Params[0].Value.(string), action.Params[1].Value.(string))
+				self.exec_action_chan <- action
+			} else if action.Name == "SetObjectProperty" {
+				self.engine.SetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value)
+				self.exec_action_chan <- action
+			} else if action.Name == "SetGoObjectMethod" {
+				self.engine.SetGoObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string))
+				self.exec_action_chan <- action
+			} else if action.Name == "SetJsObjectMethod" {
+				self.engine.SetJsObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(string))
+				self.exec_action_chan <- action
+			} else if action.Name == "GetObjectProperty" {
+				action.AppendResults(self.engine.GetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string)))
+				self.exec_action_chan <- action
+			} else if action.Name == "CallObjectMethod" {
+				action.AppendResults(self.engine.CallObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.([]interface{})...))
 				self.exec_action_chan <- action
 			} else if action.Name == "Stop" {
 				log.Println("--> Stop JerryScript!")

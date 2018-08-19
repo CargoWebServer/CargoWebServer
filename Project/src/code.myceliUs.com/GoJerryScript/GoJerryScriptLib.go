@@ -17,9 +17,6 @@ extern const char* get_object_reference_uuid(uintptr_t ref);
 extern void delete_object_reference(uintptr_t ref);
 extern jerry_value_t create_string (const char *str_p);
 extern jerry_value_t eval (const char *source_p, size_t source_size, bool is_strict);
-extern jerry_value_t parse_function (const char *resource_name_p, size_t resource_name_length,
-                      const char *arg_list_p, size_t arg_list_size,
-                      const char *source_p, size_t source_size, uint32_t parse_opts);
 extern jerry_value_t create_error (jerry_error_t error_type, const char *message_p);
 extern jerry_size_t string_to_utf8_char_buffer (const jerry_value_t value, char *buffer_p, size_t size);
 extern jerry_size_t get_string_size (const jerry_value_t value);
@@ -59,7 +56,6 @@ var (
 )
 
 // Function to access remote action channels.
-
 func evalScript(script string) (Value, error) {
 
 	// Now I will evaluate the function...
@@ -84,48 +80,30 @@ func evalScript(script string) (Value, error) {
 /**
  *
  */
-func appendJsFunction(name string, args []string, src string) error {
+func appendJsFunction(object Uint32_t, name string, src string) error {
+	// eval the script.
+	_, err := evalScript(src)
 
-	// Parameters
-	resource_name_p := C.CString(name)
-	resource_name_length := C.size_t(len(name))
-	source_p := C.CString(src)
-	source_size := C.size_t(len(src))
+	// in that case the function must be set as object function.
+	if object != nil {
+		global_object := Jerry_get_global_object()
+		defer Jerry_release_value(global_object)
 
-	// A list of string value separated by ','
-	args_ := ""
-	for i := 0; i < len(args); i++ {
-		args_ += args[i]
-		if i < len(args)-1 {
-			args_ += ", "
+		fct := Jerry_get_property(global_object, goToJs(name))
+		defer Jerry_release_value(fct)
+		if Jerry_value_is_function(fct) {
+			log.Println("=----> value is fct!")
+			// Set the function on the object.
+			Jerry_release_value(Jerry_set_property(object, goToJs(name), fct))
+
+			// remove it from the global object.
+			Jerry_delete_property(global_object, goToJs(name))
+		} else {
+			return errors.New("no function found with name " + name)
 		}
 	}
 
-	// The list of arguments.
-	arg_list_p := C.CString(args_)
-	arg_list_size := C.size_t(len(args_))
-
-	r := C.parse_function(resource_name_p, resource_name_length, arg_list_p, arg_list_size, source_p, source_size, C.uint32_t(JERRY_PARSE_NO_OPTS))
-
-	parsed_code := jerry_value_t_To_uint32_t(r)
-
-	// free memory used.
-	C.free(unsafe.Pointer(resource_name_p))
-	C.free(unsafe.Pointer(source_p))
-	C.free(unsafe.Pointer(arg_list_p))
-
-	// Keep the function object in a value.
-	if !Jerry_value_is_error(parsed_code) {
-		Jerry_release_value(parsed_code)
-		// run the script once.
-		evalScript(src)
-		return nil
-	} else {
-		Jerry_release_value(parsed_code)
-		log.Println("Fail to parse function " + name)
-		return errors.New("Fail to parse function " + name)
-	}
-
+	return err
 }
 
 /**
@@ -170,6 +148,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 				defer Jerry_release_value(null)
 				args[i] = uint32_t_To_Jerry_value_t(null)
 			} else {
+				log.Println("--> 171 ", params[i])
 				p := goToJs(params[i])
 				defer Jerry_release_value(p)
 				args[i] = uint32_t_To_Jerry_value_t(p)
@@ -177,8 +156,10 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 		}
 
 		var r_ C.jerry_value_t
+
 		if len(args) > 0 {
 			r_ = C.call_function(fctPtr, thisPtr, (C.jerry_value_p)(unsafe.Pointer(&args[0])), C.jerry_value_t(len(params)))
+			log.Println("----> 182 ", r_)
 		} else {
 			var args_ C.jerry_value_p
 			r_ = C.call_function(fctPtr, thisPtr, args_, C.jerry_value_t(0))
@@ -186,7 +167,9 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 
 		r = jerry_value_t_To_uint32_t(r_)
 	} else {
+
 		err = errors.New("Function " + name + " dosent exist")
+		log.Println("192 ----> ", err)
 	}
 
 	if Jerry_value_is_error(r) {
@@ -194,14 +177,14 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 	}
 
 	result := NewValue(r)
-
 	return *result, err
 }
 
-// Go function reside in the client, a remote call is made here.
-func callGoFunction(name string, params ...interface{}) (interface{}, error) {
+// Go function reside in the client, a remote call will be made here.
+func callGoFunction(target string, name string, params ...interface{}) (interface{}, error) {
 	action := new(Action)
 	action.Name = name
+	action.Target = target
 	action.UUID = Utility.RandomUUID()
 
 	// Set the list of parameters.
@@ -227,7 +210,7 @@ func callGoFunction(name string, params ...interface{}) (interface{}, error) {
 func object_native_free_callback(native_p C.uintptr_t) {
 	uuid := C.GoString(C.get_object_reference_uuid(native_p))
 	C.delete_object_reference(native_p)
-	GetCache().removeObject(uuid)
+	GetCache().RemoveObject(uuid)
 }
 
 // The handler is call directly from Jerry script and is use to connect JS and GO
@@ -262,25 +245,21 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 				defer Jerry_release_value(propUuid_)
 				uuid, err := jsToGo(propUuid_)
 				if err == nil {
-					object := GetCache().getObject(uuid.(string))
-
-					// Call object method.
-					result, err := Utility.CallMethod(object, name.(string), params)
-					if err == nil {
-						if result == nil {
-							return uint32_t_To_Jerry_value_t(Jerry_create_null())
-						}
+					result, err := callGoFunction(uuid.(string), name.(string), params...)
+					if err == nil && result != nil {
 						jsVal := goToJs(result)
-						return uint32_t_To_Jerry_value_t(jsVal)
-					} else {
-						jsError := createError(JERRY_ERROR_COMMON, err.(error).Error())
+						val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
+						return C.jerry_value_t(*val)
+					} else if err != nil {
+						log.Panicln(err)
+						jsError := createError(JERRY_ERROR_COMMON, err.Error())
 						return uint32_t_To_Jerry_value_t(jsError)
 					}
 				}
 
 			} else {
 				// There is no function owner I will simply call go function.
-				result, err := callGoFunction(name.(string), params...)
+				result, err := callGoFunction("", name.(string), params...)
 				if err == nil && result != nil {
 					jsVal := goToJs(result)
 					val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
@@ -356,6 +335,25 @@ func createError(errorType int, errorMsg string) Uint32_t {
 func newJsString(val string) Uint32_t {
 	str := C.create_string(C.CString(val))
 	return jerry_value_t_To_uint32_t(str)
+}
+
+/**
+ * Create a new value and set it finalyse methode.
+ */
+func NewValue(ptr Uint32_t) *Value {
+
+	v := new(Value)
+	var err error
+
+	// Export the value.
+	v.Val, err = jsToGo(ptr)
+
+	if err != nil {
+		log.Println("---> error: ", err)
+		return nil
+	}
+
+	return v
 }
 
 /**
@@ -435,7 +433,7 @@ func goToJs(value interface{}) Uint32_t {
 		ptrString := fmt.Sprintf("%d", value)
 		uuid := Utility.GenerateUUID(ptrString)
 
-		if GetCache().getObject(uuid) != nil {
+		if GetCache().GetObject(uuid) != nil {
 			return GetCache().getJsObject(uuid)
 		}
 
@@ -472,7 +470,7 @@ func goToJs(value interface{}) Uint32_t {
 		}
 
 		// Set the object in the cache.
-		GetCache().setObject(uuid, value, propValue)
+		//GetCache().setObject(uuid, value, propValue)
 
 	} else if typeOf.String() == "GoJerryScript.SwigcptrUint32_t" {
 		// already a Uint32_t
@@ -533,7 +531,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			uuid_ := Jerry_get_property(input, propUuid_)
 			defer Jerry_release_value(uuid_)
 			uuid, _ := jsToGo(uuid_)
-			value = GetCache().getObject(uuid.(string))
+			value = GetCache().GetObject(uuid.(string))
 		} else {
 			stringified := Jerry_json_stringfy(input)
 			// if there is no error
