@@ -214,7 +214,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 		}
 	}
 
-	// Now I will try to set a go function.
+	// Now set a go function.
 	obj.Set("add", AddNumber)
 
 	// and call the go function on the object.
@@ -224,6 +224,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 		t.Error("---> fail to get object property!")
 	}
 
+	// set a Js function on the object.
 	obj.SetJsMethode("helloTo", []string{"to"}, `function helloTo(to){return "Hello " + to + "!";}`)
 
 	helloToResult, _ := obj.Call("helloTo", "Jerry")

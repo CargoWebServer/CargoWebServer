@@ -235,7 +235,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 					jsError := createError(JERRY_ERROR_COMMON, err.Error())
 					return uint32_t_To_Jerry_value_t(jsError)
 				}
-				args += 4
+				args += 4 // 32 bits integer.
 			}
 
 			// This is the owner of the function.
@@ -531,6 +531,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			uuid_ := Jerry_get_property(input, propUuid_)
 			defer Jerry_release_value(uuid_)
 			uuid, _ := jsToGo(uuid_)
+
 			value = GetCache().GetObject(uuid.(string))
 		} else {
 			stringified := Jerry_json_stringfy(input)
