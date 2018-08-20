@@ -118,7 +118,7 @@ func (self *Object) Set(name string, value interface{}) {
 /**
  * Set a JS function as Object methode.
  */
-func (self *Object) SetJsMethode(name string, params []string, src string) {
+func (self *Object) SetJsMethode(name string, src string) {
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
 	action.Name = "SetJsObjectMethod"

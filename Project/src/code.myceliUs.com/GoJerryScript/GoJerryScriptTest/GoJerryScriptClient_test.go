@@ -225,7 +225,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 	}
 
 	// set a Js function on the object.
-	obj.SetJsMethode("helloTo", []string{"to"}, `function helloTo(to){return "Hello " + to + "!";}`)
+	obj.SetJsMethode("helloTo", `function helloTo(to){return "Hello " + to + "!";}`)
 
 	helloToResult, _ := obj.Call("helloTo", "Jerry")
 	helloToResult_, _ := helloToResult.ToString()
