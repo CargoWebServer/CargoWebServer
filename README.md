@@ -10,6 +10,7 @@ Cargo was created with a Service Oriented Achitecture (SOA) in mind. The basic s
 - Event service: channel and events functionalities
 - Security service: management by roles and permissions of actions and access respectively.
 - Other service: LDAP, SMTP.
+- Made use of JerryScript (exetended with Go funtions and Objects) runing in one process per session.
 
 Extensibility and modularity are key concepts in the design of Cargo. You can create your own service, all you have to do is implement the Serivce interface in Go. You can also use the service container and create a plugin in C++.
 
@@ -34,7 +35,6 @@ CargoWebServer(master depending if you clone the project or not)
 - go get github.com/mavricknz/ldap
 - go get github.com/nfnt/resize
 - go get github.com/polds/imgbase64
-- go get github.com/robertkrimen/otto
 - go get github.com/syndtr/goleveldb/leveldb
 - go get github.com/xrash/smetrics
 - go get github.com/bytbox/go-pop3
@@ -42,7 +42,6 @@ CargoWebServer(master depending if you clone the project or not)
 - go get gopkg.in/gomail.v1
 - go get golang.org/x/net/websocket
 - go get golang.org/x/text/runes
-- go get github.com/orcaman/concurrent-map
 - go get github.com/RangelReale/osin
 - go get golang.org/x/oauth2
 
