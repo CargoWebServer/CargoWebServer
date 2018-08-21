@@ -1,13 +1,17 @@
 package GoJerryScript
 
 import (
-	"bufio"
 	"encoding/gob"
-	"encoding/json"
 	"log"
 	"net"
 	"strconv"
 )
+
+// Object reference type.
+type ObjectRef struct {
+	// The uuid of the referenced object.
+	UUID string
+}
 
 /**
  * Client are use to call remote function over JerryScript js engine.
@@ -43,6 +47,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	gob.Register(Param{})
 	gob.Register(Variables{})
 	gob.Register(Value{})
+	gob.Register(ObjectRef{})
 	gob.Register([]interface{}{})
 
 	p := new(Peer)
@@ -72,15 +77,14 @@ func (self *Peer) run() {
 	// Listen incomming information.
 	go func(self *Peer) {
 		for self.isRunning {
-			data, _ := bufio.NewReader(self.conn).ReadString('\n')
-			if len(data) > 0 {
-				msg := new(Message)
-				err := json.Unmarshal([]byte(data), msg)
-				if err == nil {
-					self.receive_chan <- msg
-				} else {
-					log.Println("---> unmarchaling error: ", err)
-				}
+			msg := new(Message)
+			decoder := gob.NewDecoder(self.conn)
+			err := decoder.Decode(msg)
+
+			if err == nil {
+				self.receive_chan <- msg
+			} else {
+				//log.Println("---> unmarchaling error: ", err)
 			}
 		}
 	}(self)
@@ -93,15 +97,18 @@ func (self *Peer) run() {
 			if msg.Type == 0 {
 				// Process request in a separated go routine.
 				go func(self *Peer, msg *Message) {
-					action := UnmarshalAction(msg.Data)
-					log.Println("97 ---> receive action ", action.Name)
+					action := &msg.Remote
+
+					// Open ansew channel
+					action.Done = make(chan *Action)
 
 					// In that case I will run the action.
 					// Set the action on the channel to be execute by the peer owner.
+					log.Println("---> call action: ", action.Name)
 					self.exec_action_chan <- action
 
-					// Get back the response.
-					action = <-self.exec_action_chan
+					// Wait for the result.
+					action = <-action.Done
 
 					// Here I will create the response and send it back to the client.
 					rsp := new(Message)
@@ -109,10 +116,11 @@ func (self *Peer) run() {
 					rsp.Type = 1
 
 					// Set back the action
-					rsp.Data = MarshalAction(action)
+					rsp.Remote = *action
 
 					// Send the message back to the asking peer.
 					self.SendMessage(rsp)
+
 				}(self, msg)
 
 			} else {
@@ -121,21 +129,21 @@ func (self *Peer) run() {
 					// I will get the action...
 					action := <-self.pending_actions_chan[msg.UUID]
 
-					// Get back the action from it response.
-					action = UnmarshalAction(msg.Data)
+					// The response result in the action.
+					action.Results = msg.Remote.Results
 
 					// unblock the function call.
 					self.pending_actions_chan[msg.UUID] <- action
+
 				}(self, msg)
 			}
 		case msg := <-self.send_chan:
 			go func(self *Peer, msg *Message) {
 				// Send the message over the network.
-				data, err := json.Marshal(msg)
-				if err == nil {
-					self.conn.Write([]byte(string(data) + "\n"))
-				} else {
-					log.Println("---> marshaling error: ", err)
+				encoder := gob.NewEncoder(self.conn)
+				err := encoder.Encode(msg)
+				if err != nil {
+					//log.Println("---> marshaling error: ", err)
 				}
 			}(self, msg)
 		case <-self.stop_chan:
@@ -194,7 +202,7 @@ func (self *Peer) CallRemoteAction(action *Action) *Action {
 	msg.UUID = action.UUID
 
 	// Set the action as message data.
-	msg.Data = MarshalAction(action)
+	msg.Remote = *action
 
 	// Send the request and wait for it answer.
 	self.SendMessage(msg)

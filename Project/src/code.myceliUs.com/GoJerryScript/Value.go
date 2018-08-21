@@ -30,6 +30,16 @@ func (self Value) Object() *Object {
  * Export the Javascript value in Go.
  */
 func (self Value) Export() (interface{}, error) {
+	// Depending of the side where the value is it will be export in Go or in JS.
+	if reflect.TypeOf(self.Val).String() == "GoJerryScript.ObjectRef" {
+		ref := self.Val.(ObjectRef)
+		if GetCache().GetObject(ref.UUID) != nil {
+			return GetCache().GetObject(ref.UUID), nil
+		} else if GetCache().getJsObject(ref.UUID) != nil {
+			return GetCache().getJsObject(ref.UUID), nil
+		}
+	}
+	// Return the value itself.
 	return self.Val, nil
 }
 

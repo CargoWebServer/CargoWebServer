@@ -184,6 +184,8 @@ import "C"
 import "errors"
 import "unsafe"
 
+//import "log"
+
 /**
  * The JerryScript JS engine.
  */
@@ -241,7 +243,7 @@ func (self *Engine) SetGlobalVariable(name string, value interface{}) {
 /**
  * Return a variable define in the global object.
  */
-func (self *Engine) GetGlobalVariable(name string) (*Value, error) {
+func (self *Engine) GetGlobalVariable(name string) (Value, error) {
 	// first of all I will initialyse the arguments.
 	globalObject := Jerry_get_global_object()
 	defer Jerry_release_value(globalObject)
@@ -249,11 +251,13 @@ func (self *Engine) GetGlobalVariable(name string) (*Value, error) {
 	defer Jerry_release_value(propertyName)
 	property := Jerry_get_property(globalObject, propertyName)
 
+	var value Value
+
 	if Jerry_value_is_error(property) {
-		return nil, errors.New("No variable found with name " + name)
+		return value, errors.New("No variable found with name " + name)
 	}
 
-	value := NewValue(property)
+	value = *NewValue(property)
 
 	return value, nil
 }
@@ -270,6 +274,7 @@ func (self *Engine) CreateObject(uuid string, name string) {
 
 	// Set the object in the cache.
 	GetCache().setJsObject(uuid, obj)
+
 	if len(name) > 0 {
 		globalObj := Jerry_get_global_object()
 		defer Jerry_release_value(globalObj)
@@ -314,6 +319,72 @@ func (self *Engine) GetObjectProperty(uuid string, name string) (Value, error) {
 		}
 
 		return *NewValue(ptr), nil
+
+	} else {
+		return value, errors.New("Object " + uuid + " dosent exist!")
+	}
+}
+
+/**
+ * Create an empty array of a given size and set it as object property.
+ */
+func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) error {
+	obj := GetCache().getJsObject(uuid)
+	if obj == nil {
+		return errors.New("Object " + uuid + " dosent exist!")
+	}
+
+	arr_ := C.create_array(C.uint32_t(size))
+	Jerry_release_value(Jerry_set_property(obj, goToJs(name), jerry_value_t_To_uint32_t(arr_)))
+	return nil
+}
+
+/**
+ * Set an object property.
+ * uuid The object reference.
+ * name The name of the property to set
+ * index The index of the object in the array
+ * value The value of the property
+ */
+func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, index uint32, value interface{}) {
+	// Get the object from the cache
+	obj := GetCache().getJsObject(uuid)
+
+	if obj != nil {
+		// I will retreive the array...
+		arr := Jerry_get_property(obj, goToJs(name))
+		defer Jerry_release_value(arr)
+		if Jerry_value_is_array(arr) {
+			// So here I will set it property.
+			v := goToJs(value)
+			r := C.set_property_by_index(uint32_t_To_Jerry_value_t(arr), C.uint32_t(index), uint32_t_To_Jerry_value_t(v))
+			// Release the result
+			Jerry_release_value(jerry_value_t_To_uint32_t(r))
+		}
+	}
+}
+
+/**
+ * That function is use to get Js obeject property
+ */
+func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uint32) (Value, error) {
+	// I will get the object reference from the cache.
+	obj := GetCache().getJsObject(uuid)
+	var value Value
+	if obj != nil {
+		// Return the value from an object.
+		arr := Jerry_get_property(obj, goToJs(name))
+		defer Jerry_release_value(arr)
+
+		if Jerry_value_is_error(arr) {
+			return value, errors.New("no property found with name " + name)
+		}
+
+		// Here I will get the value.
+		e := jerry_value_t_To_uint32_t(C.get_property_by_index(uint32_t_To_Jerry_value_t(arr), C.uint32_t(index)))
+		defer Jerry_release_value(e)
+
+		return *NewValue(e), nil
 
 	} else {
 		return value, errors.New("Object " + uuid + " dosent exist!")

@@ -1,10 +1,17 @@
 package GoJerryScript
 
 import "reflect"
-import "log"
 
-import "encoding/gob"
-import "bytes"
+type Message struct {
+	// Can be 0 request or 1 response
+	Type int
+
+	// Same as it action.
+	UUID string
+
+	// The remote action to execute.
+	Remote Action
+}
 
 type Param struct {
 	// The name of the parameter if any
@@ -19,10 +26,11 @@ type Param struct {
 
 // Message can contain action to be done by both client and server.
 type Action struct {
+
 	// The same uuid as the message.
 	UUID string
 
-	// If the action must be 
+	// If the action must be
 	Target string
 
 	// The name of the action.
@@ -33,6 +41,10 @@ type Action struct {
 
 	// The action results.
 	Results []interface{}
+
+	// That channel is use to return the action
+	// when execution is done, so it no
+	Done chan *Action
 }
 
 // Append a new parameter to an action.
@@ -59,40 +71,5 @@ func (self *Action) AppendParam(name string, value interface{}) {
 // Append the action results.
 func (self *Action) AppendResults(results ...interface{}) {
 	self.Results = make([]interface{}, 0)
-	log.Println("---> append results: ", results)
 	self.Results = append(self.Results, results...)
-}
-
-// Serialyse the content of the action
-func MarshalAction(action *Action) []byte {
-	// Be sure those struct are registered.
-	gob.Register(Value{})
-	gob.Register([]Variable{})
-
-	var buffer bytes.Buffer
-	encoder := gob.NewEncoder(&buffer)
-	err := encoder.Encode(action)
-	if err != nil {
-		log.Println("---> encoding error: ", err)
-		return nil
-	}
-	return buffer.Bytes()
-}
-
-func UnmarshalAction(data []byte) *Action {
-
-	gob.Register(Value{})
-	gob.Register([]Variable{})
-
-	action := new(Action)
-	buffer := bytes.NewReader(data)
-
-	// Decode the action.
-	decoder := gob.NewDecoder(buffer)
-	err := decoder.Decode(action)
-	if err != nil {
-		log.Println("---> decoding error: ", err)
-		return nil
-	}
-	return action
 }

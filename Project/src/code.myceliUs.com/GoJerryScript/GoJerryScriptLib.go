@@ -37,7 +37,6 @@ import "code.myceliUs.com/Utility"
 import "errors"
 import "reflect"
 import "fmt"
-import "encoding/json"
 import "strconv"
 
 //import "strconv"
@@ -45,12 +44,6 @@ import "log"
 
 // Global variable.
 var (
-	// Callback function used by dynamic type, it's call when an entity is set.
-	// Can be use to store dynamic type in a cache.
-	SetEntity func(interface{}) = func(val interface{}) {
-		log.Println("---> set entity ", val)
-	}
-
 	// Channel to be use to transfert information from client and server
 	Call_remote_actions_chan chan *Action
 )
@@ -67,18 +60,21 @@ func evalScript(script string) (Value, error) {
 
 	// Create a Uint_32 value from the result.
 	ret := jerry_value_t_To_uint32_t(r)
-
-	value := NewValue(ret)
-
+	var value Value
 	if Jerry_value_is_error(ret) {
-		return *value, errors.New("Fail to run script " + script)
+		err := errors.New("Fail to run script " + script)
+		log.Println(err)
+		return value, err
 	}
 
-	return *value, nil
+	// Here I will create the return value.
+	value = *NewValue(ret)
+
+	return value, nil
 }
 
 /**
- *
+ * Append a Js function to a given object.
  */
 func appendJsFunction(object Uint32_t, name string, src string) error {
 	// eval the script.
@@ -92,12 +88,13 @@ func appendJsFunction(object Uint32_t, name string, src string) error {
 		fct := Jerry_get_property(global_object, goToJs(name))
 		defer Jerry_release_value(fct)
 		if Jerry_value_is_function(fct) {
-			log.Println("=----> value is fct!")
 			// Set the function on the object.
 			Jerry_release_value(Jerry_set_property(object, goToJs(name), fct))
 
 			// remove it from the global object.
-			Jerry_delete_property(global_object, goToJs(name))
+			if object != global_object {
+				Jerry_delete_property(global_object, goToJs(name))
+			}
 		} else {
 			return errors.New("no function found with name " + name)
 		}
@@ -148,7 +145,6 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 				defer Jerry_release_value(null)
 				args[i] = uint32_t_To_Jerry_value_t(null)
 			} else {
-				log.Println("--> 171 ", params[i])
 				p := goToJs(params[i])
 				defer Jerry_release_value(p)
 				args[i] = uint32_t_To_Jerry_value_t(p)
@@ -159,7 +155,6 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 
 		if len(args) > 0 {
 			r_ = C.call_function(fctPtr, thisPtr, (C.jerry_value_p)(unsafe.Pointer(&args[0])), C.jerry_value_t(len(params)))
-			log.Println("----> 182 ", r_)
 		} else {
 			var args_ C.jerry_value_p
 			r_ = C.call_function(fctPtr, thisPtr, args_, C.jerry_value_t(0))
@@ -167,9 +162,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 
 		r = jerry_value_t_To_uint32_t(r_)
 	} else {
-
 		err = errors.New("Function " + name + " dosent exist")
-		log.Println("192 ----> ", err)
 	}
 
 	if Jerry_value_is_error(r) {
@@ -192,17 +185,21 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 		action.AppendParam("arg"+strconv.Itoa(i), params[i])
 	}
 
+	// Create the channel to give back the action
+	// when it's done.
+	action.Done = make(chan *Action)
+
 	// Send the action to the client side.
 	Call_remote_actions_chan <- action
 
 	// Set back the action with it results in it.
-	action = <-Call_remote_actions_chan
+	action = <-action.Done
 
 	var err error
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
-
+	log.Println("----> result ", action.Name, ":", action.Results[0])
 	return action.Results[0], err
 }
 
@@ -242,8 +239,15 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 			thisPtr := (Uint32_t)(SwigcptrUint32_t(C.uintptr_t((uintptr)(unsafe.Pointer(&this)))))
 			if Jerry_value_is_object(thisPtr) {
 				propUuid_ := Jerry_get_property(thisPtr, goToJs("uuid_"))
+				var uuid interface{}
+				var err error
+				if !Jerry_value_is_undefined(propUuid_) {
+					uuid, err = jsToGo(propUuid_)
+				} else {
+					uuid = ""
+				}
 				defer Jerry_release_value(propUuid_)
-				uuid, err := jsToGo(propUuid_)
+
 				if err == nil {
 					result, err := callGoFunction(uuid.(string), name.(string), params...)
 					if err == nil && result != nil {
@@ -414,7 +418,6 @@ func goToJs(value interface{}) Uint32_t {
 	} else if typeOf.Kind() == reflect.Float64 {
 		propValue = Jerry_create_number(value.(float64))
 	} else if typeOf.Kind() == reflect.Slice {
-
 		// So here I will create a array and put value in it.
 		s := reflect.ValueOf(value)
 		l := uint32(s.Len())
@@ -428,53 +431,29 @@ func goToJs(value interface{}) Uint32_t {
 			Jerry_release_value(jerry_value_t_To_uint32_t(r))
 		}
 
+	} else if typeOf.String() == "GoJerryScript.SwigcptrUint32_t" {
+		// already a Uint32_t
+		propValue = value.(Uint32_t)
+	} else if typeOf.String() == "GoJerryScript.ObjectRef" {
+		// I got a Js object reference.
+		uuid := value.(ObjectRef).UUID
+		propValue = GetCache().getJsObject(uuid)
+
 	} else if typeOf.Kind() == reflect.Struct || typeOf.Kind() == reflect.Ptr {
 		// So here I will use the object pointer address to generate it uuid value.
 		ptrString := fmt.Sprintf("%d", value)
 		uuid := Utility.GenerateUUID(ptrString)
 
+		// The object is expect to exist.
 		if GetCache().GetObject(uuid) != nil {
 			return GetCache().getJsObject(uuid)
 		}
 
-		// The JS object will be an handle to the Go object,
-		// no property will be set in the Js object but getter and setter function
-		// will be create instead.
-		propValue = jerry_value_t_To_uint32_t(C.create_native_object(C.CString(uuid)))
+		// The object is considere undefined if is not already in the cache...
+		undefined := Jerry_create_undefined()
 
-		// First of all object properties.
-		// Here I will make use of Go reflexion to create getter and setter.
-		element := reflect.ValueOf(value).Elem()
-		for i := 0; i < element.NumField(); i++ {
-			valueField := element.Field(i)
-			typeField := element.Type().Field(i)
+		return undefined
 
-			// Here I will set the property
-			// Bust the number of field handler here.
-			if valueField.CanInterface() {
-				// So here is the field.
-				fieldValue := goToJs(valueField.Interface())
-				fieldName := goToJs(typeField.Name)
-				defer Jerry_release_value(fieldValue)
-				defer Jerry_release_value(fieldName)
-				Jerry_release_value(Jerry_set_property(propValue, fieldName, fieldValue))
-			}
-		}
-
-		// Register object method.
-		for i := 0; i < element.Addr().NumMethod(); i++ {
-			typeMethod := element.Addr().Type().Method(i)
-			methodName := typeMethod.Name
-			// Now I will create the method call
-			setGoMethod(propValue, methodName, nil)
-		}
-
-		// Set the object in the cache.
-		//GetCache().setObject(uuid, value, propValue)
-
-	} else if typeOf.String() == "GoJerryScript.SwigcptrUint32_t" {
-		// already a Uint32_t
-		propValue = value.(Uint32_t)
 	} else {
 		log.Panicln("---> type not found ", value, typeOf.String())
 	}
@@ -498,6 +477,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 	} else if Jerry_value_is_error(input) {
 		// In that case I will return the error.
 		log.Println("----> error found!")
+		log.Panicln("---> 477")
 	} else if Jerry_value_is_number(input) {
 		value = Jerry_get_number_value(input)
 	} else if Jerry_value_is_string(input) {
@@ -514,7 +494,6 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 		var i uint32
 		for i = 0; i < count; i++ {
 			e := jerry_value_t_To_uint32_t(C.get_property_by_index(uint32_t_To_Jerry_value_t(input), C.uint32_t(i)))
-			//defer Jerry_release_value(e)
 			v, err := jsToGo(e)
 			if err == nil {
 				value = append(value.([]interface{}), v)
@@ -531,26 +510,19 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			uuid_ := Jerry_get_property(input, propUuid_)
 			defer Jerry_release_value(uuid_)
 			uuid, _ := jsToGo(uuid_)
-
-			value = GetCache().GetObject(uuid.(string))
+			// Return and object reference.
+			value = ObjectRef{UUID: uuid.(string)}
 		} else {
 			stringified := Jerry_json_stringfy(input)
 			// if there is no error
 			if !Jerry_value_is_error(stringified) {
 				jsonStr := jsStrToGoStr(stringified)
-				data := make(map[string]interface{}, 0)
-				err := json.Unmarshal([]byte(jsonStr), &data)
-				if err == nil {
-					if data["TYPENAME"] != nil {
-						relfectValue := Utility.MakeInstance(data["TYPENAME"].(string), data, SetEntity)
-						value = relfectValue.Interface()
-					} else {
-						// Here map[string]interface{} will be use.
-						value = data
-					}
-				} else {
-					return nil, err
-				}
+
+				// So here I will create a remote action and tell the client to
+				// create a Go object from jsonStr. The object will be set by
+				// the client on the server.
+				return callGoFunction("Client", "CreateGoObject", jsonStr)
+
 			} else {
 				// Continue any way with nil object instead of an error...
 				return nil, nil //errors.New("fail to stringfy object!")

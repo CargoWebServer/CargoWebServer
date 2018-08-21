@@ -31,6 +31,7 @@ func NewObject(name string) *Object {
 	ptrString := fmt.Sprintf("%d", obj)
 	uuid := Utility.GenerateUUID(ptrString)
 	obj.uuid = uuid
+	obj.name = name
 
 	// Here I will keep the object in the client cache.
 	GetCache().SetObject(obj.uuid, obj)

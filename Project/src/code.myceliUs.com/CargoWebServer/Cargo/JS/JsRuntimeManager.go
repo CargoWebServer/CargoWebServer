@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/GoJerryScript"
+	"code.myceliUs.com/GoJerryScript/GoJerryScriptClient"
 	"code.myceliUs.com/Utility"
 )
 
@@ -74,7 +75,7 @@ type OperationChannel chan (OperationInfos)
  */
 type SessionInfos struct {
 	m_sessionId string
-	m_return    chan (*GoJerryScript.Engine)
+	m_return    chan (*GoJerryScriptClient.Client)
 }
 
 /**
@@ -104,7 +105,7 @@ type JsRuntimeManager struct {
 	m_script string
 
 	/** Each connection has it own VM. */
-	m_sessions map[string]*GoJerryScript.Engine
+	m_sessions map[string]*GoJerryScriptClient.Client
 
 	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
@@ -259,7 +260,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 
 				// The session processing loop...
-				go func(vm *GoJerryScript.Engine, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
+				go func(vm *GoJerryScriptClient.Client, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
 					// The session was interrupt!
 					defer func() {
 						// Stahp mean the VM was kill by the admin.
@@ -385,7 +386,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_searchDir = filepath.ToSlash(searchDir)
 
 	// List of vm one per connection.
-	jsRuntimeManager.m_sessions = make(map[string]*GoJerryScript.Engine)
+	jsRuntimeManager.m_sessions = make(map[string]*GoJerryScriptClient.Client)
 
 	// The map of script with their given path.
 	jsRuntimeManager.m_scripts = make(map[string]string)
@@ -619,6 +620,7 @@ func (this *JsRuntimeManager) appendScript(path string, src string) {
  */
 func (this *JsRuntimeManager) getExports(path string, sessionId string) (*GoJerryScript.Object, error) {
 
+	log.Println("---> get Exports for path: ", path)
 	// If the path begin by ./ that means the current module must be use...
 	var dir string
 
@@ -664,6 +666,7 @@ func (this *JsRuntimeManager) getExports(path string, sessionId string) (*GoJerr
 	}
 
 	if this.m_exports[sessionId][currentPath] != nil {
+
 		this.m_sessions[sessionId].SetGlobalVariable("exports", this.m_exports[sessionId][currentPath])
 	} else {
 		log.Panicln("---> no exports found for path ", currentPath)
@@ -707,9 +710,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 	vm.SetGlobalVariable("sessionId", sessionId)
 
 	// I will register the require function first.
-	vm.AppendJsFunction("require", []string{"moduleId"}, "function require(moduleId){return require_(moduleId, sessionId)}")
-
-	//vm.Run("function require(moduleId){return require_(moduleId, sessionId)}")
+	vm.RegisterJsFunction("require", "function require(moduleId){return require_(moduleId, sessionId)}")
 
 	// Create the map of exports.
 	jsRuntimeManager.m_exports[sessionId] = make(map[string]*GoJerryScript.Object)
@@ -766,6 +767,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
  * Set init a script.
  */
 func (this *JsRuntimeManager) initScript(path string, sessionId string) *GoJerryScript.Object {
+	log.Println("---> initScript at path: ", path)
 	vm := this.m_sessions[sessionId]
 	moduleId := this.getModuleId(path)
 	this.m_script = path
@@ -814,7 +816,7 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	}
 
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = GoJerryScript.NewEngine(9696, GoJerryScript.JERRY_INIT_EMPTY)
+	this.m_sessions[sessionId] = GoJerryScriptClient.NewClient("127.0.0.1", 9696)
 	if sessionId != "" {
 		this.initScripts(sessionId)
 	}
@@ -888,7 +890,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 /**
  * Execute javascript function.
  */
-func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScript.Engine, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
+func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScriptClient.Client, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
 
 	if len(functionStr) == 0 {
 		return nil, errors.New("No function string.")
@@ -949,10 +951,10 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScript.Engine, functi
 /**
  * Run given script for a given session.
  */
-func (this *JsRuntimeManager) GetSession(sessionId string) *GoJerryScript.Engine {
+func (this *JsRuntimeManager) GetSession(sessionId string) *GoJerryScriptClient.Client {
 	// Protectect the map access...
 	var sessionInfo SessionInfos
-	sessionInfo.m_return = make(chan (*GoJerryScript.Engine))
+	sessionInfo.m_return = make(chan (*GoJerryScriptClient.Client))
 	defer close(sessionInfo.m_return)
 	sessionInfo.m_sessionId = sessionId
 	this.m_getSession <- sessionInfo
