@@ -111,7 +111,7 @@ type JsRuntimeManager struct {
 	m_functions map[string]interface{}
 
 	/** Exported values for each file for each session **/
-	m_exports map[string]map[string]*GoJerryScript.Object
+	m_exports map[string]map[string]GoJerryScript.Object
 
 	/**Channel use for communication with vm... **/
 
@@ -142,6 +142,9 @@ type JsRuntimeManager struct {
 	m_executeJsFunction map[string]OperationChannel
 	m_runScript         map[string]OperationChannel
 	m_stopVm            map[string]chan (bool)
+
+	// The starting port number for session VM.
+	m_startPort int
 }
 
 // The main processing loop...
@@ -382,6 +385,8 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// The singleton.
 	jsRuntimeManager = new(JsRuntimeManager)
 
+	jsRuntimeManager.m_startPort = 9696
+
 	// The dir where the js file are store on the server side.
 	jsRuntimeManager.m_searchDir = filepath.ToSlash(searchDir)
 
@@ -395,7 +400,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_functions = make(map[string]interface{})
 
 	// each file contain it exports.
-	jsRuntimeManager.m_exports = make(map[string]map[string]*GoJerryScript.Object)
+	jsRuntimeManager.m_exports = make(map[string]map[string]GoJerryScript.Object)
 
 	// Initialisation of channel's.
 	jsRuntimeManager.m_appendScript = make(OperationChannel)
@@ -618,9 +623,8 @@ func (this *JsRuntimeManager) appendScript(path string, src string) {
 /**
  * Part of the module/exports
  */
-func (this *JsRuntimeManager) getExports(path string, sessionId string) (*GoJerryScript.Object, error) {
+func (this *JsRuntimeManager) getExports(path string, sessionId string) (GoJerryScript.Object, error) {
 
-	log.Println("---> get Exports for path: ", path)
 	// If the path begin by ./ that means the current module must be use...
 	var dir string
 
@@ -665,12 +669,13 @@ func (this *JsRuntimeManager) getExports(path string, sessionId string) (*GoJerr
 		currentPath = currentPath[0 : len(currentPath)-3]
 	}
 
-	if this.m_exports[sessionId][currentPath] != nil {
-
-		this.m_sessions[sessionId].SetGlobalVariable("exports", this.m_exports[sessionId][currentPath])
+	// TODO be sure
+	/*if export, ok := this.m_exports[sessionId][currentPath]; ok {
+		log.Println("---> 670: set exports!")
+		this.m_sessions[sessionId].SetGlobalVariable("exports", export)
 	} else {
 		log.Panicln("---> no exports found for path ", currentPath)
-	}
+	}*/
 
 	return exports, nil
 
@@ -713,7 +718,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 	vm.RegisterJsFunction("require", "function require(moduleId){return require_(moduleId, sessionId)}")
 
 	// Create the map of exports.
-	jsRuntimeManager.m_exports[sessionId] = make(map[string]*GoJerryScript.Object)
+	jsRuntimeManager.m_exports[sessionId] = make(map[string]GoJerryScript.Object)
 
 	// Exported golang JS function.
 	for name, function := range this.m_functions {
@@ -728,15 +733,22 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			moduleId := values[0]
 			var exportPath string
 			exportPath = filepath.ToSlash(this.m_searchDir + "/src/" + moduleId)
-			if this.m_exports[sessionId][exportPath] == nil {
-				this.m_exports[sessionId][exportPath] = vm.CreateObject("exports")
-				// Keep it path
-				this.m_exports[sessionId][exportPath].Set("path__", exportPath)
-				this.m_exports[sessionId][exportPath].Set("module_id__", moduleId)
-			}
 
-			// Set the function as part of the exports object.
-			this.m_exports[sessionId][exportPath].Set(name, function)
+			if export, ok := this.m_exports[sessionId][exportPath]; ok {
+				// Set the function as part of the exports object.
+				export.Set(name, function)
+			} else {
+				export = vm.CreateObject("exports")
+
+				// Keep it path
+				export.Set("path__", exportPath)
+				export.Set("module_id__", moduleId)
+
+				this.m_exports[sessionId][exportPath] = export
+
+				// Set the function as part of the exports object.
+				export.Set(name, function)
+			}
 
 		} else {
 			// Register go function.
@@ -766,8 +778,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 /**
  * Set init a script.
  */
-func (this *JsRuntimeManager) initScript(path string, sessionId string) *GoJerryScript.Object {
-	log.Println("---> initScript at path: ", path)
+func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJerryScript.Object {
 	vm := this.m_sessions[sessionId]
 	moduleId := this.getModuleId(path)
 	this.m_script = path
@@ -778,29 +789,26 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) *GoJerry
 	}
 
 	if jsRuntimeManager.m_exports[sessionId] == nil {
-		jsRuntimeManager.m_exports[sessionId] = make(map[string]*GoJerryScript.Object)
+		jsRuntimeManager.m_exports[sessionId] = make(map[string]GoJerryScript.Object)
 	}
 
-	var exports *GoJerryScript.Object
-	if this.m_exports[sessionId][exportPath] != nil {
-		// Here I will return the exports
-		// set the global variable exports...
-		exports = this.m_exports[sessionId][exportPath]
+	if export, ok := this.m_exports[sessionId][exportPath]; ok {
+		return export
 	} else {
 		// create a new path
-		exports = vm.CreateObject("exports")
-		exports.Set("path__", exportPath)
-		exports.Set("module_id__", moduleId)
-		this.m_exports[sessionId][exportPath] = exports
+		export := vm.CreateObject("exports")
+		export.Set("path__", exportPath)
+		export.Set("module_id__", moduleId)
+		this.m_exports[sessionId][exportPath] = export
+
 		if src, ok := this.m_scripts[path]; ok {
 			_, err := vm.EvalScript(src, []GoJerryScript.Variable{})
 			if err != nil {
 				log.Panicln("---> script running error:  ", path, err)
 			}
 		}
+		return export
 	}
-
-	return exports
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -815,8 +823,13 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 		return // Nothing to do if the session already exist.
 	}
 
+	log.Println("---> create a new vm for session: ", sessionId)
+
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = GoJerryScriptClient.NewClient("127.0.0.1", 9696)
+	this.m_sessions[sessionId] = GoJerryScriptClient.NewClient("127.0.0.1", this.m_startPort)
+
+	this.m_startPort += 1
+
 	if sessionId != "" {
 		this.initScripts(sessionId)
 	}

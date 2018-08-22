@@ -15,10 +15,10 @@ type Object struct {
 
 	// If a name is given the object will be set
 	// as a property of the global JS object
-	name string
+	Name string
 
 	// The unique object identifier.
-	uuid string
+	UUID string
 }
 
 /**
@@ -30,11 +30,11 @@ func NewObject(name string) *Object {
 	obj := new(Object)
 	ptrString := fmt.Sprintf("%d", obj)
 	uuid := Utility.GenerateUUID(ptrString)
-	obj.uuid = uuid
-	obj.name = name
+	obj.UUID = uuid
+	obj.Name = name
 
 	// Here I will keep the object in the client cache.
-	GetCache().SetObject(obj.uuid, obj)
+	GetCache().SetObject(obj.UUID, obj)
 
 	return obj
 }
@@ -50,8 +50,8 @@ func (self *Object) SetPeer(peer *Peer) {
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
 	action.Name = "CreateObject"
-	action.AppendParam("uuid", self.uuid)
-	action.AppendParam("name", self.name)
+	action.AppendParam("uuid", self.UUID)
+	action.AppendParam("name", self.Name)
 
 	// Call the action here.
 	peer.CallRemoteAction(action)
@@ -60,11 +60,11 @@ func (self *Object) SetPeer(peer *Peer) {
 /**
  * Return property value.
  */
-func (self *Object) Get(name string) (*Value, error) {
+func (self *Object) Get(name string) (Value, error) {
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
 	action.Name = "GetObjectProperty"
-	action.AppendParam("uuid", self.uuid)
+	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 
 	// Call the action here.
@@ -80,7 +80,7 @@ func (self *Object) Get(name string) (*Value, error) {
 		err = action.Results[1].(error)
 	}
 
-	return &result, err
+	return result, err
 }
 
 /**
@@ -96,7 +96,7 @@ func (self *Object) Set(name string, value interface{}) {
 		action := new(Action)
 		action.UUID = Utility.RandomUUID()
 		action.Name = "SetGoObjectMethod"
-		action.AppendParam("uuid", self.uuid)
+		action.AppendParam("uuid", self.UUID)
 		action.AppendParam("name", name)
 
 		// Call the action here.
@@ -107,7 +107,7 @@ func (self *Object) Set(name string, value interface{}) {
 		action := new(Action)
 		action.UUID = Utility.RandomUUID()
 		action.Name = "SetObjectProperty"
-		action.AppendParam("uuid", self.uuid)
+		action.AppendParam("uuid", self.UUID)
 		action.AppendParam("name", name)
 		action.AppendParam("value", value)
 
@@ -123,7 +123,7 @@ func (self *Object) SetJsMethode(name string, src string) {
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
 	action.Name = "SetJsObjectMethod"
-	action.AppendParam("uuid", self.uuid)
+	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 	action.AppendParam("src", src)
 
@@ -139,7 +139,7 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
 	action.Name = "CallObjectMethod"
-	action.AppendParam("uuid", self.uuid)
+	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 
 	action.AppendParam("params", params)

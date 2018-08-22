@@ -14,8 +14,7 @@ func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	this.appendFunction("require_", func(identifier string, sessionId string) *GoJerryScript.Object {
-		log.Println("----> require is call with params: ", identifier, sessionId)
+	this.appendFunction("require_", func(identifier string, sessionId string) GoJerryScript.Object {
 		// resolve dependencie and return the exports.
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {

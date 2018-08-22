@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	//	"strconv"
+	"strconv"
 	"time"
 
 	"encoding/json"
+	//	"errors"
 	"os/exec"
 	"reflect"
 
@@ -46,13 +47,13 @@ func NewClient(address string, port int) *Client {
 
 	var err error
 	// Here I will start the external server process.
-	/*client.srv = exec.Command("/home/dave/Documents/CargoWebServer/Project/src/code.myceliUs.com/GoJerryScript/GoJerryScriptServer/GoJerryScriptServer", strconv.Itoa(port))
-	err := client.srv.Start()
+	client.srv = exec.Command("/home/dave/Documents/CargoWebServer/Project/src/code.myceliUs.com/GoJerryScript/GoJerryScriptServer/GoJerryScriptServer", strconv.Itoa(port))
+	err = client.srv.Start()
 
 	if err != nil {
 		log.Println("Fail to start GoJerryScriptServer", err)
 		return nil
-	}*/
+	}
 
 	// Create the client connection, try 5 time and wait 200 millisecond each try.
 	for i := 0; i < 5; i++ {
@@ -110,24 +111,29 @@ func (self *Client) processActions() {
 	for self.isRunning {
 		select {
 		case action := <-self.exec_action_chan:
-			go func() {
+			go func(a *GoJerryScript.Action) {
+				log.Println("---> client exec action: ", a.UUID, a.Name)
+
 				var target interface{}
 				isJsObject := true
-				if len(action.Target) > 0 {
-					if action.Target == "Client" {
+				if len(a.Target) > 0 {
+					if a.Target == "Client" {
 						// Call a methode of client
 						target = self
 						isJsObject = false
 					} else {
-						target = GoJerryScript.GetCache().GetObject(action.Target)
-						isJsObject = reflect.TypeOf(target).String() == "*GoJerryScript.Object"
+						target = GoJerryScript.GetCache().GetObject(a.Target)
+						isJsObject = reflect.TypeOf(target).String() == "GoJerryScript.Object" ||
+							reflect.TypeOf(target).String() == "*GoJerryScript.Object"
 					}
 				}
 
 				params := make([]interface{}, 0)
-				for i := 0; i < len(action.Params); i++ {
+				for i := 0; i < len(a.Params); i++ {
 					// So here I will append the value to parameters.
-					params = append(params, action.Params[i].Value)
+					log.Println("---> params: ", a.Params[i].Name, a.Params[i].Type, a.Params[i].Value)
+					// TODO test if the parameter is a ObjectRef.
+					params = append(params, a.Params[i].Value)
 				}
 
 				// I will call the function.
@@ -135,10 +141,10 @@ func (self *Client) processActions() {
 				var err interface{}
 
 				if isJsObject {
-					results, err = self.callGoFunction(action.Name, params...)
+					results, err = self.callGoFunction(a.Name, params...)
 				} else {
 					// Now I will call the method on the object.
-					results, err = Utility.CallMethod(target, action.Name, params)
+					results, err = Utility.CallMethod(target, a.Name, params)
 				}
 
 				// if results are go struct
@@ -146,7 +152,33 @@ func (self *Client) processActions() {
 				if results != nil {
 					if reflect.TypeOf(results).Kind() == reflect.Slice {
 						// Here if the result is a slice I will test if it contains struct...
-						log.Println("----> 134")
+						slice := reflect.ValueOf(results)
+						results_ := make([]interface{}, 0)
+
+						for i := 0; i < slice.Len(); i++ {
+							e := slice.Index(i)
+							// I will derefence the pointer if it's a pointer.
+							if reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
+								e = e.Elem()
+							}
+
+							// Test it
+							if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
+								// results will be register.
+								var uuid string
+								if reflect.TypeOf(e.Interface()).String() != "GoJerryScript.Object" {
+									uuid = self.RegisterGoObject(slice.Index(i).Interface(), "")
+								} else {
+									// No need to export the object function here
+									// because it's already exist on the server side.
+									uuid = results.(GoJerryScript.Object).UUID
+								}
+								// I will set the results a object reference.
+								results_ = append(results_, GoJerryScript.ObjectRef{UUID: uuid})
+							}
+						}
+						// Set the array of object references.
+						results = results_
 					} else {
 						// I will test if the result is a structure or not...
 						e := reflect.ValueOf(results)
@@ -157,8 +189,14 @@ func (self *Client) processActions() {
 						// Test it
 						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
 							// results will be register.
-							uuid := self.RegisterGoObject(results, "")
-
+							var uuid string
+							if reflect.TypeOf(e.Interface()).String() != "GoJerryScript.Object" {
+								uuid = self.RegisterGoObject(results, "")
+							} else {
+								// No need to export the object function here
+								// because it's already exist on the server side.
+								uuid = results.(GoJerryScript.Object).UUID
+							}
 							// I will set the results a object reference.
 							results = GoJerryScript.ObjectRef{UUID: uuid}
 						}
@@ -166,11 +204,11 @@ func (self *Client) processActions() {
 				}
 
 				// set the action result.
-				action.AppendResults(results, err)
+				a.AppendResults(results, err)
 
 				// Here I will create the response and send it back to the client.
-				action.Done <- action
-			}()
+				a.Done <- a
+			}(action)
 		}
 	}
 }
@@ -179,7 +217,7 @@ func (self *Client) processActions() {
 
 // Create Go object
 func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
-
+	log.Println("---> create object ", jsonStr)
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)
@@ -189,7 +227,8 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 			value = relfectValue.Interface()
 		} else {
 			// Here map[string]interface{} will be use.
-			value = data
+			return nil, nil //errors.New("No object are registered in go to back the js object!")
+
 		}
 	}
 
@@ -212,7 +251,7 @@ func (self *Client) RegisterGoType(value interface{}) {
  * name If a name is given It will be a global variable.
  */
 func (self *Client) RegisterGoObject(obj interface{}, name string) string {
-	//log.Println("---> register object: ", obj)
+	log.Println("---> register object: ", obj)
 	// First of all I will create the uuid property.
 	ptrString := fmt.Sprintf("%d", obj)
 	uuid := Utility.GenerateUUID(ptrString)
@@ -402,14 +441,14 @@ func (self *Client) RegisterJsFunction(name string, src string) error {
 /**
  * Create a new Js object.
  */
-func (self *Client) CreateObject(name string) *GoJerryScript.Object {
+func (self *Client) CreateObject(name string) GoJerryScript.Object {
 	// Create the object.
 	obj := GoJerryScript.NewObject(name)
 
 	// Give object the peer so it can register itself with the server.
 	obj.SetPeer(self.peer)
 
-	return obj
+	return *obj
 }
 
 /**
@@ -440,7 +479,7 @@ func (self *Client) EvalScript(script string, variables GoJerryScript.Variables)
 }
 
 /**
- * Call a function with a given name and a list of parameter.
+ * Call a JS/Go function with a given name and a list of parameter.
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScript.Value, error) {
 	// So here I will create the function parameters.
@@ -454,7 +493,6 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 
 	// Call the remote action
 	action = self.peer.CallRemoteAction(action)
-
 	var err error
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
@@ -467,7 +505,6 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
  * Set the global variable name.
  */
 func (self *Client) SetGlobalVariable(name string, value interface{}) {
-
 	// So here I will create the function parameters.
 	action := new(GoJerryScript.Action)
 	action.UUID = Utility.RandomUUID()

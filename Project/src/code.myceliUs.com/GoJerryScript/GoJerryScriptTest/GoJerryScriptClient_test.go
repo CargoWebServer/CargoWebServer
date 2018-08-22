@@ -53,6 +53,11 @@ func (self *Person) SayHelloTo(to string) string {
 	return self.FirstName + " say hello to " + to + "!"
 }
 
+// A method that return an array.
+func (self *Person) GetContacts() []*Person {
+	return self.Contacts
+}
+
 // Simple function to test adding tow number in Go
 // that function will be call inside JS via the handler.
 func AddNumber(a float64, b float64) float64 {
@@ -211,7 +216,7 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.RegisterGoObject(p, "Dave")
 
 	// Now I will eval sricpt on it...
-	engine.RegisterJsFunction("Test1", `function Test1(){print('--> Hello ' + Dave.Name())}`)
+	engine.RegisterJsFunction("Test1", `function Test1(){print('--> Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
 	// Eval script that contain Go object in it.
 	engine.EvalScript("Test1();", GoJerryScript.Variables{})

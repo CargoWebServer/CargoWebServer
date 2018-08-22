@@ -38,6 +38,7 @@ import "errors"
 import "reflect"
 import "fmt"
 import "strconv"
+import "strings"
 
 //import "strconv"
 import "log"
@@ -199,7 +200,7 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
-	log.Println("----> result ", action.Name, ":", action.Results[0])
+
 	return action.Results[0], err
 }
 
@@ -513,15 +514,23 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			// Return and object reference.
 			value = ObjectRef{UUID: uuid.(string)}
 		} else {
+
 			stringified := Jerry_json_stringfy(input)
+
 			// if there is no error
 			if !Jerry_value_is_error(stringified) {
-				jsonStr := jsStrToGoStr(stringified)
 
-				// So here I will create a remote action and tell the client to
-				// create a Go object from jsonStr. The object will be set by
-				// the client on the server.
-				return callGoFunction("Client", "CreateGoObject", jsonStr)
+				jsonStr := jsStrToGoStr(stringified)
+				if strings.Index(jsonStr, "TYPENAME") != -1 {
+					// So here I will create a remote action and tell the client to
+					// create a Go object from jsonStr. The object will be set by
+					// the client on the server.
+					return callGoFunction("Client", "CreateGoObject", jsonStr)
+				}
+
+				// In that case the object has no go representation...
+				// and must be use only in JS.
+				return nil, nil
 
 			} else {
 				// Continue any way with nil object instead of an error...

@@ -903,7 +903,6 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 
 			// I will open a connection with the service and get it list of actions.
 			conn, err := GetServer().connect(config.GetIpv4(), config.GetPort())
-
 			if err != nil {
 				return
 			}

@@ -51,13 +51,14 @@ func (self *Server) processRemoteActions() {
 	for self.isRunning {
 		select {
 		case action := <-self.call_remote_actions_chan:
-
-			// Call remote action
-			action = self.peer.CallRemoteAction(action)
-
-			// Set back the action on the channel.
-			action.Done <- action
+			go func(a *GoJerryScript.Action, s *Server) {
+				// Call remote action
+				a = s.peer.CallRemoteAction(a)
+				// Set back the action on the channel.
+				a.Done <- a
+			}(action, self)
 		}
+
 	}
 }
 
@@ -72,40 +73,41 @@ func (self *Server) processActions() {
 		case action := <-self.exec_action_chan:
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
-			go func() {
-				if action.Name == "RegisterJsFunction" {
-					action.AppendResults(self.engine.RegisterJsFunction(action.Params[0].Value.(string), action.Params[1].Value.(string)))
-				} else if action.Name == "EvalScript" {
+			go func(a *GoJerryScript.Action, s *Server) {
+				log.Println("---> server exec action: ", a.UUID, a.Name)
+				if a.Name == "RegisterJsFunction" {
+					a.AppendResults(s.engine.RegisterJsFunction(a.Params[0].Value.(string), a.Params[1].Value.(string)))
+				} else if a.Name == "EvalScript" {
 					// So here I will call the function and return it value.
-					action.AppendResults(self.engine.EvalScript(action.Params[0].Value.(string), action.Params[1].Value.(GoJerryScript.Variables)))
-				} else if action.Name == "CallFunction" {
+					a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), a.Params[1].Value.(GoJerryScript.Variables)))
+				} else if a.Name == "CallFunction" {
 					// So here I will call the function and return it value.
-					action.AppendResults(self.engine.CallFunction(action.Params[0].Value.(string), action.Params[1].Value.([]interface{})))
-				} else if action.Name == "RegisterGoFunction" {
-					self.engine.RegisterGoFunction(action.Params[0].Value.(string))
-				} else if action.Name == "CreateObject" {
-					self.engine.CreateObject(action.Params[0].Value.(string), action.Params[1].Value.(string))
-				} else if action.Name == "SetObjectProperty" {
-					self.engine.SetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value)
-				} else if action.Name == "SetGoObjectMethod" {
-					self.engine.SetGoObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string))
-				} else if action.Name == "SetJsObjectMethod" {
-					self.engine.SetJsObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(string))
-				} else if action.Name == "GetObjectProperty" {
-					action.AppendResults(self.engine.GetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string)))
-				} else if action.Name == "CallObjectMethod" {
-					action.AppendResults(self.engine.CallObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.([]interface{})...))
-				} else if action.Name == "CreateObjectArray" {
-					action.AppendResults(self.engine.CreateObjectArray(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(uint32)))
-				} else if action.Name == "SetObjectPropertyAtIndex" {
-					self.engine.SetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(uint32), action.Params[3].Value)
-				} else if action.Name == "GetObjectPropertyAtIndex" {
-					action.AppendResults(self.engine.GetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(uint32)))
-				} else if action.Name == "SetGlobalVariable" {
-					self.engine.SetGlobalVariable(action.Params[0].Value.(string), action.Params[1].Value)
-				} else if action.Name == "GetGlobalVariable" {
-					action.AppendResults(self.engine.GetGlobalVariable(action.Params[0].Value.(string)))
-				} else if action.Name == "Stop" {
+					a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+				} else if a.Name == "RegisterGoFunction" {
+					s.engine.RegisterGoFunction(a.Params[0].Value.(string))
+				} else if a.Name == "CreateObject" {
+					s.engine.CreateObject(a.Params[0].Value.(string), a.Params[1].Value.(string))
+				} else if a.Name == "SetObjectProperty" {
+					s.engine.SetObjectProperty(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value)
+				} else if a.Name == "SetGoObjectMethod" {
+					s.engine.SetGoObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string))
+				} else if a.Name == "SetJsObjectMethod" {
+					s.engine.SetJsObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(string))
+				} else if a.Name == "GetObjectProperty" {
+					a.AppendResults(s.engine.GetObjectProperty(a.Params[0].Value.(string), a.Params[1].Value.(string)))
+				} else if a.Name == "CallObjectMethod" {
+					a.AppendResults(s.engine.CallObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.([]interface{})...))
+				} else if a.Name == "CreateObjectArray" {
+					a.AppendResults(s.engine.CreateObjectArray(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32)))
+				} else if a.Name == "SetObjectPropertyAtIndex" {
+					s.engine.SetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32), a.Params[3].Value)
+				} else if a.Name == "GetObjectPropertyAtIndex" {
+					a.AppendResults(s.engine.GetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32)))
+				} else if a.Name == "SetGlobalVariable" {
+					s.engine.SetGlobalVariable(a.Params[0].Value.(string), a.Params[1].Value)
+				} else if a.Name == "GetGlobalVariable" {
+					a.AppendResults(s.engine.GetGlobalVariable(a.Params[0].Value.(string)))
+				} else if a.Name == "Stop" {
 					log.Println("--> Stop JerryScript!")
 					// TODO fix it.
 					// Stop the server.
@@ -113,7 +115,7 @@ func (self *Server) processActions() {
 					self.engine.Clear()
 
 					// Send back the result to client.
-					self.exec_action_chan <- action
+					self.exec_action_chan <- a
 
 					// Close the connection.
 					self.peer.Close()
@@ -122,8 +124,8 @@ func (self *Server) processActions() {
 					break*/
 				}
 
-				action.Done <- action
-			}()
+				a.Done <- a
+			}(action, self)
 		}
 	}
 }

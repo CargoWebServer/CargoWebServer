@@ -47,6 +47,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	gob.Register(Param{})
 	gob.Register(Variables{})
 	gob.Register(Value{})
+	gob.Register(Object{})
 	gob.Register(ObjectRef{})
 	gob.Register([]interface{}{})
 
@@ -78,13 +79,13 @@ func (self *Peer) run() {
 	go func(self *Peer) {
 		for self.isRunning {
 			msg := new(Message)
+			log.Println(self.conn.LocalAddr().String())
 			decoder := gob.NewDecoder(self.conn)
 			err := decoder.Decode(msg)
-
 			if err == nil {
 				self.receive_chan <- msg
 			} else {
-				//log.Println("---> unmarchaling error: ", err)
+				log.Panicln("---> unmarchaling error: ", err)
 			}
 		}
 	}(self)
@@ -104,12 +105,10 @@ func (self *Peer) run() {
 
 					// In that case I will run the action.
 					// Set the action on the channel to be execute by the peer owner.
-					log.Println("---> call action: ", action.Name)
 					self.exec_action_chan <- action
 
 					// Wait for the result.
 					action = <-action.Done
-
 					// Here I will create the response and send it back to the client.
 					rsp := new(Message)
 					rsp.UUID = msg.UUID
@@ -127,6 +126,7 @@ func (self *Peer) run() {
 				go func(self *Peer, msg *Message) {
 					// Here I receive a response.
 					// I will get the action...
+					//log.Println("---> 130 receive response action: ", msg.Remote.UUID, msg.Remote.Name)
 					action := <-self.pending_actions_chan[msg.UUID]
 
 					// The response result in the action.
@@ -139,11 +139,17 @@ func (self *Peer) run() {
 			}
 		case msg := <-self.send_chan:
 			go func(self *Peer, msg *Message) {
+
 				// Send the message over the network.
 				encoder := gob.NewEncoder(self.conn)
+				log.Println("----> send action ", msg.Remote)
 				err := encoder.Encode(msg)
 				if err != nil {
-					//log.Println("---> marshaling error: ", err)
+					log.Println("---> ", msg.Remote.Name)
+					for i := 0; i < len(msg.Remote.Results); i++ {
+						log.Println("---> ", msg.Remote.Results[i])
+					}
+					log.Panicln("---> marshaling error: ", err)
 				}
 			}(self, msg)
 		case <-self.stop_chan:
@@ -212,7 +218,6 @@ func (self *Peer) CallRemoteAction(action *Action) *Action {
 
 	// Call remote action and wait for it result and set it back in the action.
 	action = <-self.pending_actions_chan[action.UUID]
-
 	// Remove it from the map.
 	delete(self.pending_actions_chan, action.UUID)
 

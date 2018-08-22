@@ -37,7 +37,7 @@ type Action struct {
 	Name string
 
 	// The list of action parameters.
-	Params []*Param
+	Params []Param
 
 	// The action results.
 	Results []interface{}
@@ -51,7 +51,7 @@ type Action struct {
 // TODO test if the parameter is an object reference in that case send
 // object info and not the object itself. To the same for results.
 func (self *Action) AppendParam(name string, value interface{}) {
-	param := new(Param)
+	var param Param
 	param.Name = name
 
 	// Here I will use the go reflection to get the type of
@@ -62,7 +62,7 @@ func (self *Action) AppendParam(name string, value interface{}) {
 	param.Value = value
 
 	if self.Params == nil {
-		self.Params = make([]*Param, 0)
+		self.Params = make([]Param, 0)
 	}
 
 	self.Params = append(self.Params, param)
