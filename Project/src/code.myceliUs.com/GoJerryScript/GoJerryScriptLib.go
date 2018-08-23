@@ -136,8 +136,6 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 	var r Uint32_t
 	var err error
 
-	log.Println("----> Call function with  params: ", params)
-
 	// if the function is define...
 	if Jerry_value_is_function(fct) {
 		// Now I will set the arguments...

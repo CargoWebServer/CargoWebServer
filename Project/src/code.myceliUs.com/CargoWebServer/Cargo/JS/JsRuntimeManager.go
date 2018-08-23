@@ -222,7 +222,6 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			// In case the script must be run...
 			if operationInfos.m_params["run"].(bool) {
 				for _, session := range jsRuntimeManager.m_sessions {
-					log.Println(script)
 					session.EvalScript(script, []GoJerryScript.Variable{})
 				}
 			}

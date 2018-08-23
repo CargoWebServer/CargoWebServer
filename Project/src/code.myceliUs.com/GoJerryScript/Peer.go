@@ -79,7 +79,6 @@ func (self *Peer) run() {
 	go func(self *Peer) {
 		for self.isRunning {
 			msg := new(Message)
-			log.Println(self.conn.LocalAddr().String())
 			decoder := gob.NewDecoder(self.conn)
 			err := decoder.Decode(msg)
 			if err == nil {
@@ -126,9 +125,8 @@ func (self *Peer) run() {
 				go func(self *Peer, msg *Message) {
 					// Here I receive a response.
 					// I will get the action...
-					//log.Println("---> 130 receive response action: ", msg.Remote.UUID, msg.Remote.Name)
 					action := <-self.pending_actions_chan[msg.UUID]
-
+					log.Println("---> 130 receive response action: ", action)
 					// The response result in the action.
 					action.Results = msg.Remote.Results
 
@@ -142,7 +140,8 @@ func (self *Peer) run() {
 
 				// Send the message over the network.
 				encoder := gob.NewEncoder(self.conn)
-				log.Println("----> send action ", msg.Remote)
+				log.Println("---> send action ", msg.Remote)
+
 				err := encoder.Encode(msg)
 				if err != nil {
 					log.Println("---> ", msg.Remote.Name)
