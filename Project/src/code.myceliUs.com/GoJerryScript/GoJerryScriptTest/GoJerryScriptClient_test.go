@@ -78,8 +78,8 @@ var engine = GoJerryScriptClient.NewClient("127.0.0.1", 8081)
 func TestHelloJerry(t *testing.T) {
 
 	// Register the function SayHelloTo. The function take one parameter.
-	engine.RegisterJsFunction("SayHelloTo", "function SayHelloTo(to){return 'Hello ' + to + '!';}")
-	str, _ := engine.CallFunction("SayHelloTo", "Jerry Script")
+	engine.RegisterJsFunction("SayHelloTo", "function SayHelloTo(greething, to){return greething + ' ' + to + '!';}")
+	str, _ := engine.CallFunction("SayHelloTo", "Hello", "Jerry Script")
 
 	str_, _ := str.ToString()
 

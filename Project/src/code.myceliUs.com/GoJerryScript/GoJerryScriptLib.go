@@ -136,6 +136,8 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 	var r Uint32_t
 	var err error
 
+	log.Println("----> Call function with  params: ", params)
+
 	// if the function is define...
 	if Jerry_value_is_function(fct) {
 		// Now I will set the arguments...
@@ -158,7 +160,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 			r_ = C.call_function(fctPtr, thisPtr, (C.jerry_value_p)(unsafe.Pointer(&args[0])), C.jerry_value_t(len(params)))
 		} else {
 			var args_ C.jerry_value_p
-			r_ = C.call_function(fctPtr, thisPtr, args_, C.jerry_value_t(0))
+			r_ = C.call_function(fctPtr, thisPtr, args_, C.uint32_t(len(args)))
 		}
 
 		r = jerry_value_t_To_uint32_t(r_)

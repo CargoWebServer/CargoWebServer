@@ -938,8 +938,8 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScriptClient.Client, 
 	} else {
 		functionName = functionStr
 	}
-
-	result, err_ := vm.CallFunction(functionName, functionParams)
+	log.Println("---> CallFunction JsRuntimeManager ", functionName, functionParams)
+	result, err_ := vm.CallFunction(functionName, functionParams...)
 
 	if err_ != nil {
 		log.Println("Error found with function ", functionName, err_.(error), "params: ", functionParams)

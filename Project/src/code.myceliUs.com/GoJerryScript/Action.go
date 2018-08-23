@@ -1,6 +1,7 @@
 package GoJerryScript
 
 import "reflect"
+import "log"
 
 type Message struct {
 	// Can be 0 request or 1 response
@@ -51,6 +52,7 @@ type Action struct {
 // TODO test if the parameter is an object reference in that case send
 // object info and not the object itself. To the same for results.
 func (self *Action) AppendParam(name string, value interface{}) {
+
 	var param Param
 	param.Name = name
 
@@ -64,7 +66,7 @@ func (self *Action) AppendParam(name string, value interface{}) {
 	if self.Params == nil {
 		self.Params = make([]Param, 0)
 	}
-
+	log.Println("Append param ", name, " whit value ", value, " param.Type ", param.Type)
 	self.Params = append(self.Params, param)
 }
 

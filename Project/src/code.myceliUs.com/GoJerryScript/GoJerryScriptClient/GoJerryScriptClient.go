@@ -131,7 +131,6 @@ func (self *Client) processActions() {
 				params := make([]interface{}, 0)
 				for i := 0; i < len(a.Params); i++ {
 					// So here I will append the value to parameters.
-					log.Println("---> params: ", a.Params[i].Name, a.Params[i].Type, a.Params[i].Value)
 					// TODO test if the parameter is a ObjectRef.
 					params = append(params, a.Params[i].Value)
 				}

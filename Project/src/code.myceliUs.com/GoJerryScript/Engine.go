@@ -60,10 +60,10 @@ jerry_value_t
 call_function ( const jerry_value_t func_obj_val,
                 const jerry_value_t this_val,
                 const jerry_value_p args_p,
-                jerry_size_t args_count){
+                int32_t args_count){
 
 	// evaluate the result
-	jerry_value_t ret = jerry_call_function ( func_obj_val, this_val,args_p, args_count );
+	jerry_value_t ret = jerry_call_function ( func_obj_val, this_val, args_p, args_count );
 	return ret;
 }
 
@@ -458,6 +458,7 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Engine) CallFunction(name string, params []interface{}) (Value, error) {
+
 	globalObject := Jerry_get_global_object()
 	defer Jerry_release_value(globalObject)
 
