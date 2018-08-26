@@ -236,9 +236,10 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 	action.Name = name
 	action.Target = target
 	action.UUID = Utility.RandomUUID()
-
+	log.Println("----> call: ", name)
 	// Set the list of parameters.
 	for i := 0; i < len(params); i++ {
+		log.Println("---> param: ", params[i], reflect.TypeOf(params[i]).String())
 		action.AppendParam("arg"+strconv.Itoa(i), params[i])
 	}
 
@@ -251,7 +252,7 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 
 	// Set back the action with it results in it.
 	action = <-action.Done
-
+	log.Println("---> 255 ", action.Results)
 	var err error
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
@@ -707,4 +708,50 @@ const sizeOfUintPtr = unsafe.Sizeof(uintptr(0))
 
 func uintptrToBytes(u *uintptr) []byte {
 	return (*[sizeOfUintPtr]byte)(unsafe.Pointer(u))[:]
+}
+
+// Convert objectRef to object as needed.
+func GetObject(val interface{}) interface{} {
+	if reflect.TypeOf(val).String() == "GoJerryScript.ObjectRef" {
+		ref := val.(ObjectRef)
+		if GetCache().GetObject(ref.UUID) != nil {
+			return GetCache().GetObject(ref.UUID)
+		}
+		return nil
+
+	} else if reflect.TypeOf(val).Kind() == reflect.Slice {
+		// In case of a slice I will transform the object ref with it actual values.
+		slice := reflect.ValueOf(val)
+
+		//values := make([]interface{}, 0)
+
+		var values reflect.Value
+		for i := 0; i < slice.Len(); i++ {
+			e := slice.Index(i)
+			if e.IsValid() {
+				if !e.IsNil() {
+					if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+						ref := e.Interface().(ObjectRef)
+						if GetCache().GetObject(ref.UUID) != nil {
+							obj := GetCache().GetObject(ref.UUID)
+							if obj != nil {
+								if i == 0 {
+									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
+								}
+								values = reflect.Append(values, reflect.ValueOf(obj))
+							} else {
+								log.Println("---> fail to retreive object ", ref.UUID)
+							}
+						}
+					}
+				}
+			}
+		}
+		// return values with object instead of object ref.
+		if values.IsValid() {
+			return values.Interface()
+		}
+	}
+	// No conversion was necessary.
+	return val
 }

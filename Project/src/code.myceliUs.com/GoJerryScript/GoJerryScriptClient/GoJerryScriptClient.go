@@ -106,6 +106,7 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 
 	results, err := Utility.CallFunction(name, setObjectRefs(params)...)
 	if err != nil {
+		log.Println("---> call go function ", name, " fail with error: ", err)
 		return nil, err
 	}
 
@@ -158,7 +159,7 @@ func (self *Client) processActions() {
 				for i := 0; i < len(a.Params); i++ {
 					// So here I will append the value to parameters.
 					// TODO test if the parameter is a ObjectRef.
-					params = append(params, a.Params[i].Value)
+					params = append(params, GoJerryScript.GetObject(a.Params[i].Value))
 				}
 
 				// I will call the function.

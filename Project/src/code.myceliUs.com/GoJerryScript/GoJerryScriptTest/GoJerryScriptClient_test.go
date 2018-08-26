@@ -24,7 +24,7 @@ func GetPerson() *Person {
 	var p *Person
 	p = new(Person)
 	p.TYPENAME = "GoJerryScript.Person"
-	p.Age = 40
+	p.Age = 42
 	p.FirstName = "Dave"
 	p.LastName = "Courtois"
 	p.NickNames = make([]string, 0)
@@ -33,14 +33,19 @@ func GetPerson() *Person {
 	p.Contacts = make([]*Person, 0)
 
 	// Append a contact.
-	c := new(Person)
-	c.TYPENAME = "GoJerryScript.Person"
-	c.Age = 21
-	c.FirstName = "Emmanuel"
-	c.LastName = "Proulx"
+	c0 := new(Person)
+	c0.TYPENAME = "GoJerryScript.Person"
+	c0.Age = 21
+	c0.FirstName = "Emmanuel"
+	c0.LastName = "Proulx"
+	p.Contacts = append(p.Contacts, c0)
 
-	p.Contacts = append(p.Contacts, c)
-
+	c1 := new(Person)
+	c1.TYPENAME = "GoJerryScript.Person"
+	c1.Age = 42
+	c1.FirstName = "Eric"
+	c1.LastName = "Boucher"
+	p.Contacts = append(p.Contacts, c1)
 	return p
 }
 
@@ -49,8 +54,20 @@ func (self *Person) Name() string {
 	return self.FirstName + " " + self.LastName
 }
 
-func (self *Person) SayHelloTo(to string) string {
-	return self.FirstName + " say hello to " + to + "!"
+// A method that use a Go type as pointer.
+func (self *Person) SayHelloTo(to *Person) string {
+	return self.FirstName + " say hello to " + to.Name() + "!"
+}
+
+// A function with an array of object as parameter.
+func (self *Person) SayHelloToAll(all []*Person) string {
+	var greathing string
+
+	for i := 0; i < len(all); i++ {
+		greathing += self.FirstName + " say hello to " + all[i].Name() + "!\n"
+	}
+
+	return greathing
 }
 
 // A method that return an array.
@@ -118,14 +135,12 @@ func TestBooleanValue(t *testing.T) {
 	if boolean_ == false {
 		t.Error("Expected true, got ", boolean)
 	}
-
 }
 
 /**
  * Test playing with array value.
  */
 func TestArray(t *testing.T) {
-
 	engine.RegisterJsFunction("TestArray", "function TestArray(arr, val){arr.push(val); return arr;}")
 	arr, err0 := engine.CallFunction("TestArray", []interface{}{1.0, 3.0, 4.0}, 2.25)
 	if err0 == nil {
@@ -215,7 +230,7 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.RegisterGoObject(p, "Dave")
 
 	// Now I will eval sricpt on it...
-	engine.RegisterJsFunction("Test1", `function Test1(){print('--> Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
+	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
 	// Eval script that contain Go object in it.
 	engine.EvalScript("Test1();", GoJerryScript.Variables{})
@@ -225,10 +240,10 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.RegisterGoFunction("GetPerson", GetPerson)
 
 	// Eval single return type (not array)
-	engine.EvalScript("print('Hello: ' + GetPerson().Name() + 'Your age are ' + GetPerson().Age)", []GoJerryScript.Variable{})
+	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []GoJerryScript.Variable{})
 
 	// Eval array...
-	engine.EvalScript("print('Hello ' + GetPerson().Contacts[0].Name())", []GoJerryScript.Variable{})
+	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []GoJerryScript.Variable{})
 
 	//engine.Stop()
 }
@@ -252,7 +267,6 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 
 	p_, _ := p.Export()
 
-	log.Println("----> p_", p_)
 	if err == nil {
 		t.Log(p_)
 	}
