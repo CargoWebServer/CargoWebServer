@@ -72,7 +72,7 @@ func NewHub() *Hub {
 								conn.Close() // Here I will close the connection.
 							} else {
 								go func(rqst *message) {
-									GetServer().GetProcessor().m_sendRequest <- rqst
+									GetServer().getProcessor().m_sendRequest <- rqst
 								}(rqst)
 							}
 						}
@@ -109,7 +109,7 @@ func (h *Hub) run() {
 			GetServer().onClose(c.GetUuid())
 
 		case msg := <-h.receivedMsg:
-			GetServer().GetProcessor().m_incomingChannel <- msg
+			GetServer().getProcessor().m_incomingChannel <- msg
 
 		case done := <-h.abortedByEnvironment:
 			if done {

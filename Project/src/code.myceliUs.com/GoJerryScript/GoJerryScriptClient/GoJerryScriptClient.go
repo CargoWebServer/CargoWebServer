@@ -2,7 +2,6 @@
 package GoJerryScriptClient
 
 import (
-	"fmt"
 	"log"
 
 	"strconv"
@@ -10,6 +9,7 @@ import (
 
 	"encoding/json"
 	//	"errors"
+	"fmt"
 	"os/exec"
 	"reflect"
 
@@ -75,9 +75,36 @@ func NewClient(address string, port int) *Client {
 	return client
 }
 
+// Replace object reference by actual object.
+func setObjectRefs(values []interface{}) []interface{} {
+
+	for i := 0; i < len(values); i++ {
+		if reflect.TypeOf(values[i]).Kind() == reflect.Slice {
+			// Here I got a slice...
+			slice := reflect.ValueOf(values[i])
+
+			for j := 0; j < slice.Len(); j++ {
+				e := slice.Index(j)
+				if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+					// Replace the object reference with it actual object.
+					values[i].([]interface{})[j] = GoJerryScript.GetCache().GetObject(e.Interface().(GoJerryScript.ObjectRef).UUID)
+				}
+			}
+		} else {
+			if reflect.TypeOf(values[i]).String() == "GoJerryScript.ObjectRef" {
+				// Replace the object reference with it actual value.
+				values[i] = GoJerryScript.GetCache().GetObject(values[i].(GoJerryScript.ObjectRef).UUID)
+			}
+		}
+	}
+
+	return values
+}
+
 // Call a go function and return it result.
-func (self *Client) callGoFunction(name string, params ...interface{}) (interface{}, error) {
-	results, err := Utility.CallFunction(name, params...)
+func (self *Client) callGoFunction(name string, params []interface{}) (interface{}, error) {
+
+	results, err := Utility.CallFunction(name, setObjectRefs(params)...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,14 +133,13 @@ func (self *Client) callGoFunction(name string, params ...interface{}) (interfac
 	return nil, nil
 }
 
-// Run requested actions.
+// Action request by the server.
 func (self *Client) processActions() {
 	for self.isRunning {
 		select {
 		case action := <-self.exec_action_chan:
 			go func(a *GoJerryScript.Action) {
 				log.Println("---> client exec action: ", a.UUID, a.Name)
-
 				var target interface{}
 				isJsObject := true
 				if len(a.Target) > 0 {
@@ -140,7 +166,7 @@ func (self *Client) processActions() {
 				var err interface{}
 
 				if isJsObject {
-					results, err = self.callGoFunction(a.Name, params...)
+					results, err = self.callGoFunction(a.Name, params)
 				} else {
 					// Now I will call the method on the object.
 					results, err = Utility.CallMethod(target, a.Name, params)
@@ -161,7 +187,6 @@ func (self *Client) processActions() {
 								e = e.Elem()
 							}
 
-							// Test it
 							if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
 								// results will be register.
 								var uuid string
@@ -201,10 +226,8 @@ func (self *Client) processActions() {
 						}
 					}
 				}
-
 				// set the action result.
 				a.AppendResults(results, err)
-
 				// Here I will create the response and send it back to the client.
 				a.Done <- a
 			}(action)
@@ -216,7 +239,6 @@ func (self *Client) processActions() {
 
 // Create Go object
 func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
-	log.Println("---> create object ", jsonStr)
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)
@@ -230,8 +252,11 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 
 		}
 	}
-
 	return value, err
+}
+
+func (self *Client) DeleteGoObject(uuid string) {
+	GoJerryScript.GetCache().RemoveObject(uuid)
 }
 
 /**
@@ -250,14 +275,20 @@ func (self *Client) RegisterGoType(value interface{}) {
  * name If a name is given It will be a global variable.
  */
 func (self *Client) RegisterGoObject(obj interface{}, name string) string {
-	log.Println("---> register object: ", obj)
-	// First of all I will create the uuid property.
-	ptrString := fmt.Sprintf("%d", obj)
-	uuid := Utility.GenerateUUID(ptrString)
+	// Random uuid.
+	var uuid string
+	if len(name) > 0 {
+		// In that case the object is in the global scope.
+		uuid = Utility.GenerateUUID(name)
+	} else {
+		// Not a global object.
+		ptrStr := fmt.Sprintf("%p", obj)
+		uuid = Utility.GenerateUUID(ptrStr)
+		//uuid = Utility.RandomUUID()
+	}
 
+	// Do not recreate already existing object.
 	if GoJerryScript.GetCache().GetObject(uuid) != nil {
-		// if the object is already register I will return
-		// this avoid circular call
 		return uuid
 	}
 
@@ -474,7 +505,11 @@ func (self *Client) EvalScript(script string, variables GoJerryScript.Variables)
 		err = action.Results[1].(error)
 	}
 
-	return action.Results[0].(GoJerryScript.Value), err
+	// Transform object ref into object as needed.
+	value := action.Results[0].(GoJerryScript.Value)
+	value.Export()
+
+	return value, err
 }
 
 /**
@@ -497,7 +532,11 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 		err = action.Results[1].(error)
 	}
 
-	return action.Results[0].(GoJerryScript.Value), err
+	// Transform object ref into object as needed.
+	value := action.Results[0].(GoJerryScript.Value)
+	value.Export()
+
+	return value, err
 }
 
 /**
@@ -536,7 +575,11 @@ func (self *Client) GetGlobalVariable(name string) (GoJerryScript.Value, error) 
 		err = action.Results[1].(error)
 	}
 
-	return action.Results[0].(GoJerryScript.Value), err
+	// Transform object ref into object as needed.
+	value := action.Results[0].(GoJerryScript.Value)
+	value.Export()
+
+	return value, err
 }
 
 /**

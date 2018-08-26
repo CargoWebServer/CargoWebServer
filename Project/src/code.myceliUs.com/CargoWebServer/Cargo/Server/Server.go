@@ -516,7 +516,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 	})
@@ -585,7 +585,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 	})
@@ -665,7 +665,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 	})
@@ -745,7 +745,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 	})
@@ -817,7 +817,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 	})
@@ -882,7 +882,7 @@ func (this *Server) Start() {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 	})
 
@@ -985,7 +985,7 @@ func (this *Server) Start() {
 
 			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, caller)
 			go func(rqst *message) {
-				GetServer().GetProcessor().m_sendRequest <- rqst
+				GetServer().getProcessor().m_sendRequest <- rqst
 			}(rqst)
 
 			return conn
@@ -1139,23 +1139,23 @@ func (this *Server) connect(host string, port int) (*WebSocketConnection, error)
 // Getter
 //////////////////////////////////////////////////////////
 
-func (this *Server) GetProcessor() *MessageProcessor {
+func (this *Server) getProcessor() *MessageProcessor {
 	return this.messageProcessor
 }
 
-func (this *Server) GetHub() *Hub {
+func (this *Server) getHub() *Hub {
 	return this.hub
 }
 
-func (this *Server) AppendLogger(logger *Logger) {
+func (this *Server) appendLogger(logger *Logger) {
 	this.loggers[logger.id] = logger
 }
 
-func (this *Server) GetLoggerById(id string) *Logger {
+func (this *Server) getLoggerById(id string) *Logger {
 	return this.loggers[id]
 }
 
-func (this *Server) GetDefaultErrorLogger() *Logger {
+func (this *Server) getDefaultErrorLogger() *Logger {
 	return this.loggers["defaultErrorLogger"]
 }
 

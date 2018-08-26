@@ -48,8 +48,6 @@ type Action struct {
 }
 
 // Append a new parameter to an action.
-// TODO test if the parameter is an object reference in that case send
-// object info and not the object itself. To the same for results.
 func (self *Action) AppendParam(name string, value interface{}) {
 
 	var param Param
@@ -65,12 +63,11 @@ func (self *Action) AppendParam(name string, value interface{}) {
 	if self.Params == nil {
 		self.Params = make([]Param, 0)
 	}
+
 	self.Params = append(self.Params, param)
 }
 
 // Append the action results.
-// TODO test if the parameter is an object reference in that case send
-// object info and not the object itself. To the same for results.
 func (self *Action) AppendResults(results ...interface{}) {
 	self.Results = make([]interface{}, 0)
 	self.Results = append(self.Results, results...)

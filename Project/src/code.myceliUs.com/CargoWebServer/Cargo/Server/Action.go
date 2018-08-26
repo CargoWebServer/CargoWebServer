@@ -53,7 +53,7 @@ func (action *Action) sendResponse(result []*MessageData) {
 	to := make([]*WebSocketConnection, 1)
 	to[0] = action.msg.from
 	resultMsg, _ := NewResponseMessage(action.msg.GetId(), result, to)
-	GetServer().GetProcessor().appendResponse(resultMsg)
+	GetServer().getProcessor().appendResponse(resultMsg)
 }
 
 /**

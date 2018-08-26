@@ -4,7 +4,7 @@ import "reflect"
 import "code.myceliUs.com/Utility"
 import "errors"
 
-//import "log"
+import "log"
 
 /**
  * Interface Js value as Go value.
@@ -17,9 +17,14 @@ type Value struct {
 /**
  * If the value is an object it can be use as so.
  */
-func (self Value) Object() *Object {
-	if reflect.TypeOf(self.Val).String() == "*GoJerryScript.Object" {
-		return self.Val.(*Object)
+func (self *Value) Object() *Object {
+	if self.Val != nil {
+		if reflect.TypeOf(self.Val).String() == "GoJerryScript.Object" {
+			obj := self.Val.(Object)
+			return &obj
+		} else if reflect.TypeOf(self.Val).String() == "*GoJerryScript.Object" {
+			return self.Val.(*Object)
+		}
 	}
 
 	// not an object.
@@ -29,14 +34,43 @@ func (self Value) Object() *Object {
 /**
  * Export the Javascript value in Go.
  */
-func (self Value) Export() (interface{}, error) {
+func (self *Value) Export() (interface{}, error) {
 	// Depending of the side where the value is it will be export in Go or in JS.
-	if reflect.TypeOf(self.Val).String() == "GoJerryScript.ObjectRef" {
-		ref := self.Val.(ObjectRef)
-		if GetCache().GetObject(ref.UUID) != nil {
-			return GetCache().GetObject(ref.UUID), nil
-		} else if GetCache().getJsObject(ref.UUID) != nil {
-			return GetCache().getJsObject(ref.UUID), nil
+	if self.Val != nil {
+		if reflect.TypeOf(self.Val).String() == "GoJerryScript.ObjectRef" {
+			ref := self.Val.(ObjectRef)
+			if GetCache().GetObject(ref.UUID) != nil {
+				self.Val = GetCache().GetObject(ref.UUID)
+			} else {
+				log.Println("---> fail to retreive object ", ref.UUID)
+			}
+		} else if reflect.TypeOf(self.Val).Kind() == reflect.Slice {
+			// In case of a slice I will transform the object ref with it actual values.
+			slice := reflect.ValueOf(self.Val)
+			values := make([]interface{}, 0)
+			for i := 0; i < slice.Len(); i++ {
+				e := slice.Index(i)
+				if e.IsValid() {
+					if !e.IsNil() {
+						if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+							ref := e.Interface().(ObjectRef)
+							if GetCache().GetObject(ref.UUID) != nil {
+								obj := GetCache().GetObject(ref.UUID)
+								if obj != nil {
+									values = append(values, obj)
+								} else {
+									log.Println("---> fail to retreive object ", ref.UUID)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Set the values...
+			if len(values) > 0 {
+				self.Val = values
+			}
 		}
 	}
 	// Return the value itself.

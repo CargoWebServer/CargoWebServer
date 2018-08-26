@@ -2,7 +2,6 @@ package GoJerryScript
 
 //import "log"
 import "code.myceliUs.com/Utility"
-import "fmt"
 import "reflect"
 
 /**
@@ -28,9 +27,16 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
-	ptrString := fmt.Sprintf("%d", obj)
-	uuid := Utility.GenerateUUID(ptrString)
-	obj.UUID = uuid
+
+	// If the name is given that's mean the object will be set as a global
+	// object so it uuid will be generated from it name.
+	if len(name) > 0 {
+		// Thats mean the value is a global variable.
+		obj.UUID = Utility.GenerateUUID(name)
+	} else {
+		obj.UUID = Utility.RandomUUID()
+	}
+
 	obj.Name = name
 
 	// Here I will keep the object in the client cache.
@@ -49,6 +55,7 @@ func (self *Object) SetPeer(peer *Peer) {
 	// So here I will create the action.
 	action := new(Action)
 	action.UUID = Utility.RandomUUID()
+
 	action.Name = "CreateObject"
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", self.Name)

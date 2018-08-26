@@ -600,7 +600,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			}(done), nil)
 
 		// Send the request.
-		GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeRqst
+		GetServer().getProcessor().m_sendRequest <- oauth2AuthorizeRqst
 
 		// So here I must block the execution of that function and wait
 		// for the authorization. To do so I will made use of channel and
@@ -615,7 +615,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
 				// Send the request.
-				GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeEnd
+				GetServer().getProcessor().m_sendRequest <- oauth2AuthorizeEnd
 			}
 		}
 
@@ -636,7 +636,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
 				// Send the request.
-				GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeEnd
+				GetServer().getProcessor().m_sendRequest <- oauth2AuthorizeEnd
 			}
 		}
 
@@ -1310,7 +1310,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 				to[0] = GetServer().getConnectionById(sessionId)
 				var errData []byte
 				authorizationDenied := NewErrorMessage(messageId, 1, "Permission Denied by user", errData, to)
-				GetServer().GetProcessor().m_incomingChannel <- authorizationDenied
+				GetServer().getProcessor().m_incomingChannel <- authorizationDenied
 				return
 			}
 		}
@@ -1382,7 +1382,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		to[0] = GetServer().getConnectionById(sessionId)
 		authorizationAccept, _ := NewResponseMessage(messageId, results, to)
 
-		GetServer().GetProcessor().m_incomingChannel <- authorizationAccept
+		GetServer().getProcessor().m_incomingChannel <- authorizationAccept
 
 		redirectUrl, err := resp.GetRedirectUrl()
 		if err == nil {
@@ -1533,7 +1533,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		to[0] = GetServer().getConnectionById(sessionId)
 		var errData []byte
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
-		GetServer().GetProcessor().m_incomingChannel <- accessDenied
+		GetServer().getProcessor().m_incomingChannel <- accessDenied
 	} else {
 		log.Println("--------> try to create access grant response whit id: ", messageId)
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "", scope)
@@ -1564,7 +1564,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			to := make([]*WebSocketConnection, 2)
 			to[0] = GetServer().getConnectionById(sessionId)
 			accessGrantResp, _ := NewResponseMessage(messageId, results, to)
-			GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
+			GetServer().getProcessor().m_incomingChannel <- accessGrantResp
 
 			// Set the values inside a string array and send it over channel.
 			values := make([]string, 2)
@@ -1580,7 +1580,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			to[0] = GetServer().getConnectionById(sessionId)
 			var errData []byte
 			accessDenied := NewErrorMessage(messageId, 1, err.Error(), errData, to)
-			GetServer().GetProcessor().m_incomingChannel <- accessDenied
+			GetServer().getProcessor().m_incomingChannel <- accessDenied
 			channels[messageId] <- make([]string, 0) // deblock the channel...
 		}
 	}

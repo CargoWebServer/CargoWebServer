@@ -795,6 +795,7 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJerryS
 		return export
 	} else {
 		// create a new path
+		log.Println("---> init script: ", path)
 		export := vm.CreateObject("exports")
 		export.Set("path__", exportPath)
 		export.Set("module_id__", moduleId)

@@ -132,7 +132,8 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 
 					// In case of GoJerryScript value...
 					if reflect.TypeOf(v).String() == "GoJerryScript.Value" {
-						v, _ = v.(GoJerryScript.Value).Export()
+						v_ := v.(GoJerryScript.Value)
+						v, _ = v_.Export()
 					}
 
 					if strings.HasSuffix(fieldType, ":Ref") {

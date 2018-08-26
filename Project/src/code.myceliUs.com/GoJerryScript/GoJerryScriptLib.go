@@ -18,7 +18,7 @@ extern void delete_object_reference(uintptr_t ref);
 extern jerry_value_t create_string (const char *str_p);
 extern jerry_value_t eval (const char *source_p, size_t source_size, bool is_strict);
 extern jerry_value_t create_error (jerry_error_t error_type, const char *message_p);
-extern jerry_size_t string_to_utf8_char_buffer (const jerry_value_t value, char *buffer_p, size_t size);
+extern jerry_size_t string_to_char_buffer (const jerry_value_t value, char *buffer_p, size_t size);
 extern jerry_size_t get_string_size (const jerry_value_t value);
 extern jerry_value_t create_native_object(const char* uuid);
 extern jerry_value_t create_array (uint32_t);
@@ -47,23 +47,89 @@ import "log"
 var (
 	// Channel to be use to transfert information from client and server
 	Call_remote_actions_chan chan *Action
+
+	// The global object.
+	globalObj = Jerry_create_null()
 )
 
-// Function to access remote action channels.
+// Return the global object pointer.
+func getGlobalObject() Uint32_t {
+	if Jerry_value_is_null(globalObj) {
+		globalObj = Jerry_get_global_object()
+	}
+
+	return globalObj
+}
+
+// Set property.
+func Jerry_set_object_property(obj Uint32_t, name string, value interface{}) error {
+
+	log.Println("---> set object property: ", name, ":", value)
+	propName := goToJs(name)
+
+	var propValue Uint32_t
+	if reflect.TypeOf(value).String() != "GoJerryScript.SwigcptrUint32_t" {
+		propValue = goToJs(value)
+		// non-object property...
+		defer Jerry_release_value(propValue)
+	} else {
+		// In that case I will not release the property value
+		// rigth now. The value will release when function call will go
+		// out of context. In Case of global variable the release value must
+		// be release explicitely.
+		propValue = value.(Uint32_t)
+	}
+
+	// get the reuslt.
+	setResult := Jerry_set_property(obj, propName, propValue)
+
+	// Now I will release the isSet, propValue and propName.
+	defer Jerry_release_value(propName)
+	defer Jerry_release_value(setResult)
+
+	if Jerry_value_is_error(setResult) {
+		err := errors.New("fail to set property " + name)
+		return err
+	}
+
+	return nil
+}
+
+func Jerry_get_object_property(obj Uint32_t, name string) Uint32_t {
+	propName := goToJs(name)
+	property := Jerry_get_property(obj, propName)
+
+	return property
+}
+
+// Retrun true if an object own a given property.
+func Jerry_object_own_property(obj Uint32_t, name string) bool {
+	propName := goToJs(name)
+	hasProperty := Jerry_has_own_property(obj, propName)
+
+	// release ressource.
+	defer Jerry_release_value(hasProperty)
+	defer Jerry_release_value(propName)
+
+	return Jerry_get_boolean_value(hasProperty)
+}
+
+// Eval a given script string.
 func evalScript(script string) (Value, error) {
 
 	// Now I will evaluate the function...
-	src := C.CString(script)
-	r := C.eval(src, C.size_t(len(script)), false)
-
-	// Free the allocated value.
-	C.free(unsafe.Pointer(src))
+	cstr := C.CString(script)
+	defer C.free(unsafe.Pointer(cstr))
+	r := C.eval(cstr, C.size_t(len(script)), false)
 
 	// Create a Uint_32 value from the result.
+	// the ret object will be release in the NewValue function.
 	ret := jerry_value_t_To_uint32_t(r)
+
 	var value Value
 	if Jerry_value_is_error(ret) {
 		err := errors.New("Fail to run script " + script)
+		defer Jerry_release_value(ret)
 		log.Println(err)
 		return value, err
 	}
@@ -83,24 +149,19 @@ func appendJsFunction(object Uint32_t, name string, src string) error {
 
 	// in that case the function must be set as object function.
 	if object != nil {
-		global_object := Jerry_get_global_object()
-		defer Jerry_release_value(global_object)
-
-		fct := Jerry_get_property(global_object, goToJs(name))
-		defer Jerry_release_value(fct)
+		fct := Jerry_get_object_property(getGlobalObject(), name)
 		if Jerry_value_is_function(fct) {
 			// Set the function on the object.
-			Jerry_release_value(Jerry_set_property(object, goToJs(name), fct))
+			Jerry_set_object_property(object, name, fct)
 
 			// remove it from the global object.
-			if object != global_object {
-				Jerry_delete_property(global_object, goToJs(name))
+			if object != getGlobalObject() {
+				Jerry_delete_property(getGlobalObject(), goToJs(name))
 			}
 		} else {
 			return errors.New("no function found with name " + name)
 		}
 	}
-
 	return err
 }
 
@@ -111,11 +172,9 @@ func setGoMethod(object Uint32_t, name string, fct interface{}) {
 	if fct != nil {
 		Utility.RegisterFunction(name, fct)
 	}
-	cs := C.CString(name)
 	if Jerry_value_is_object(object) {
-		C.setGoMethod(cs, uint32_t_To_Jerry_value_t(object))
+		C.setGoMethod(C.CString(name), uint32_t_To_Jerry_value_t(object))
 	}
-	defer C.free(unsafe.Pointer(cs))
 }
 
 /**
@@ -127,13 +186,13 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 	var fct Uint32_t
 
 	thisPtr = uint32_t_To_Jerry_value_t(obj)
-	fctName := goToJs(name)
-	defer goToJs(fctName)
-	fct = Jerry_get_property(obj, fctName)
+
+	fct = Jerry_get_object_property(obj, name)
 	defer Jerry_release_value(fct)
 
 	fctPtr = uint32_t_To_Jerry_value_t(fct)
 	var r Uint32_t
+
 	var err error
 
 	// if the function is define...
@@ -147,7 +206,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 				args[i] = uint32_t_To_Jerry_value_t(null)
 			} else {
 				p := goToJs(params[i])
-				defer Jerry_release_value(p)
+				//defer Jerry_release_value(p)
 				args[i] = uint32_t_To_Jerry_value_t(p)
 			}
 		}
@@ -206,25 +265,28 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 
 //export object_native_free_callback
 func object_native_free_callback(native_p C.uintptr_t) {
+
 	uuid := C.GoString(C.get_object_reference_uuid(native_p))
 	C.delete_object_reference(native_p)
-	GetCache().RemoveObject(uuid)
+
+	// Now I will ask the client side to remove it object reference to.
+	callGoFunction("Client", "DeleteGoObject", uuid)
 }
 
 // The handler is call directly from Jerry script and is use to connect JS and GO
 //export handler
 func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length int) C.jerry_value_t {
 	// The function pointer.
-	fctPtr := (Uint32_t)(SwigcptrUint32_t(C.uintptr_t((uintptr)(unsafe.Pointer(&fct)))))
+	fctPtr := jerry_value_t_To_uint32_t(fct)
 	if Jerry_value_is_function(fctPtr) {
-		propName := goToJs("name")
-		defer Jerry_release_value(propName)
-		proValue := Jerry_get_property(fctPtr, propName)
+		proValue := Jerry_get_object_property(fctPtr, "name")
 		defer Jerry_release_value(proValue)
 		name, err := jsToGo(proValue)
+
 		if err == nil {
 			params := make([]interface{}, 0)
 			for i := 0; i < length; i++ {
+				// Create function parmeters.
 				val, err := jsToGo((Uint32_t)(SwigcptrUint32_t(C.uintptr_t(args))))
 				if err == nil {
 					params = append(params, val)
@@ -237,18 +299,11 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 			}
 
 			// This is the owner of the function.
-			thisPtr := (Uint32_t)(SwigcptrUint32_t(C.uintptr_t((uintptr)(unsafe.Pointer(&this)))))
+			thisPtr := jerry_value_t_To_uint32_t(this)
 			if Jerry_value_is_object(thisPtr) {
-				propUuid_ := Jerry_get_property(thisPtr, goToJs("uuid_"))
-				var uuid interface{}
-				var err error
-				if !Jerry_value_is_undefined(propUuid_) {
-					uuid, err = jsToGo(propUuid_)
-				} else {
-					uuid = ""
-				}
+				propUuid_ := Jerry_get_object_property(thisPtr, "uuid_")
 				defer Jerry_release_value(propUuid_)
-
+				uuid, err := jsToGo(propUuid_)
 				if err == nil {
 					result, err := callGoFunction(uuid.(string), name.(string), params...)
 					if err == nil && result != nil {
@@ -260,6 +315,8 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 						jsError := createError(JERRY_ERROR_COMMON, err.Error())
 						return uint32_t_To_Jerry_value_t(jsError)
 					}
+				} else {
+					log.Panicln("---------> uuid not found!")
 				}
 
 			} else {
@@ -330,7 +387,7 @@ func (self Uint8) Swigcptr() uintptr {
 func createError(errorType int, errorMsg string) Uint32_t {
 	msg := C.CString(errorMsg)
 	err := C.create_error(C.jerry_error_t(errorType), msg)
-	C.free(unsafe.Pointer(msg))
+	defer C.free(unsafe.Pointer(msg))
 	return jerry_value_t_To_uint32_t(err)
 }
 
@@ -338,7 +395,9 @@ func createError(errorType int, errorMsg string) Uint32_t {
  * Create a new JerryScript String from go string
  */
 func newJsString(val string) Uint32_t {
-	str := C.create_string(C.CString(val))
+	cstr := C.CString(val)
+	defer C.free(unsafe.Pointer(cstr))
+	str := C.create_string(cstr)
 	return jerry_value_t_To_uint32_t(str)
 }
 
@@ -361,18 +420,63 @@ func NewValue(ptr Uint32_t) *Value {
 	return v
 }
 
+// Retreive an object by it uuid as a global object property.
+func getJsObjectByUuid(uuid string) Uint32_t {
+
+	hasProperty := Jerry_has_property(getGlobalObject(), goToJs(uuid))
+	defer Jerry_release_value(hasProperty)
+
+	if Jerry_get_boolean_value(hasProperty) == true {
+		property := Jerry_get_object_property(getGlobalObject(), uuid)
+		if Jerry_value_is_object(property) {
+			log.Println("---> object found ", uuid)
+			return property
+		} else {
+			if Jerry_value_is_abort(property) {
+				log.Println("---> property ", uuid, "is abort")
+			} else if Jerry_value_is_array(property) {
+				log.Println("---> property ", uuid, "is array")
+			} else if Jerry_value_is_boolean(property) {
+				log.Println("---> property ", uuid, "is boolean")
+			} else if Jerry_value_is_constructor(property) {
+				log.Println("---> property ", uuid, "is constructor")
+			} else if Jerry_value_is_error(property) {
+				log.Println("---> property ", uuid, "is error")
+			} else if Jerry_value_is_function(property) {
+				log.Println("---> property ", uuid, "is function")
+			} else if Jerry_value_is_number(property) {
+				log.Println("---> property ", uuid, "is number")
+			} else if Jerry_value_is_null(property) {
+				log.Println("---> property ", uuid, "is null")
+			} else if Jerry_value_is_promise(property) {
+				log.Println("---> property ", uuid, "is promise")
+			} else if Jerry_value_is_string(property) {
+				log.Println("---> property ", uuid, "is string")
+			} else if Jerry_value_is_undefined(property) {
+				log.Println("---> property ", uuid, "is undefined")
+			}
+			log.Panicln("---> property uuid is not an object! ", uuid)
+		}
+	}
+
+	log.Println("---> object ", uuid, "is undefined!")
+	// The property is undefined.
+	return Jerry_create_undefined()
+}
+
 /**
  * Create a go string from a JS string pointer.
  */
 func jsStrToGoStr(str Uint32_t) string {
 
 	// Size info, ptr and it value
-	size := C.size_t(C.get_string_size(uint32_t_To_Jerry_value_t(str)))
+	str_ := uint32_t_To_Jerry_value_t(str)
+	size := C.size_t(C.get_string_size(str_))
 
 	buffer := (*C.char)(unsafe.Pointer(C.malloc(size)))
 
 	// Test if the string is a valid utf8 string...
-	C.string_to_utf8_char_buffer(uint32_t_To_Jerry_value_t(str), buffer, size)
+	C.string_to_char_buffer(uint32_t_To_Jerry_value_t(str), buffer, size)
 
 	// Copy the value to a string.
 	value := C.GoStringN(buffer, C.int(size))
@@ -438,23 +542,19 @@ func goToJs(value interface{}) Uint32_t {
 	} else if typeOf.String() == "GoJerryScript.ObjectRef" {
 		// I got a Js object reference.
 		uuid := value.(ObjectRef).UUID
-		propValue = GetCache().getJsObject(uuid)
+		propValue = getJsObjectByUuid(uuid)
+		if Jerry_value_is_undefined(propValue) {
+			// If the object is not in the cache...
+			log.Panicln("----> object ", uuid, " dosent exist anymore!")
+		}
 
 	} else if typeOf.Kind() == reflect.Struct || typeOf.Kind() == reflect.Ptr {
 		// So here I will use the object pointer address to generate it uuid value.
+		log.Println("--------> 462: need a fix... ")
 		ptrString := fmt.Sprintf("%d", value)
 		uuid := Utility.GenerateUUID(ptrString)
-
 		// The object is expect to exist.
-		if GetCache().GetObject(uuid) != nil {
-			return GetCache().getJsObject(uuid)
-		}
-
-		// The object is considere undefined if is not already in the cache...
-		undefined := Jerry_create_undefined()
-
-		return undefined
-
+		return getJsObjectByUuid(uuid)
 	} else {
 		log.Panicln("---> type not found ", value, typeOf.String())
 	}
@@ -500,26 +600,21 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 				value = append(value.([]interface{}), v)
 			}
 		}
-		//Jerry_release_value(input)
 	} else if Jerry_value_is_object(input) {
 		// The go object will be a copy of the Js object.
-		propUuid_ := goToJs("uuid_")
-		defer Jerry_release_value(propUuid_)
-		hasUuid_ := Jerry_has_own_property(input, propUuid_)
-		defer Jerry_release_value(hasUuid_)
-		if Jerry_get_boolean_value(hasUuid_) {
-			uuid_ := Jerry_get_property(input, propUuid_)
+		if Jerry_object_own_property(input, "uuid_") {
+			uuid_ := Jerry_get_object_property(input, "uuid_")
 			defer Jerry_release_value(uuid_)
+
+			// Get the uuid string.
 			uuid, _ := jsToGo(uuid_)
+
 			// Return and object reference.
 			value = ObjectRef{UUID: uuid.(string)}
 		} else {
-
 			stringified := Jerry_json_stringfy(input)
-
 			// if there is no error
 			if !Jerry_value_is_error(stringified) {
-
 				jsonStr := jsStrToGoStr(stringified)
 				if strings.Index(jsonStr, "TYPENAME") != -1 {
 					// So here I will create a remote action and tell the client to
@@ -531,7 +626,6 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 				// In that case the object has no go representation...
 				// and must be use only in JS.
 				return nil, nil
-
 			} else {
 				// Continue any way with nil object instead of an error...
 				return nil, nil //errors.New("fail to stringfy object!")
@@ -553,7 +647,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 		// Here a function is found
 		log.Println("--->promise!", input)
 	} else {
-		log.Panicln("---> not implemented Jerry value type.")
+		log.Println("---> not implemented Jerry value type.")
 	}
 
 	return value, nil

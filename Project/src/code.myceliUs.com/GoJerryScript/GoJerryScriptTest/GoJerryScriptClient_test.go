@@ -80,7 +80,6 @@ func TestHelloJerry(t *testing.T) {
 	// Register the function SayHelloTo. The function take one parameter.
 	engine.RegisterJsFunction("SayHelloTo", "function SayHelloTo(greething, to){return greething + ' ' + to + '!';}")
 	str, _ := engine.CallFunction("SayHelloTo", "Hello", "Jerry Script")
-
 	str_, _ := str.ToString()
 
 	if str_ != "Hello Jerry Script!" {

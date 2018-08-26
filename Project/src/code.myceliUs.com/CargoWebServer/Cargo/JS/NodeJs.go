@@ -16,6 +16,7 @@ func (this *JsRuntimeManager) initNodeJs() {
 	 */
 	this.appendFunction("require_", func(identifier string, sessionId string) GoJerryScript.Object {
 		// resolve dependencie and return the exports.
+		log.Println("---> require: ", identifier, " session id ", sessionId)
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {
 			log.Println("---> error found in require function ", err)

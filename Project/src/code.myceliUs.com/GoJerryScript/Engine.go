@@ -15,26 +15,6 @@ handler (const jerry_value_t,
          const jerry_value_t[],
          const jerry_length_t);
 
-// Define a new function handler.
-void setGoFct(const char* name){
-  // Function will have there own handler.
-  jerry_value_t fct_handler = jerry_create_external_function (handler);
-  jerry_value_t glob_obj = jerry_get_global_object ();
-  jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
-
-  // keep the name in the function object itself, so it will be use at runtime
-  // by the handler to know witch function to dynamicaly call.
-  jerry_value_t prop_name_name = jerry_create_string ((const jerry_char_t *) "name");
-  jerry_release_value (jerry_set_property (fct_handler, prop_name_name, prop_name));
-
-  // set property and release the return value without any check
-  jerry_release_value (jerry_set_property (glob_obj, prop_name, fct_handler));
-  jerry_release_value (prop_name);
-  jerry_release_value (prop_name_name);
-  jerry_release_value (glob_obj);
-  jerry_release_value (fct_handler);
-}
-
 typedef jerry_value_t* jerry_value_p;
 
 // Define a new function handler.
@@ -53,6 +33,7 @@ void setGoMethod(const char* name, jerry_value_t obj){
   jerry_release_value (prop_name);
   jerry_release_value (prop_name_name);
   jerry_release_value (fct_handler);
+
 }
 
 // Call a JS function.
@@ -63,8 +44,7 @@ call_function ( const jerry_value_t func_obj_val,
                 int32_t args_count){
 
 	// evaluate the result
-	jerry_value_t ret = jerry_call_function ( func_obj_val, this_val, args_p, args_count );
-	return ret;
+	return jerry_call_function ( func_obj_val, this_val, args_p, args_count );
 }
 
 // Eval Script.
@@ -88,26 +68,25 @@ create_error (jerry_error_t error_type,
 
 // Create a string and return it value.
 jerry_value_t create_string (const char *str_p){
-	return jerry_create_string_from_utf8 (str_p);
+	return jerry_create_string (str_p);
 }
 
 jerry_size_t
 get_string_size (const jerry_value_t value){
-	return jerry_get_utf8_string_size(value);
+	return jerry_get_string_size(value);
 }
 
 jerry_size_t
-string_to_utf8_char_buffer (const jerry_value_t value, char *buffer_p, size_t buffer_size){
-
+string_to_char_buffer (const jerry_value_t value, char *buffer_p, size_t buffer_size){
 	// Here I will set the string value inside the buffer and return
 	// the size of the written data.
-	return jerry_string_to_utf8_char_buffer (value, buffer_p, buffer_size);
+	return jerry_string_to_char_buffer (value, buffer_p, buffer_size);
 }
 
 //extern jerry_value_t create_native_object(const char* uuid);
 // Use to bind Js object and Go object lifecycle
 typedef  struct {
-	const char* uuid;
+  const char* uuid;
 } object_reference_t;
 
 // Return the object reference.
@@ -131,28 +110,15 @@ static const jerry_object_native_info_t native_obj_type_info =
   .free_cb = object_native_free_callback
 };
 
-jerry_value_t create_native_object(const char* uuid){
-	// Create the js object that will be back by the
-	// native object.
-	jerry_value_t object = jerry_create_object();
-
+void create_native_object(const char* uuid, jerry_value_t object){
 	// Here I will create the native object reference.
 	object_reference_t *native_obj = malloc(sizeof(*native_obj));
+
+	// Set it uuid.
 	native_obj->uuid = uuid;
 
 	// Set the native pointer.
 	jerry_set_object_native_pointer (object, native_obj, &native_obj_type_info);
-
-	// Set the uuid property of the newly created object.
-	jerry_value_t prop_uuid = jerry_create_string ((const jerry_char_t *) uuid);
- 	jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) "uuid_");
-
-	// Set the uuid property.
-  	jerry_release_value (jerry_set_property (object, prop_name, prop_uuid));
-	jerry_release_value (prop_uuid);
-	jerry_release_value (prop_name);
-
-	return object;
 }
 
 // Simplifyed array function.
@@ -182,9 +148,8 @@ get_array_length (const jerry_value_t value){
 */
 import "C"
 import "errors"
+import "log"
 import "unsafe"
-
-//import "log"
 
 /**
  * The JerryScript JS engine.
@@ -224,39 +189,22 @@ func (self *Engine) start(port int, options int) {
  * value The value of the variable, can be a string, a number,
  */
 func (self *Engine) SetGlobalVariable(name string, value interface{}) {
-
-	// first of all I will initialyse the arguments.
-	globalObject := Jerry_get_global_object()
-	defer Jerry_release_value(globalObject)
-
-	propName := goToJs(name)
-	defer Jerry_release_value(propName)
-
-	// Take a go value and initialyse a Uint32 representation.
-	propValue := goToJs(value)
-	defer Jerry_release_value(propValue)
-
 	// Set the propertie in the global context..
-	Jerry_release_value(Jerry_set_property(globalObject, propName, propValue))
+	Jerry_set_object_property(getGlobalObject(), name, value)
 }
 
 /**
  * Return a variable define in the global object.
  */
 func (self *Engine) GetGlobalVariable(name string) (Value, error) {
+
 	// first of all I will initialyse the arguments.
-	globalObject := Jerry_get_global_object()
-	defer Jerry_release_value(globalObject)
-	propertyName := goToJs(name)
-	defer Jerry_release_value(propertyName)
-	property := Jerry_get_property(globalObject, propertyName)
+	property := Jerry_get_object_property(getGlobalObject(), name)
 
 	var value Value
-
 	if Jerry_value_is_error(property) {
 		return value, errors.New("No variable found with name " + name)
 	}
-
 	value = *NewValue(property)
 
 	return value, nil
@@ -268,23 +216,28 @@ func (self *Engine) GetGlobalVariable(name string) (Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
+	log.Println("Create Native object:", uuid)
 
-	// Keep the pointer.
-	obj := jerry_value_t_To_uint32_t(C.create_native_object(C.CString(uuid)))
+	// Create the object JS object.
+	obj := Jerry_create_object()
+	if !Jerry_value_is_object(obj) {
+		log.Panicln("---> fail to create a new object! ", uuid)
+	}
 
-	// Set the object in the cache.
-	GetCache().setJsObject(uuid, obj)
+	// Set the uuid property.
+	Jerry_set_object_property(obj, "uuid_", uuid)
+
+	// keep the object in the global namespace.
+	// set is uuid as global object property
+	Jerry_set_object_property(getGlobalObject(), uuid, obj)
 
 	if len(name) > 0 {
-		globalObj := Jerry_get_global_object()
-		defer Jerry_release_value(globalObj)
-
-		propName := goToJs(name)
-		defer Jerry_release_value(propName)
-
-		// Set the object as a propety in the global object.
-		Jerry_release_value(Jerry_set_property(globalObj, propName, obj))
+		// set is name as global object property
+		Jerry_set_object_property(getGlobalObject(), name, obj)
 	}
+
+	// Set native object to the object.
+	C.create_native_object(C.CString(uuid), uint32_t_To_Jerry_value_t(obj))
 }
 
 /**
@@ -293,35 +246,41 @@ func (self *Engine) CreateObject(uuid string, name string) {
  * name The name of the property to set
  * value The value of the property
  */
-func (self *Engine) SetObjectProperty(uuid string, name string, value interface{}) {
+func (self *Engine) SetObjectProperty(uuid string, name string, value interface{}) error {
 	// Get the object from the cache
-	obj := GetCache().getJsObject(uuid)
-	if obj != nil {
+	obj := getJsObjectByUuid(uuid)
+	if !Jerry_value_is_undefined(obj) {
 		// Set the property value.
-		Jerry_release_value(Jerry_set_property(obj, goToJs(name), goToJs(value)))
+		Jerry_set_object_property(obj, name, value)
+	} else {
+		err := errors.New("311 Object " + uuid + " dosent exist!")
+		log.Println("---> ", err)
+		return err
 	}
+
+	return nil
 }
 
 /**
- * That function is use to get Js obeject property
+ * That function is use to get Js object property
  */
 func (self *Engine) GetObjectProperty(uuid string, name string) (Value, error) {
-	// I will get the object reference from the cache.
-	obj := GetCache().getJsObject(uuid)
 	var value Value
-	if obj != nil {
+	// I will get the object reference from the cache.
+	obj := getJsObjectByUuid(uuid)
+	if !Jerry_value_is_undefined(obj) {
 		// Return the value from an object.
-		ptr := Jerry_get_property(obj, goToJs(name))
-		defer Jerry_release_value(ptr)
-
-		if Jerry_value_is_error(ptr) {
+		property := Jerry_get_object_property(obj, name)
+		defer Jerry_release_value(property)
+		if Jerry_value_is_error(property) {
 			return value, errors.New("no property found with name " + name)
 		}
-
-		return *NewValue(ptr), nil
+		return *NewValue(property), nil
 
 	} else {
-		return value, errors.New("Object " + uuid + " dosent exist!")
+		err := errors.New("302 Object " + uuid + " dosent exist!")
+		log.Println("---> ", err)
+		return value, err
 	}
 }
 
@@ -329,13 +288,22 @@ func (self *Engine) GetObjectProperty(uuid string, name string) (Value, error) {
  * Create an empty array of a given size and set it as object property.
  */
 func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) error {
-	obj := GetCache().getJsObject(uuid)
-	if obj == nil {
-		return errors.New("Object " + uuid + " dosent exist!")
+	obj := getJsObjectByUuid(uuid)
+	if Jerry_value_is_undefined(obj) {
+		err := errors.New("340 Object " + uuid + " dosent exist!")
+		log.Println("---> ", err)
+		return err
 	}
 
-	arr_ := C.create_array(C.uint32_t(size))
-	Jerry_release_value(Jerry_set_property(obj, goToJs(name), jerry_value_t_To_uint32_t(arr_)))
+	arr_ := jerry_value_t_To_uint32_t(C.create_array(C.uint32_t(size)))
+	if !Jerry_value_is_array(arr_) {
+		err := errors.New("321 fail to create array property for Object " + uuid)
+		return err
+	}
+
+	// set it property.
+	Jerry_set_object_property(obj, name, arr_)
+
 	return nil
 }
 
@@ -348,11 +316,10 @@ func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) err
  */
 func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, index uint32, value interface{}) {
 	// Get the object from the cache
-	obj := GetCache().getJsObject(uuid)
-
-	if obj != nil {
+	obj := getJsObjectByUuid(uuid)
+	if !Jerry_value_is_undefined(obj) {
 		// I will retreive the array...
-		arr := Jerry_get_property(obj, goToJs(name))
+		arr := Jerry_get_object_property(obj, name)
 		defer Jerry_release_value(arr)
 		if Jerry_value_is_array(arr) {
 			// So here I will set it property.
@@ -369,11 +336,11 @@ func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, index uin
  */
 func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uint32) (Value, error) {
 	// I will get the object reference from the cache.
-	obj := GetCache().getJsObject(uuid)
 	var value Value
-	if obj != nil {
+	obj := getJsObjectByUuid(uuid)
+	if !Jerry_value_is_undefined(obj) {
 		// Return the value from an object.
-		arr := Jerry_get_property(obj, goToJs(name))
+		arr := Jerry_get_object_property(obj, name)
 		defer Jerry_release_value(arr)
 
 		if Jerry_value_is_error(arr) {
@@ -387,7 +354,7 @@ func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uin
 		return *NewValue(e), nil
 
 	} else {
-		return value, errors.New("Object " + uuid + " dosent exist!")
+		return value, errors.New("395 Object " + uuid + " dosent exist!")
 	}
 }
 
@@ -395,26 +362,38 @@ func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uin
  * set object methode.
  */
 func (self *Engine) SetGoObjectMethod(uuid, name string) error {
-	obj := GetCache().getJsObject(uuid)
-	if obj == nil {
-		return errors.New("Object " + uuid + " dosent exist!")
+	log.Println("---> set object ", uuid, " method ", name)
+	obj := getJsObjectByUuid(uuid)
+	var err error
+	if Jerry_value_is_undefined(obj) {
+		err = errors.New("389 Object " + uuid + " dosent exist!")
+		log.Println(err)
+		return err
 	}
-	cs := C.CString(name)
-	if Jerry_value_is_object(obj) {
-		C.setGoMethod(cs, uint32_t_To_Jerry_value_t(obj))
-	}
-	defer C.free(unsafe.Pointer(cs))
 
-	return nil
+	if Jerry_value_is_object(obj) {
+
+		cstr := C.CString(name)
+		defer C.free(unsafe.Pointer(cstr))
+
+		C.setGoMethod(C.CString(name), uint32_t_To_Jerry_value_t(obj))
+		return nil
+	}
+
+	err = errors.New("397 " + uuid + " is not an object!")
+	log.Println(err)
+	return err
 }
 
 func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
-	obj := GetCache().getJsObject(uuid)
-	if obj == nil {
-		return errors.New("Object " + uuid + " dosent exist!")
+	obj := getJsObjectByUuid(uuid)
+	if Jerry_value_is_undefined(obj) {
+		return errors.New("418 Object " + uuid + " dosent exist!")
 	}
+
 	// In that case I want to associate a js function to the object.
 	err := appendJsFunction(obj, name, src)
+	log.Println("---> 413", err)
 	return err
 }
 
@@ -422,10 +401,11 @@ func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
  * Call object methode.
  */
 func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (Value, error) {
-	obj := GetCache().getJsObject(uuid)
-	var result Value
-	if obj == nil {
-		return result, errors.New("Object " + uuid + " dosent exist!")
+
+	var value Value
+	obj := getJsObjectByUuid(uuid)
+	if Jerry_value_is_undefined(obj) {
+		return value, errors.New("432 Object " + uuid + " dosent exist!")
 	}
 	return callJsFunction(obj, name, params)
 }
@@ -436,9 +416,9 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
  * Register a go function in JS
  */
 func (self *Engine) RegisterGoFunction(name string) {
-	cs := C.CString(name)
-	C.setGoFct(cs)
-	defer C.free(unsafe.Pointer(cs))
+	cstr := C.CString(name)
+	defer C.free(unsafe.Pointer(cstr))
+	C.setGoMethod(cstr, uint32_t_To_Jerry_value_t(getGlobalObject()))
 }
 
 /**
@@ -459,11 +439,8 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
  */
 func (self *Engine) CallFunction(name string, params []interface{}) (Value, error) {
 
-	globalObject := Jerry_get_global_object()
-	defer Jerry_release_value(globalObject)
-
 	// Call function on the global object here.
-	return callJsFunction(globalObject, name, params)
+	return callJsFunction(getGlobalObject(), name, params)
 }
 
 func (self *Engine) Clear() {

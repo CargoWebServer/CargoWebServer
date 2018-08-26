@@ -192,7 +192,7 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -323,7 +323,7 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -537,7 +537,7 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1316,7 +1316,7 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1427,7 +1427,7 @@ func (this *GraphStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1559,7 +1559,7 @@ func (this *GraphStore) Connect() error {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1616,7 +1616,7 @@ func (this *GraphStore) Ping() error {
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1703,7 +1703,7 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -1950,7 +1950,7 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -2140,7 +2140,7 @@ func (this *GraphStore) Update(queryStr string, triples []interface{}, params []
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.
@@ -2233,7 +2233,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 		go func(rqst *message) {
-			GetServer().GetProcessor().m_sendRequest <- rqst
+			GetServer().getProcessor().m_sendRequest <- rqst
 		}(rqst)
 
 		// wait for result here.

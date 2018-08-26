@@ -176,7 +176,7 @@ func (this *ServiceManager) registerServiceListeners(conn *WebSocketConnection) 
 
 	rqst, _ := NewRequestMessage(Utility.RandomUUID(), method, params, to, successCallback, nil, errorCallback, wait)
 
-	GetServer().GetProcessor().m_sendRequest <- rqst
+	GetServer().getProcessor().m_sendRequest <- rqst
 
 	// I will also synchronize the methode...
 	<-wait
@@ -283,7 +283,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 	}
 
 	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, wait)
-	GetServer().GetProcessor().m_sendRequest <- rqst
+	GetServer().getProcessor().m_sendRequest <- rqst
 
 	// I will also synchronize the methode...
 	<-wait

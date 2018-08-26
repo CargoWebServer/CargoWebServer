@@ -86,7 +86,7 @@ func (c *WebSocketConnection) Open(host string, port int) (err error) {
 		return errors.New("fail to connect with " + origin)
 	} else if c.m_socket != nil {
 		c.m_isOpen = true
-		GetServer().GetHub().register <- c
+		GetServer().getHub().register <- c
 		// Start reading and writing loop's
 		go c.Writer()
 		go c.Reader()
@@ -99,7 +99,7 @@ func (c *WebSocketConnection) Close() {
 	if c.m_isOpen {
 		c.m_isOpen = false
 		c.m_socket.Close() // Close the socket..
-		GetServer().GetHub().unregister <- c
+		GetServer().getHub().unregister <- c
 		GetServer().removeAllOpenSubConnections(c.GetUuid())
 	}
 }
@@ -124,7 +124,7 @@ func (c *WebSocketConnection) Reader() {
 		}
 		msg, err := NewMessageFromData(in, c)
 		if err == nil {
-			GetServer().GetHub().receivedMsg <- msg
+			GetServer().getHub().receivedMsg <- msg
 		}
 		time.Sleep(1 * time.Millisecond)
 	}
@@ -150,7 +150,7 @@ func HttpHandler(ws *websocket.Conn) {
 	c.send = make(chan []byte)
 
 	// Register the connection with the hub.
-	GetServer().GetHub().register <- c
+	GetServer().getHub().register <- c
 
 	defer func(c *WebSocketConnection) {
 		//  I will remove all sub-connection associated with the connection

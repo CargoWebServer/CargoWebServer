@@ -117,6 +117,7 @@ func (self *Peer) run() {
 					rsp.Remote = *action
 
 					// Send the message back to the asking peer.
+					//log.Println("---> 120 send response action: ", action)
 					self.SendMessage(rsp)
 
 				}(self, msg)
@@ -126,7 +127,7 @@ func (self *Peer) run() {
 					// Here I receive a response.
 					// I will get the action...
 					action := <-self.pending_actions_chan[msg.UUID]
-					log.Println("---> 130 receive response action: ", action)
+
 					// The response result in the action.
 					action.Results = msg.Remote.Results
 
@@ -140,9 +141,10 @@ func (self *Peer) run() {
 
 				// Send the message over the network.
 				encoder := gob.NewEncoder(self.conn)
-				log.Println("---> send action ", msg.Remote)
+				//log.Println("---> send ", msg.Remote)
 
 				err := encoder.Encode(msg)
+
 				if err != nil {
 					log.Println("---> ", msg.Remote.Name)
 					for i := 0; i < len(msg.Remote.Results); i++ {
