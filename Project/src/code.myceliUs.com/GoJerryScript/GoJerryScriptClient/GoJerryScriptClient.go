@@ -9,7 +9,7 @@ import (
 
 	"encoding/json"
 	//	"errors"
-	"fmt"
+	//"fmt"
 	"os/exec"
 	"reflect"
 
@@ -21,7 +21,7 @@ var (
 	// Callback function used by dynamic type, it's call when an entity is set.
 	// Can be use to store dynamic type in a cache.
 	SetEntity func(interface{}) = func(val interface{}) {
-		log.Println("---> set entity ", val)
+		/** nothing todo here... **/
 	}
 )
 
@@ -282,9 +282,9 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 		uuid = Utility.GenerateUUID(name)
 	} else {
 		// Not a global object.
-		ptrStr := fmt.Sprintf("%p", obj)
-		uuid = Utility.GenerateUUID(ptrStr)
-		//uuid = Utility.RandomUUID()
+		//ptrStr := fmt.Sprintf("%p", obj)
+		//uuid = Utility.GenerateUUID(ptrStr)
+		uuid = Utility.RandomUUID()
 	}
 
 	// Do not recreate already existing object.
@@ -421,7 +421,6 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
  * Register a go function to bu usable in JS (in the global object)
  */
 func (self *Client) RegisterGoFunction(name string, fct interface{}) {
-	log.Println("---> register go function: ", name)
 
 	// Keep the function in the local client.
 	Utility.RegisterFunction(name, fct)

@@ -216,7 +216,6 @@ func (self *Engine) GetGlobalVariable(name string) (Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
-	log.Println("Create Native object:", uuid)
 
 	// Create the object JS object.
 	obj := Jerry_create_object()
@@ -229,7 +228,7 @@ func (self *Engine) CreateObject(uuid string, name string) {
 
 	// keep the object in the global namespace.
 	// set is uuid as global object property
-	Jerry_set_object_property(getGlobalObject(), uuid, obj)
+	GetCache().setJsObject(uuid, obj)
 
 	if len(name) > 0 {
 		// set is name as global object property
@@ -362,7 +361,6 @@ func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uin
  * set object methode.
  */
 func (self *Engine) SetGoObjectMethod(uuid, name string) error {
-	log.Println("---> set object ", uuid, " method ", name)
 	obj := getJsObjectByUuid(uuid)
 	var err error
 	if Jerry_value_is_undefined(obj) {

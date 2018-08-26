@@ -63,10 +63,7 @@ func getGlobalObject() Uint32_t {
 
 // Set property.
 func Jerry_set_object_property(obj Uint32_t, name string, value interface{}) error {
-
-	log.Println("---> set object property: ", name, ":", value)
 	propName := goToJs(name)
-
 	var propValue Uint32_t
 	if reflect.TypeOf(value).String() != "GoJerryScript.SwigcptrUint32_t" {
 		propValue = goToJs(value)
@@ -206,7 +203,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 				args[i] = uint32_t_To_Jerry_value_t(null)
 			} else {
 				p := goToJs(params[i])
-				//defer Jerry_release_value(p)
+				defer Jerry_release_value(p)
 				args[i] = uint32_t_To_Jerry_value_t(p)
 			}
 		}
@@ -269,6 +266,8 @@ func object_native_free_callback(native_p C.uintptr_t) {
 	uuid := C.GoString(C.get_object_reference_uuid(native_p))
 	C.delete_object_reference(native_p)
 
+	GetCache().RemoveObject(uuid)
+
 	// Now I will ask the client side to remove it object reference to.
 	callGoFunction("Client", "DeleteGoObject", uuid)
 }
@@ -308,8 +307,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 					result, err := callGoFunction(uuid.(string), name.(string), params...)
 					if err == nil && result != nil {
 						jsVal := goToJs(result)
-						val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
-						return C.jerry_value_t(*val)
+						return uint32_t_To_Jerry_value_t(jsVal)
 					} else if err != nil {
 						log.Panicln(err)
 						jsError := createError(JERRY_ERROR_COMMON, err.Error())
@@ -324,8 +322,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 				result, err := callGoFunction("", name.(string), params...)
 				if err == nil && result != nil {
 					jsVal := goToJs(result)
-					val := (*uintptr)(unsafe.Pointer(jsVal.Swigcptr()))
-					return C.jerry_value_t(*val)
+					return uint32_t_To_Jerry_value_t(jsVal)
 				} else if err != nil {
 					log.Panicln(err)
 					jsError := createError(JERRY_ERROR_COMMON, err.Error())
@@ -423,40 +420,9 @@ func NewValue(ptr Uint32_t) *Value {
 // Retreive an object by it uuid as a global object property.
 func getJsObjectByUuid(uuid string) Uint32_t {
 
-	hasProperty := Jerry_has_property(getGlobalObject(), goToJs(uuid))
-	defer Jerry_release_value(hasProperty)
-
-	if Jerry_get_boolean_value(hasProperty) == true {
-		property := Jerry_get_object_property(getGlobalObject(), uuid)
-		if Jerry_value_is_object(property) {
-			log.Println("---> object found ", uuid)
-			return property
-		} else {
-			if Jerry_value_is_abort(property) {
-				log.Println("---> property ", uuid, "is abort")
-			} else if Jerry_value_is_array(property) {
-				log.Println("---> property ", uuid, "is array")
-			} else if Jerry_value_is_boolean(property) {
-				log.Println("---> property ", uuid, "is boolean")
-			} else if Jerry_value_is_constructor(property) {
-				log.Println("---> property ", uuid, "is constructor")
-			} else if Jerry_value_is_error(property) {
-				log.Println("---> property ", uuid, "is error")
-			} else if Jerry_value_is_function(property) {
-				log.Println("---> property ", uuid, "is function")
-			} else if Jerry_value_is_number(property) {
-				log.Println("---> property ", uuid, "is number")
-			} else if Jerry_value_is_null(property) {
-				log.Println("---> property ", uuid, "is null")
-			} else if Jerry_value_is_promise(property) {
-				log.Println("---> property ", uuid, "is promise")
-			} else if Jerry_value_is_string(property) {
-				log.Println("---> property ", uuid, "is string")
-			} else if Jerry_value_is_undefined(property) {
-				log.Println("---> property ", uuid, "is undefined")
-			}
-			log.Panicln("---> property uuid is not an object! ", uuid)
-		}
+	obj := GetCache().getJsObject(uuid)
+	if obj != nil {
+		return obj
 	}
 
 	log.Println("---> object ", uuid, "is undefined!")
@@ -578,7 +544,6 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 	} else if Jerry_value_is_error(input) {
 		// In that case I will return the error.
 		log.Println("----> error found!")
-		log.Panicln("---> 477")
 	} else if Jerry_value_is_number(input) {
 		value = Jerry_get_number_value(input)
 	} else if Jerry_value_is_string(input) {

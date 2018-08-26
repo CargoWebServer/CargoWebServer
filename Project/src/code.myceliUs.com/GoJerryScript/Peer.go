@@ -117,7 +117,6 @@ func (self *Peer) run() {
 					rsp.Remote = *action
 
 					// Send the message back to the asking peer.
-					//log.Println("---> 120 send response action: ", action)
 					self.SendMessage(rsp)
 
 				}(self, msg)
@@ -141,15 +140,8 @@ func (self *Peer) run() {
 
 				// Send the message over the network.
 				encoder := gob.NewEncoder(self.conn)
-				//log.Println("---> send ", msg.Remote)
-
 				err := encoder.Encode(msg)
-
 				if err != nil {
-					log.Println("---> ", msg.Remote.Name)
-					for i := 0; i < len(msg.Remote.Results); i++ {
-						log.Println("---> ", msg.Remote.Results[i])
-					}
 					log.Panicln("---> marshaling error: ", err)
 				}
 			}(self, msg)
