@@ -410,7 +410,7 @@ func (this *SessionManager) GetActiveSessionByAccountId(accountId string, messag
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *SessionManager) UpdateSessionState(state int64, messageId string, sessionId string) {
+func (this *SessionManager) UpdateSessionState(state float64, messageId string, sessionId string) {
 
 	// Get the session object...
 	session := this.getActiveSessionById(sessionId)

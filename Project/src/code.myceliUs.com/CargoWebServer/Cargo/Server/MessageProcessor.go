@@ -426,7 +426,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		this.m_receiveRequestError <- m
 
 	} else if *msg.Type == Message_EVENT {
-
 		// When the client throw an event this is the place where
 		// I handle it.
 		evt := msg.GetEvt()

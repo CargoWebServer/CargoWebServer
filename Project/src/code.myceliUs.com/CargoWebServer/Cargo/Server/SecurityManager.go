@@ -768,8 +768,8 @@ func (this *SecurityManager) RemoveAction(roleId string, accountName string, mes
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *SecurityManager) AppendPermission(accountId string, permissionType int, pattern string, messageId string, sessionId string) {
-	errObj := this.appendPermission(accountId, permissionType, pattern)
+func (this *SecurityManager) AppendPermission(accountId string, permissionType float64, pattern string, messageId string, sessionId string) {
+	errObj := this.appendPermission(accountId, int(permissionType), pattern)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}

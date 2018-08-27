@@ -1217,7 +1217,7 @@ func (this *FileManager) DownloadFile(path string, fileName string, mimeType *Mi
 //    } (progressCallback, caller)
 //    xhr.send(formData);
 //}
-func (this *FileManager) CreateFile(filename string, filepath string, thumbnailMaxHeight int64, thumbnailMaxWidth int64, dbFile bool, messageId string, sessionId string) *CargoEntities.File {
+func (this *FileManager) CreateFile(filename string, filepath string, thumbnailMaxHeight float64, thumbnailMaxWidth float64, dbFile bool, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1322,7 +1322,7 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //    } (progressCallback, caller)
 //    xhr.send(formData);
 //}
-func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight int64, thumbnailMaxWidth int64, messageId string, sessionId string) {
+func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight float64, thumbnailMaxWidth float64, messageId string, sessionId string) {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

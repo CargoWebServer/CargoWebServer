@@ -74,7 +74,6 @@ func (self *Server) processActions() {
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
 			go func(a *GoJerryScript.Action, s *Server) {
-				log.Println("---> server exec action: ", a.UUID, a.Name)
 				if a.Name == "RegisterJsFunction" {
 					a.AppendResults(s.engine.RegisterJsFunction(a.Params[0].Value.(string), a.Params[1].Value.(string)))
 				} else if a.Name == "EvalScript" {

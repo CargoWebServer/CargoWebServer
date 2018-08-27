@@ -68,19 +68,19 @@ create_error (jerry_error_t error_type,
 
 // Create a string and return it value.
 jerry_value_t create_string (const char *str_p){
-	return jerry_create_string (str_p);
+	return jerry_create_string_from_utf8 (str_p);
 }
 
 jerry_size_t
 get_string_size (const jerry_value_t value){
-	return jerry_get_string_size(value);
+	return jerry_get_utf8_string_size(value);
 }
 
 jerry_size_t
 string_to_char_buffer (const jerry_value_t value, char *buffer_p, size_t buffer_size){
 	// Here I will set the string value inside the buffer and return
 	// the size of the written data.
-	return jerry_string_to_char_buffer (value, buffer_p, buffer_size);
+	return jerry_string_to_utf8_char_buffer (value, buffer_p, buffer_size);
 }
 
 //extern jerry_value_t create_native_object(const char* uuid);
@@ -144,6 +144,12 @@ get_property_by_index (const jerry_value_t obj_val,
 uint32_t
 get_array_length (const jerry_value_t value){
 	return jerry_get_array_length (value);
+}
+
+// parse a json object and return it value.
+jerry_value_t
+json_parse (const char *string_p, size_t string_size){
+	return jerry_json_parse (string_p, string_size);
 }
 */
 import "C"

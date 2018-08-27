@@ -305,6 +305,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
 								vm.SetGlobalVariable("messageId", jsFunctionInfos.m_messageId)
 								vm.SetGlobalVariable("sessionId", jsFunctionInfos.m_sessionId)
+								//log.Println("---> execute jsFunction: ", jsFunctionInfos.m_functionStr)
 								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							}
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
@@ -603,7 +604,6 @@ func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
  * Append a function in the function map.
  */
 func (this *JsRuntimeManager) appendFunction(functionId string, function interface{}) {
-	log.Println("--> append function: ", functionId)
 	this.m_functions[functionId] = function
 }
 
@@ -938,7 +938,6 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScriptClient.Client, 
 	} else {
 		functionName = functionStr
 	}
-	log.Println("---> CallFunction JsRuntimeManager ", functionName, functionParams)
 	result, err_ := vm.CallFunction(functionName, functionParams...)
 
 	if err_ != nil {

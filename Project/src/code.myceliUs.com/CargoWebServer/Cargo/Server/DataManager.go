@@ -616,7 +616,7 @@ func (this *DataManager) HasDataStore(storeId string, messageId string, sessionI
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *DataManager) CreateDataStore(storeId string, storeName string, hostName string, ipv4 string, port int64, storeType int64, storeVendor int64, messageId string, sessionId string) {
+func (this *DataManager) CreateDataStore(storeId string, storeName string, hostName string, ipv4 string, port float64, storeType float64, storeVendor float64, messageId string, sessionId string) {
 	if storeType == 0 {
 		storeType = 1
 	}

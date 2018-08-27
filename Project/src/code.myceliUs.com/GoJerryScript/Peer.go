@@ -101,8 +101,6 @@ func (self *Peer) run() {
 			err := decoder.Decode(&data)
 			if err == nil {
 				// Here I will create a message from the generic map of interface
-				log.Println("----> received data: ", data)
-
 				msg, err := Utility.InitializeStructure(data, SetEntity)
 				if err != nil {
 					log.Panicln("---> unmarchaling error: ", err)

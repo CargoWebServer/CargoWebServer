@@ -61,12 +61,13 @@ func newCache() {
 				} else if operation["name"] == "setJsObject" {
 					// set the object in the map.
 					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(Uint32_t)
+					//log.Println("---> cache contain: ", len(cache.m_jsObjects))
 				} else if operation["name"] == "removeObject" {
 					delete(cache.m_objects, operation["id"].(string))
 					obj := cache.m_jsObjects[operation["id"].(string)]
 					// remove it pointer from the interpreter.
 					if obj != nil {
-						//Jerry_release_value(obj)
+						//log.Println("delete object ----> ", operation["id"].(string))
 						delete(cache.m_jsObjects, operation["id"].(string))
 						Jerry_release_value(obj)
 					}
@@ -126,9 +127,18 @@ func (cache *Cache) RemoveObject(id string) {
 
 // Convert objectRef to object as needed.
 func GetObject(val interface{}) interface{} {
-
+	if val == nil {
+		return nil
+	}
 	if reflect.TypeOf(val).String() == "GoJerryScript.ObjectRef" {
 		ref := val.(ObjectRef)
+		if GetCache().GetObject(ref.UUID) != nil {
+			return GetCache().GetObject(ref.UUID)
+		}
+		return nil
+
+	} else if reflect.TypeOf(val).String() == "*GoJerryScript.ObjectRef" {
+		ref := val.(*ObjectRef)
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
@@ -144,6 +154,19 @@ func GetObject(val interface{}) interface{} {
 				if !e.IsNil() {
 					if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
 						ref := e.Interface().(ObjectRef)
+						if GetCache().GetObject(ref.UUID) != nil {
+							obj := GetCache().GetObject(ref.UUID)
+							if obj != nil {
+								if i == 0 {
+									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
+								}
+								values = reflect.Append(values, reflect.ValueOf(obj))
+							} else {
+								log.Println("---> fail to retreive object ", ref.UUID)
+							}
+						}
+					} else if reflect.TypeOf(e.Interface()).String() == "*GoJerryScript.ObjectRef" {
+						ref := e.Interface().(*ObjectRef)
 						if GetCache().GetObject(ref.UUID) != nil {
 							obj := GetCache().GetObject(ref.UUID)
 							if obj != nil {

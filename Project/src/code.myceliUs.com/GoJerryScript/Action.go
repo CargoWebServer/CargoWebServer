@@ -2,7 +2,6 @@ package GoJerryScript
 
 import "reflect"
 import "code.myceliUs.com/Utility"
-import "log"
 
 type MessageType int
 
@@ -102,12 +101,13 @@ func (self *Action) AppendParam(name string, value interface{}) {
 
 	// Here I will use the go reflection to get the type of
 	// the value...
-	param.Type = reflect.TypeOf(value).String()
-
+	if value == nil {
+		param.Type = "unknow"
+	} else {
+		param.Type = reflect.TypeOf(value).String()
+	}
 	// Set the parameter value.
 	param.Value = value
-
-	log.Println("-----> param: ", name, " value ", value)
 
 	if self.Params == nil {
 		self.Params = make([]*Param, 0)
@@ -118,9 +118,6 @@ func (self *Action) AppendParam(name string, value interface{}) {
 
 // Append the action results.
 func (self *Action) AppendResults(results ...interface{}) {
-	for i := 0; i < len(results); i++ {
-		log.Println("---> ", results[i])
-	}
 	self.Results = make([]interface{}, 0)
 	self.Results = append(self.Results, results...)
 }

@@ -25,13 +25,14 @@ extern jerry_value_t create_array (uint32_t);
 extern jerry_value_t set_property_by_index (const jerry_value_t, uint32_t, const jerry_value_t);
 extern jerry_value_t get_property_by_index (const jerry_value_t, uint32_t);
 extern uint32_t get_array_length (const jerry_value_t);
-
+extern jerry_value_t json_parse (const char *string_p, size_t string_size);
 */
 import "C"
 
 //import "reflect"
 import "unsafe"
 import "encoding/binary"
+import "encoding/json"
 import "math"
 import "code.myceliUs.com/Utility"
 import "errors"
@@ -507,7 +508,7 @@ func goToJs(value interface{}) Uint32_t {
 		propValue = value.(Uint32_t)
 	} else if typeOf.String() == "*GoJerryScript.ObjectRef" {
 		// I got a Js object reference.
-		uuid := value.(ObjectRef).UUID
+		uuid := value.(*ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
 		if Jerry_value_is_undefined(propValue) {
 			// If the object is not in the cache...
@@ -521,6 +522,18 @@ func goToJs(value interface{}) Uint32_t {
 		uuid := Utility.GenerateUUID(ptrString)
 		// The object is expect to exist.
 		return getJsObjectByUuid(uuid)
+	} else if typeOf.String() == "map[string]interface {}" {
+		// In that case I will create a object from the value found in the map
+		// and return it as prop value.
+		data, err := json.Marshal(value)
+		if err == nil {
+			cstr := C.CString(string(data))
+			defer C.free(unsafe.Pointer(cstr))
+			propValue = jerry_value_t_To_uint32_t(C.json_parse(cstr, C.size_t(len(string(data)))))
+			if Jerry_value_is_object(propValue) {
+				log.Println("----> succeffuly create object: ", string(data))
+			}
+		}
 	} else {
 		log.Panicln("---> type not found ", value, typeOf.String())
 	}

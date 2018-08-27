@@ -16,7 +16,8 @@ function main() {
     // Append filter to receive all session event message
     // on the sessionEvent channel.
     //securityTests()
-    /*
+    
+    /*102
     server.eventHandler.appendEventFilter(
          "CargoEntities.",
          "EntityEvent",

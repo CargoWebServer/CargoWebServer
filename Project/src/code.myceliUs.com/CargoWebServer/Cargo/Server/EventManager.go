@@ -606,7 +606,8 @@ func (this *EventManager) RemoveEventListener(id string, name string) {
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @scope {public}
-func (this *EventManager) BroadcastNetworkEvent(eventNumber int64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
+func (this *EventManager) BroadcastNetworkEvent(eventNumber float64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
+
 	// Create the new event objet...
 	evt, _ := NewEvent(int32(eventNumber), channelId, eventDatas.([]*MessageData))
 

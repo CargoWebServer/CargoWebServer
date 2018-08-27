@@ -85,13 +85,19 @@ func setObjectRefs(values []interface{}) []interface{} {
 
 			for j := 0; j < slice.Len(); j++ {
 				e := slice.Index(j)
-				if reflect.TypeOf(e.Interface()).String() == "*GoJerryScript.ObjectRef" {
+				if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+					// Replace the object reference with it actual object.
+					values[i].([]interface{})[j] = GoJerryScript.GetCache().GetObject(e.Interface().(GoJerryScript.ObjectRef).UUID)
+				} else if reflect.TypeOf(e.Interface()).String() == "*GoJerryScript.ObjectRef" {
 					// Replace the object reference with it actual object.
 					values[i].([]interface{})[j] = GoJerryScript.GetCache().GetObject(e.Interface().(*GoJerryScript.ObjectRef).UUID)
 				}
 			}
 		} else {
-			if reflect.TypeOf(values[i]).String() == "*GoJerryScript.ObjectRef" {
+			if reflect.TypeOf(values[i]).String() == "GoJerryScript.ObjectRef" {
+				// Replace the object reference with it actual value.
+				values[i] = GoJerryScript.GetCache().GetObject(values[i].(GoJerryScript.ObjectRef).UUID)
+			} else if reflect.TypeOf(values[i]).String() == "*GoJerryScript.ObjectRef" {
 				// Replace the object reference with it actual value.
 				values[i] = GoJerryScript.GetCache().GetObject(values[i].(*GoJerryScript.ObjectRef).UUID)
 			}
@@ -140,7 +146,6 @@ func (self *Client) processActions() {
 		select {
 		case action := <-self.exec_action_chan:
 			go func(a *GoJerryScript.Action) {
-				log.Println("---> client exec action: ", a.UUID, a.Name)
 				var target interface{}
 				isJsObject := true
 				if len(a.Target) > 0 {
@@ -158,7 +163,6 @@ func (self *Client) processActions() {
 				params := make([]interface{}, 0)
 				for i := 0; i < len(a.Params); i++ {
 					// So here I will append the value to parameters.
-					// TODO test if the parameter is a ObjectRef.
 					params = append(params, GoJerryScript.GetObject(a.Params[i].Value))
 				}
 
@@ -171,6 +175,11 @@ func (self *Client) processActions() {
 				} else {
 					// Now I will call the method on the object.
 					results, err = Utility.CallMethod(target, a.Name, params)
+					if err != nil {
+						log.Println("---> target ", target)
+						log.Println("---> call Method: ", a.Name, params)
+						log.Println("---> error: ", err)
+					}
 				}
 
 				// if results are go struct
@@ -192,6 +201,7 @@ func (self *Client) processActions() {
 								// results will be register.
 								var uuid string
 								if reflect.TypeOf(e.Interface()).String() != "GoJerryScript.Object" {
+									log.Println("---> register ", e.Interface())
 									uuid = self.RegisterGoObject(slice.Index(i).Interface(), "")
 								} else {
 									// No need to export the object function here
@@ -199,6 +209,7 @@ func (self *Client) processActions() {
 									uuid = results.(GoJerryScript.Object).UUID
 								}
 								// I will set the results a object reference.
+								log.Println("---> set object reference: ", GoJerryScript.NewObjectRef(uuid))
 								results_ = append(results_, GoJerryScript.NewObjectRef(uuid))
 							}
 						}
@@ -276,6 +287,10 @@ func (self *Client) RegisterGoType(value interface{}) {
  * name If a name is given It will be a global variable.
  */
 func (self *Client) RegisterGoObject(obj interface{}, name string) string {
+	// Here I will dynamicaly register objet type in the utility cache...
+	empty := reflect.New(reflect.TypeOf(obj))
+	self.RegisterGoType(empty.Elem().Interface())
+
 	// Random uuid.
 	var uuid string
 	if len(name) > 0 {
@@ -327,51 +342,73 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 		// Here I will set the property
 		// Bust the number of field handler here.
 		if valueField.CanInterface() {
-			// So here is the field.
-			fieldValue := valueField.Interface()
-			fieldName := typeField.Name
+			if valueField.IsValid() {
+				// So here is the field.
+				fieldValue := valueField.Interface()
+				fieldName := typeField.Name
 
-			// Now depending of the type of the field I will do a recursion.
-			var typeOf = reflect.TypeOf(fieldValue)
+				// Now depending of the type of the field I will do a recursion.
+				var typeOf = reflect.TypeOf(fieldValue)
 
-			// Dereference the pointer as needed.
-			if typeOf.Kind() == reflect.Ptr {
-				// Here I will access the value and not the pointer...
-				fieldValue = valueField.Elem().Interface()
-			}
-
-			if typeOf.Kind() == reflect.Slice {
-				if valueField.Len() > 0 {
-					isObject := false
-					for i := 0; i < valueField.Len(); i++ {
-						fieldValue := valueField.Index(i).Interface()
-						// If the value is a struct I need to register it to JS
-						if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
-							if reflect.TypeOf(reflect.ValueOf(fieldValue).Elem()).Kind() == reflect.Struct {
-								// Here the element is a structure so I need to create it representation.
-								uuid_ := self.RegisterGoObject(fieldValue, "")
-								if i == 0 {
-									action := GoJerryScript.NewAction("CreateObjectArray", "")
-									action.AppendParam("uuid", uuid)
-									action.AppendParam("name", fieldName)
-									action.AppendParam("size", uint32(valueField.Len()))
-									self.peer.CallRemoteAction(action)
-								}
-
-								// Set the object in the array of object property.
-								action := GoJerryScript.NewAction("SetObjectPropertyAtIndex", "")
-								action.AppendParam("uuid", uuid)
-								action.AppendParam("name", fieldName)
-								action.AppendParam("index", uint32(i))
-								action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
-								self.peer.CallRemoteAction(action)
-								isObject = true
-							}
-						}
+				// Dereference the pointer as needed.
+				if typeOf != nil {
+					if typeOf.Kind() == reflect.Ptr {
+						// Here I will access the value and not the pointer...
+						fieldValue = valueField.Elem().Interface()
 					}
 
-					// if the array dosent contain structure I will set it values...
-					if !isObject {
+					if typeOf.Kind() == reflect.Slice {
+						if valueField.Len() > 0 {
+							isObject := false
+							for i := 0; i < valueField.Len(); i++ {
+								fieldValue := valueField.Index(i).Interface()
+								// If the value is a struct I need to register it to JS
+								if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
+									if reflect.TypeOf(reflect.ValueOf(fieldValue).Elem()).Kind() == reflect.Struct {
+										// Here the element is a structure so I need to create it representation.
+										uuid_ := self.RegisterGoObject(fieldValue, "")
+										if i == 0 {
+											action := GoJerryScript.NewAction("CreateObjectArray", "")
+											action.AppendParam("uuid", uuid)
+											action.AppendParam("name", fieldName)
+											action.AppendParam("size", uint32(valueField.Len()))
+											self.peer.CallRemoteAction(action)
+										}
+
+										// Set the object in the array of object property.
+										action := GoJerryScript.NewAction("SetObjectPropertyAtIndex", "")
+										action.AppendParam("uuid", uuid)
+										action.AppendParam("name", fieldName)
+										action.AppendParam("index", uint32(i))
+										action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
+										self.peer.CallRemoteAction(action)
+										isObject = true
+									}
+								}
+							}
+
+							// if the array dosent contain structure I will set it values...
+							if !isObject {
+								action := GoJerryScript.NewAction("SetObjectProperty", "")
+								action.AppendParam("uuid", uuid)
+								action.AppendParam("name", fieldName)
+								action.AppendParam("value", fieldValue)
+								self.peer.CallRemoteAction(action)
+							}
+						}
+					} else if typeOf.Kind() == reflect.Struct {
+						// Set the struct...
+						uuid_ := self.RegisterGoObject(fieldValue, "")
+
+						// Set the struct as object property.
+						action := GoJerryScript.NewAction("SetObjectProperty", "")
+						action.AppendParam("uuid", uuid)
+						action.AppendParam("name", fieldName)
+						action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
+						self.peer.CallRemoteAction(action)
+
+					} else {
+						// basic type.
 						action := GoJerryScript.NewAction("SetObjectProperty", "")
 						action.AppendParam("uuid", uuid)
 						action.AppendParam("name", fieldName)
@@ -379,24 +416,6 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 						self.peer.CallRemoteAction(action)
 					}
 				}
-			} else if typeOf.Kind() == reflect.Struct {
-				// Set the struct...
-				uuid_ := self.RegisterGoObject(fieldValue, "")
-
-				// Set the struct as object property.
-				action := GoJerryScript.NewAction("SetObjectProperty", "")
-				action.AppendParam("uuid", uuid)
-				action.AppendParam("name", fieldName)
-				action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
-				self.peer.CallRemoteAction(action)
-
-			} else {
-				// basic type.
-				action := GoJerryScript.NewAction("SetObjectProperty", "")
-				action.AppendParam("uuid", uuid)
-				action.AppendParam("name", fieldName)
-				action.AppendParam("value", fieldValue)
-				self.peer.CallRemoteAction(action)
 			}
 		}
 	}
@@ -474,7 +493,6 @@ func (self *Client) EvalScript(script string, variables []interface{}) (GoJerryS
 	action = self.peer.CallRemoteAction(action)
 
 	var err error
-
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
@@ -494,6 +512,13 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 	action := GoJerryScript.NewAction("CallFunction", "")
 	action.AppendParam("name", name)
 	action.AppendParam("params", params)
+
+	if name == "EventManagerBroadcastNetworkEvent" {
+		log.Println("---> call function ", name)
+		for i := 0; i < len(params); i++ {
+			log.Println(" --> param: ", reflect.TypeOf(params[i]).String())
+		}
+	}
 
 	// Call the remote action
 	action = self.peer.CallRemoteAction(action)

@@ -165,11 +165,71 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 	return v
 }
 
+// Return an initialyse field value.
+func InitializeStructureFieldArrayValue(fieldName string, fieldType reflect.Type, values reflect.Value, setEntity func(interface{})) reflect.Value {
+	// Create a slice here.
+	slice := reflect.MakeSlice(fieldType, values.Len(), values.Len())
+
+	// Here I will iterate over the slice
+	for i := 0; i < values.Len(); i++ {
+		// the slice value.
+		v_ := values.Index(i).Interface()
+
+		// If the type is register as dynamic type.
+		if v_ != nil {
+			if reflect.TypeOf(v_).String() == "map[string]interface {}" {
+				// The value is a dynamic value.
+				v_ := v_.(map[string]interface{})
+				if v_["TYPENAME"] != nil {
+					fv := initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
+					// I will set the reference in the parent object.
+					setEntity(fv.Interface())
+
+					// Special case for entity (Cargo)...
+					if strings.HasPrefix(fieldName, "M_") {
+						if v_["UUID"] != nil {
+							index := slice.Index(i)
+							index.Set(reflect.ValueOf(v_["UUID"].(string)))
+						}
+					} else {
+						index := slice.Index(i)
+						index.Set(fv)
+					}
+
+				} else {
+					// A generic map not a dynamic type.
+					index := slice.Index(i)
+					index.Set(reflect.ValueOf(v_))
+				}
+			} else {
+				// Not an array of map[string]interface {}
+				index := slice.Index(i)
+				if reflect.TypeOf(v_).Kind() == reflect.Slice {
+					slice := InitializeStructureFieldArrayValue(fieldName, reflect.TypeOf(v_), reflect.ValueOf(v_), setEntity)
+					// Set the slice...
+					if slice.IsValid() {
+						// A sub-array.
+						index.Set(slice)
+					}
+				} else {
+					// Not an array
+					fv := InitializeBaseTypeValue(reflect.TypeOf(v_), v_).Convert(reflect.TypeOf(v_))
+					if fv.IsValid() {
+						index.Set(fv)
+					}
+				}
+			}
+		}
+	}
+	return slice
+}
+
 func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType reflect.Type, fieldValue interface{}, setEntity func(interface{})) {
 	switch fieldType.Kind() {
 	case reflect.Slice:
 		// That's mean the value contain an array...
 		if reflect.TypeOf(fieldValue).String() == "[]uint8" || reflect.TypeOf(fieldValue).String() == "[]byte" {
+			log.Println("---> binairy type value ", fieldName, " value ", fieldValue)
 			fv := InitializeBaseTypeValue(reflect.TypeOf(fieldValue), fieldValue)
 			val := fv.String()
 			val_, err := b64.StdEncoding.DecodeString(val)
@@ -179,50 +239,7 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 			// Set the value...
 			v.Elem().FieldByName(fieldName).Set(reflect.ValueOf([]byte(val)))
 		} else {
-			values := reflect.ValueOf(fieldValue)
-			var slice reflect.Value
-			// Here I will iterate over the slice
-			for i := 0; i < values.Len(); i++ {
-				// the slice value.
-				v_ := values.Index(i).Interface()
-				// If it's an array of interface...
-				if i == 0 {
-					log.Println("---> create ", fieldType.String())
-					slice = reflect.MakeSlice(fieldType, values.Len(), values.Len())
-				}
-				// If the type is register as dynamic type.
-				if v_ != nil {
-					if reflect.TypeOf(v_).String() == "map[string]interface {}" {
-						// The value is a dynamic value.
-						v_ := v_.(map[string]interface{})
-						if v_["TYPENAME"] != nil {
-							log.Println("---> init ", v_["TYPENAME"])
-							fv := initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
-							// I will set the reference in the parent object.
-							setEntity(fv.Interface())
-							// Special case for entity (Cargo)...
-							if strings.HasPrefix(fieldName, "M_") {
-								if v_["UUID"] != nil {
-									index := slice.Index(i)
-									index.Set(reflect.ValueOf(v_["UUID"].(string)))
-								}
-							} else {
-								index := slice.Index(i)
-								index.Set(fv)
-							}
-						} else {
-							// A generic map not a dynamic type.
-							index := slice.Index(i)
-							index.Set(reflect.ValueOf(v_))
-						}
-					} else {
-						// Not an array of map[string]interface {}
-						// TODO manage slice inside slice inside slice inside slice...
-						index := slice.Index(i)
-						index.Set(reflect.ValueOf(v_))
-					}
-				}
-			}
+			slice := InitializeStructureFieldArrayValue(fieldName, fieldType, reflect.ValueOf(fieldValue), setEntity)
 			// Set the slice...
 			if slice.IsValid() {
 				v.Elem().FieldByName(fieldName).Set(slice)

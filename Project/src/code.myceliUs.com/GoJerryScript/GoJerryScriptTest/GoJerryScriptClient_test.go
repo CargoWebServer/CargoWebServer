@@ -85,6 +85,7 @@ func (self *Person) SayHelloToAll(all []*Person) string {
 
 // A method that return an array.
 func (self *Person) GetContacts() []*Person {
+	log.Println("---> get contact was call!", self.Contacts)
 	return self.Contacts
 }
 

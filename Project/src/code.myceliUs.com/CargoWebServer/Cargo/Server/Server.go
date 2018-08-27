@@ -59,6 +59,7 @@ type Server struct {
  * Create a new server...
  */
 func newServer() *Server {
+
 	// The server object itself...
 	server = new(Server)
 

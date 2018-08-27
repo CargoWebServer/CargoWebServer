@@ -1820,6 +1820,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query in
 	}
 
 	// If no order ar specified i will use the id's as order.
+
 	if len(orderBy) == 0 {
 		// Here I will sort by it it's without it uuid...
 		prototype, err := this.getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
