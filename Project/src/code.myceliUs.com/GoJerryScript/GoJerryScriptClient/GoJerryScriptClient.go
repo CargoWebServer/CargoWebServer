@@ -85,15 +85,15 @@ func setObjectRefs(values []interface{}) []interface{} {
 
 			for j := 0; j < slice.Len(); j++ {
 				e := slice.Index(j)
-				if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+				if reflect.TypeOf(e.Interface()).String() == "*GoJerryScript.ObjectRef" {
 					// Replace the object reference with it actual object.
-					values[i].([]interface{})[j] = GoJerryScript.GetCache().GetObject(e.Interface().(GoJerryScript.ObjectRef).UUID)
+					values[i].([]interface{})[j] = GoJerryScript.GetCache().GetObject(e.Interface().(*GoJerryScript.ObjectRef).UUID)
 				}
 			}
 		} else {
-			if reflect.TypeOf(values[i]).String() == "GoJerryScript.ObjectRef" {
+			if reflect.TypeOf(values[i]).String() == "*GoJerryScript.ObjectRef" {
 				// Replace the object reference with it actual value.
-				values[i] = GoJerryScript.GetCache().GetObject(values[i].(GoJerryScript.ObjectRef).UUID)
+				values[i] = GoJerryScript.GetCache().GetObject(values[i].(*GoJerryScript.ObjectRef).UUID)
 			}
 		}
 	}
@@ -199,7 +199,7 @@ func (self *Client) processActions() {
 									uuid = results.(GoJerryScript.Object).UUID
 								}
 								// I will set the results a object reference.
-								results_ = append(results_, GoJerryScript.ObjectRef{UUID: uuid})
+								results_ = append(results_, GoJerryScript.NewObjectRef(uuid))
 							}
 						}
 						// Set the array of object references.
@@ -223,14 +223,14 @@ func (self *Client) processActions() {
 								uuid = results.(GoJerryScript.Object).UUID
 							}
 							// I will set the results a object reference.
-							results = GoJerryScript.ObjectRef{UUID: uuid}
+							results = GoJerryScript.NewObjectRef(uuid)
 						}
 					}
 				}
 				// set the action result.
 				a.AppendResults(results, err)
 				// Here I will create the response and send it back to the client.
-				a.Done <- a
+				a.GetDone() <- a
 			}(action)
 		}
 	}
@@ -297,9 +297,7 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 	GoJerryScript.GetCache().SetObject(uuid, obj)
 
 	// Now I will create the object on the server.
-	createObjectAction := new(GoJerryScript.Action)
-	createObjectAction.UUID = Utility.RandomUUID()
-	createObjectAction.Name = "CreateObject"
+	createObjectAction := GoJerryScript.NewAction("CreateObject", "")
 	createObjectAction.AppendParam("uuid", uuid)
 	createObjectAction.AppendParam("name", name) // no name is nessarry here.
 
@@ -316,9 +314,7 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 	for i := 0; i < element.Addr().NumMethod(); i++ {
 		typeMethod := element.Addr().Type().Method(i)
 		methodName := typeMethod.Name
-		action := new(GoJerryScript.Action)
-		action.UUID = Utility.RandomUUID()
-		action.Name = "SetGoObjectMethod"
+		action := GoJerryScript.NewAction("SetGoObjectMethod", "")
 		action.AppendParam("uuid", uuid)
 		action.AppendParam("name", methodName)
 		self.peer.CallRemoteAction(action)
@@ -355,23 +351,19 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 								// Here the element is a structure so I need to create it representation.
 								uuid_ := self.RegisterGoObject(fieldValue, "")
 								if i == 0 {
-									action := new(GoJerryScript.Action)
-									action.UUID = Utility.RandomUUID()
-									action.Name = "CreateObjectArray"
+									action := GoJerryScript.NewAction("CreateObjectArray", "")
 									action.AppendParam("uuid", uuid)
 									action.AppendParam("name", fieldName)
 									action.AppendParam("size", uint32(valueField.Len()))
 									self.peer.CallRemoteAction(action)
 								}
 
-								// Set the object in the array the object property.
-								action := new(GoJerryScript.Action)
-								action.UUID = Utility.RandomUUID()
-								action.Name = "SetObjectPropertyAtIndex"
+								// Set the object in the array of object property.
+								action := GoJerryScript.NewAction("SetObjectPropertyAtIndex", "")
 								action.AppendParam("uuid", uuid)
 								action.AppendParam("name", fieldName)
 								action.AppendParam("index", uint32(i))
-								action.AppendParam("value", GoJerryScript.ObjectRef{UUID: uuid_})
+								action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
 								self.peer.CallRemoteAction(action)
 								isObject = true
 							}
@@ -380,9 +372,7 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 
 					// if the array dosent contain structure I will set it values...
 					if !isObject {
-						action := new(GoJerryScript.Action)
-						action.UUID = Utility.RandomUUID()
-						action.Name = "SetObjectProperty"
+						action := GoJerryScript.NewAction("SetObjectProperty", "")
 						action.AppendParam("uuid", uuid)
 						action.AppendParam("name", fieldName)
 						action.AppendParam("value", fieldValue)
@@ -394,19 +384,15 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 				uuid_ := self.RegisterGoObject(fieldValue, "")
 
 				// Set the struct as object property.
-				action := new(GoJerryScript.Action)
-				action.UUID = Utility.RandomUUID()
-				action.Name = "SetObjectProperty"
+				action := GoJerryScript.NewAction("SetObjectProperty", "")
 				action.AppendParam("uuid", uuid)
 				action.AppendParam("name", fieldName)
-				action.AppendParam("value", GoJerryScript.ObjectRef{UUID: uuid_})
+				action.AppendParam("value", GoJerryScript.NewObjectRef(uuid_))
 				self.peer.CallRemoteAction(action)
 
 			} else {
 				// basic type.
-				action := new(GoJerryScript.Action)
-				action.UUID = Utility.RandomUUID()
-				action.Name = "SetObjectProperty"
+				action := GoJerryScript.NewAction("SetObjectProperty", "")
 				action.AppendParam("uuid", uuid)
 				action.AppendParam("name", fieldName)
 				action.AppendParam("value", fieldValue)
@@ -429,11 +415,7 @@ func (self *Client) RegisterGoFunction(name string, fct interface{}) {
 	// Register the function in the server.
 
 	// Create the action.
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
-
-	// The name of the action to execute.
-	action.Name = "RegisterGoFunction"
+	action := GoJerryScript.NewAction("RegisterGoFunction", "")
 
 	// Append the name parameter.
 	action.AppendParam("name", name)
@@ -449,11 +431,7 @@ func (self *Client) RegisterGoFunction(name string, fct interface{}) {
  */
 func (self *Client) RegisterJsFunction(name string, src string) error {
 	// Create the action.
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
-
-	// The name of the action to execute.
-	action.Name = "RegisterJsFunction"
+	action := GoJerryScript.NewAction("RegisterJsFunction", "")
 
 	action.AppendParam("name", name)
 	action.AppendParam("src", src)
@@ -485,13 +463,9 @@ func (self *Client) CreateObject(name string) GoJerryScript.Object {
  * Evaluate sript.
  * The list of global variables to be set before executing the script.
  */
-func (self *Client) EvalScript(script string, variables GoJerryScript.Variables) (GoJerryScript.Value, error) {
+func (self *Client) EvalScript(script string, variables []interface{}) (GoJerryScript.Value, error) {
 	// So here I will create the function parameters.
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
-
-	// The name of the action to execute.
-	action.Name = "EvalScript"
+	action := GoJerryScript.NewAction("EvalScript", "")
 
 	action.AppendParam("script", script)
 	action.AppendParam("variables", variables)
@@ -506,10 +480,10 @@ func (self *Client) EvalScript(script string, variables GoJerryScript.Variables)
 	}
 
 	// Transform object ref into object as needed.
-	value := action.Results[0].(GoJerryScript.Value)
+	value := action.Results[0].(*GoJerryScript.Value)
 	value.Export()
 
-	return value, err
+	return *value, err
 }
 
 /**
@@ -517,11 +491,7 @@ func (self *Client) EvalScript(script string, variables GoJerryScript.Variables)
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScript.Value, error) {
 	// So here I will create the function parameters.
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
-
-	// The name of the action to execute.
-	action.Name = "CallFunction"
+	action := GoJerryScript.NewAction("CallFunction", "")
 	action.AppendParam("name", name)
 	action.AppendParam("params", params)
 
@@ -533,10 +503,10 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 	}
 
 	// Transform object ref into object as needed.
-	value := action.Results[0].(GoJerryScript.Value)
+	value := action.Results[0].(*GoJerryScript.Value)
 	value.Export()
 
-	return value, err
+	return *value, err
 }
 
 /**
@@ -544,11 +514,8 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
  */
 func (self *Client) SetGlobalVariable(name string, value interface{}) {
 	// So here I will create the function parameters.
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
+	action := GoJerryScript.NewAction("SetGlobalVariable", "")
 
-	// The name of the action to execute.
-	action.Name = "SetGlobalVariable"
 	action.AppendParam("name", name)
 	action.AppendParam("value", value)
 
@@ -560,11 +527,8 @@ func (self *Client) SetGlobalVariable(name string, value interface{}) {
  * Get the global variable name.
  */
 func (self *Client) GetGlobalVariable(name string) (GoJerryScript.Value, error) {
-	action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
+	action := GoJerryScript.NewAction("GetGlobalVariable", "")
 
-	// The name of the action to execute.
-	action.Name = "GetGlobalVariable"
 	action.AppendParam("name", name)
 
 	// Call the remote action
@@ -576,10 +540,10 @@ func (self *Client) GetGlobalVariable(name string) (GoJerryScript.Value, error) 
 	}
 
 	// Transform object ref into object as needed.
-	value := action.Results[0].(GoJerryScript.Value)
+	value := action.Results[0].(*GoJerryScript.Value)
 	value.Export()
 
-	return value, err
+	return *value, err
 }
 
 /**
@@ -587,12 +551,7 @@ func (self *Client) GetGlobalVariable(name string) (GoJerryScript.Value, error) 
  */
 func (self *Client) Stop() bool {
 	// Create the action.
-	/*action := new(GoJerryScript.Action)
-	action.UUID = Utility.RandomUUID()
-
-	// The name of the action to execute.
-	action.Name = "Stop"
-
+	/*action := GoJerryScript.NewAction("Stop", "")
 	action = self.peer.CallRemoteAction(action)*/
 
 	// Stop action proecessing

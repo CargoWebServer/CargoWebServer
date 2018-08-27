@@ -55,7 +55,7 @@ func (self *Server) processRemoteActions() {
 				// Call remote action
 				a = s.peer.CallRemoteAction(a)
 				// Set back the action on the channel.
-				a.Done <- a
+				a.GetDone() <- a
 			}(action, self)
 		}
 
@@ -79,10 +79,18 @@ func (self *Server) processActions() {
 					a.AppendResults(s.engine.RegisterJsFunction(a.Params[0].Value.(string), a.Params[1].Value.(string)))
 				} else if a.Name == "EvalScript" {
 					// So here I will call the function and return it value.
-					a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), a.Params[1].Value.(GoJerryScript.Variables)))
+					if a.Params[1].Value != nil {
+						a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+					} else {
+						a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), []interface{}{}))
+					}
 				} else if a.Name == "CallFunction" {
 					// So here I will call the function and return it value.
-					a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+					if a.Params[1].Value != nil {
+						a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+					} else {
+						a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), []interface{}{}))
+					}
 				} else if a.Name == "RegisterGoFunction" {
 					s.engine.RegisterGoFunction(a.Params[0].Value.(string))
 				} else if a.Name == "CreateObject" {
@@ -98,11 +106,11 @@ func (self *Server) processActions() {
 				} else if a.Name == "CallObjectMethod" {
 					a.AppendResults(s.engine.CallObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.([]interface{})...))
 				} else if a.Name == "CreateObjectArray" {
-					a.AppendResults(s.engine.CreateObjectArray(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32)))
+					a.AppendResults(s.engine.CreateObjectArray(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64))))
 				} else if a.Name == "SetObjectPropertyAtIndex" {
-					s.engine.SetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32), a.Params[3].Value)
+					s.engine.SetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64)), a.Params[3].Value)
 				} else if a.Name == "GetObjectPropertyAtIndex" {
-					a.AppendResults(s.engine.GetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(uint32)))
+					a.AppendResults(s.engine.GetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64))))
 				} else if a.Name == "SetGlobalVariable" {
 					s.engine.SetGlobalVariable(a.Params[0].Value.(string), a.Params[1].Value)
 				} else if a.Name == "GetGlobalVariable" {
@@ -124,7 +132,7 @@ func (self *Server) processActions() {
 					break*/
 				}
 
-				a.Done <- a
+				a.GetDone() <- a
 			}(action, self)
 		}
 	}

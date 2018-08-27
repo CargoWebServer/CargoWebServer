@@ -1,17 +1,35 @@
 package GoJerryScript
 
 import (
-	"encoding/gob"
+	"encoding/json"
 	"log"
 	"net"
 	"strconv"
+
+	"code.myceliUs.com/Utility"
 )
 
 // Object reference type.
 type ObjectRef struct {
 	// The uuid of the referenced object.
-	UUID string
+	UUID     string
+	TYPENAME string
 }
+
+func NewObjectRef(uuid string) *ObjectRef {
+	ref := new(ObjectRef)
+	ref.UUID = uuid
+	ref.TYPENAME = "GoJerryScript.ObjectRef"
+	return ref
+}
+
+var (
+	// Callback function used by dynamic type, it's call when an entity is set.
+	// Can be use to store dynamic type in a cache.
+	SetEntity func(interface{}) = func(val interface{}) {
+		/** nothing todo here... **/
+	}
+)
 
 /**
  * Client are use to call remote function over JerryScript js engine.
@@ -42,14 +60,13 @@ type Peer struct {
 
 func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	// Transferable objects types over the client/server.
-	gob.Register(Message{})
-	gob.Register(Action{})
-	gob.Register(Param{})
-	gob.Register(Variables{})
-	gob.Register(Value{})
-	gob.Register(Object{})
-	gob.Register(ObjectRef{})
-	gob.Register([]interface{}{})
+	Utility.RegisterType((*Message)(nil))
+	Utility.RegisterType((*Action)(nil))
+	Utility.RegisterType((*Param)(nil))
+	Utility.RegisterType((*Variable)(nil))
+	Utility.RegisterType((*Value)(nil))
+	Utility.RegisterType((*Object)(nil))
+	Utility.RegisterType((*ObjectRef)(nil))
 
 	p := new(Peer)
 	p.port = port
@@ -63,7 +80,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	// pending action.
 	p.pending_actions_chan = make(map[string]chan *Action, 0)
 
-	// action exec channel, this is given by the channel owner.
+	// action exec channel, this is given by the channel owner.return
 	p.exec_action_chan = exec_action_chan
 
 	// Stop the process.
@@ -78,11 +95,19 @@ func (self *Peer) run() {
 	// Listen incomming information.
 	go func(self *Peer) {
 		for self.isRunning {
-			msg := new(Message)
-			decoder := gob.NewDecoder(self.conn)
-			err := decoder.Decode(msg)
+			data := make(map[string]interface{})
+
+			decoder := json.NewDecoder(self.conn)
+			err := decoder.Decode(&data)
 			if err == nil {
-				self.receive_chan <- msg
+				// Here I will create a message from the generic map of interface
+				log.Println("----> received data: ", data)
+
+				msg, err := Utility.InitializeStructure(data, SetEntity)
+				if err != nil {
+					log.Panicln("---> unmarchaling error: ", err)
+				}
+				self.receive_chan <- msg.Interface().(*Message)
 			} else {
 				log.Panicln("---> unmarchaling error: ", err)
 			}
@@ -94,27 +119,24 @@ func (self *Peer) run() {
 		select {
 		case msg := <-self.receive_chan:
 			// So here the message can be a request or a response.
-			if msg.Type == 0 {
+			if msg.Type == Request {
 				// Process request in a separated go routine.
 				go func(self *Peer, msg *Message) {
-					action := &msg.Remote
+					// Get the action
+					action := msg.Remote
 
-					// Open ansew channel
-					action.Done = make(chan *Action)
+					// Open answer channel
+					action.SetDone()
 
 					// In that case I will run the action.
 					// Set the action on the channel to be execute by the peer owner.
 					self.exec_action_chan <- action
 
 					// Wait for the result.
-					action = <-action.Done
-					// Here I will create the response and send it back to the client.
-					rsp := new(Message)
-					rsp.UUID = msg.UUID
-					rsp.Type = 1
+					action = <-action.GetDone()
 
-					// Set back the action
-					rsp.Remote = *action
+					// Here I will create the response and send it back to the client.
+					rsp := NewMessage(Response, action)
 
 					// Send the message back to the asking peer.
 					self.SendMessage(rsp)
@@ -137,9 +159,8 @@ func (self *Peer) run() {
 			}
 		case msg := <-self.send_chan:
 			go func(self *Peer, msg *Message) {
-
 				// Send the message over the network.
-				encoder := gob.NewEncoder(self.conn)
+				encoder := json.NewEncoder(self.conn)
 				err := encoder.Encode(msg)
 				if err != nil {
 					log.Panicln("---> marshaling error: ", err)
@@ -196,12 +217,7 @@ func (self *Peer) CallRemoteAction(action *Action) *Action {
 	self.pending_actions_chan[action.UUID] = make(chan *Action)
 
 	// Create the action request.
-	msg := new(Message)
-	msg.Type = 0
-	msg.UUID = action.UUID
-
-	// Set the action as message data.
-	msg.Remote = *action
+	msg := NewMessage(Request, action)
 
 	// Send the request and wait for it answer.
 	self.SendMessage(msg)

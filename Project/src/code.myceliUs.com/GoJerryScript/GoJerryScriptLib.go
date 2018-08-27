@@ -232,27 +232,24 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 
 // Go function reside in the client, a remote call will be made here.
 func callGoFunction(target string, name string, params ...interface{}) (interface{}, error) {
-	action := new(Action)
-	action.Name = name
-	action.Target = target
-	action.UUID = Utility.RandomUUID()
-	log.Println("----> call: ", name)
+
+	action := NewAction(name, target)
+
 	// Set the list of parameters.
 	for i := 0; i < len(params); i++ {
-		log.Println("---> param: ", params[i], reflect.TypeOf(params[i]).String())
 		action.AppendParam("arg"+strconv.Itoa(i), params[i])
 	}
 
 	// Create the channel to give back the action
 	// when it's done.
-	action.Done = make(chan *Action)
+	action.SetDone()
 
 	// Send the action to the client side.
 	Call_remote_actions_chan <- action
 
 	// Set back the action with it results in it.
-	action = <-action.Done
-	log.Println("---> 255 ", action.Results)
+	action = <-action.GetDone()
+
 	var err error
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
@@ -405,6 +402,8 @@ func newJsString(val string) Uint32_t {
 func NewValue(ptr Uint32_t) *Value {
 
 	v := new(Value)
+	v.TYPENAME = "GoJerryScript.Value"
+
 	var err error
 
 	// Export the value.
@@ -506,7 +505,7 @@ func goToJs(value interface{}) Uint32_t {
 	} else if typeOf.String() == "GoJerryScript.SwigcptrUint32_t" {
 		// already a Uint32_t
 		propValue = value.(Uint32_t)
-	} else if typeOf.String() == "GoJerryScript.ObjectRef" {
+	} else if typeOf.String() == "*GoJerryScript.ObjectRef" {
 		// I got a Js object reference.
 		uuid := value.(ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
@@ -576,7 +575,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			uuid, _ := jsToGo(uuid_)
 
 			// Return and object reference.
-			value = ObjectRef{UUID: uuid.(string)}
+			value = NewObjectRef(uuid.(string))
 		} else {
 			stringified := Jerry_json_stringfy(input)
 			// if there is no error
@@ -698,8 +697,23 @@ func (self Instance) Swigcptr() uintptr {
  * Variable with name and value.
  */
 type Variable struct {
-	Name  string
+	// The typename.
+	TYPENAME string
+	// The variable name
+	Name string
+	// It value.
 	Value interface{}
+}
+
+/**
+ * Create a new variable type.
+ */
+func NewVariable(name string, value interface{}) *Variable {
+	v := new(Variable)
+	v.TYPENAME = "GoJerryScript.Variable"
+	v.Name = name
+	v.Value = value
+	return v
 }
 
 type Variables []Variable
@@ -708,50 +722,4 @@ const sizeOfUintPtr = unsafe.Sizeof(uintptr(0))
 
 func uintptrToBytes(u *uintptr) []byte {
 	return (*[sizeOfUintPtr]byte)(unsafe.Pointer(u))[:]
-}
-
-// Convert objectRef to object as needed.
-func GetObject(val interface{}) interface{} {
-	if reflect.TypeOf(val).String() == "GoJerryScript.ObjectRef" {
-		ref := val.(ObjectRef)
-		if GetCache().GetObject(ref.UUID) != nil {
-			return GetCache().GetObject(ref.UUID)
-		}
-		return nil
-
-	} else if reflect.TypeOf(val).Kind() == reflect.Slice {
-		// In case of a slice I will transform the object ref with it actual values.
-		slice := reflect.ValueOf(val)
-
-		//values := make([]interface{}, 0)
-
-		var values reflect.Value
-		for i := 0; i < slice.Len(); i++ {
-			e := slice.Index(i)
-			if e.IsValid() {
-				if !e.IsNil() {
-					if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
-						ref := e.Interface().(ObjectRef)
-						if GetCache().GetObject(ref.UUID) != nil {
-							obj := GetCache().GetObject(ref.UUID)
-							if obj != nil {
-								if i == 0 {
-									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
-								}
-								values = reflect.Append(values, reflect.ValueOf(obj))
-							} else {
-								log.Println("---> fail to retreive object ", ref.UUID)
-							}
-						}
-					}
-				}
-			}
-		}
-		// return values with object instead of object ref.
-		if values.IsValid() {
-			return values.Interface()
-		}
-	}
-	// No conversion was necessary.
-	return val
 }

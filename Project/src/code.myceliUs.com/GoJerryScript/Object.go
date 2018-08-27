@@ -8,6 +8,8 @@ import "reflect"
  * Go representation of a JS object.
  */
 type Object struct {
+	// The typename.
+	TYPENAME string
 
 	// The peer where the object live.
 	peer *Peer
@@ -27,6 +29,7 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
+	obj.TYPENAME = "GoJerryScript.Object"
 
 	// If the name is given that's mean the object will be set as a global
 	// object so it uuid will be generated from it name.
@@ -53,10 +56,7 @@ func (self *Object) SetPeer(peer *Peer) {
 	self.peer = peer
 
 	// So here I will create the action.
-	action := new(Action)
-	action.UUID = Utility.RandomUUID()
-
-	action.Name = "CreateObject"
+	action := NewAction("CreateObject", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", self.Name)
 
@@ -68,26 +68,25 @@ func (self *Object) SetPeer(peer *Peer) {
  * Return property value.
  */
 func (self *Object) Get(name string) (Value, error) {
-	action := new(Action)
-	action.UUID = Utility.RandomUUID()
-	action.Name = "GetObjectProperty"
+
+	action := NewAction("GetObjectProperty", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)
-	var result Value
+	var result *Value
 	var err error
 
 	if action.Results[0] != nil {
-		result = action.Results[0].(Value)
+		result = action.Results[0].(*Value)
 	}
 
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
 
-	return result, err
+	return *result, err
 }
 
 /**
@@ -100,9 +99,8 @@ func (self *Object) Set(name string, value interface{}) {
 	if reflect.TypeOf(value).Kind() == reflect.Func {
 		// In that case I will register the function.
 		Utility.RegisterFunction(name, value)
-		action := new(Action)
-		action.UUID = Utility.RandomUUID()
-		action.Name = "SetGoObjectMethod"
+		action := NewAction("SetGoObjectMethod", "")
+
 		action.AppendParam("uuid", self.UUID)
 		action.AppendParam("name", name)
 
@@ -111,9 +109,8 @@ func (self *Object) Set(name string, value interface{}) {
 
 	} else {
 
-		action := new(Action)
-		action.UUID = Utility.RandomUUID()
-		action.Name = "SetObjectProperty"
+		action := NewAction("SetObjectProperty", "")
+
 		action.AppendParam("uuid", self.UUID)
 		action.AppendParam("name", name)
 		action.AppendParam("value", value)
@@ -127,9 +124,7 @@ func (self *Object) Set(name string, value interface{}) {
  * Set a JS function as Object methode.
  */
 func (self *Object) SetJsMethode(name string, src string) {
-	action := new(Action)
-	action.UUID = Utility.RandomUUID()
-	action.Name = "SetJsObjectMethod"
+	action := NewAction("SetJsObjectMethod", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 	action.AppendParam("src", src)
@@ -143,9 +138,7 @@ func (self *Object) SetJsMethode(name string, src string) {
  */
 func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 
-	action := new(Action)
-	action.UUID = Utility.RandomUUID()
-	action.Name = "CallObjectMethod"
+	action := NewAction("CallObjectMethod", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 
@@ -154,16 +147,16 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)
 
-	var result Value
+	var result *Value
 	var err error
 
 	if action.Results[0] != nil {
-		result = action.Results[0].(Value)
+		result = action.Results[0].(*Value)
 	}
 
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
 
-	return result, err
+	return *result, err
 }

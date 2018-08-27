@@ -10,6 +10,9 @@ import "errors"
  * Interface Js value as Go value.
  */
 type Value struct {
+	// The typename.
+	TYPENAME string
+	
 	// The go value that reflect the js value.
 	Val interface{}
 }

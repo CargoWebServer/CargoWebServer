@@ -159,7 +159,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			go func(intervalInfo *IntervalInfo) {
 				// Set the variable as function.
 				functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript("var "+functionName+"="+intervalInfo.callback, []GoJerryScript.Variable{})
+				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript("var "+functionName+"="+intervalInfo.callback, []interface{}{})
 
 				// I must run the script one and at interval after it...
 				if err == nil {
@@ -168,7 +168,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						for t := range intervalInfo.ticker.C {
 							// So here I will call the callback.
 							// The callback contain unamed function...
-							_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript(functionName+"()", []GoJerryScript.Variable{})
+							_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript(functionName+"()", []interface{}{})
 							if err != nil {
 								log.Println("---> Run interval callback error: ", err, t)
 							}
@@ -222,7 +222,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			// In case the script must be run...
 			if operationInfos.m_params["run"].(bool) {
 				for _, session := range jsRuntimeManager.m_sessions {
-					session.EvalScript(script, []GoJerryScript.Variable{})
+					session.EvalScript(script, []interface{}{})
 				}
 			}
 			callback <- []interface{}{true} // unblock the channel...
@@ -313,7 +313,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							var results interface{}
 							var err error
 							if operationInfos.m_params["script"] != nil {
-								results, err = vm.EvalScript(operationInfos.m_params["script"].(string), []GoJerryScript.Variable{})
+								results, err = vm.EvalScript(operationInfos.m_params["script"].(string), []interface{}{})
 							}
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
@@ -802,7 +802,7 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJerryS
 		this.m_exports[sessionId][exportPath] = export
 
 		if src, ok := this.m_scripts[path]; ok {
-			_, err := vm.EvalScript(src, []GoJerryScript.Variable{})
+			_, err := vm.EvalScript(src, []interface{}{})
 			if err != nil {
 				log.Panicln("---> script running error:  ", path, err)
 			}
@@ -929,7 +929,7 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJerryScriptClient.Client, 
 			functionStr = "function " + functionName + strings.TrimSpace(functionStr)[8:]
 		}
 
-		_, err = vm.EvalScript(functionStr, []GoJerryScript.Variable{})
+		_, err = vm.EvalScript(functionStr, []interface{}{})
 		if err != nil {
 			log.Println("fail to run ", functionStr)
 			return nil, err

@@ -6,6 +6,13 @@ import "log"
 import "code.myceliUs.com/GoJerryScript"
 import "code.myceliUs.com/GoJerryScript/GoJerryScriptClient"
 
+type GenderType int
+
+const (
+	Male GenderType = 1 + iota
+	Female
+)
+
 // Golang struct...
 type Person struct {
 	// Must be GoJerryScript.Person
@@ -14,8 +21,11 @@ type Person struct {
 	LastName  string
 	Age       int
 	NickNames []string
-
+	// List of contact.
 	Contacts []*Person
+
+	// Gender
+	Gender GenderType
 }
 
 // Create a person and return it as a reasult.
@@ -29,6 +39,7 @@ func GetPerson() *Person {
 	p.LastName = "Courtois"
 	p.NickNames = make([]string, 0)
 	p.NickNames = append(p.NickNames, "Natural")
+	p.Gender = Male
 
 	p.Contacts = make([]*Person, 0)
 
@@ -38,6 +49,7 @@ func GetPerson() *Person {
 	c0.Age = 21
 	c0.FirstName = "Emmanuel"
 	c0.LastName = "Proulx"
+	c0.Gender = Male
 	p.Contacts = append(p.Contacts, c0)
 
 	c1 := new(Person)
@@ -45,6 +57,7 @@ func GetPerson() *Person {
 	c1.Age = 42
 	c1.FirstName = "Eric"
 	c1.LastName = "Boucher"
+	c1.Gender = Male
 	p.Contacts = append(p.Contacts, c1)
 	return p
 }
@@ -115,7 +128,9 @@ func TestNumericValue(t *testing.T) {
 
 	// Create a remote javascript server.
 	engine.RegisterJsFunction("Add", "function Add(a, b){return a + b;}")
-	number, _ := engine.EvalScript("Add(a, b);", GoJerryScript.Variables{{Name: "a", Value: 1}, {Name: "b", Value: 2.25}})
+	a := GoJerryScript.NewVariable("a", 1)
+	b := GoJerryScript.NewVariable("b", 2.25)
+	number, _ := engine.EvalScript("Add(a, b);", []interface{}{a, b})
 	number_, _ := number.Export()
 
 	if number_ != 3.25 {
@@ -146,7 +161,6 @@ func TestArray(t *testing.T) {
 	if err0 == nil {
 		t.Log(arr)
 	}
-
 }
 
 /**
@@ -223,6 +237,8 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.RegisterGoFunction("print", PrintValue)
 
 	// Create the object to register.
+	engine.RegisterGoType((*Person)(nil))
+
 	p := GetPerson()
 
 	// Here I will register a go Object in JavaScript and set
@@ -233,17 +249,17 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
 	// Eval script that contain Go object in it.
-	engine.EvalScript("Test1();", GoJerryScript.Variables{})
+	engine.EvalScript("Test1();", []interface{}{})
 
 	// Now I will try to register a function that return a Go type and use it
 	// result to access it contact.
 	engine.RegisterGoFunction("GetPerson", GetPerson)
 
 	// Eval single return type (not array)
-	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []GoJerryScript.Variable{})
+	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
 	// Eval array...
-	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []GoJerryScript.Variable{})
+	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
 
 	//engine.Stop()
 }
@@ -259,7 +275,7 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 
 	// Register the dynamic type.
 	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJerryScriptTest.Person", FirstName:"Jerry", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
-	p, err := engine.EvalScript("TestJsToGoStruct();", []GoJerryScript.Variable{})
+	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 
 	if err != nil {
 		t.Error("fail to create Go from Js: ", err)

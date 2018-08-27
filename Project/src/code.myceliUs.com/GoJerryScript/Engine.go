@@ -452,11 +452,11 @@ func (self *Engine) Clear() {
  * variables Contain the list of variable to set on the global context before
  * running the script.
  */
-func (self *Engine) EvalScript(script string, variables Variables) (Value, error) {
+func (self *Engine) EvalScript(script string, variables []interface{}) (Value, error) {
 
 	// Here the values are put on the global contex before use in the function.
 	for i := 0; i < len(variables); i++ {
-		self.SetGlobalVariable(variables[i].Name, variables[i].Value)
+		self.SetGlobalVariable(variables[i].(*Variable).Name, variables[i].(*Variable).Value)
 	}
 
 	return evalScript(script)

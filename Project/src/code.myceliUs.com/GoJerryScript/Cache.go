@@ -1,5 +1,10 @@
 package GoJerryScript
 
+import (
+	"log"
+	"reflect"
+)
+
 // The cache is simply a map of object that keep go object accessible for JerryScript.
 type Cache struct {
 	// The map where object are store.
@@ -117,4 +122,49 @@ func (cache *Cache) RemoveObject(id string) {
 	values["name"] = "removeObject"
 	values["id"] = id
 	cache.m_operations <- values
+}
+
+// Convert objectRef to object as needed.
+func GetObject(val interface{}) interface{} {
+
+	if reflect.TypeOf(val).String() == "GoJerryScript.ObjectRef" {
+		ref := val.(ObjectRef)
+		if GetCache().GetObject(ref.UUID) != nil {
+			return GetCache().GetObject(ref.UUID)
+		}
+		return nil
+
+	} else if reflect.TypeOf(val).Kind() == reflect.Slice {
+		// In case of a slice I will transform the object ref with it actual values.
+		slice := reflect.ValueOf(val)
+		var values reflect.Value
+		for i := 0; i < slice.Len(); i++ {
+			e := slice.Index(i)
+			if e.IsValid() {
+				if !e.IsNil() {
+					if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+						ref := e.Interface().(ObjectRef)
+						if GetCache().GetObject(ref.UUID) != nil {
+							obj := GetCache().GetObject(ref.UUID)
+							if obj != nil {
+								if i == 0 {
+									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
+								}
+								values = reflect.Append(values, reflect.ValueOf(obj))
+							} else {
+								log.Println("---> fail to retreive object ", ref.UUID)
+							}
+						}
+					}
+				}
+			}
+		}
+		// return values with object instead of object ref.
+		if values.IsValid() {
+			return values.Interface()
+		}
+	}
+
+	// No conversion was necessary.
+	return val
 }

@@ -39,7 +39,6 @@ func RegisterType(typedNil interface{}) {
 	var typeName = t.Name()
 	if _, ok := typeRegistry[t.PkgPath()[index+1:]+"."+typeName]; !ok {
 		if index > 0 {
-
 			typeRegistry[t.PkgPath()[index+1:]+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
 			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
@@ -114,15 +113,15 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 	case reflect.Int64:
 		v = reflect.ValueOf(toInt(value))
 	case reflect.Uint:
-		v = reflect.ValueOf(value.(uint64))
+		v = reflect.ValueOf(value.(uint))
 	case reflect.Uint8:
-		v = reflect.ValueOf(value.(uint64))
+		v = reflect.ValueOf(value.(uint8))
 	case reflect.Uint32:
-		v = reflect.ValueOf(value.(uint64))
+		v = reflect.ValueOf(value.(uint32))
 	case reflect.Uint64:
 		v = reflect.ValueOf(value.(uint64))
 	case reflect.Float32:
-		v = reflect.ValueOf(value.(float64))
+		v = reflect.ValueOf(value.(float32))
 	case reflect.Float64:
 		v = reflect.ValueOf(value.(float64))
 	case reflect.Array:
@@ -158,241 +157,106 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 	for name, value := range data {
 		ft, exist := t.FieldByName(name)
 		if exist && value != nil {
-			switch ft.Type.Kind() {
-			case reflect.Slice:
-				// That's mean the value contain an array...
-				if strings.HasPrefix(reflect.TypeOf(value).String(), "[]") {
-					if reflect.TypeOf(value).String() == "[]interface {}" {
-						values := value.([]interface{})
-						for i := 0; i < len(values); i++ {
-							var fv reflect.Value
-							switch v_ := values[i].(type) {
-							// Here i have a sub-value.
-							case map[string]interface{}:
-								if v_["TYPENAME"] != nil {
-									fv = initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
-									if fv.IsValid() {
-										// I will set the reference in the parent object.
-										setEntity(fv.Interface())
-										if strings.HasPrefix(name, "M_") {
-											if v_["UUID"] != nil {
-												v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), reflect.ValueOf(v_["UUID"].(string))))
-											}
-										} else {
-											v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-										}
-									}
-								}
-							default:
-								// A base type...
-								// Here I will try to convert the base type to the one I have in
-								// the structure.
-								if v.Elem().FieldByName(name).Type().String() == "[]string" {
-									var string_ string
-									fv = InitializeBaseTypeValue(reflect.TypeOf(string_), v_)
-								} else if v.Elem().FieldByName(name).Type().String() == "[]int" {
-									var int_ int
-									fv = InitializeBaseTypeValue(reflect.TypeOf(int_), v_)
-								} else if v.Elem().FieldByName(name).Type().String() == "[]float" {
-									var float_ float64
-									fv = InitializeBaseTypeValue(reflect.TypeOf(float_), v_)
-								} else if v.Elem().FieldByName(name).Type().String() == "[]bool" {
-									var bool_ bool
-									fv = InitializeBaseTypeValue(reflect.TypeOf(bool_), v_)
-								} else {
-									fv = InitializeBaseTypeValue(reflect.TypeOf(v_), v_)
-								}
-								if fv.IsValid() {
-									v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-								}
-							}
-
-						}
-					} else if reflect.TypeOf(value).String() == "[]string" {
-						values := value.([]string)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]int" {
-						values := value.([]int)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]int64" {
-						values := value.([]int64)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]int32" {
-						values := value.([]int32)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]int16" {
-						values := value.([]int16)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]int8" {
-						values := value.([]int8)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]bool" {
-						values := value.([]bool)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]float64" {
-						values := value.([]bool)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]float32" {
-						values := value.([]float32)
-						for i := 0; i < len(values); i++ {
-							fv := InitializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
-							if fv.IsValid() {
-								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
-							}
-						}
-					} else if reflect.TypeOf(value).String() == "[]uint8" || reflect.TypeOf(value).String() == "[]byte" {
-						fv := InitializeBaseTypeValue(reflect.TypeOf(value), value)
-						val := fv.String()
-						val_, err := b64.StdEncoding.DecodeString(val)
-						if err == nil {
-							val = string(val_)
-						}
-						// Set the value...
-						v.Elem().FieldByName(name).Set(reflect.ValueOf([]byte(val)))
-					}
-				} else {
-					// Here the value is a base type...
-					fv := InitializeBaseTypeValue(reflect.TypeOf(value), value)
-					if fv.IsValid() {
-						if ft.Type.String() != fv.Type().String() {
-							// So here a conversion is necessary...
-							if ft.Type.String() == "[]uint8" || ft.Type.String() == "[]byte" || fv.Type().String() == "string" {
-								val := fv.String()
-								val_, err := b64.StdEncoding.DecodeString(val)
-								if err == nil {
-									val = string(val_)
-								}
-								// Set the value...
-								v.Elem().FieldByName(name).Set(reflect.ValueOf([]byte(val)))
-							}
-						} else {
-							v.Elem().FieldByName(name).Set(fv)
-						}
-					}
-				}
-			case reflect.Struct:
-				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-				if fv.IsValid() {
-					v.Elem().FieldByName(name).Set(fv.Elem())
-				}
-			case reflect.Ptr:
-				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-				if fv.IsValid() {
-					v.Elem().FieldByName(name).Set(fv)
-				}
-			case reflect.Interface:
-				// To recurse is divine!-)
-				if reflect.TypeOf(value).String() == "map[string]interface {}" {
-					if typeName_, ok := value.(map[string]interface{})["TYPENAME"]; ok {
-						if _, ok := typeRegistry[typeName_.(string)]; ok {
-							fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-							if fv.IsValid() {
-								setEntity(fv.Interface())
-								// I will set the reference in the parent object.
-								if strings.HasPrefix(name, "M_") {
-									if value.(map[string]interface{})["UUID"] != nil {
-										v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
-									}
-								} else {
-									v.Elem().FieldByName(name).Set(fv)
-								}
-							}
-						} else {
-							// Here it's a dynamic entity...
-							v.Elem().FieldByName(name).Set(reflect.ValueOf(value))
-						}
-					} else {
-						v.Elem().FieldByName(name).Set(reflect.ValueOf(value))
-					}
-				}
-			case reflect.Map:
-				fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-				if fv.IsValid() {
-					v.Elem().FieldByName(name).Set(fv.Elem())
-				}
-
-			default:
-				if reflect.TypeOf(value).String() == "map[string]interface {}" {
-					if typeName_, ok := value.(map[string]interface{})["TYPENAME"]; ok {
-						if _, ok := typeRegistry[typeName_.(string)]; ok {
-							fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-							if fv.IsValid() {
-								setEntity(fv.Interface())
-								// I will set the reference in the parent object.
-								if strings.HasPrefix(name, "M_") {
-									if value.(map[string]interface{})["UUID"] != nil {
-										v.Elem().FieldByName(name).Set(reflect.ValueOf(value.(map[string]interface{})["UUID"]))
-									}
-								} else {
-									v.Elem().FieldByName(name).Set(fv)
-								}
-							}
-						} else {
-							// Here it's a dynamic entity...
-							v.Elem().FieldByName(name).Set(reflect.ValueOf(value))
-						}
-					} else {
-						fv, _ := InitializeStructure(value.(map[string]interface{}), setEntity)
-
-						if fv.IsValid() {
-							v.Elem().FieldByName(name).Set(fv.Elem())
-						}
-					}
-
-				} else {
-					// Convert is use to enumeration type who are int and must be convert to
-					// it const type representation.
-					fv := InitializeBaseTypeValue(ft.Type, value).Convert(ft.Type)
-					if fv.IsValid() {
-						v.Elem().FieldByName(name).Set(fv)
-					}
-				}
-			}
+			initializeStructureFieldValue(v, name, ft.Type, value, setEntity)
 		}
 	}
 
 	// Return the initialysed value...
 	return v
+}
+
+func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType reflect.Type, fieldValue interface{}, setEntity func(interface{})) {
+	switch fieldType.Kind() {
+	case reflect.Slice:
+		// That's mean the value contain an array...
+		if reflect.TypeOf(fieldValue).String() == "[]uint8" || reflect.TypeOf(fieldValue).String() == "[]byte" {
+			fv := InitializeBaseTypeValue(reflect.TypeOf(fieldValue), fieldValue)
+			val := fv.String()
+			val_, err := b64.StdEncoding.DecodeString(val)
+			if err == nil {
+				val = string(val_)
+			}
+			// Set the value...
+			v.Elem().FieldByName(fieldName).Set(reflect.ValueOf([]byte(val)))
+		} else {
+			values := reflect.ValueOf(fieldValue)
+			var slice reflect.Value
+			// Here I will iterate over the slice
+			for i := 0; i < values.Len(); i++ {
+				// the slice value.
+				v_ := values.Index(i).Interface()
+				// If it's an array of interface...
+				if i == 0 {
+					log.Println("---> create ", fieldType.String())
+					slice = reflect.MakeSlice(fieldType, values.Len(), values.Len())
+				}
+				// If the type is register as dynamic type.
+				if v_ != nil {
+					if reflect.TypeOf(v_).String() == "map[string]interface {}" {
+						// The value is a dynamic value.
+						v_ := v_.(map[string]interface{})
+						if v_["TYPENAME"] != nil {
+							log.Println("---> init ", v_["TYPENAME"])
+							fv := initializeStructureValue(v_["TYPENAME"].(string), v_, setEntity)
+							// I will set the reference in the parent object.
+							setEntity(fv.Interface())
+							// Special case for entity (Cargo)...
+							if strings.HasPrefix(fieldName, "M_") {
+								if v_["UUID"] != nil {
+									index := slice.Index(i)
+									index.Set(reflect.ValueOf(v_["UUID"].(string)))
+								}
+							} else {
+								index := slice.Index(i)
+								index.Set(fv)
+							}
+						} else {
+							// A generic map not a dynamic type.
+							index := slice.Index(i)
+							index.Set(reflect.ValueOf(v_))
+						}
+					} else {
+						// Not an array of map[string]interface {}
+						// TODO manage slice inside slice inside slice inside slice...
+						index := slice.Index(i)
+						index.Set(reflect.ValueOf(v_))
+					}
+				}
+			}
+			// Set the slice...
+			if slice.IsValid() {
+				v.Elem().FieldByName(fieldName).Set(slice)
+			}
+		}
+
+	case reflect.Struct:
+		fv, _ := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
+		if fv.IsValid() {
+			v.Elem().FieldByName(fieldName).Set(fv.Elem())
+		}
+	case reflect.Ptr:
+		fv, _ := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
+		if fv.IsValid() {
+			v.Elem().FieldByName(fieldName).Set(fv)
+		}
+	case reflect.Interface:
+		// Here the type of the actual value will determine the value to initialyse...
+		initializeStructureFieldValue(v, fieldName, reflect.TypeOf(fieldValue), fieldValue, setEntity)
+
+	case reflect.Map:
+		fv, _ := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
+		if fv.IsValid() {
+			v.Elem().FieldByName(fieldName).Set(fv.Elem())
+		}
+	default:
+		// Convert is use to enumeration type who are int and must be convert to
+		// it const type representation.
+		fv := InitializeBaseTypeValue(fieldType, fieldValue).Convert(fieldType)
+		if fv.IsValid() {
+			v.Elem().FieldByName(fieldName).Set(fv)
+		}
+	}
+
 }
 
 /**
