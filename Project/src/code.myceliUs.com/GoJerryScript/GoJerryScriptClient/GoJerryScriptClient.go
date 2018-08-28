@@ -47,7 +47,8 @@ func NewClient(address string, port int) *Client {
 
 	var err error
 	// Here I will start the external server process.
-	client.srv = exec.Command("/home/dave/Documents/CargoWebServer/Project/src/code.myceliUs.com/GoJerryScript/GoJerryScriptServer/GoJerryScriptServer", strconv.Itoa(port))
+	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
+	client.srv = exec.Command("GoJerryScriptServer", strconv.Itoa(port))
 	err = client.srv.Start()
 
 	if err != nil {
@@ -189,11 +190,10 @@ func (self *Client) processActions() {
 						// Here if the result is a slice I will test if it contains struct...
 						slice := reflect.ValueOf(results)
 						results_ := make([]interface{}, 0)
-
 						for i := 0; i < slice.Len(); i++ {
 							e := slice.Index(i)
 							// I will derefence the pointer if it's a pointer.
-							if reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
+							for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
 								e = e.Elem()
 							}
 
@@ -201,7 +201,6 @@ func (self *Client) processActions() {
 								// results will be register.
 								var uuid string
 								if reflect.TypeOf(e.Interface()).String() != "GoJerryScript.Object" {
-									log.Println("---> register ", e.Interface())
 									uuid = self.RegisterGoObject(slice.Index(i).Interface(), "")
 								} else {
 									// No need to export the object function here
@@ -209,7 +208,6 @@ func (self *Client) processActions() {
 									uuid = results.(GoJerryScript.Object).UUID
 								}
 								// I will set the results a object reference.
-								log.Println("---> set object reference: ", GoJerryScript.NewObjectRef(uuid))
 								results_ = append(results_, GoJerryScript.NewObjectRef(uuid))
 							}
 						}
@@ -513,13 +511,6 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 	action.AppendParam("name", name)
 	action.AppendParam("params", params)
 
-	if name == "EventManagerBroadcastNetworkEvent" {
-		log.Println("---> call function ", name)
-		for i := 0; i < len(params); i++ {
-			log.Println(" --> param: ", reflect.TypeOf(params[i]).String())
-		}
-	}
-
 	// Call the remote action
 	action = self.peer.CallRemoteAction(action)
 	var err error
@@ -527,8 +518,9 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJerryScr
 		err = action.Results[1].(error)
 	}
 
-	// Transform object ref into object as needed.
 	value := action.Results[0].(*GoJerryScript.Value)
+
+	// Transform object ref into object as needed.
 	value.Export()
 
 	return *value, err

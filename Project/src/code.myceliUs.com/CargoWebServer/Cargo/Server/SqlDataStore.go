@@ -1296,7 +1296,6 @@ func (this *SqlDataStore) setRefs() error {
 		for i := 0; i < len(associations_); i++ {
 			refName := associations_[i][0].(string)
 			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, this.m_id)
-			log.Println("---> ", trg)
 			if !Utility.Contains(associativeTable.Fields, "M_"+refName) {
 				fieldType := trg.TypeName
 				fieldType = fieldType + ":Ref" // Associative table contain only references.

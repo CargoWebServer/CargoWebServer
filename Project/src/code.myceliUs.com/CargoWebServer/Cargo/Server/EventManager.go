@@ -606,12 +606,34 @@ func (this *EventManager) RemoveEventListener(id string, name string) {
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @scope {public}
-func (this *EventManager) BroadcastNetworkEvent(eventNumber float64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+// EventManager.prototype.broadcastNetworkEvent = function(eventNumber, channelId, eventDatas, successCallback, errorCallback, caller){
+//	  var params = [];
+//	  params.push(createRpcData(eventNumber, "INTEGER", "eventNumber"));
+//	  params.push(createRpcData(channelId, "STRING", "channelId"));
+//	  params.push(createRpcData(eventDatas, "JSON_STR", "eventDatas"));
+//    var rqst = new Request(randomUUID(), server.conn, "BroadcastNetworkEvent", params,
+//        // Progress callback
+//        function () { },
+//        // Success callback
+//        function (id, results, caller) {
+//            // Keep the session id...
+//            caller.successCallback(results, caller.caller)
+//        },
+//        // Error callback...
+//        function (errorMsg, caller) {
+//            caller.errorCallback(errorMsg, caller.caller)
+//        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+//    rqst.send();
+//}
+func (this *EventManager) BroadcastNetworkEvent(eventNumber int64, channelId string, eventDatas []*MessageData, messageId string, sessionId string) {
 
 	// Create the new event objet...
-	evt, _ := NewEvent(int32(eventNumber), channelId, eventDatas.([]*MessageData))
+	evt, _ := NewEvent(int32(eventNumber), channelId, eventDatas)
 
-	b, err := json.Marshal(eventDatas.([]*MessageData))
+	b, err := json.Marshal(eventDatas)
 	this.appendEventData(evt, string(b))
 
 	if err != nil {

@@ -89,6 +89,7 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			}(wait, &results_)
 
 			results := finalMethod.Call(in)
+
 			if len(results) > 0 {
 				if len(results) == 1 {
 					// One result here...
@@ -137,7 +138,6 @@ func SetProperty(i interface{}, field string, value interface{}) error {
 				// change value of N
 				if f.Kind() == reflect.TypeOf(value).Kind() {
 					f.Set(reflect.ValueOf(value))
-					log.Println("---> ", i)
 				} else {
 					log.Println("---> field ", field, " has type ", f.Kind(), " not ", reflect.TypeOf(value).Kind())
 				}

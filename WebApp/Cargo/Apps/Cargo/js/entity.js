@@ -22,7 +22,7 @@
 
 /**
 * The query is use to specifying the basic information it's like
-* the select, insert or update of sql..
+* the select, insert or update of sql...
 */
 var EntityQuery = function (typeName) {
     // Must be Server.EntityQuery

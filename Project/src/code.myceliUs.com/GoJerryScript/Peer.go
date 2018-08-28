@@ -96,7 +96,6 @@ func (self *Peer) run() {
 	go func(self *Peer) {
 		for self.isRunning {
 			data := make(map[string]interface{})
-
 			decoder := json.NewDecoder(self.conn)
 			err := decoder.Decode(&data)
 			if err == nil {

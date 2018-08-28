@@ -319,6 +319,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
 							if stop {
+								vm.Stop()
 								break process // exit the processing loop.
 							}
 						}
@@ -336,41 +337,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 				// here I will not wait for the session to clean before retrun.
 				go func() {
 					// Wait until the vm is stop
-					wait := make(chan string, 1)
-					timer := time.NewTimer(5 * time.Second)
-
-					// Call the interupt function on the VM.
-					/*jsRuntimeManager.m_sessions[sessionId].Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
-						return func() {
-							timer.Stop()
-							// Continue the processing.
-							wait <- "--> Interrupt execution of VM with id " + sessionId
-							// The panic error will actually kill the vm
-							panic(errors.New("Stahp"))
-						}
-					}(sessionId, wait, timer)*/
-
-					// If nothing append for 1 second I will return.
-					go func(wait chan string, timer *time.Timer) {
-						// simply ignore the error here.
-						defer func() {
-							// Stahp mean the VM was kill by the admin.
-							if caught := recover(); caught != nil {
-								log.Println("---> session: ", sessionId, " is now closed")
-								return
-							}
-						}()
-
-						<-timer.C
-						wait <- "--> Stop execution of VM with id " + sessionId
-						if jsRuntimeManager.m_sessions[sessionId] != nil {
-							jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
-						}
-					}(wait, timer)
-
-					// Synchronyse exec of interuption here.
-					log.Println(<-wait)
-
+					jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
 					jsRuntimeManager.removeVm(sessionId)
 				}()
 			} else {

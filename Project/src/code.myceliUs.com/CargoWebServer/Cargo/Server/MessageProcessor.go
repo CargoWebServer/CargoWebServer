@@ -358,6 +358,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 				// Only registered type will be process sucessfully here.
 				// how the server will be able to know what to do otherwise.
 				if strings.HasPrefix(val, "[") && strings.HasSuffix(val, "]") {
+
 					// It contain an array of values to be init
 					var values interface{}
 					if param.GetTypeName() == "[]string" {
@@ -383,9 +384,13 @@ func (this *MessageProcessor) processIncomming(m *message) {
 										// here i will set an empty generic array.
 										a.Params = append(a.Params, make([]interface{}, 0))
 									}
+								} else {
+									log.Panicln("---> 388 fail to initialize array")
 								}
 							}
 						}
+					} else {
+						log.Panicln("---> 391 fail to unmarshal json!")
 					}
 
 				} else {

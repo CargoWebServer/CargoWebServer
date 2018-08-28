@@ -74,6 +74,7 @@ func (action *Action) execute() {
 	messageID := action.msg.GetId()
 
 	if errMsg != nil {
+		log.Println("---> 77 ", action.Name, errMsg)
 		err := errMsg.(error)
 
 		// Create the error object.
@@ -125,6 +126,15 @@ func (self *Action) RegisterListener(name string) {
  */
 func (self *Action) UnregisterListener(name string) {
 	GetServer().GetEventManager().RemoveEventListener(self.msg.from.GetUuid(), name)
+}
+
+/**
+ * Broadcast a network event.
+ */
+func (self *Action) BroadcastNetworkEvent(eventNumber int64, channelId string, eventDatas []*MessageData) {
+	messageId := self.msg.GetId()
+	sessionId := self.msg.from.GetUuid()
+	GetServer().GetEventManager().BroadcastNetworkEvent(eventNumber, channelId, eventDatas, messageId, sessionId)
 }
 
 /**

@@ -521,7 +521,6 @@ func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *C
 		if strings.HasSuffix(id, ".") {
 			id = id[0 : len(id)-1]
 		}
-		log.Println("---> 524 computer domain : ", id)
 		return this.getComputer(id)
 	} else {
 		hostname, _ := os.Hostname()

@@ -9,7 +9,7 @@ var languageInfo = {
 }
 
 /**
- * This function is the entry point of the application
+ * This function is the entry point of the application.
  */
 function main() {
     // eventTests()

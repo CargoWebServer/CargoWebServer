@@ -24,7 +24,7 @@ var ErrorManager = function(id, name){
     // The event id.
     this.id = id
 
-    // The name of the event
+    // The name of the event.
     this.name = name
     this.observers = {}
 

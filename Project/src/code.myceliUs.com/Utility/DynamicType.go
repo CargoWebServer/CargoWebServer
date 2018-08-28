@@ -229,7 +229,6 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 	case reflect.Slice:
 		// That's mean the value contain an array...
 		if reflect.TypeOf(fieldValue).String() == "[]uint8" || reflect.TypeOf(fieldValue).String() == "[]byte" {
-			log.Println("---> binairy type value ", fieldName, " value ", fieldValue)
 			fv := InitializeBaseTypeValue(reflect.TypeOf(fieldValue), fieldValue)
 			val := fv.String()
 			val_, err := b64.StdEncoding.DecodeString(val)
@@ -261,11 +260,18 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 		initializeStructureFieldValue(v, fieldName, reflect.TypeOf(fieldValue), fieldValue, setEntity)
 
 	case reflect.Map:
-		fv, _ := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
-		if fv.IsValid() {
-			v.Elem().FieldByName(fieldName).Set(fv.Elem())
+		fv, err := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
+		if err == nil {
+			if fv.IsValid() {
+				v.Elem().FieldByName(fieldName).Set(fv.Elem())
+			}
+		} else {
+			// In that case I dont have a map with a define type so i will simply set
+			// the actual value to the field.
+			v.Elem().FieldByName(fieldName).Set(reflect.ValueOf(fieldValue))
 		}
 	default:
+
 		// Convert is use to enumeration type who are int and must be convert to
 		// it const type representation.
 		fv := InitializeBaseTypeValue(fieldType, fieldValue).Convert(fieldType)
@@ -300,10 +306,8 @@ func InitializeStructures(data []interface{}, typeName string, setEntity func(in
 							values = reflect.ValueOf(emptyInterfaceArray)
 						}
 					}
-
 					values = reflect.Append(values, obj)
 				}
-
 				return values, nil
 			} else {
 				return reflect.ValueOf(data), nil

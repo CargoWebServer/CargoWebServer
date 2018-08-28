@@ -143,6 +143,7 @@ func NewEvent(code int32, name string, eventData []*MessageData) (*Event, error)
 			if err != nil {
 				return nil, err
 			}
+	
 			msgEvtData.DataBytes = b
 
 		}
