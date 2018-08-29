@@ -1,4 +1,4 @@
-package GoJerryScript
+package GoJavaScript
 
 import "reflect"
 import "code.myceliUs.com/Utility"
@@ -27,7 +27,7 @@ type Message struct {
 
 func NewMessage(messageType MessageType, action *Action) *Message {
 	msg := new(Message)
-	msg.TYPENAME = "GoJerryScript.Message"
+	msg.TYPENAME = "GoJavaScript.Message"
 	msg.Remote = action
 	msg.Type = messageType
 	msg.UUID = action.UUID
@@ -76,7 +76,7 @@ type Action struct {
 // Create a new action.
 func NewAction(name string, target string) *Action {
 	a := new(Action)
-	a.TYPENAME = "GoJerryScript.Action"
+	a.TYPENAME = "GoJavaScript.Action"
 	a.Name = name
 	a.Target = target
 	a.UUID = Utility.RandomUUID()
@@ -96,7 +96,7 @@ func (self *Action) GetDone() chan *Action {
 func (self *Action) AppendParam(name string, value interface{}) {
 	// Create a new paremeter.
 	param := new(Param)
-	param.TYPENAME = "GoJerryScript.Param"
+	param.TYPENAME = "GoJavaScript.Param"
 	param.Name = name
 
 	// Here I will use the go reflection to get the type of

@@ -24,6 +24,8 @@ Session::Session(QWebSocket* socket, QObject *parent) :
     // from inside the slot...
     this->socket->setParent(NULL);
     this->socket->moveToThread(QCoreApplication::instance()->thread());
+
+    qDebug() << "New connection open.";
 }
 
 Session::~Session(){

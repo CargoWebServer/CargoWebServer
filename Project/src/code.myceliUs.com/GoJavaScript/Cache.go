@@ -1,11 +1,11 @@
-package GoJerryScript
+package GoJavaScript
 
 import (
 	"log"
 	"reflect"
 )
 
-// The cache is simply a map of object that keep go object accessible for JerryScript.
+// The cache is simply a map of object that keep go object accessible for JavaScript.
 type Cache struct {
 	// The map where object are store.
 	m_objects map[string]interface{}
@@ -69,7 +69,6 @@ func newCache() {
 					if obj != nil {
 						//log.Println("delete object ----> ", operation["id"].(string))
 						delete(cache.m_jsObjects, operation["id"].(string))
-						Jerry_release_value(obj)
 					}
 				}
 			}
@@ -89,7 +88,7 @@ func (cache *Cache) GetObject(id string) interface{} {
 	return <-values["result"].(chan interface{})
 }
 
-func (cache *Cache) getJsObject(id string) Uint32_t {
+func (cache *Cache) GetJsObject(id string) Uint32_t {
 	// Here I will get object from the cache.
 	values := make(map[string]interface{})
 	values["name"] = "getJsObject"
@@ -109,7 +108,7 @@ func (cache *Cache) SetObject(id string, object interface{}) {
 	cache.m_operations <- values
 }
 
-func (cache *Cache) setJsObject(id string, jsObject Uint32_t) {
+func (cache *Cache) SetJsObject(id string, jsObject Uint32_t) {
 	// Here I will set object in the cache
 	values := make(map[string]interface{})
 	values["name"] = "setJsObject"
@@ -130,14 +129,14 @@ func GetObject(val interface{}) interface{} {
 	if val == nil {
 		return nil
 	}
-	if reflect.TypeOf(val).String() == "GoJerryScript.ObjectRef" {
+	if reflect.TypeOf(val).String() == "GoJavaScript.ObjectRef" {
 		ref := val.(ObjectRef)
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
 		return nil
 
-	} else if reflect.TypeOf(val).String() == "*GoJerryScript.ObjectRef" {
+	} else if reflect.TypeOf(val).String() == "*GoJavaScript.ObjectRef" {
 		ref := val.(*ObjectRef)
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
@@ -152,7 +151,7 @@ func GetObject(val interface{}) interface{} {
 			e := slice.Index(i)
 			if e.IsValid() {
 				if !e.IsNil() {
-					if reflect.TypeOf(e.Interface()).String() == "GoJerryScript.ObjectRef" {
+					if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
 						ref := e.Interface().(ObjectRef)
 						if GetCache().GetObject(ref.UUID) != nil {
 							obj := GetCache().GetObject(ref.UUID)
@@ -165,7 +164,7 @@ func GetObject(val interface{}) interface{} {
 								log.Println("---> fail to retreive object ", ref.UUID)
 							}
 						}
-					} else if reflect.TypeOf(e.Interface()).String() == "*GoJerryScript.ObjectRef" {
+					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
 						ref := e.Interface().(*ObjectRef)
 						if GetCache().GetObject(ref.UUID) != nil {
 							obj := GetCache().GetObject(ref.UUID)

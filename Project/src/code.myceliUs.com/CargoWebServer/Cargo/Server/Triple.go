@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"code.myceliUs.com/GoJerryScript"
+	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/Utility"
 )
 
@@ -130,9 +130,9 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 						isIndex = Utility.Contains(prototype.Indexs, k)
 					}
 
-					// In case of GoJerryScript value...
-					if reflect.TypeOf(v).String() == "GoJerryScript.Value" {
-						v_ := v.(GoJerryScript.Value)
+					// In case of GoJavaScript value...
+					if reflect.TypeOf(v).String() == "GoJavaScript.Value" {
+						v_ := v.(GoJavaScript.Value)
 						v, _ = v_.Export()
 					}
 

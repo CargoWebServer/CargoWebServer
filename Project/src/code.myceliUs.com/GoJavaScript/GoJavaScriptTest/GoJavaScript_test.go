@@ -1,10 +1,10 @@
-package GoJerryScriptTest
+package GoJavaScriptTest
 
 import "testing"
 import "log"
 
-import "code.myceliUs.com/GoJerryScript"
-import "code.myceliUs.com/GoJerryScript/GoJerryScriptClient"
+import "code.myceliUs.com/GoJavaScript"
+import "code.myceliUs.com/GoJavaScript/GoJavaScriptClient"
 
 type GenderType int
 
@@ -15,7 +15,7 @@ const (
 
 // Golang struct...
 type Person struct {
-	// Must be GoJerryScript.Person
+	// Must be GoJavaScript.Person
 	TYPENAME  string
 	FirstName string
 	LastName  string
@@ -33,7 +33,7 @@ func GetPerson() *Person {
 
 	var p *Person
 	p = new(Person)
-	p.TYPENAME = "GoJerryScript.Person"
+	p.TYPENAME = "GoJavaScript.Person"
 	p.Age = 42
 	p.FirstName = "Dave"
 	p.LastName = "Courtois"
@@ -45,7 +45,7 @@ func GetPerson() *Person {
 
 	// Append a contact.
 	c0 := new(Person)
-	c0.TYPENAME = "GoJerryScript.Person"
+	c0.TYPENAME = "GoJavaScript.Person"
 	c0.Age = 21
 	c0.FirstName = "Emmanuel"
 	c0.LastName = "Proulx"
@@ -53,7 +53,7 @@ func GetPerson() *Person {
 	p.Contacts = append(p.Contacts, c0)
 
 	c1 := new(Person)
-	c1.TYPENAME = "GoJerryScript.Person"
+	c1.TYPENAME = "GoJavaScript.Person"
 	c1.Age = 42
 	c1.FirstName = "Eric"
 	c1.LastName = "Boucher"
@@ -100,21 +100,21 @@ func PrintValue(value interface{}) {
 	log.Println(value)
 }
 
-var engine = GoJerryScriptClient.NewClient("127.0.0.1", 8081)
+var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "jerryscript")
 
 /**
  * Simple Hello world test.
- * Start JerryScript interpreter append simple script and run it.
+ * Start JavaScript interpreter append simple script and run it.
  */
-func TestHelloJerry(t *testing.T) {
+func TestHelloJava(t *testing.T) {
 
 	// Register the function SayHelloTo. The function take one parameter.
 	engine.RegisterJsFunction("SayHelloTo", "function SayHelloTo(greething, to){return greething + ' ' + to + '!';}")
-	str, _ := engine.CallFunction("SayHelloTo", "Hello", "Jerry Script")
+	str, _ := engine.CallFunction("SayHelloTo", "Hello", "Java Script")
 	str_, _ := str.ToString()
 
-	if str_ != "Hello Jerry Script!" {
-		t.Error("Expected 'Hello Jerry Script!', got ", str)
+	if str_ != "Hello Java Script!" {
+		t.Error("Expected 'Hello Java Script!', got ", str)
 	} else {
 		// display hello jerry!
 		log.Println(str_)
@@ -129,8 +129,8 @@ func TestNumericValue(t *testing.T) {
 
 	// Create a remote javascript server.
 	engine.RegisterJsFunction("Add", "function Add(a, b){return a + b;}")
-	a := GoJerryScript.NewVariable("a", 1)
-	b := GoJerryScript.NewVariable("b", 2.25)
+	a := GoJavaScript.NewVariable("a", 1)
+	b := GoJavaScript.NewVariable("b", 2.25)
 	number, _ := engine.EvalScript("Add(a, b);", []interface{}{a, b})
 	number_, _ := number.Export()
 
@@ -144,7 +144,6 @@ func TestNumericValue(t *testing.T) {
  * Test function with boolean values.
  */
 func TestBooleanValue(t *testing.T) {
-
 	engine.RegisterJsFunction("TestBool", "function TestBool(val){return val>0;}")
 	boolean, _ := engine.CallFunction("TestBool", 1)
 	boolean_, _ := boolean.ToBoolean()
@@ -184,7 +183,7 @@ func TestGoFunction(t *testing.T) {
 func TestGlobalVariable(t *testing.T) {
 
 	// First of all I will register the tow go function in the Engine.
-	var toto = "This is Jerry"
+	var toto = "This is Java"
 	engine.SetGlobalVariable("toto", toto)
 
 	toto_, _ := engine.GetGlobalVariable("toto")
@@ -225,9 +224,9 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 	// set a Js function on the object.
 	obj.SetJsMethode("helloTo", `function helloTo(to){return "Hello " + to + "!";}`)
 
-	helloToResult, _ := obj.Call("helloTo", "Jerry")
+	helloToResult, _ := obj.Call("helloTo", "Java")
 	helloToResult_, _ := helloToResult.ToString()
-	if helloToResult_ != "Hello Jerry!" {
+	if helloToResult_ != "Hello Java!" {
 		t.Error("---> fail to set js property!")
 	}
 
@@ -262,7 +261,6 @@ func TestRegisterGoObject(t *testing.T) {
 	// Eval array...
 	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
 
-	//engine.Stop()
 }
 
 /**
@@ -275,7 +273,7 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 	engine.RegisterGoType((*Person)(nil))
 
 	// Register the dynamic type.
-	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJerryScriptTest.Person", FirstName:"Jerry", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
+	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
 	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 
 	if err != nil {
@@ -287,4 +285,8 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 	if err == nil {
 		t.Log(p_)
 	}
+}
+
+func TestStopJava(t *testing.T) {
+	engine.Stop()
 }

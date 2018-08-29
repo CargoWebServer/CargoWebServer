@@ -1,4 +1,4 @@
-package GoJerryScript
+package GoJavaScript
 
 import (
 	"encoding/json"
@@ -9,17 +9,10 @@ import (
 	"code.myceliUs.com/Utility"
 )
 
-// Object reference type.
-type ObjectRef struct {
-	// The uuid of the referenced object.
-	UUID     string
-	TYPENAME string
-}
-
 func NewObjectRef(uuid string) *ObjectRef {
 	ref := new(ObjectRef)
 	ref.UUID = uuid
-	ref.TYPENAME = "GoJerryScript.ObjectRef"
+	ref.TYPENAME = "GoJavaScript.ObjectRef"
 	return ref
 }
 
@@ -32,7 +25,7 @@ var (
 )
 
 /**
- * Client are use to call remote function over JerryScript js engine.
+ * Client are use to call remote function over javascript engine.
  */
 type Peer struct {
 
@@ -93,7 +86,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 func (self *Peer) run() {
 
 	// Listen incomming information.
-	go func(self *Peer) {
+	go func() {
 		for self.isRunning {
 			data := make(map[string]interface{})
 			decoder := json.NewDecoder(self.conn)
@@ -102,17 +95,17 @@ func (self *Peer) run() {
 				// Here I will create a message from the generic map of interface
 				msg, err := Utility.InitializeStructure(data, SetEntity)
 				if err != nil {
-					log.Panicln("---> unmarchaling error: ", err)
+					return
 				}
 				self.receive_chan <- msg.Interface().(*Message)
 			} else {
-				log.Panicln("---> unmarchaling error: ", err)
+				return
 			}
 		}
-	}(self)
+	}()
 
 	// Process
-	for {
+	for self.isRunning {
 		select {
 		case msg := <-self.receive_chan:
 			// So here the message can be a request or a response.
@@ -157,10 +150,11 @@ func (self *Peer) run() {
 		case msg := <-self.send_chan:
 			go func(self *Peer, msg *Message) {
 				// Send the message over the network.
+
 				encoder := json.NewEncoder(self.conn)
 				err := encoder.Encode(msg)
 				if err != nil {
-					log.Panicln("---> marshaling error: ", err)
+					log.Println("---> marshaling error: ", err)
 				}
 			}(self, msg)
 		case <-self.stop_chan:
@@ -186,9 +180,6 @@ func (self *Peer) Listen() {
 }
 
 func (self *Peer) Close() {
-	// Close the connection.
-	self.conn.Close()
-
 	// Send stop request.
 	self.stop_chan <- true
 }

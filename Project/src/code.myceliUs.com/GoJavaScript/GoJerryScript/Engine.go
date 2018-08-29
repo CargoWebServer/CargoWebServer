@@ -153,9 +153,14 @@ json_parse (const char *string_p, size_t string_size){
 }
 */
 import "C"
-import "errors"
-import "log"
-import "unsafe"
+
+import (
+	"errors"
+	"log"
+	"unsafe"
+
+	"code.myceliUs.com/GoJavaScript"
+)
 
 /**
  * The JerryScript JS engine.
@@ -165,27 +170,18 @@ type Engine struct {
 	port int
 }
 
-// Create new Javascript
-func NewEngine(port int, options int) *Engine {
-	// The engine.
-	engine := new(Engine)
-	engine.start(port, options)
-
-	return engine
-}
-
 /**
  * Init and start the engine.
  * port The port to communicate with the engine, or the debbuger.
  * option Can be JERRY_INIT_EMPTY, JERRY_INIT_SHOW_OPCODES, JERRY_INIT_SHOW_REGEXP_OPCODES
  *		  JERRY_INIT_MEM_STATS, 	JERRY_INIT_MEM_STATS_SEPARATE (or a combination option)
  */
-func (self *Engine) start(port int, options int) {
+func (self *Engine) Start(port int) {
 	/* The port to communicate with the instance */
 	self.port = port
 
 	/* Init the script engine. */
-	Jerry_init(Jerry_init_flag_t(options))
+	Jerry_init(Jerry_init_flag_t(JERRY_INIT_EMPTY))
 }
 
 /////////////////// Global variables //////////////////////
@@ -202,12 +198,12 @@ func (self *Engine) SetGlobalVariable(name string, value interface{}) {
 /**
  * Return a variable define in the global object.
  */
-func (self *Engine) GetGlobalVariable(name string) (Value, error) {
+func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
 
 	// first of all I will initialyse the arguments.
 	property := Jerry_get_object_property(getGlobalObject(), name)
 
-	var value Value
+	var value GoJavaScript.Value
 	if Jerry_value_is_error(property) {
 		return value, errors.New("No variable found with name " + name)
 	}
@@ -234,7 +230,7 @@ func (self *Engine) CreateObject(uuid string, name string) {
 
 	// keep the object in the global namespace.
 	// set is uuid as global object property
-	GetCache().setJsObject(uuid, obj)
+	GoJavaScript.GetCache().SetJsObject(uuid, obj)
 
 	if len(name) > 0 {
 		// set is name as global object property
@@ -269,8 +265,8 @@ func (self *Engine) SetObjectProperty(uuid string, name string, value interface{
 /**
  * That function is use to get Js object property
  */
-func (self *Engine) GetObjectProperty(uuid string, name string) (Value, error) {
-	var value Value
+func (self *Engine) GetObjectProperty(uuid string, name string) (GoJavaScript.Value, error) {
+	var value GoJavaScript.Value
 	// I will get the object reference from the cache.
 	obj := getJsObjectByUuid(uuid)
 	if !Jerry_value_is_undefined(obj) {
@@ -339,9 +335,9 @@ func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, index uin
 /**
  * That function is use to get Js obeject property
  */
-func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uint32) (Value, error) {
+func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uint32) (GoJavaScript.Value, error) {
 	// I will get the object reference from the cache.
-	var value Value
+	var value GoJavaScript.Value
 	obj := getJsObjectByUuid(uuid)
 	if !Jerry_value_is_undefined(obj) {
 		// Return the value from an object.
@@ -404,9 +400,9 @@ func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
 /**
  * Call object methode.
  */
-func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (Value, error) {
+func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (GoJavaScript.Value, error) {
 
-	var value Value
+	var value GoJavaScript.Value
 	obj := getJsObjectByUuid(uuid)
 	if Jerry_value_is_undefined(obj) {
 		return value, errors.New("432 Object " + uuid + " dosent exist!")
@@ -441,7 +437,7 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
 /**
  * Call a Javascript function. The function must exist...
  */
-func (self *Engine) CallFunction(name string, params []interface{}) (Value, error) {
+func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
 
 	// Call function on the global object here.
 	return callJsFunction(getGlobalObject(), name, params)
@@ -458,11 +454,11 @@ func (self *Engine) Clear() {
  * variables Contain the list of variable to set on the global context before
  * running the script.
  */
-func (self *Engine) EvalScript(script string, variables []interface{}) (Value, error) {
+func (self *Engine) EvalScript(script string, variables []interface{}) (GoJavaScript.Value, error) {
 
 	// Here the values are put on the global contex before use in the function.
 	for i := 0; i < len(variables); i++ {
-		self.SetGlobalVariable(variables[i].(*Variable).Name, variables[i].(*Variable).Value)
+		self.SetGlobalVariable(variables[i].(*GoJavaScript.Variable).Name, variables[i].(*GoJavaScript.Variable).Value)
 	}
 
 	return evalScript(script)

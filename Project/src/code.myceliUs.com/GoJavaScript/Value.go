@@ -1,4 +1,4 @@
-package GoJerryScript
+package GoJavaScript
 
 import "reflect"
 import "code.myceliUs.com/Utility"
@@ -12,7 +12,7 @@ import "errors"
 type Value struct {
 	// The typename.
 	TYPENAME string
-	
+
 	// The go value that reflect the js value.
 	Val interface{}
 }
@@ -22,10 +22,10 @@ type Value struct {
  */
 func (self *Value) Object() *Object {
 	if self.Val != nil {
-		if reflect.TypeOf(self.Val).String() == "GoJerryScript.Object" {
+		if reflect.TypeOf(self.Val).String() == "GoJavaScript.Object" {
 			obj := self.Val.(Object)
 			return &obj
-		} else if reflect.TypeOf(self.Val).String() == "*GoJerryScript.Object" {
+		} else if reflect.TypeOf(self.Val).String() == "*GoJavaScript.Object" {
 			return self.Val.(*Object)
 		}
 	}

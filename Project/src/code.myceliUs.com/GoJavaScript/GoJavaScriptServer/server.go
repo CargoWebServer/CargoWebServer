@@ -3,41 +3,56 @@ package main
 import (
 	"log"
 
-	"code.myceliUs.com/GoJerryScript"
+	"code.myceliUs.com/GoJavaScript"
+	"code.myceliUs.com/GoJavaScript/GoJerryScript"
 )
 
-// The server will redirect client command to JerryScript.
+// The server will redirect client command to JavaScript.
 type Server struct {
 	isRunning bool
-	peer      *GoJerryScript.Peer
-	engine    *GoJerryScript.Engine
+	peer      *GoJavaScript.Peer
+
+	// The underlying engine, can be:
+	// - JerryScript
+	engine GoJavaScript.Engine
 
 	// execute remote action.
-	exec_action_chan chan *GoJerryScript.Action
+	exec_action_chan chan *GoJavaScript.Action
 
 	// call remote actions from the engine.
-	call_remote_actions_chan chan *GoJerryScript.Action
+	call_remote_actions_chan chan *GoJavaScript.Action
 }
 
-func NewServer(address string, port int) *Server {
+func NewServer(address string, port int, name string) *Server {
 
 	// I will create a new server and start listen for incomming request.
 	server := new(Server)
 	server.isRunning = true
 	// open the action channel.
-	server.exec_action_chan = make(chan *GoJerryScript.Action)
+	server.exec_action_chan = make(chan *GoJavaScript.Action)
 
 	// open remote action call.
-	server.call_remote_actions_chan = make(chan *GoJerryScript.Action, 0)
+	server.call_remote_actions_chan = make(chan *GoJavaScript.Action, 0)
 
 	// Global variable use in server side.
-	GoJerryScript.Call_remote_actions_chan = server.call_remote_actions_chan
+	GoJavaScript.Call_remote_actions_chan = server.call_remote_actions_chan
 
 	// Create the peer.
-	server.peer = GoJerryScript.NewPeer(address, port, server.exec_action_chan)
+	server.peer = GoJavaScript.NewPeer(address, port, server.exec_action_chan)
 
 	// The underlying engine.
-	server.engine = GoJerryScript.NewEngine(port, GoJerryScript.JERRY_INIT_EMPTY)
+
+	// The engine.
+	if name == "jerryscript" {
+		server.engine = new(GoJerryScript.Engine)
+		server.engine.Start(port)
+	} else if name == "otto" {
+		/** implement it **/
+	} else if name == "v8" {
+		/** implement it **/
+	} else if name == "chakra" {
+		/** implement it **/
+	}
 
 	// Start listen
 	go server.peer.Listen()
@@ -51,7 +66,7 @@ func (self *Server) processRemoteActions() {
 	for self.isRunning {
 		select {
 		case action := <-self.call_remote_actions_chan:
-			go func(a *GoJerryScript.Action, s *Server) {
+			go func(a *GoJavaScript.Action, s *Server) {
 				// Call remote action
 				a = s.peer.CallRemoteAction(a)
 				// Set back the action on the channel.
@@ -73,7 +88,7 @@ func (self *Server) processActions() {
 		case action := <-self.exec_action_chan:
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
-			go func(a *GoJerryScript.Action, s *Server) {
+			go func(a *GoJavaScript.Action, s *Server) {
 				if a.Name == "RegisterJsFunction" {
 					a.AppendResults(s.engine.RegisterJsFunction(a.Params[0].Value.(string), a.Params[1].Value.(string)))
 				} else if a.Name == "EvalScript" {
@@ -115,24 +130,14 @@ func (self *Server) processActions() {
 				} else if a.Name == "GetGlobalVariable" {
 					a.AppendResults(s.engine.GetGlobalVariable(a.Params[0].Value.(string)))
 				} else if a.Name == "Stop" {
-					log.Println("--> Stop JerryScript!")
-					// TODO fix it.
-					// Stop the server.
-					/*self.isRunning = false
-					self.engine.Clear()
-
+					log.Println("--> Stop JavaScript exec!")
 					// Send back the result to client.
-					self.exec_action_chan <- a
-
-					// Close the connection.
-					self.peer.Close()
-
-					// return.
-					break*/
+					self.isRunning = false
 				}
-
 				a.GetDone() <- a
 			}(action, self)
 		}
 	}
+	self.peer.Close()
+	log.Println("---> server stop processing incomming messages!")
 }

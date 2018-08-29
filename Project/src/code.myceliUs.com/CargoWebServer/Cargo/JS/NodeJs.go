@@ -7,16 +7,15 @@ package JS
 import (
 	"log"
 
-	"code.myceliUs.com/GoJerryScript"
+	"code.myceliUs.com/GoJavaScript"
 )
 
 func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	this.appendFunction("require_", func(identifier string, sessionId string) GoJerryScript.Object {
+	this.appendFunction("require_", func(identifier string, sessionId string) GoJavaScript.Object {
 		// resolve dependencie and return the exports.
-		log.Println("---> require: ", identifier, " session id ", sessionId)
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {
 			log.Println("---> error found in require function ", err)

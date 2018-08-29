@@ -39,15 +39,13 @@ import "errors"
 import "reflect"
 import "strconv"
 import "strings"
+import "code.myceliUs.com/GoJavaScript"
 
 //import "strconv"
 import "log"
 
 // Global variable.
 var (
-	// Channel to be use to transfert information from client and server
-	Call_remote_actions_chan chan *Action
-
 	// The global object.
 	globalObj = Jerry_create_null()
 )
@@ -57,7 +55,6 @@ func getGlobalObject() Uint32_t {
 	if Jerry_value_is_null(globalObj) {
 		globalObj = Jerry_get_global_object()
 	}
-
 	return globalObj
 }
 
@@ -112,7 +109,7 @@ func Jerry_object_own_property(obj Uint32_t, name string) bool {
 }
 
 // Eval a given script string.
-func evalScript(script string) (Value, error) {
+func evalScript(script string) (GoJavaScript.Value, error) {
 
 	// Now I will evaluate the function...
 	cstr := C.CString(script)
@@ -123,7 +120,7 @@ func evalScript(script string) (Value, error) {
 	// the ret object will be release in the NewValue function.
 	ret := jerry_value_t_To_uint32_t(r)
 
-	var value Value
+	var value GoJavaScript.Value
 	if Jerry_value_is_error(ret) {
 		err := errors.New("Fail to run script " + script)
 		defer Jerry_release_value(ret)
@@ -177,7 +174,8 @@ func setGoMethod(object Uint32_t, name string, fct interface{}) {
 /**
  * Call a Js function / method
  */
-func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, error) {
+func callJsFunction(obj Uint32_t, name string, params []interface{}) (GoJavaScript.Value, error) {
+
 	var thisPtr C.jerry_value_t
 	var fctPtr C.jerry_value_t
 	var fct Uint32_t
@@ -216,7 +214,6 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 			var args_ C.jerry_value_p
 			r_ = C.call_function(fctPtr, thisPtr, args_, C.uint32_t(len(args)))
 		}
-
 		r = jerry_value_t_To_uint32_t(r_)
 	} else {
 		err = errors.New("Function " + name + " dosent exist")
@@ -233,7 +230,7 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (Value, err
 // Go function reside in the client, a remote call will be made here.
 func callGoFunction(target string, name string, params ...interface{}) (interface{}, error) {
 
-	action := NewAction(name, target)
+	action := GoJavaScript.NewAction(name, target)
 
 	// Set the list of parameters.
 	for i := 0; i < len(params); i++ {
@@ -245,7 +242,7 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 	action.SetDone()
 
 	// Send the action to the client side.
-	Call_remote_actions_chan <- action
+	GoJavaScript.Call_remote_actions_chan <- action
 
 	// Set back the action with it results in it.
 	action = <-action.GetDone()
@@ -262,9 +259,13 @@ func callGoFunction(target string, name string, params ...interface{}) (interfac
 func object_native_free_callback(native_p C.uintptr_t) {
 
 	uuid := C.GoString(C.get_object_reference_uuid(native_p))
+
 	C.delete_object_reference(native_p)
 
-	GetCache().RemoveObject(uuid)
+	// Release the reference.
+	Jerry_release_value(GoJavaScript.GetCache().GetJsObject(uuid))
+
+	GoJavaScript.GetCache().RemoveObject(uuid)
 
 	// Now I will ask the client side to remove it object reference to.
 	callGoFunction("Client", "DeleteGoObject", uuid)
@@ -399,15 +400,16 @@ func newJsString(val string) Uint32_t {
 /**
  * Create a new value and set it finalyse methode.
  */
-func NewValue(ptr Uint32_t) *Value {
-
-	v := new(Value)
-	v.TYPENAME = "GoJerryScript.Value"
+func NewValue(ptr Uint32_t) *GoJavaScript.Value {
+	// Here I will create a new GoJavaScript value.
+	v := new(GoJavaScript.Value)
+	v.TYPENAME = "GoJavaScript.Value"
 
 	var err error
 
 	// Export the value.
 	v.Val, err = jsToGo(ptr)
+	log.Println("413 ---> ", v.Val)
 
 	if err != nil {
 		log.Println("---> error: ", err)
@@ -420,7 +422,7 @@ func NewValue(ptr Uint32_t) *Value {
 // Retreive an object by it uuid as a global object property.
 func getJsObjectByUuid(uuid string) Uint32_t {
 
-	obj := GetCache().getJsObject(uuid)
+	obj := GoJavaScript.GetCache().GetJsObject(uuid)
 	if obj != nil {
 		return obj
 	}
@@ -505,17 +507,17 @@ func goToJs(value interface{}) Uint32_t {
 	} else if typeOf.String() == "GoJerryScript.SwigcptrUint32_t" {
 		// already a Uint32_t
 		propValue = value.(Uint32_t)
-	} else if typeOf.String() == "GoJerryScript.ObjectRef" {
+	} else if typeOf.String() == "GoJavaScript.ObjectRef" {
 		// I got a Js object reference.
-		uuid := value.(ObjectRef).UUID
+		uuid := value.(GoJavaScript.ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
 		if Jerry_value_is_undefined(propValue) {
 			// If the object is not in the cache...
 			log.Panicln("----> object ", uuid, " dosent exist anymore!")
 		}
-	} else if typeOf.String() == "*GoJerryScript.ObjectRef" {
+	} else if typeOf.String() == "*GoJavaScript.ObjectRef" {
 		// I got a Js object reference.
-		uuid := value.(*ObjectRef).UUID
+		uuid := value.(*GoJavaScript.ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
 		if Jerry_value_is_undefined(propValue) {
 			// If the object is not in the cache...
@@ -530,7 +532,7 @@ func goToJs(value interface{}) Uint32_t {
 				ref, err := callGoFunction("Client", "CreateGoObject", string(data))
 				if err == nil {
 					// In that case an object exist in the case...
-					propValue = GetCache().getJsObject(ref.(*ObjectRef).UUID)
+					propValue = GoJavaScript.GetCache().GetJsObject(ref.(*GoJavaScript.ObjectRef).UUID)
 				} else {
 					log.Println("--> fail to Create Go object ", string(data), err)
 				}
@@ -595,7 +597,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 			uuid, _ := jsToGo(uuid_)
 
 			// Return and object reference.
-			value = NewObjectRef(uuid.(string))
+			value = GoJavaScript.NewObjectRef(uuid.(string))
 		} else {
 			stringified := Jerry_json_stringfy(input)
 			// if there is no error
@@ -712,31 +714,6 @@ func (self Instance) Free() {
 func (self Instance) Swigcptr() uintptr {
 	return uintptr(self.ptr)
 }
-
-/**
- * Variable with name and value.
- */
-type Variable struct {
-	// The typename.
-	TYPENAME string
-	// The variable name
-	Name string
-	// It value.
-	Value interface{}
-}
-
-/**
- * Create a new variable type.
- */
-func NewVariable(name string, value interface{}) *Variable {
-	v := new(Variable)
-	v.TYPENAME = "GoJerryScript.Variable"
-	v.Name = name
-	v.Value = value
-	return v
-}
-
-type Variables []Variable
 
 const sizeOfUintPtr = unsafe.Sizeof(uintptr(0))
 

@@ -1,4 +1,4 @@
-package GoJerryScript
+package GoJavaScript
 
 //import "log"
 import "code.myceliUs.com/Utility"
@@ -29,7 +29,7 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
-	obj.TYPENAME = "GoJerryScript.Object"
+	obj.TYPENAME = "GoJavaScript.Object"
 
 	// If the name is given that's mean the object will be set as a global
 	// object so it uuid will be generated from it name.
