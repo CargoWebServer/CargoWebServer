@@ -10,7 +10,7 @@ Cargo was created with a Service Oriented Achitecture (SOA) in mind. The basic s
 - Event service: channel and events functionalities
 - Security service: management by roles and permissions of actions and access respectively.
 - Other service: LDAP, SMTP.
-- Made use of JerryScript (done) / Chakra (in progress) / V8 (futur work)runing in her own process, one per session and extended with Go funtions and Objects.
+- Made use of JerryScript (done) / Chakra (in progress) / V8 (futur work) runing in her own process, one per session and extended with Go funtions and Objects.
 
 Extensibility and modularity are key concepts in the design of Cargo. You can create your own service, all you have to do is implement the Serivce interface in Go. You can also use the service container and create a plugin in C++.
 
