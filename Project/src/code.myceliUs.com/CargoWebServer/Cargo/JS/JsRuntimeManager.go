@@ -800,11 +800,6 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	if sessionId != "" {
 		this.initScripts(sessionId)
 	}
-
-	// That channel is use to interrupt vm machine, it must be created before
-	// the vm start.
-
-	//this.m_sessions[sessionId].Interrupt = make(chan func(), 1) // The buffer prevents blocking
 }
 
 /**

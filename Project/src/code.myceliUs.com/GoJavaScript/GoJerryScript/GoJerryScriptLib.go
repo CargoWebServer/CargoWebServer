@@ -1,6 +1,6 @@
 package GoJerryScript
 
-//#cgo LDFLAGS: -L/usr/local/lib -ljerry-core -ljerry-ext -ljerry-libm -ljerry-port-default
+//#cgo LDFLAGS:  -L/usr/local/lib -ljerry-core -ljerry-ext -ljerry-libm -ljerry-port-default
 /*
 #include <stdio.h>
 #include <stdlib.h>

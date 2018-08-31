@@ -175,6 +175,9 @@ type Engine struct {
  * port The port to communicate with the engine, or the debbuger.
  * option Can be JERRY_INIT_EMPTY, JERRY_INIT_SHOW_OPCODES, JERRY_INIT_SHOW_REGEXP_OPCODES
  *		  JERRY_INIT_MEM_STATS, 	JERRY_INIT_MEM_STATS_SEPARATE (or a combination option)
+ * Note you must compile the JerryScript librarie with the following configuration:
+ *
+ * sudo python tools/build.py  --jerry-libc=off --cpointer-32bit=on --mem-heap=2000000 --error-messages=on
  */
 func (self *Engine) Start(port int) {
 	/* The port to communicate with the instance */
