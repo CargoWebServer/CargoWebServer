@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"code.myceliUs.com/GoJavaScript"
+	"code.myceliUs.com/GoJavaScript/GoChakra"
 	"code.myceliUs.com/GoJavaScript/GoJerryScript"
 )
 
@@ -45,14 +46,16 @@ func NewServer(address string, port int, name string) *Server {
 	// The engine.
 	if name == "jerryscript" {
 		server.engine = new(GoJerryScript.Engine)
-		server.engine.Start(port)
 	} else if name == "otto" {
 		/** implement it **/
 	} else if name == "v8" {
 		/** implement it **/
-	} else if name == "chakra" {
-		/** implement it **/
+	} else if name == "chakracore" {
+		server.engine = new(GoChakra.Engine)
 	}
+
+	// Start the engine
+	server.engine.Start(port)
 
 	// Start listen
 	go server.peer.Listen()
@@ -70,7 +73,7 @@ func (self *Server) processRemoteActions() {
 				// Call remote action
 				a = s.peer.CallRemoteAction(a)
 				// Set back the action on the channel.
-				a.GetDone() <- a
+				action.GetDone() <- a
 			}(action, self)
 		}
 
@@ -82,60 +85,59 @@ func (self *Server) processActions() {
 
 	// Process remote action in it own goroutine.
 	go self.processRemoteActions()
-
 	for self.isRunning {
 		select {
 		case action := <-self.exec_action_chan:
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
-			go func(a *GoJavaScript.Action, s *Server) {
-				if a.Name == "RegisterJsFunction" {
-					a.AppendResults(s.engine.RegisterJsFunction(a.Params[0].Value.(string), a.Params[1].Value.(string)))
-				} else if a.Name == "EvalScript" {
+			go func() {
+				if action.Name == "RegisterJsFunction" {
+					action.AppendResults(self.engine.RegisterJsFunction(action.Params[0].Value.(string), action.Params[1].Value.(string)))
+				} else if action.Name == "EvalScript" {
 					// So here I will call the function and return it value.
-					if a.Params[1].Value != nil {
-						a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+					if action.Params[1].Value != nil {
+						action.AppendResults(self.engine.EvalScript(action.Params[0].Value.(string), action.Params[1].Value.([]interface{})))
 					} else {
-						a.AppendResults(s.engine.EvalScript(a.Params[0].Value.(string), []interface{}{}))
+						action.AppendResults(self.engine.EvalScript(action.Params[0].Value.(string), []interface{}{}))
 					}
-				} else if a.Name == "CallFunction" {
+				} else if action.Name == "CallFunction" {
 					// So here I will call the function and return it value.
-					if a.Params[1].Value != nil {
-						a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), a.Params[1].Value.([]interface{})))
+					if action.Params[1].Value != nil {
+						action.AppendResults(self.engine.CallFunction(action.Params[0].Value.(string), action.Params[1].Value.([]interface{})))
 					} else {
-						a.AppendResults(s.engine.CallFunction(a.Params[0].Value.(string), []interface{}{}))
+						action.AppendResults(self.engine.CallFunction(action.Params[0].Value.(string), []interface{}{}))
 					}
-				} else if a.Name == "RegisterGoFunction" {
-					s.engine.RegisterGoFunction(a.Params[0].Value.(string))
-				} else if a.Name == "CreateObject" {
-					s.engine.CreateObject(a.Params[0].Value.(string), a.Params[1].Value.(string))
-				} else if a.Name == "SetObjectProperty" {
-					s.engine.SetObjectProperty(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value)
-				} else if a.Name == "SetGoObjectMethod" {
-					s.engine.SetGoObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string))
-				} else if a.Name == "SetJsObjectMethod" {
-					s.engine.SetJsObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.(string))
-				} else if a.Name == "GetObjectProperty" {
-					a.AppendResults(s.engine.GetObjectProperty(a.Params[0].Value.(string), a.Params[1].Value.(string)))
-				} else if a.Name == "CallObjectMethod" {
-					a.AppendResults(s.engine.CallObjectMethod(a.Params[0].Value.(string), a.Params[1].Value.(string), a.Params[2].Value.([]interface{})...))
-				} else if a.Name == "CreateObjectArray" {
-					a.AppendResults(s.engine.CreateObjectArray(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64))))
-				} else if a.Name == "SetObjectPropertyAtIndex" {
-					s.engine.SetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64)), a.Params[3].Value)
-				} else if a.Name == "GetObjectPropertyAtIndex" {
-					a.AppendResults(s.engine.GetObjectPropertyAtIndex(a.Params[0].Value.(string), a.Params[1].Value.(string), uint32(a.Params[2].Value.(float64))))
-				} else if a.Name == "SetGlobalVariable" {
-					s.engine.SetGlobalVariable(a.Params[0].Value.(string), a.Params[1].Value)
-				} else if a.Name == "GetGlobalVariable" {
-					a.AppendResults(s.engine.GetGlobalVariable(a.Params[0].Value.(string)))
-				} else if a.Name == "Stop" {
+				} else if action.Name == "RegisterGoFunction" {
+					self.engine.RegisterGoFunction(action.Params[0].Value.(string))
+				} else if action.Name == "CreateObject" {
+					self.engine.CreateObject(action.Params[0].Value.(string), action.Params[1].Value.(string))
+				} else if action.Name == "SetObjectProperty" {
+					self.engine.SetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value)
+				} else if action.Name == "SetGoObjectMethod" {
+					self.engine.SetGoObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string))
+				} else if action.Name == "SetJsObjectMethod" {
+					self.engine.SetJsObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(string))
+				} else if action.Name == "GetObjectProperty" {
+					action.AppendResults(self.engine.GetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string)))
+				} else if action.Name == "CallObjectMethod" {
+					action.AppendResults(self.engine.CallObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.([]interface{})...))
+				} else if action.Name == "CreateObjectArray" {
+					action.AppendResults(self.engine.CreateObjectArray(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64))))
+				} else if action.Name == "SetObjectPropertyAtIndex" {
+					self.engine.SetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64)), action.Params[3].Value)
+				} else if action.Name == "GetObjectPropertyAtIndex" {
+					action.AppendResults(self.engine.GetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64))))
+				} else if action.Name == "SetGlobalVariable" {
+					self.engine.SetGlobalVariable(action.Params[0].Value.(string), action.Params[1].Value)
+				} else if action.Name == "GetGlobalVariable" {
+					action.AppendResults(self.engine.GetGlobalVariable(action.Params[0].Value.(string)))
+				} else if action.Name == "Stop" {
 					log.Println("--> Stop JavaScript exec!")
 					// Send back the result to client.
 					self.isRunning = false
 				}
-				a.GetDone() <- a
-			}(action, self)
+				action.GetDone() <- action
+			}()
 		}
 	}
 	self.peer.Close()

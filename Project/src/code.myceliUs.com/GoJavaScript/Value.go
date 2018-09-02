@@ -50,6 +50,7 @@ func (self *Value) Export() (interface{}, error) {
  * Type validation function.
  */
 func (self *Value) IsString() bool {
+
 	if reflect.TypeOf(self.Val).Kind() == reflect.String {
 		return true
 	}
@@ -57,6 +58,9 @@ func (self *Value) IsString() bool {
 }
 
 func (self *Value) ToString() (string, error) {
+	if self.Val == nil {
+		return "", nil
+	}
 	if !self.IsString() {
 		return "", errors.New("The value is not a string!")
 	}

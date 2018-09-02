@@ -37,7 +37,6 @@ import "math"
 import "code.myceliUs.com/Utility"
 import "errors"
 import "reflect"
-import "strconv"
 import "strings"
 import "code.myceliUs.com/GoJavaScript"
 
@@ -142,7 +141,7 @@ func appendJsFunction(object Uint32_t, name string, src string) error {
 	_, err := evalScript(src)
 
 	// in that case the function must be set as object function.
-	if object != nil {
+	if object != nil && err == nil {
 		fct := Jerry_get_object_property(getGlobalObject(), name)
 		if Jerry_value_is_function(fct) {
 			// Set the function on the object.
@@ -227,34 +226,6 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (GoJavaScri
 	return *result, err
 }
 
-// Go function reside in the client, a remote call will be made here.
-func callGoFunction(target string, name string, params ...interface{}) (interface{}, error) {
-
-	action := GoJavaScript.NewAction(name, target)
-
-	// Set the list of parameters.
-	for i := 0; i < len(params); i++ {
-		action.AppendParam("arg"+strconv.Itoa(i), params[i])
-	}
-
-	// Create the channel to give back the action
-	// when it's done.
-	action.SetDone()
-
-	// Send the action to the client side.
-	GoJavaScript.Call_remote_actions_chan <- action
-
-	// Set back the action with it results in it.
-	action = <-action.GetDone()
-
-	var err error
-	if action.Results[1] != nil {
-		err = action.Results[1].(error)
-	}
-
-	return action.Results[0], err
-}
-
 //export object_native_free_callback
 func object_native_free_callback(native_p C.uintptr_t) {
 
@@ -263,12 +234,12 @@ func object_native_free_callback(native_p C.uintptr_t) {
 	C.delete_object_reference(native_p)
 
 	// Release the reference.
-	Jerry_release_value(GoJavaScript.GetCache().GetJsObject(uuid))
+	Jerry_release_value(GoJavaScript.GetCache().GetJsObject(uuid).(Uint32_t))
 
 	GoJavaScript.GetCache().RemoveObject(uuid)
 
 	// Now I will ask the client side to remove it object reference to.
-	callGoFunction("Client", "DeleteGoObject", uuid)
+	GoJavaScript.CallGoFunction("Client", "DeleteGoObject", uuid)
 }
 
 // The handler is call directly from Jerry script and is use to connect JS and GO
@@ -303,7 +274,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 				defer Jerry_release_value(propUuid_)
 				uuid, err := jsToGo(propUuid_)
 				if err == nil {
-					result, err := callGoFunction(uuid.(string), name.(string), params...)
+					result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
 					if err == nil && result != nil {
 						jsVal := goToJs(result)
 						return uint32_t_To_Jerry_value_t(jsVal)
@@ -318,7 +289,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 
 			} else {
 				// There is no function owner I will simply call go function.
-				result, err := callGoFunction("", name.(string), params...)
+				result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
 				if err == nil && result != nil {
 					jsVal := goToJs(result)
 					return uint32_t_To_Jerry_value_t(jsVal)
@@ -404,18 +375,13 @@ func NewValue(ptr Uint32_t) *GoJavaScript.Value {
 	// Here I will create a new GoJavaScript value.
 	v := new(GoJavaScript.Value)
 	v.TYPENAME = "GoJavaScript.Value"
-
 	var err error
-
 	// Export the value.
 	v.Val, err = jsToGo(ptr)
-	log.Println("413 ---> ", v.Val)
-
 	if err != nil {
 		log.Println("---> error: ", err)
 		return nil
 	}
-
 	return v
 }
 
@@ -424,9 +390,8 @@ func getJsObjectByUuid(uuid string) Uint32_t {
 
 	obj := GoJavaScript.GetCache().GetJsObject(uuid)
 	if obj != nil {
-		return obj
+		return obj.(Uint32_t)
 	}
-
 	log.Println("---> object ", uuid, "is undefined!")
 	// The property is undefined.
 	return Jerry_create_undefined()
@@ -462,7 +427,6 @@ func goToJs(value interface{}) Uint32_t {
 	if typeOf.Kind() == reflect.String {
 		// String value
 		propValue = newJsString(value.(string))
-
 	} else if typeOf.Kind() == reflect.Bool {
 		// Boolean value
 		propValue = Jerry_create_boolean(value.(bool))
@@ -529,10 +493,10 @@ func goToJs(value interface{}) Uint32_t {
 		data, err := json.Marshal(value)
 		if err == nil {
 			if value.(map[string]interface{})["TYPENAME"] != nil {
-				ref, err := callGoFunction("Client", "CreateGoObject", string(data))
+				ref, err := GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(data))
 				if err == nil {
 					// In that case an object exist in the case...
-					propValue = GoJavaScript.GetCache().GetJsObject(ref.(*GoJavaScript.ObjectRef).UUID)
+					propValue = GoJavaScript.GetCache().GetJsObject(ref.(*GoJavaScript.ObjectRef).UUID).(Uint32_t)
 				} else {
 					log.Println("--> fail to Create Go object ", string(data), err)
 				}
@@ -542,6 +506,14 @@ func goToJs(value interface{}) Uint32_t {
 				defer C.free(unsafe.Pointer(cstr))
 				propValue = jerry_value_t_To_uint32_t(C.json_parse(cstr, C.size_t(len(string(data)))))
 			}
+		}
+	} else if typeOf.Kind() == reflect.Struct {
+		log.Panicln("---> type is a struct ", typeOf.String())
+
+	} else if typeOf.Kind() == reflect.Struct {
+		val, err := Utility.ToMap(value)
+		if err == nil {
+			return goToJs(val)
 		}
 	} else {
 		log.Panicln("---> type not found ", value, typeOf.String())
@@ -573,7 +545,8 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 	} else if Jerry_value_is_boolean(input) {
 		value = Jerry_get_boolean_value(input)
 	} else if Jerry_value_is_typedarray(input) {
-		/** Not made use of typed array **/
+		/** not implemented **/
+
 	} else if Jerry_value_is_array(input) {
 		count := (uint32)(C.get_array_length(uint32_t_To_Jerry_value_t(input)))
 		// So here I got a array without type so I will get it property by index
@@ -607,7 +580,7 @@ func jsToGo(input Uint32_t) (interface{}, error) {
 					// So here I will create a remote action and tell the client to
 					// create a Go object from jsonStr. The object will be set by
 					// the client on the server.
-					return callGoFunction("Client", "CreateGoObject", jsonStr)
+					return GoJavaScript.CallGoFunction("Client", "CreateGoObject", jsonStr)
 				}
 
 				// In that case the object has no go representation...

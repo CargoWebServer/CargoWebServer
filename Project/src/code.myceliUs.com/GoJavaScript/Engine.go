@@ -1,10 +1,41 @@
 package GoJavaScript
 
+import "strconv"
+
 // Global variable.
 var (
-	// Channel to be use to transfert information from client and server
+	// Channel use by library code to call Go function on the client side of
+	// the lib.
 	Call_remote_actions_chan chan *Action
 )
+
+// Go function reside in the client, a remote call will be made here.
+func CallGoFunction(target string, name string, params ...interface{}) (interface{}, error) {
+
+	action := NewAction(name, target)
+
+	// Set the list of parameters.
+	for i := 0; i < len(params); i++ {
+		action.AppendParam("arg"+strconv.Itoa(i), params[i])
+	}
+
+	// Create the channel to give back the action
+	// when it's done.
+	action.SetDone()
+
+	// Send the action to the client side.
+	Call_remote_actions_chan <- action
+
+	// Set back the action with it results in it.
+	action = <-action.GetDone()
+
+	var err error
+	if action.Results[1] != nil {
+		err = action.Results[1].(error)
+	}
+
+	return action.Results[0], err
+}
 
 /**
  * The JavaScript JS engine.

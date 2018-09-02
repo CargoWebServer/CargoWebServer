@@ -191,7 +191,7 @@ func (self *Engine) Start(port int) {
 /**
  * Set a variable on the global context.
  * name The name of the variable in the context.
- * value The value of the variable, can be a string, a number,
+ * value The value of the variable, can be a string, a number, an object.
  */
 func (self *Engine) SetGlobalVariable(name string, value interface{}) {
 	// Set the propertie in the global context..
@@ -427,7 +427,7 @@ func (self *Engine) RegisterGoFunction(name string) {
 /**
  * Parse and set a function in the Javascript.
  * name The name of the function (the function will be keep in the engine for it
- *      lifetime.
+ * lifetime.
  * args The argument name for that function.
  * src  The body of the function
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
@@ -446,11 +446,6 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 	return callJsFunction(getGlobalObject(), name, params)
 }
 
-func (self *Engine) Clear() {
-	/* Cleanup the script engine. */
-	Jerry_cleanup()
-}
-
 /**
  * Evaluate a script.
  * script Contain the code to run.
@@ -465,4 +460,9 @@ func (self *Engine) EvalScript(script string, variables []interface{}) (GoJavaSc
 	}
 
 	return evalScript(script)
+}
+
+func (self *Engine) Clear() {
+	/* Cleanup the script engine. */
+	Jerry_cleanup()
 }

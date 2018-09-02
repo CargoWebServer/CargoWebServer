@@ -84,7 +84,6 @@ func setObjectRefs(values []interface{}) []interface{} {
 		if reflect.TypeOf(values[i]).Kind() == reflect.Slice {
 			// Here I got a slice...
 			slice := reflect.ValueOf(values[i])
-
 			for j := 0; j < slice.Len(); j++ {
 				e := slice.Index(j)
 				if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
@@ -300,8 +299,6 @@ func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 		uuid = Utility.GenerateUUID(name)
 	} else {
 		// Not a global object.
-		//ptrStr := fmt.Sprintf("%p", obj)
-		//uuid = Utility.GenerateUUID(ptrStr)
 		uuid = Utility.RandomUUID()
 	}
 

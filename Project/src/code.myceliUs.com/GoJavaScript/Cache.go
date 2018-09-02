@@ -11,7 +11,7 @@ type Cache struct {
 	m_objects map[string]interface{}
 
 	// The js object references
-	m_jsObjects map[string]Uint32_t
+	m_jsObjects map[string]interface{}
 
 	// The object count.
 	m_objectsCount map[string]uint
@@ -37,7 +37,7 @@ func newCache() {
 
 		// The map of objects.
 		cache.m_objects = make(map[string]interface{})
-		cache.m_jsObjects = make(map[string]Uint32_t)
+		cache.m_jsObjects = make(map[string]interface{})
 		cache.m_objectsCount = make(map[string]uint)
 
 		// The operation channel.
@@ -54,13 +54,13 @@ func newCache() {
 					operation["result"].(chan interface{}) <- object
 				} else if operation["name"] == "getJsObject" {
 					var object = cache.m_jsObjects[operation["id"].(string)]
-					operation["result"].(chan Uint32_t) <- object
+					operation["result"].(chan interface{}) <- object
 				} else if operation["name"] == "setObject" {
 					// increment the reference count.
 					cache.m_objects[operation["id"].(string)] = operation["object"]
 				} else if operation["name"] == "setJsObject" {
 					// set the object in the map.
-					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(Uint32_t)
+					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(interface{})
 					//log.Println("---> cache contain: ", len(cache.m_jsObjects))
 				} else if operation["name"] == "removeObject" {
 					delete(cache.m_objects, operation["id"].(string))
@@ -88,15 +88,15 @@ func (cache *Cache) GetObject(id string) interface{} {
 	return <-values["result"].(chan interface{})
 }
 
-func (cache *Cache) GetJsObject(id string) Uint32_t {
+func (cache *Cache) GetJsObject(id string) interface{} {
 	// Here I will get object from the cache.
 	values := make(map[string]interface{})
 	values["name"] = "getJsObject"
 	values["id"] = id
-	values["result"] = make(chan Uint32_t)
+	values["result"] = make(chan interface{})
 	cache.m_operations <- values
 	// wait to the result to be found.
-	return <-values["result"].(chan Uint32_t)
+	return <-values["result"].(chan interface{})
 }
 
 func (cache *Cache) SetObject(id string, object interface{}) {
@@ -108,7 +108,7 @@ func (cache *Cache) SetObject(id string, object interface{}) {
 	cache.m_operations <- values
 }
 
-func (cache *Cache) SetJsObject(id string, jsObject Uint32_t) {
+func (cache *Cache) SetJsObject(id string, jsObject interface{}) {
 	// Here I will set object in the cache
 	values := make(map[string]interface{})
 	values["name"] = "setJsObject"
