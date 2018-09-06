@@ -91,6 +91,7 @@ func (self *Server) processActions() {
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
 			go func() {
+				log.Println("---> call action: ", action.Name)
 				if action.Name == "RegisterJsFunction" {
 					action.AppendResults(self.engine.RegisterJsFunction(action.Params[0].Value.(string), action.Params[1].Value.(string)))
 				} else if action.Name == "EvalScript" {
@@ -138,6 +139,7 @@ func (self *Server) processActions() {
 				}
 				action.GetDone() <- action
 			}()
+
 		}
 	}
 	self.peer.Close()

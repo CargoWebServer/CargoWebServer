@@ -231,10 +231,6 @@ func (self *Engine) CreateObject(uuid string, name string) {
 	// Set the uuid property.
 	Jerry_set_object_property(obj, "uuid_", uuid)
 
-	// keep the object in the global namespace.
-	// set is uuid as global object property
-	GoJavaScript.GetCache().SetJsObject(uuid, obj)
-
 	if len(name) > 0 {
 		// set is name as global object property
 		Jerry_set_object_property(getGlobalObject(), name, obj)

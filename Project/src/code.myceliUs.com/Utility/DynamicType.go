@@ -263,7 +263,7 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 		fv, err := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
 		if err == nil {
 			if fv.IsValid() {
-				v.Elem().FieldByName(fieldName).Set(fv.Elem())
+				v.Elem().FieldByName(fieldName).Set(fv)
 			}
 		} else {
 			// In that case I dont have a map with a define type so i will simply set

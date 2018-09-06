@@ -3,6 +3,8 @@ package GoChakra
 import (
 	"log"
 
+	"unsafe"
+
 	"code.myceliUs.com/GoJavaScript"
 )
 
@@ -10,39 +12,59 @@ import (
 #include "ChakraCore.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 // The null pointer value.
 #define nullptr 0
 
 // Only one runtime and context per process.
-JsRuntimeHandle runtime;
-JsContextRef context;
 unsigned currentSourceContext = 0;
-
-void initRuntime(){
-
-	// Create the runtime.
-	JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime);
-
-	// create the context
-	JsCreateContext(runtime, &context);
-
-	// set the context.
-	JsSetCurrentContext(context);
-}
-
-// Return the runtime
-const JsRuntimeHandle getRuntime(){
-	return runtime;
-}
-
-// Return the active context.
-const JsContextRef getActiveContext(){
-	return context;
-}
 
 unsigned getCurrentSourceContext(){
 	return currentSourceContext++;
+}
+
+// String function...
+JsErrorCode jsCopyString(
+        _In_ JsValueRef value,
+        _Out_opt_ char* buffer,
+        _In_ size_t bufferSize){
+
+	return JsCopyString( value, buffer, bufferSize, nullptr);
+}
+
+// delete object callback.
+void jsObjectBeforeCollectCallback(_In_ JsRef ref, _In_opt_ void *callbackState);
+
+// Set the function that will be call before the object will be deleted.
+void setNativeObjectDeleteCallback(_In_ JsRef ref, _In_opt_ void *callbackState){
+	JsSetObjectBeforeCollectCallback(ref, callbackState, jsObjectBeforeCollectCallback);
+}
+
+// function handling.
+extern JsValueRef nativeFunctionHandler(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
+
+// Set a go function.
+void setNativeFunctionHandler(const char* callbackName, JsValueRef obj){
+
+	// create the property id from name.
+	JsPropertyIdRef propertyId;
+
+	// create property id
+	JsCreatePropertyId(callbackName, strlen(callbackName), &propertyId);
+
+	// Create a function. (callee)
+	JsValueRef function;
+
+	JsValueRef functionName;
+	JsCreateString(callbackName, strlen(callbackName), &functionName);
+
+	JsCreateNamedFunction(functionName, nativeFunctionHandler, nullptr, &function);
+
+
+	// Set the js property to object.
+	JsSetProperty(obj, propertyId, function, true);
+
 }
 
 */
@@ -54,6 +76,8 @@ import "errors"
  * The Chacra JS Runtime.
  */
 type Runtime struct {
+	context uintptr
+	runtime uintptr
 }
 
 /**
@@ -62,15 +86,9 @@ type Runtime struct {
  */
 func (self *Runtime) Start() {
 	// Create the runtime and the context.
-	C.initRuntime()
-}
-
-func (self *Runtime) DisplayContext(line int) {
-	var context uintptr
-	JsGetCurrentContext(&context)
-
-	log.Println("--> context ", line, " ", context, getGlobalObject())
-
+	JsCreateRuntime(JsRuntimeAttributeNone, nil, &self.runtime)
+	JsCreateContext(self.runtime, &self.context)
+	JsSetCurrentContext(self.context)
 }
 
 /////////////////// Global variables //////////////////////
@@ -121,6 +139,7 @@ func (self *Runtime) GetGlobalVariable(name string) (GoJavaScript.Value, error) 
 }
 
 /////////////////// Objects //////////////////////
+
 /**
  * Create JavaScript object with given uuid. If name is given the object will be
  * set a global object property.
@@ -130,20 +149,13 @@ func (self *Runtime) CreateObject(uuid string, name string) {
 	// Create the object JS object.
 	var obj uintptr
 
+	JsCreateObject(&obj)
+
 	// Set the uuid property.
 	JsSetObjectPropertyByName(obj, "uuid_", uuid)
 
-	// keep the object in the global namespace.
-	// set is uuid as global object property
-	GoJavaScript.GetCache().SetJsObject(uuid, obj)
-
-	if len(name) > 0 {
-		// set is name as global object property
-		JsSetObjectPropertyByName(getGlobalObject(), name, obj)
-	}
-
 	// Set native object to the object.
-	// C.create_native_object(C.CString(uuid), uint32_t_To_Jerry_value_t(obj))
+	C.setNativeObjectDeleteCallback(C.JsRef(obj), nil)
 }
 
 /**
@@ -153,12 +165,16 @@ func (self *Runtime) CreateObject(uuid string, name string) {
  * value The value of the property
  */
 func (self *Runtime) SetObjectProperty(uuid string, name string, value interface{}) error {
+	log.Println("---> set object property: ", name, value)
+
 	// Get the object from the cache
 	obj := getJsObjectByUuid(uuid)
+
 	if !JsIsUndefined(obj) {
 		// Set the property value.
 		err := JsSetObjectPropertyByName(obj, name, value)
 		if err != nil {
+			log.Println("---> 204 err ", err)
 			return err
 		}
 	} else {
@@ -268,16 +284,16 @@ func (self *Runtime) GetObjectPropertyAtIndex(uuid string, name string, i uint32
 func (self *Runtime) SetGoObjectMethod(uuid, name string) error {
 	obj := getJsObjectByUuid(uuid)
 	var err error
-	if !JsIsUndefined(obj) {
+	if JsIsUndefined(obj) {
 		err = errors.New("389 Object " + uuid + " dosent exist!")
 		log.Println(err)
 		return err
 	}
 
 	if JsIsObject(obj) {
-
-		// TODO set native method.
-		// C.setGoMethod(C.CString(name), uint32_t_To_Jerry_value_t(obj))
+		cstr := C.CString(name)
+		defer C.free(unsafe.Pointer(cstr))
+		C.setNativeFunctionHandler(cstr, C.JsValueRef(obj))
 		return nil
 	}
 
@@ -315,8 +331,9 @@ func (self *Runtime) CallObjectMethod(uuid string, name string, params ...interf
  * Register a go function in JS
  */
 func (self *Runtime) RegisterGoFunction(name string) {
-	// TODO implement it
-	// C.setGoMethod(cstr, uint32_t_To_Jerry_value_t(getGlobalObject()))
+	cstr := C.CString(name)
+	defer C.free(unsafe.Pointer(cstr))
+	C.setNativeFunctionHandler(cstr, C.JsValueRef(getGlobalObject()))
 }
 
 /**
@@ -328,6 +345,7 @@ func (self *Runtime) RegisterGoFunction(name string) {
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
  */
 func (self *Runtime) RegisterJsFunction(name string, src string) error {
+	log.Println("---> 356 register ", name, getCurrentContext())
 	err := appendJsFunction(uintptr(0), name, src)
 	return err
 }
@@ -336,6 +354,7 @@ func (self *Runtime) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Runtime) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
+	log.Println("---> call ", name, getCurrentContext())
 	val, err := callJsFunction(getGlobalObject(), name, params)
 	// Call function on the global object here.
 	return *NewValue(val), err

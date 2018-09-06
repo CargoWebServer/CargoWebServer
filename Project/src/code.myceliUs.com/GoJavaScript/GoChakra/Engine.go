@@ -2,9 +2,11 @@ package GoChakra
 
 import (
 	"log"
+
 	"runtime"
 
 	"code.myceliUs.com/GoJavaScript"
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -15,6 +17,24 @@ type Engine struct {
 
 	// That channel will be use to process action requested on the runtime.
 	actions chan map[string]interface{}
+
+	// Global value that must be set on each newly created runtime.
+
+	// That map contain the js function source code.
+	jsFunctions map[string]string
+
+	// That map contain the list of go function callable on the client side form
+	// the server.
+	goFunctions []string
+
+	// The list of global variables
+	variables map[string]interface{}
+
+	// The main runtime.
+	runtime *Runtime
+
+	// Stop main runtime channel.
+	stop chan bool
 }
 
 /**
@@ -26,72 +46,154 @@ func (self *Engine) Start(port int) {
 	// The channel of actions to be process on the runtime.
 	self.actions = make(chan map[string]interface{}, 0)
 
+	// Initialisation of memory...
+	self.jsFunctions = make(map[string]string, 0)
+	self.goFunctions = make([]string, 0)
+	self.variables = make(map[string]interface{}, 0)
+	self.stop = make(chan bool)
+	self.runtime = self.newRuntime(self.stop)
+}
+
+/**
+ * Each engine will run in it own thread so
+ */
+func (self *Engine) newRuntime(stop chan bool) *Runtime {
 	// Start processing action here.
+
+	// The rutime must run in one thread only or context and rutime variable
+	// will be lost.
+
+	// The default runtime.
+	var jsRuntime *Runtime
+	wait := make(chan bool)
+
+	// Start the runtime processing loop.
 	go func() {
-		// The rutime must run in one thread only or context and rutime variable
-		// will be lost.
+		// Fix the goroutine in it own thread.
 		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
 
-		runtime := new(Runtime)
-		runtime.Start()
+		// Start the runtime in it thread
+		jsRuntime = new(Runtime)
+		jsRuntime.Start()
 
-		for {
-			select {
-			// Process action here.
-			case action := <-self.actions:
-				//log.Println("---> action receive ", action)
-				if action["id"] == "SetGlobalVariable" {
-					runtime.SetGlobalVariable(action["name"].(string), action["value"])
-				} else if action["id"] == "GetGlobalVariable" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.GetGlobalVariable(action["name"].(string))
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "CreateObject" {
-					runtime.CreateObject(action["uuid"].(string), action["name"].(string))
-				} else if action["id"] == "SetObjectProperty" {
-					action["error"].(chan error) <- runtime.SetObjectProperty(action["uuid"].(string), action["name"].(string), action["value"])
-				} else if action["id"] == "GetObjectProperty" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.GetObjectProperty(action["uuid"].(string), action["name"].(string))
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "CreateObjectArray" {
-					action["error"].(chan error) <- runtime.CreateObjectArray(action["uuid"].(string), action["name"].(string), action["size"].(uint32))
-				} else if action["id"] == "SetObjectPropertyAtIndex" {
-					runtime.SetObjectPropertyAtIndex(action["uuid"].(string), action["name"].(string), action["i"].(uint32), action["value"])
-				} else if action["id"] == "GetObjectPropertyAtIndex" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.GetObjectPropertyAtIndex(action["uuid"].(string), action["name"].(string), action["i"].(uint32))
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "SetGoObjectMethod" {
-					action["error"].(chan error) <- runtime.SetGoObjectMethod(action["uuid"].(string), action["name"].(string))
-				} else if action["id"] == "SetJsObjectMethod" {
-					action["error"].(chan error) <- runtime.SetJsObjectMethod(action["uuid"].(string), action["name"].(string), action["src"].(string))
-				} else if action["id"] == "CallObjectMethod" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.CallObjectMethod(action["uuid"].(string), action["name"].(string), action["params"].([]interface{})...)
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "RegisterGoFunction" {
-					runtime.RegisterGoFunction(action["name"].(string))
-				} else if action["id"] == "RegisterJsFunction" {
-					log.Println("71 --> RegisterJsFunction")
-					action["error"].(chan error) <- runtime.RegisterJsFunction(action["name"].(string), action["src"].(string))
-				} else if action["id"] == "CallFunction" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.CallFunction(action["name"].(string), action["params"].([]interface{}))
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "EvalScript" {
-					results := make([]interface{}, 2)
-					results[0], results[1] = runtime.EvalScript(action["script"].(string), action["variables"].([]interface{}))
-					action["results"].(chan []interface{}) <- results
-				} else if action["id"] == "Clear" {
-					runtime.Clear()
-				}
-			}
+		// Here I will set the global thing.
+
+		// The js functions
+		for name, src := range self.jsFunctions {
+			jsRuntime.RegisterJsFunction(name, src)
 		}
 
+		// The go functions
+		for i := 0; i < len(self.goFunctions); i++ {
+			jsRuntime.RegisterGoFunction(self.goFunctions[i])
+		}
+
+		// The variables.
+		for name, variable := range self.variables {
+			jsRuntime.SetGlobalVariable(name, variable)
+		}
+
+		log.Println("---> start process message. 91 ", getCurrentContext())
+		wait <- true
+
+		// Start the processing loop.
+		for {
+			select {
+			case <-stop:
+				// exist process loop.
+				log.Println("---> stop runtime ", getCurrentContext())
+				// give back the thread to the os
+				runtime.UnlockOSThread()
+				return // exit the process function.
+
+			case action := <-self.actions:
+				log.Println("---> 46 action receive ", action["id"].(string))
+				if action["id"] == "SetGlobalVariable" {
+					jsRuntime.SetGlobalVariable(action["name"].(string), action["value"])
+					action["done"].(chan bool) <- true
+				} else if action["id"] == "CreateObject" {
+					jsRuntime.CreateObject(action["uuid"].(string), action["name"].(string))
+					action["done"].(chan bool) <- true
+				} else if action["id"] == "SetObjectPropertyAtIndex" {
+					jsRuntime.SetObjectPropertyAtIndex(action["uuid"].(string), action["name"].(string), action["i"].(uint32), action["value"])
+					action["done"].(chan bool) <- true
+				} else if action["id"] == "Clear" {
+					jsRuntime.Clear()
+					action["done"].(chan bool) <- true
+					break // exit the processing loop.
+				} else if action["id"] == "RegisterJsFunction" {
+					action["error"].(chan error) <- jsRuntime.RegisterJsFunction(action["name"].(string), action["src"].(string))
+				} else if action["id"] == "RegisterGoFunction" {
+					jsRuntime.RegisterGoFunction(action["name"].(string))
+					action["done"].(chan bool) <- true
+				} else if action["id"] == "SetGoObjectMethod" {
+					action["error"].(chan error) <- jsRuntime.SetGoObjectMethod(action["uuid"].(string), action["name"].(string))
+				} else if action["id"] == "SetJsObjectMethod" {
+					action["error"].(chan error) <- jsRuntime.SetJsObjectMethod(action["uuid"].(string), action["name"].(string), action["src"].(string))
+				} else if action["id"] == "SetObjectProperty" {
+					action["error"].(chan error) <- jsRuntime.SetObjectProperty(action["uuid"].(string), action["name"].(string), action["value"])
+				} else if action["id"] == "CreateObjectArray" {
+					action["error"].(chan error) <- jsRuntime.CreateObjectArray(action["uuid"].(string), action["name"].(string), action["size"].(uint32))
+				} else if action["id"] == "GetObjectProperty" {
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime.GetObjectProperty(action["uuid"].(string), action["name"].(string))
+					action["results"].(chan []interface{}) <- results
+				} else if action["id"] == "GetObjectPropertyAtIndex" {
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime.GetObjectPropertyAtIndex(action["uuid"].(string), action["name"].(string), action["i"].(uint32))
+					action["results"].(chan []interface{}) <- results
+				} else if action["id"] == "GetGlobalVariable" {
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime.GetGlobalVariable(action["name"].(string))
+					action["results"].(chan []interface{}) <- results
+				} else if action["id"] == "CallFunction" {
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime.CallFunction(action["name"].(string), action["params"].([]interface{}))
+					action["results"].(chan []interface{}) <- results
+				} else if action["id"] == "EvalScript" {
+					// Each script will be call in it own js runtime,
+					// this is the only way to not blocking the main processing
+					// loop.
+					stop_ := make(chan bool)
+					jsRuntime_ := self.newRuntime(stop_)
+
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime_.EvalScript(action["script"].(string), action["variables"].([]interface{}))
+					action["results"].(chan []interface{}) <- results
+
+					// Set back global variable after the script was done.
+					for name, src := range self.jsFunctions {
+						jsRuntime.RegisterJsFunction(name, src)
+					}
+
+					for i := 0; i < len(self.goFunctions); i++ {
+						jsRuntime.RegisterGoFunction(self.goFunctions[i])
+					}
+
+					for name, variable := range self.variables {
+						jsRuntime.SetGlobalVariable(name, variable)
+					}
+
+					// stop the jsRuntime.
+					jsRuntime_.Clear()
+
+					// stop the processing loop.
+					stop_ <- true
+
+				} else if action["id"] == "CallObjectMethod" {
+					results := make([]interface{}, 2)
+					results[0], results[1] = jsRuntime.CallObjectMethod(action["uuid"].(string), action["name"].(string), action["params"].([]interface{})...)
+					action["results"].(chan []interface{}) <- results
+				}
+				log.Println("---> 98 action done ", action["id"].(string))
+			}
+		}
 	}()
 
+	// Wait for the runtime to start in it own thread...
+	<-wait
+
+	return jsRuntime
 }
 
 /////////////////// Global variables //////////////////////
@@ -102,11 +204,18 @@ func (self *Engine) Start(port int) {
  * value The value of the variable, can be a string, a number,
  */
 func (self *Engine) SetGlobalVariable(name string, value interface{}) {
+	// Keep the variable on the map.
+	self.variables[name] = value
+
 	action := make(map[string]interface{})
 	action["id"] = "SetGlobalVariable"
 	action["name"] = name
 	action["value"] = value
+
+	action["done"] = make(chan bool, 0)
 	self.actions <- action
+
+	<-action["done"].(chan bool)
 }
 
 /**
@@ -122,7 +231,6 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
 	self.actions <- action
 
 	results := <-action["results"].(chan []interface{})
-
 	var err error
 	if results[1] != nil {
 		err = results[1].(error)
@@ -136,11 +244,16 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
+
 	action := make(map[string]interface{})
 	action["id"] = "CreateObject"
 	action["uuid"] = uuid
 	action["name"] = name
+
+	action["done"] = make(chan bool, 0)
 	self.actions <- action
+
+	<-action["done"].(chan bool)
 }
 
 /**
@@ -150,6 +263,7 @@ func (self *Engine) CreateObject(uuid string, name string) {
  * value The value of the property
  */
 func (self *Engine) SetObjectProperty(uuid string, name string, value interface{}) error {
+
 	action := make(map[string]interface{})
 	action["id"] = "SetObjectProperty"
 	action["uuid"] = uuid
@@ -190,6 +304,7 @@ func (self *Engine) GetObjectProperty(uuid string, name string) (GoJavaScript.Va
  * Create an empty array of a given size and set it as object property.
  */
 func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) error {
+
 	action := make(map[string]interface{})
 	action["id"] = "CreateObjectArray"
 	action["uuid"] = uuid
@@ -211,13 +326,18 @@ func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) err
  * value The value of the property
  */
 func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, i uint32, value interface{}) {
+
 	action := make(map[string]interface{})
 	action["id"] = "SetObjectPropertyAtIndex"
 	action["uuid"] = uuid
 	action["name"] = name
 	action["i"] = i
 	action["value"] = value
+
+	action["done"] = make(chan bool, 0)
 	self.actions <- action
+
+	<-action["done"].(chan bool)
 }
 
 /**
@@ -229,12 +349,12 @@ func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, i uint32)
 	action["uuid"] = uuid
 	action["name"] = name
 	action["i"] = i
+
 	// The resturn channel
 	action["results"] = make(chan []interface{}, 0)
-
 	self.actions <- action
-
 	results := <-action["results"].(chan []interface{})
+
 	var err error
 	if results[1] != nil {
 		err = results[1].(error)
@@ -277,11 +397,12 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 	action["uuid"] = uuid
 	action["name"] = name
 	action["params"] = params
+
 	// The resturn channel
 	action["results"] = make(chan []interface{}, 0)
 	self.actions <- action
-
 	results := <-action["results"].(chan []interface{})
+
 	var err error
 	if results[1] != nil {
 		err = results[1].(error)
@@ -296,10 +417,19 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
  * Register a go function in JS
  */
 func (self *Engine) RegisterGoFunction(name string) {
+	// Keep the go function in memory...
+	if Utility.Contains(self.goFunctions, name) {
+		self.goFunctions = append(self.goFunctions, name)
+	}
+
 	action := make(map[string]interface{})
 	action["id"] = "RegisterGoFunction"
 	action["name"] = name
+
+	action["done"] = make(chan bool, 0)
 	self.actions <- action
+
+	<-action["done"].(chan bool)
 }
 
 /**
@@ -311,10 +441,14 @@ func (self *Engine) RegisterGoFunction(name string) {
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
  */
 func (self *Engine) RegisterJsFunction(name string, src string) error {
+	// I will keep the JS function in the map of functions
+	self.jsFunctions[name] = src
+
 	action := make(map[string]interface{})
 	action["id"] = "RegisterJsFunction"
 	action["name"] = name
 	action["src"] = src
+
 	// if there is error
 	action["error"] = make(chan error, 0)
 	self.actions <- action
@@ -326,6 +460,7 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
  */
 func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
 	action := make(map[string]interface{})
+
 	action["id"] = "CallFunction"
 	action["name"] = name
 	action["params"] = params
@@ -333,8 +468,9 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 	// The resturn channel
 	action["results"] = make(chan []interface{}, 0)
 	self.actions <- action
-
 	results := <-action["results"].(chan []interface{})
+
+	log.Println("---> call function result: ", results)
 
 	var err error
 	if results[1] != nil {
@@ -358,7 +494,6 @@ func (self *Engine) EvalScript(script string, variables []interface{}) (GoJavaSc
 
 	// The resturn channel
 	action["results"] = make(chan []interface{}, 0)
-
 	self.actions <- action
 	results := <-action["results"].(chan []interface{})
 
@@ -375,5 +510,9 @@ func (self *Engine) Clear() {
 	/* Cleanup the script engine. */
 	action := make(map[string]interface{})
 	action["id"] = "Clear"
+
+	action["done"] = make(chan bool, 0)
 	self.actions <- action
+
+	<-action["done"].(chan bool)
 }

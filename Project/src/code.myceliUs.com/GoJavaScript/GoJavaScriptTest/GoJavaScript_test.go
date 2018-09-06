@@ -59,11 +59,14 @@ func GetPerson() *Person {
 	c1.LastName = "Boucher"
 	c1.Gender = Male
 	p.Contacts = append(p.Contacts, c1)
+
+	log.Println("---> get Person was call!", p)
 	return p
 }
 
 // A simple function.
 func (self *Person) Name() string {
+	log.Println("---> name was called ", self.FirstName+" "+self.LastName)
 	return self.FirstName + " " + self.LastName
 }
 
@@ -100,7 +103,7 @@ func PrintValue(value interface{}) {
 	log.Println(value)
 }
 
-var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "chakracore")
+var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "jerryscript" /*, "chakracore"*/)
 
 /**
  * Simple Hello world test.
@@ -119,7 +122,6 @@ func TestHelloJava(t *testing.T) {
 		// display hello jerry!
 		log.Println(str_)
 	}
-
 }
 
 /*
@@ -163,129 +165,132 @@ func TestArray(t *testing.T) {
 	}
 }
 
-///**
-// * Test calling a go function from JS.
-// */
-//func TestGoFunction(t *testing.T) {
+/**
+ * Test calling a go function from JS.
+ */
+func TestGoFunction(t *testing.T) {
 
-//	// First of all I will register the tow go function in the Engine.
-//	engine.RegisterGoFunction("AddNumber", AddNumber)
-//	engine.RegisterGoFunction("Print", PrintValue)
-//	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); Print("The result is:" + result); return result;}`)
-//	addNumberResult, err := engine.CallFunction("TestAddNumber")
+	// First of all I will register the tow go function in the Engine.
+	engine.RegisterGoFunction("AddNumber", AddNumber)
+	engine.RegisterGoFunction("Print", PrintValue)
+	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); Print("The result is:" + result); return result;}`)
+	addNumberResult, err := engine.CallFunction("TestAddNumber")
 
-//	if err == nil {
-//		t.Log("Add number result: ", addNumberResult)
-//	}
+	if err == nil {
+		t.Log("Add number result: ", addNumberResult)
+	}
 
-//}
+}
 
-//func TestGlobalVariable(t *testing.T) {
+func TestGlobalVariable(t *testing.T) {
 
-//	// First of all I will register the tow go function in the Engine.
-//	var toto = "This is Java"
-//	engine.SetGlobalVariable("toto", toto)
+	// First of all I will register the tow go function in the Engine.
+	var toto = "This is Java"
+	engine.SetGlobalVariable("toto", toto)
 
-//	toto_, _ := engine.GetGlobalVariable("toto")
-//	toto__, _ := toto_.Export()
+	toto_, _ := engine.GetGlobalVariable("toto")
+	toto__, _ := toto_.Export()
 
-//	if toto__ != toto {
-//		t.Log("Set/Get global variables fail! ")
-//	}
+	if toto__ != toto {
+		t.Log("Set/Get global variables fail! ")
+	}
 
-//}
+}
 
-//func TestCreateJsObjectFromGo(t *testing.T) {
+func TestCreateJsObjectFromGo(t *testing.T) {
 
-//	// First of all I will create the object.
-//	obj := engine.CreateObject("test")
+	engine.RegisterGoFunction("print", PrintValue)
 
-//	// Set a property on test.
-//	obj.Set("number", 1.01)
+	// First of all I will create the object.
+	obj := engine.CreateObject("test")
 
-//	number, err := obj.Get("number")
-//	if err == nil {
-//		number_, _ := number.ToFloat()
-//		if number_ != 1.01 {
-//			t.Error("---> fail to get object property!")
-//		}
-//	}
+	// Set a property on test.
+	obj.Set("number", 1.01)
 
-//	// Now set a go function.
-//	obj.Set("add", AddNumber)
+	number, err := obj.Get("number")
+	if err == nil {
+		number_, _ := number.ToFloat()
+		if number_ != 1.01 {
+			t.Error("---> fail to get object property!")
+		}
+	}
 
-//	// and call the go function on the object.
-//	addReuslt, _ := obj.Call("add", 2, 3)
-//	addReuslt_, _ := addReuslt.ToFloat()
-//	if addReuslt_ != 5.0 {
-//		t.Error("---> fail to get object property!")
-//	}
+	// Now set a go function.
+	obj.Set("add", AddNumber)
 
-//	// set a Js function on the object.
-//	obj.SetJsMethode("helloTo", `function helloTo(to){return "Hello " + to + "!";}`)
+	// and call the go function on the object.
+	addReuslt, _ := obj.Call("add", 2, 3)
+	addReuslt_, _ := addReuslt.ToFloat()
+	if addReuslt_ != 5.0 {
+		t.Error("---> fail to get object property!")
+	}
 
-//	helloToResult, _ := obj.Call("helloTo", "Java")
-//	helloToResult_, _ := helloToResult.ToString()
-//	if helloToResult_ != "Hello Java!" {
-//		t.Error("---> fail to set js property!")
-//	}
+	// set a Js function on the object.
+	obj.SetJsMethode("helloTo", `function helloTo(to){print("Hello " + to + "!"); return "Hello " + to + "!";}`)
 
-//}
+	helloToResult, _ := obj.Call("helloTo", "Java")
+	helloToResult_, _ := helloToResult.ToString()
+	if helloToResult_ != "Hello Java!" {
+		t.Error("---> fail to set js property!")
+	}
 
-//func TestRegisterGoObject(t *testing.T) {
+}
 
-//	engine.RegisterGoFunction("print", PrintValue)
+func TestRegisterGoObject(t *testing.T) {
 
-//	// Create the object to register.
-//	engine.RegisterGoType((*Person)(nil))
+	engine.RegisterGoFunction("print", PrintValue)
 
-//	p := GetPerson()
+	// Create the object to register.
+	engine.RegisterGoType((*Person)(nil))
 
-//	// Here I will register a go Object in JavaScript and set
-//	// it as global variable named Dave.
-//	engine.RegisterGoObject(p, "Dave")
+	p := GetPerson()
 
-//	// Now I will eval sricpt on it...
-//	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
+	// Here I will register a go Object in JavaScript and set
+	// it as global variable named Dave.
+	engine.SetGlobalVariable("Dave", p)
 
-//	// Eval script that contain Go object in it.
-//	engine.EvalScript("Test1();", []interface{}{})
+	// Now I will eval sricpt on it...
+	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
-//	// Now I will try to register a function that return a Go type and use it
-//	// result to access it contact.
-//	engine.RegisterGoFunction("GetPerson", GetPerson)
+	// Eval script that contain Go object in it.
+	engine.EvalScript("Test1();", []interface{}{})
 
-//	// Eval single return type (not array)
-//	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
+	// Now I will try to register a function that return a Go type and use it
+	// result to access it contact.
+	engine.RegisterGoFunction("GetPerson", GetPerson)
 
-//	// Eval array...
-//	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+	// Eval single return type (not array)
+	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
-//}
+	// Eval array...
+	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+}
 
-///**
-// * Test calling a go function from JS.
-// */
-//func TestCreateGoObjectFromJs(t *testing.T) {
+/**
+ * Test calling a go function from JS.
+ */
+func TestCreateGoObjectFromJs(t *testing.T) {
 
-//	// Test with structure
-//	// The type must be register before being usable by the vm.
-//	engine.RegisterGoType((*Person)(nil))
+	// Test with structure
+	// The type must be register before being usable by the vm.
+	engine.RegisterGoType((*Person)(nil))
 
-//	// Register the dynamic type.
-//	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
-//	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
+	// Register the dynamic type.
+	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
+	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 
-//	if err != nil {
-//		t.Error("fail to create Go from Js: ", err)
-//	}
+	if err != nil {
+		t.Error("fail to create Go from Js: ", err)
+	}
 
-//	p_, _ := p.Export()
+	p_, _ := p.Export()
 
-//	if err == nil {
-//		t.Log(p_)
-//	}
-//}
+	if err == nil {
+		t.Log(p_)
+	} else {
+		t.Error("test fail!")
+	}
+}
 
 func TestStopJava(t *testing.T) {
 	engine.Stop()

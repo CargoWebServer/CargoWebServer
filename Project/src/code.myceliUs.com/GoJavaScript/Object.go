@@ -4,22 +4,31 @@ package GoJavaScript
 import "code.myceliUs.com/Utility"
 import "reflect"
 
+// The object must be contain entirely in the client a get by the server when he's
+// ready to use it with getObjectByUuid... so no channel will dead lock.
 /**
  * Go representation of a JS object.
  */
 type Object struct {
 	// The typename.
-	TYPENAME string
+	//TYPENAME string
 
-	// The peer where the object live.
-	peer *Peer
+	// The unique object identifier.
+	UUID string
 
 	// If a name is given the object will be set
 	// as a property of the global JS object
 	Name string
 
-	// The unique object identifier.
-	UUID string
+	// Contain method name for Go and Js method
+	// and Js code for Js method.
+	Methods map[string]string
+
+	// Contain the properties of the object.
+	Properties map[string]interface{}
+
+	// The peer where the object live.
+	peer *Peer
 }
 
 /**
@@ -29,7 +38,7 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
-	obj.TYPENAME = "GoJavaScript.Object"
+	//obj.TYPENAME = "GoJavaScript.Object"
 
 	// If the name is given that's mean the object will be set as a global
 	// object so it uuid will be generated from it name.
@@ -40,7 +49,17 @@ func NewObject(name string) *Object {
 		obj.UUID = Utility.RandomUUID()
 	}
 
+	// The name of the object.
 	obj.Name = name
+
+	// Set the properties.
+
+	// Contain method name for Go and Js method
+	// and Js code for Js method.
+	obj.Methods = make(map[string]string, 0)
+
+	// Contain the properties of the object.
+	obj.Properties = make(map[string]interface{}, 0)
 
 	// Here I will keep the object in the client cache.
 	GetCache().SetObject(obj.UUID, obj)
@@ -55,38 +74,25 @@ func (self *Object) SetPeer(peer *Peer) {
 	// I will set the object peer.
 	self.peer = peer
 
-	// So here I will create the action.
-	action := NewAction("CreateObject", "")
-	action.AppendParam("uuid", self.UUID)
-	action.AppendParam("name", self.Name)
+	// Here I have to register the object on the server if it name is define
+	// that will be a global variable.
+	if len(self.Name) > 0 {
+		action := NewAction("CreateObject", "")
+		action.AppendParam("uuid", self.UUID)
+		action.AppendParam("name", self.Name)
 
-	// Call the action here.
-	peer.CallRemoteAction(action)
+		// Call the action here.
+		action = self.peer.CallRemoteAction(action)
+	}
 }
 
 /**
  * Return property value.
  */
 func (self *Object) Get(name string) (Value, error) {
-
-	action := NewAction("GetObjectProperty", "")
-	action.AppendParam("uuid", self.UUID)
-	action.AppendParam("name", name)
-
-	// Call the action here.
-	action = self.peer.CallRemoteAction(action)
-	var result *Value
-	var err error
-
-	if action.Results[0] != nil {
-		result = action.Results[0].(*Value)
-	}
-
-	if action.Results[1] != nil {
-		err = action.Results[1].(error)
-	}
-
-	return *result, err
+	var val Value
+	val.Val = self.Properties[name]
+	return val, nil
 }
 
 /**
@@ -97,26 +103,12 @@ func (self *Object) Get(name string) (Value, error) {
 func (self *Object) Set(name string, value interface{}) {
 	// If the value is a function
 	if reflect.TypeOf(value).Kind() == reflect.Func {
-		// In that case I will register the function.
+		// Set a go method.
 		Utility.RegisterFunction(name, value)
-		action := NewAction("SetGoObjectMethod", "")
-
-		action.AppendParam("uuid", self.UUID)
-		action.AppendParam("name", name)
-
-		// Call the action here.
-		self.peer.CallRemoteAction(action)
-
+		self.Methods[name] = ""
 	} else {
-
-		action := NewAction("SetObjectProperty", "")
-
-		action.AppendParam("uuid", self.UUID)
-		action.AppendParam("name", name)
-		action.AppendParam("value", value)
-
-		// Call the action here.
-		self.peer.CallRemoteAction(action)
+		// Set object property
+		self.Properties[name] = value
 	}
 }
 
@@ -124,24 +116,16 @@ func (self *Object) Set(name string, value interface{}) {
  * Set a JS function as Object methode.
  */
 func (self *Object) SetJsMethode(name string, src string) {
-	action := NewAction("SetJsObjectMethod", "")
-	action.AppendParam("uuid", self.UUID)
-	action.AppendParam("name", name)
-	action.AppendParam("src", src)
-
-	// Call the action here.
-	self.peer.CallRemoteAction(action)
+	self.Methods[name] = src
 }
 
 /**
  * Call a function over an object.
  */
 func (self *Object) Call(name string, params ...interface{}) (Value, error) {
-
 	action := NewAction("CallObjectMethod", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
-
 	action.AppendParam("params", params)
 
 	// Call the action here.

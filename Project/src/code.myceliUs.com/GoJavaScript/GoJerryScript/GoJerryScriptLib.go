@@ -20,7 +20,7 @@ extern jerry_value_t eval (const char *source_p, size_t source_size, bool is_str
 extern jerry_value_t create_error (jerry_error_t error_type, const char *message_p);
 extern jerry_size_t string_to_char_buffer (const jerry_value_t value, char *buffer_p, size_t size);
 extern jerry_size_t get_string_size (const jerry_value_t value);
-extern jerry_value_t create_native_object(const char* uuid);
+extern void create_native_object(const char* uuid, jerry_value_t object);
 extern jerry_value_t create_array (uint32_t);
 extern jerry_value_t set_property_by_index (const jerry_value_t, uint32_t, const jerry_value_t);
 extern jerry_value_t get_property_by_index (const jerry_value_t, uint32_t);
@@ -230,12 +230,10 @@ func callJsFunction(obj Uint32_t, name string, params []interface{}) (GoJavaScri
 func object_native_free_callback(native_p C.uintptr_t) {
 
 	uuid := C.GoString(C.get_object_reference_uuid(native_p))
-
 	C.delete_object_reference(native_p)
 
 	// Release the reference.
 	Jerry_release_value(GoJavaScript.GetCache().GetJsObject(uuid).(Uint32_t))
-
 	GoJavaScript.GetCache().RemoveObject(uuid)
 
 	// Now I will ask the client side to remove it object reference to.
@@ -388,13 +386,99 @@ func NewValue(ptr Uint32_t) *GoJavaScript.Value {
 // Retreive an object by it uuid as a global object property.
 func getJsObjectByUuid(uuid string) Uint32_t {
 
-	obj := GoJavaScript.GetCache().GetJsObject(uuid)
-	if obj != nil {
-		return obj.(Uint32_t)
+	// So here I will try to create a local Js representation of the object.
+	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
+
+	if err == nil {
+		// So here I got an object map info.
+		// Create the object JS object.
+		obj := Jerry_create_object()
+		if !Jerry_value_is_object(obj) {
+			log.Panicln("---> fail to create a new object! ", uuid)
+		}
+
+		// I will keep the reference in the js cache to be able to remove release
+		// the c pointer reference latter.
+		GoJavaScript.GetCache().SetJsObject(uuid, obj)
+
+		// Set the uuid property.
+		Jerry_set_object_property(obj, "uuid_", uuid)
+
+		if objInfos.(map[string]interface{})["Name"] != nil {
+			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
+				// set is name as global object property
+				Jerry_set_object_property(getGlobalObject(), objInfos.(map[string]interface{})["Name"].(string), obj)
+			}
+		}
+
+		// Set native object to the object.
+		C.create_native_object(C.CString(uuid), uint32_t_To_Jerry_value_t(obj))
+
+		// Now I will set the object method.
+		methods := objInfos.(map[string]interface{})["Methods"].(map[string]interface{})
+		for name, src := range methods {
+			if len(src.(string)) == 0 {
+				// Set the go function here.
+				cstr := C.CString(name)
+				defer C.free(unsafe.Pointer(cstr))
+				C.setGoMethod(C.CString(name), uint32_t_To_Jerry_value_t(obj))
+			} else {
+				// append the object function here.
+				appendJsFunction(obj, name, src.(string))
+			}
+		}
+
+		// I can remove the methods from the infos.
+		delete(objInfos.(map[string]interface{}), "Methods")
+
+		// Now the object properties.
+		for name, value := range objInfos.(map[string]interface{}) {
+			if reflect.TypeOf(value).Kind() == reflect.Slice {
+				slice := reflect.ValueOf(value)
+				values := jerry_value_t_To_uint32_t(C.create_array(C.uint32_t(slice.Len())))
+				for i := 0; i < slice.Len(); i++ {
+					e := slice.Index(i).Interface()
+					if reflect.TypeOf(e).Kind() == reflect.Map {
+						// Here The value contain a map... so I will append
+						if e.(map[string]interface{})["TYPENAME"] != nil {
+							if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
+								value_ := getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string))
+								r := C.set_property_by_index(uint32_t_To_Jerry_value_t(values), C.uint32_t(uint32(i)), uint32_t_To_Jerry_value_t(goToJs(value_)))
+								// Release the result
+								Jerry_release_value(jerry_value_t_To_uint32_t(r))
+							}
+						} else {
+							log.Println("---> unknow object propertie type 231")
+						}
+					} else {
+						r := C.set_property_by_index(uint32_t_To_Jerry_value_t(values), C.uint32_t(uint32(i)), uint32_t_To_Jerry_value_t(goToJs(e)))
+						// Release the result
+						Jerry_release_value(jerry_value_t_To_uint32_t(r))
+					}
+				}
+				Jerry_set_object_property(obj, name, values)
+
+			} else if reflect.TypeOf(value).Kind() == reflect.Map {
+				if value.(map[string]interface{})["TYPENAME"] != nil {
+					if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
+						value_ := getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string))
+						Jerry_set_object_property(obj, name, value_)
+					} else {
+						log.Println("---> unknow object propertie type 245")
+					}
+				}
+			} else {
+				// Standard object property, int, string, float...
+				Jerry_set_object_property(obj, name, value)
+			}
+		}
+		return obj
 	}
+
 	log.Println("---> object ", uuid, "is undefined!")
+
 	// The property is undefined.
-	return Jerry_create_undefined()
+	return nil
 }
 
 /**
@@ -496,7 +580,7 @@ func goToJs(value interface{}) Uint32_t {
 				ref, err := GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(data))
 				if err == nil {
 					// In that case an object exist in the case...
-					propValue = GoJavaScript.GetCache().GetJsObject(ref.(*GoJavaScript.ObjectRef).UUID).(Uint32_t)
+					propValue = getJsObjectByUuid(ref.(*GoJavaScript.ObjectRef).UUID)
 				} else {
 					log.Println("--> fail to Create Go object ", string(data), err)
 				}
