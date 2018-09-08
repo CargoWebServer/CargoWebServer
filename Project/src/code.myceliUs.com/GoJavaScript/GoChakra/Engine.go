@@ -149,6 +149,7 @@ func (self *Engine) newRuntime(stop chan bool) *Runtime {
 				} else if action["id"] == "CallFunction" {
 					results := make([]interface{}, 2)
 					results[0], results[1] = jsRuntime.CallFunction(action["name"].(string), action["params"].([]interface{}))
+					log.Println("---> function results: ", results)
 					action["results"].(chan []interface{}) <- results
 				} else if action["id"] == "EvalScript" {
 					// Each script will be call in it own js runtime,
@@ -159,7 +160,6 @@ func (self *Engine) newRuntime(stop chan bool) *Runtime {
 
 					results := make([]interface{}, 2)
 					results[0], results[1] = jsRuntime_.EvalScript(action["script"].(string), action["variables"].([]interface{}))
-					action["results"].(chan []interface{}) <- results
 
 					// Set back global variable after the script was done.
 					for name, src := range self.jsFunctions {
@@ -179,6 +179,7 @@ func (self *Engine) newRuntime(stop chan bool) *Runtime {
 
 					// stop the processing loop.
 					stop_ <- true
+					action["results"].(chan []interface{}) <- results
 
 				} else if action["id"] == "CallObjectMethod" {
 					results := make([]interface{}, 2)
@@ -244,6 +245,13 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
+
+	// Keep the object as global variable.
+	if len(name) > 0 {
+		// Keep an object reference in the global variable map in that
+		// case.
+		self.variables[name] = GoJavaScript.NewObjectRef(uuid)
+	}
 
 	action := make(map[string]interface{})
 	action["id"] = "CreateObject"
@@ -418,7 +426,7 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
  */
 func (self *Engine) RegisterGoFunction(name string) {
 	// Keep the go function in memory...
-	if Utility.Contains(self.goFunctions, name) {
+	if !Utility.Contains(self.goFunctions, name) {
 		self.goFunctions = append(self.goFunctions, name)
 	}
 
@@ -469,9 +477,6 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 	action["results"] = make(chan []interface{}, 0)
 	self.actions <- action
 	results := <-action["results"].(chan []interface{})
-
-	log.Println("---> call function result: ", results)
-
 	var err error
 	if results[1] != nil {
 		err = results[1].(error)
@@ -487,6 +492,7 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
  * running the script.
  */
 func (self *Engine) EvalScript(script string, variables []interface{}) (GoJavaScript.Value, error) {
+	//log.Println("---> 493 ", getCurrentContext(), script)
 	action := make(map[string]interface{})
 	action["id"] = "EvalScript"
 	action["script"] = script

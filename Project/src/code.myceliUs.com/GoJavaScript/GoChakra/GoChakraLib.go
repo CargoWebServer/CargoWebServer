@@ -19,7 +19,7 @@ _In_ JsValueRef value,
         _Out_opt_ char* buffer,
         _In_ size_t bufferSize);
 
-extern void setNativeFunctionHandler(const char* callbackName, JsValueRef obj);
+extern JsValueRef createNativeFunctionHandler(const char* callbackName);
 extern void setNativeObjectDeleteCallback(_In_ JsRef ref, _In_opt_ void *callbackState);
 
 */
@@ -169,11 +169,11 @@ func NewValue(ptr uintptr) *GoJavaScript.Value {
 func getJsObjectByUuid(uuid string) uintptr {
 	// So here I will try to create a local Js representation of the object.
 	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
-
 	if err == nil {
+		log.Println("---> ", objInfos)
+
 		// So here I got an object map info.
 		var obj uintptr
-
 		JsCreateObject(&obj)
 
 		// Set the uuid property.
@@ -194,11 +194,14 @@ func getJsObjectByUuid(uuid string) uintptr {
 		// Now I will set the object method.
 		methods := objInfos.(map[string]interface{})["Methods"].(map[string]interface{})
 		for name, src := range methods {
-			if len(src.(string)) == 0 {
+			src_ := src.(string)
+			if len(src_) == 0 {
 				// Set the go function here.
 				cstr := C.CString(name)
 				defer C.free(unsafe.Pointer(cstr))
-				C.setNativeFunctionHandler(cstr, C.JsValueRef(obj))
+				fct := uintptr(C.createNativeFunctionHandler(cstr))
+				JsSetObjectPropertyByName(obj, name, fct)
+
 			} else {
 				// append the object function here.
 				appendJsFunction(obj, name, src.(string))
@@ -249,7 +252,6 @@ func getJsObjectByUuid(uuid string) uintptr {
 		}
 		return obj
 	}
-
 	log.Println("---> object ", uuid, "is undefined!")
 
 	// The property is undefined.
@@ -337,12 +339,10 @@ func goToJs(value interface{}) uintptr {
 	} else if typeOf.Kind() == reflect.Slice {
 		// So here I will create a array and put value in it.
 		s := reflect.ValueOf(value)
-
 		err := getError(JsCreateArray(uint(s.Len()), &val))
 		if err != nil {
 			log.Println("--> fail to create number array value", value)
 		}
-
 		for i := 0; i < s.Len(); i++ {
 			// I will get element by index.
 			e := goToJs(s.Index(i).Interface())
@@ -357,19 +357,11 @@ func goToJs(value interface{}) uintptr {
 	} else if typeOf.String() == "GoJavaScript.ObjectRef" {
 		// I got a Js object reference.
 		uuid := value.(GoJavaScript.ObjectRef).UUID
-		val = getJsObjectByUuid(uuid)
-		if val == uintptr(0) {
-			// If the object is not in the cache...
-			log.Panicln("----> object ", uuid, " dosent exist anymore!")
-		}
+		return getJsObjectByUuid(uuid)
 	} else if typeOf.String() == "*GoJavaScript.ObjectRef" {
 		// I got a Js object reference.
 		uuid := value.(*GoJavaScript.ObjectRef).UUID
-		val = getJsObjectByUuid(uuid)
-		if val == uintptr(0) {
-			// If the object is not in the cache...
-			log.Panicln("----> object ", uuid, " dosent exist anymore!")
-		}
+		return getJsObjectByUuid(uuid)
 	} else if typeOf.String() == "map[string]interface {}" {
 		// In that case I will create a object from the value found in the map
 		// and return it as prop value.
@@ -378,9 +370,8 @@ func goToJs(value interface{}) uintptr {
 			if value.(map[string]interface{})["TYPENAME"] != nil {
 				ref, err := GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(data))
 				if err == nil {
-					// In that case an object exist in the case...
+					// Get back it reference from the client side.
 					val = getJsObjectByUuid(ref.(*GoJavaScript.ObjectRef).UUID)
-					// GoJavaScript.GetCache().GetJsObject(ref.(*GoJavaScript.ObjectRef).UUID).(uintptr)
 				} else {
 					log.Println("--> fail to Create Go object ", string(data), err)
 				}
@@ -733,6 +724,7 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 	if !JsIsUndefined(fctName) {
 		name, err := jsToGo(fctName)
 		if err == nil {
+			log.Println("---> 735 try to call function name: ", name)
 			size := unsafe.Sizeof(uintptr(0))
 			params := make([]interface{}, 0)
 			var thisPtr uintptr
@@ -760,6 +752,7 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 				if err == nil {
 					uuid, _ := jsToGo(propUuid_)
 					result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
+					log.Println("---> 766 call function: ", propUuid_, name, " with result ", result)
 					if err == nil && result != nil {
 						return C.JsValueRef(goToJs(result))
 					} else if err != nil {
@@ -771,6 +764,7 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 			} else {
 				// There is no function owner I will simply call go function.
 				result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
+				log.Println("---> 772 call function: ", name, " with result ", result)
 				if err == nil && result != nil {
 					return C.JsValueRef(goToJs(result))
 				} else if err != nil {
@@ -778,6 +772,8 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 				}
 			}
 		}
+	} else {
+		log.Panicln("---> invalid function pointer call!")
 	}
 
 	return nil

@@ -421,8 +421,8 @@ func (self *Client) RegisterGoFunction(name string, fct interface{}) {
 
 	// Append the name parameter.
 	action.AppendParam("name", name)
-
 	action = self.peer.CallRemoteAction(action)
+
 }
 
 /**

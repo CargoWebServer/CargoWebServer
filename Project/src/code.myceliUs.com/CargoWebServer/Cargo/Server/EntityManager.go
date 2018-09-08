@@ -1232,7 +1232,6 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 //    )
 //}
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
-
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	if store == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("There is no store with id '"+storeId+"'."))

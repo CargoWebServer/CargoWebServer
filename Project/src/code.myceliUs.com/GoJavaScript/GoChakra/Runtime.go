@@ -45,26 +45,13 @@ void setNativeObjectDeleteCallback(_In_ JsRef ref, _In_opt_ void *callbackState)
 extern JsValueRef nativeFunctionHandler(JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount, void *callbackState);
 
 // Set a go function.
-void setNativeFunctionHandler(const char* callbackName, JsValueRef obj){
-
-	// create the property id from name.
-	JsPropertyIdRef propertyId;
-
-	// create property id
-	JsCreatePropertyId(callbackName, strlen(callbackName), &propertyId);
-
-	// Create a function. (callee)
-	JsValueRef function;
-
+JsValueRef createNativeFunctionHandler(const char* callbackName){
+	// Create the name property.
 	JsValueRef functionName;
 	JsCreateString(callbackName, strlen(callbackName), &functionName);
-
+	JsValueRef function;
 	JsCreateNamedFunction(functionName, nativeFunctionHandler, nullptr, &function);
-
-
-	// Set the js property to object.
-	JsSetProperty(obj, propertyId, function, true);
-
+	return  function;
 }
 
 */
@@ -153,6 +140,11 @@ func (self *Runtime) CreateObject(uuid string, name string) {
 
 	// Set the uuid property.
 	JsSetObjectPropertyByName(obj, "uuid_", uuid)
+
+	if len(name) > 0 {
+		// Set the object as global object propertie in that particular case.
+		JsSetObjectPropertyByName(getGlobalObject(), name, obj)
+	}
 
 	// Set native object to the object.
 	C.setNativeObjectDeleteCallback(C.JsRef(obj), nil)
@@ -293,7 +285,9 @@ func (self *Runtime) SetGoObjectMethod(uuid, name string) error {
 	if JsIsObject(obj) {
 		cstr := C.CString(name)
 		defer C.free(unsafe.Pointer(cstr))
-		C.setNativeFunctionHandler(cstr, C.JsValueRef(obj))
+		//C.setNativeFunctionHandler(cstr, C.JsValueRef(obj))
+		fct := uintptr(C.createNativeFunctionHandler(cstr))
+		JsSetObjectPropertyByName(obj, name, fct)
 		return nil
 	}
 
@@ -331,9 +325,11 @@ func (self *Runtime) CallObjectMethod(uuid string, name string, params ...interf
  * Register a go function in JS
  */
 func (self *Runtime) RegisterGoFunction(name string) {
+	log.Println("---> 334 register go function: ", name, getCurrentContext())
 	cstr := C.CString(name)
 	defer C.free(unsafe.Pointer(cstr))
-	C.setNativeFunctionHandler(cstr, C.JsValueRef(getGlobalObject()))
+	fct := uintptr(C.createNativeFunctionHandler(cstr))
+	JsSetObjectPropertyByName(getGlobalObject(), name, fct)
 }
 
 /**
@@ -354,8 +350,9 @@ func (self *Runtime) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Runtime) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
-	log.Println("---> call ", name, getCurrentContext())
+	log.Println("---> call ", name, params, getCurrentContext())
 	val, err := callJsFunction(getGlobalObject(), name, params)
+	log.Println("---> result: ", val, " error ", err)
 	// Call function on the global object here.
 	return *NewValue(val), err
 }
@@ -380,4 +377,6 @@ func (self *Runtime) EvalScript(script string, variables []interface{}) (GoJavaS
 
 func (self *Runtime) Clear() {
 	/* Cleanup the script Runtime. */
+	//JsSetCurrentContext()
+	JsDisposeRuntime(self.runtime)
 }

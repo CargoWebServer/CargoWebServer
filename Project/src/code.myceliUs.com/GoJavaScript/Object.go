@@ -1,6 +1,6 @@
 package GoJavaScript
 
-//import "log"
+import "log"
 import "code.myceliUs.com/Utility"
 import "reflect"
 
@@ -127,6 +127,8 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 	action.AppendParam("params", params)
+
+	log.Println("----> call remote action from the client to the server: ", name, params)
 
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)

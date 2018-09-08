@@ -70,6 +70,11 @@ func (self *Person) Name() string {
 	return self.FirstName + " " + self.LastName
 }
 
+// Return a object, also recursive.
+func (self *Person) Myself() *Person {
+	return self
+}
+
 // A method that use a Go type as pointer.
 func (self *Person) SayHelloTo(to *Person) string {
 	return self.FirstName + " say hello to " + to.Name() + "!"
@@ -103,7 +108,7 @@ func PrintValue(value interface{}) {
 	log.Println(value)
 }
 
-var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "jerryscript" /*, "chakracore"*/)
+var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081 /*"jerryscript"*/, "chakracore")
 
 /**
  * Simple Hello world test.
@@ -239,6 +244,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 func TestRegisterGoObject(t *testing.T) {
 
 	engine.RegisterGoFunction("print", PrintValue)
+	engine.RegisterGoFunction("GetPerson", GetPerson)
 
 	// Create the object to register.
 	engine.RegisterGoType((*Person)(nil))
@@ -255,15 +261,18 @@ func TestRegisterGoObject(t *testing.T) {
 	// Eval script that contain Go object in it.
 	engine.EvalScript("Test1();", []interface{}{})
 
-	// Now I will try to register a function that return a Go type and use it
-	// result to access it contact.
-	engine.RegisterGoFunction("GetPerson", GetPerson)
-
 	// Eval single return type (not array)
 	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
 	// Eval array...
 	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+
+	// Eval object chain call...
+	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
+
+	// I will now register a function that call GetPerson in it.
+	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
+	engine.CallFunction("SayHelloToContact", []interface{}{1})
 }
 
 /**

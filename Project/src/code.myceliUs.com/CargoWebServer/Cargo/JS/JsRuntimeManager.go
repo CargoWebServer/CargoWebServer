@@ -793,7 +793,7 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	log.Println("---> create a new vm for session: ", sessionId)
 
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1", this.m_startPort, "jerryscript" /* "chakracore"*/)
+	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1", this.m_startPort, "jerryscript" /*"chakracore"*/)
 
 	this.m_startPort += 1
 
