@@ -592,9 +592,6 @@ func goToJs(value interface{}) Uint32_t {
 			}
 		}
 	} else if typeOf.Kind() == reflect.Struct {
-		log.Panicln("---> type is a struct ", typeOf.String())
-
-	} else if typeOf.Kind() == reflect.Struct {
 		val, err := Utility.ToMap(value)
 		if err == nil {
 			return goToJs(val)

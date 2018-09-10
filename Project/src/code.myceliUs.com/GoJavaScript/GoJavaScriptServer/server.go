@@ -5,6 +5,7 @@ import (
 
 	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/GoJavaScript/GoChakra"
+	"code.myceliUs.com/GoJavaScript/GoDuktape"
 	"code.myceliUs.com/GoJavaScript/GoJerryScript"
 )
 
@@ -46,10 +47,8 @@ func NewServer(address string, port int, name string) *Server {
 	// The engine.
 	if name == "jerryscript" {
 		server.engine = new(GoJerryScript.Engine)
-	} else if name == "otto" {
-		/** implement it **/
-	} else if name == "v8" {
-		/** implement it **/
+	} else if name == "duktape" {
+		server.engine = new(GoDuktape.Engine)
 	} else if name == "chakracore" {
 		server.engine = new(GoChakra.Engine)
 	}
