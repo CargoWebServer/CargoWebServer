@@ -89,19 +89,21 @@ func (self *Value) IsUndefined() bool {
 }
 
 func (self *Value) IsNumber() bool {
-	if reflect.TypeOf(self.Val).Kind() == reflect.Float32 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Float64 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Int ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Int8 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Int16 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Int32 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Int64 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Uint ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Uint8 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Uint16 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Uint32 ||
-		reflect.TypeOf(self.Val).Kind() == reflect.Uint64 {
-		return true
+	if self.Val != nil {
+		if reflect.TypeOf(self.Val).Kind() == reflect.Float32 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Float64 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Int ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Int8 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Int16 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Int32 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Int64 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Uint ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Uint8 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Uint16 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Uint32 ||
+			reflect.TypeOf(self.Val).Kind() == reflect.Uint64 {
+			return true
+		}
 	}
 	return false
 }

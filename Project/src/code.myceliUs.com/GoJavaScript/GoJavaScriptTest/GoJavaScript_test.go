@@ -171,76 +171,78 @@ func TestArray(t *testing.T) {
 	}
 }
 
-///**
-// * Test calling a go function from JS.
-// */
-//func TestGoFunction(t *testing.T) {
+/**
+ * Test calling a go function from JS.
+ */
+func TestGoFunction(t *testing.T) {
 
-//	// First of all I will register the tow go function in the Engine.
-//	engine.RegisterGoFunction("AddNumber", AddNumber)
-//	engine.RegisterGoFunction("Print", PrintValue)
-//	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); Print("The result is:" + result); return result;}`)
-//	addNumberResult, err := engine.CallFunction("TestAddNumber")
+	// First of all I will register the tow go function in the Engine.
+	engine.RegisterGoFunction("AddNumber", AddNumber)
+	engine.RegisterGoFunction("Print", PrintValue)
+	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); Print("The result is:" + result); return result;}`)
+	addNumberResult, err := engine.CallFunction("TestAddNumber")
 
-//	if err == nil {
-//		t.Log("Add number result: ", addNumberResult)
-//	}
+	if err == nil {
+		t.Log("Add number result: ", addNumberResult)
+	}
 
-//}
+}
 
-//func TestGlobalVariable(t *testing.T) {
+func TestGlobalVariable(t *testing.T) {
 
-//	// First of all I will register the tow go function in the Engine.
-//	var toto = "This is Java"
-//	engine.SetGlobalVariable("toto", toto)
+	// First of all I will register the tow go function in the Engine.
+	var toto = "This is Java"
+	engine.SetGlobalVariable("toto", toto)
 
-//	toto_, _ := engine.GetGlobalVariable("toto")
-//	toto__, _ := toto_.Export()
+	toto_, _ := engine.GetGlobalVariable("toto")
+	toto__, _ := toto_.Export()
 
-//	if toto__ != toto {
-//		t.Log("Set/Get global variables fail! ")
-//	}
+	if toto__ != toto {
+		t.Log("Set/Get global variables fail! ")
+	}
 
-//}
+}
 
-//func TestCreateJsObjectFromGo(t *testing.T) {
+/**
+ * Test creating JavaScript function and calling
+ */
+func TestCreateJsObjectFromGo(t *testing.T) {
 
-//	engine.RegisterGoFunction("print", PrintValue)
+	engine.RegisterGoFunction("print", PrintValue)
 
-//	// First of all I will create the object.
-//	obj := engine.CreateObject("test")
+	// First of all I will create the object.
+	obj := engine.CreateObject("test")
 
-//	// Set a property on test.
-//	obj.Set("number", 1.01)
+	// Set a property on test.
+	obj.Set("number", 1.01)
 
-//	number, err := obj.Get("number")
-//	if err == nil {
-//		number_, _ := number.ToFloat()
-//		if number_ != 1.01 {
-//			t.Error("---> fail to get object property!")
-//		}
-//	}
+	number, err := obj.Get("number")
+	if err == nil {
+		number_, _ := number.ToFloat()
+		if number_ != 1.01 {
+			t.Error("---> fail to get object property!")
+		}
+	}
 
-//	// Now set a go function.
-//	obj.Set("add", AddNumber)
+	// Now set a go function.
+	obj.Set("add", AddNumber)
 
-//	// and call the go function on the object.
-//	addReuslt, _ := obj.Call("add", 2, 3)
-//	addReuslt_, _ := addReuslt.ToFloat()
-//	if addReuslt_ != 5.0 {
-//		t.Error("---> fail to get object property!")
-//	}
+	// set a Js function on the object.
+	obj.SetJsMethode("helloTo", `function helloTo(to){print("Hello " + to + "!"); return "Hello " + to + "!";}`)
 
-//	// set a Js function on the object.
-//	obj.SetJsMethode("helloTo", `function helloTo(to){print("Hello " + to + "!"); return "Hello " + to + "!";}`)
+	// and call the go function on the object.
+	addReuslt, _ := obj.Call("add", 2, 3)
+	addReuslt_, _ := addReuslt.ToFloat()
+	if addReuslt_ != 5.0 {
+		t.Error("---> fail to get object property!")
+	}
 
-//	helloToResult, _ := obj.Call("helloTo", "Java")
-//	helloToResult_, _ := helloToResult.ToString()
-//	if helloToResult_ != "Hello Java!" {
-//		t.Error("---> fail to set js property!")
-//	}
-
-//}
+	helloToResult, _ := obj.Call("helloTo", "Java")
+	helloToResult_, _ := helloToResult.ToString()
+	if helloToResult_ != "Hello Java!" {
+		t.Error("---> fail to set js property!")
+	}
+}
 
 //func TestRegisterGoObject(t *testing.T) {
 

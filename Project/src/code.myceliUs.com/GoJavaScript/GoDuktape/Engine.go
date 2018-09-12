@@ -14,13 +14,31 @@ duk_context_ptr create_default_context(){
 }
 
 // Clear the default context.
-void eval_string(duk_context_ptr context, const char* src){
-	duk_eval_string(context,src);
+duk_int_t eval_string(duk_context_ptr context, const char* src){
+	return duk_peval_string(context,src);
 }
 
-// Compile a script.
-void compile(duk_context_ptr context, int flags){
-	duk_compile(context, flags);
+extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src){
+	return duk_pcompile_string(ctx, DUK_COMPILE_FUNCTION, src);
+}
+
+const char* safe_to_string(duk_context_ptr ctx, duk_idx_t index){
+	return duk_safe_to_string(ctx, index);
+}
+
+// The function handler.
+extern duk_ret_t c_function_handler(duk_context_ptr ctx);
+
+// Set C function handler.
+duk_idx_t push_c_function(duk_context_ptr ctx, const char* name){
+	duk_idx_t fct_idx = duk_push_c_function(ctx, c_function_handler, DUK_VARARGS);
+
+	// Set the function name as property...
+	duk_push_string(ctx, "name");
+	duk_push_string(ctx, name);
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE);
+
+	return fct_idx;
 }
 
 */
@@ -30,7 +48,7 @@ import "unsafe"
 import "code.myceliUs.com/GoJavaScript"
 
 //import "reflect"
-
+import "errors"
 import "log"
 
 /**
@@ -111,7 +129,21 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
+	log.Println("--> create object: ", uuid, name)
+	obj_idx := C.duk_push_object(self.context)
 
+	// Now I will set the uuid property.
+	uuid_ := C.CString(uuid)
+	C.duk_push_string(self.context, uuid_)
+	C.free(unsafe.Pointer(uuid_))
+	uuid_ = C.CString("uuid_")
+	C.duk_put_prop_string(self.context, obj_idx, uuid_)
+	C.free(unsafe.Pointer(uuid_))
+
+	if len(name) > 0 {
+		name_ := C.CString(name)
+		C.duk_put_global_string(self.context, name_)
+	}
 }
 
 /**
@@ -177,6 +209,54 @@ func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
  */
 func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (GoJavaScript.Value, error) {
 	var value GoJavaScript.Value
+	value.TYPENAME = "GoJavaScript.Value"
+
+	// I will get (create the object on the stack)
+	getJsObjectByUuid(uuid, self.context)
+
+	// go to the object position.
+	uuid_ := C.CString(uuid)
+	C.duk_get_global_string(self.context, uuid_)
+
+	// get the object position.
+	log.Println("---> try to call propertie: ", name)
+
+	// Set the function name to be call
+	cstr := C.CString(name)
+	C.duk_push_string(self.context, cstr)
+	defer C.free(unsafe.Pointer(cstr))
+
+	// Put the method in the context.
+	C.duk_get_prop_string(self.context, C.int(-2), cstr)
+
+	// Put the this object pointer.
+	C.duk_dup(self.context, -2)
+
+	// Set the arguments...
+	for i := 0; i < len(params); i++ {
+		// So here I will set argument on the context.
+		log.Println("---> param : ", params[i])
+		setValue(self.context, params[i])
+	}
+
+	// Call the method.
+	if int(C.duk_pcall_method(self.context, C.int(len(params)))) == 0 {
+		// Now the result is at -1
+		v, err := getValue(self.context, -1)
+		if err == nil {
+			log.Println("---> result ", v)
+			value.Val = v
+		}
+
+		// remove the result from the stack.
+		C.duk_pop(self.context) // Pop the call result.
+	} else {
+		err := errors.New(C.GoString(C.safe_to_string(self.context, -1)))
+		log.Println("268 ---> error found!", err)
+		return value, err
+	}
+	C.duk_pop(self.context) // Pop the instance.
+
 	return value, nil
 }
 
@@ -187,6 +267,13 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
  */
 func (self *Engine) RegisterGoFunction(name string) {
 
+	// Keep the go function in memory...
+	cstr := C.CString(name)
+	C.push_c_function(self.context, cstr)
+	C.duk_put_global_string(self.context, cstr)
+
+	// The propertie name value
+	C.free(unsafe.Pointer(cstr))
 }
 
 /**
@@ -199,10 +286,12 @@ func (self *Engine) RegisterGoFunction(name string) {
  */
 func (self *Engine) RegisterJsFunction(name string, src string) error {
 	cstr := C.CString(src)
+	defer C.free(unsafe.Pointer(cstr))
 
 	// eval the script.
-	C.eval_string(self.context, cstr)
-	C.free(unsafe.Pointer(cstr))
+	if int(C.eval_string(self.context, cstr)) != 0 {
+		return errors.New(C.GoString(C.safe_to_string(self.context, -1)))
+	}
 	return nil
 }
 
@@ -212,8 +301,8 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
 func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
 	var value GoJavaScript.Value
 	value.TYPENAME = "GoJavaScript.Value"
-
 	cstr := C.CString(name)
+
 	// Set the property at top of the stack.
 	ret := C.int(C.duk_get_global_string(self.context, cstr))
 	C.free(unsafe.Pointer(cstr))
@@ -231,7 +320,6 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 		// Now the result is at -1
 		v, err := getValue(self.context, -1)
 		if err == nil {
-			log.Println("---> v ", v)
 			value.Val = v
 		}
 
