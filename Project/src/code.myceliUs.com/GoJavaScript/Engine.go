@@ -130,8 +130,7 @@ type Engine interface {
 	 * Parse and set a function in the Javascript.
 	 * name The name of the function (the function will be keep in the engine for it
 	 *      lifetime.
-	 * args The argument name for that function.
-	 * src  The body of the function
+	 * src  The source of the function.
 	 * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
 	 */
 	RegisterJsFunction(name string, src string) error

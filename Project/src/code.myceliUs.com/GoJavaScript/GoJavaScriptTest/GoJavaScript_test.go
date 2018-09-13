@@ -244,39 +244,39 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 	}
 }
 
-//func TestRegisterGoObject(t *testing.T) {
+func TestRegisterGoObject(t *testing.T) {
 
-//	engine.RegisterGoFunction("print", PrintValue)
-//	engine.RegisterGoFunction("GetPerson", GetPerson)
+	engine.RegisterGoFunction("print", PrintValue)
 
-//	// Create the object to register.
-//	engine.RegisterGoType((*Person)(nil))
+	// Create the object to register.
+	engine.RegisterGoType((*Person)(nil))
 
-//	p := GetPerson()
+	p := GetPerson()
 
-//	// Here I will register a go Object in JavaScript and set
-//	// it as global variable named Dave.
-//	engine.SetGlobalVariable("Dave", p)
+	// Here I will register a go Object in JavaScript and set
+	// it as global variable named Dave.
+	engine.SetGlobalVariable("Dave", p)
 
-//	// Now I will eval sricpt on it...
-//	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
+	// Now I will eval sricpt on it...
+	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() /*+ ' your first contacts is ' + Dave.GetContacts()[0].Name()*/)}`)
 
-//	// Eval script that contain Go object in it.
-//	engine.EvalScript("Test1();", []interface{}{})
+	// Eval script that contain Go object in it.
+	engine.EvalScript("Test1();", []interface{}{})
 
-//	// Eval single return type (not array)
-//	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
+	//	// Eval single return type (not array)
+	//	engine.RegisterGoFunction("GetPerson", GetPerson)
+	//	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
-//	// Eval array...
-//	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+	//	// Eval array...
+	//	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
 
-//	// Eval object chain call...
-//	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
+	//	// Eval object chain call...
+	//	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
 
-//	// I will now register a function that call GetPerson in it.
-//	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
-//	engine.CallFunction("SayHelloToContact", []interface{}{1})
-//}
+	//	// I will now register a function that call GetPerson in it.
+	//	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
+	//	engine.CallFunction("SayHelloToContact", []interface{}{1})
+}
 
 ///**
 // * Test calling a go function from JS.

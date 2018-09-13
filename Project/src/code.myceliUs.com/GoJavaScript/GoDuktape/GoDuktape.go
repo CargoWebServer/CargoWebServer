@@ -8,7 +8,8 @@ extern duk_idx_t push_c_function(duk_context_ptr ctx, const char* name);
 extern duk_int_t eval_string(duk_context_ptr context, const char* src);
 extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src);
 extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t index);
-
+extern duk_bool_t is_error(duk_context_ptr ctx, duk_idx_t index);
+extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t idx);
 */
 import "C"
 import "reflect"
@@ -105,13 +106,17 @@ func isFunction(ctx C.duk_context_ptr, index int) bool {
 	return false
 }
 
+func isError(ctx C.duk_context_ptr, index int) bool {
+
+	return int(C.is_error(ctx, C.int(index))) > 0
+}
+
 // Retreive an object by it uuid as a global object property.
 func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 	// So here I will try to create a local Js representation of the object.
 	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
 	log.Println("----> object infos: ", objInfos)
-
 	if err == nil {
 		// So here I got an object map info.
 		// Create the object JS object.
@@ -124,7 +129,8 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 		uuid_name := C.CString("uuid_")
 		C.duk_put_prop_string(ctx, obj_idx, uuid_name)
-		C.free(unsafe.Pointer(uuid_name))
+
+		defer C.free(unsafe.Pointer(uuid_name))
 
 		// Now I will set the object method.
 		methods := objInfos.(map[string]interface{})["Methods"].(map[string]interface{})
@@ -152,46 +158,59 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 		// Now the object properties.
 		for name, value := range objInfos.(map[string]interface{}) {
+			cname := C.CString(name)
 			if reflect.TypeOf(value).Kind() == reflect.Slice {
 				slice := reflect.ValueOf(value)
-				values := jerry_value_t_To_uint32_t(C.create_array(C.uint32_t(slice.Len())))
+				values := C.duk_push_array(ctx)
 				for i := 0; i < slice.Len(); i++ {
 					e := slice.Index(i).Interface()
 					if reflect.TypeOf(e).Kind() == reflect.Map {
 						// Here The value contain a map... so I will append
 						if e.(map[string]interface{})["TYPENAME"] != nil {
 							if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-								value_ := getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string))
-								r := C.set_property_by_index(uint32_t_To_Jerry_value_t(values), C.uint32_t(uint32(i)), uint32_t_To_Jerry_value_t(goToJs(value_)))
-								// Release the result
-								Jerry_release_value(jerry_value_t_To_uint32_t(r))
+								// Here I will pup the object in the stack value.
+								getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
+								uuid_ := C.CString(e.(map[string]interface{})["UUID"].(string))
+								C.duk_get_global_string(ctx, uuid_)
+								C.duk_put_prop_index(ctx, values, C.uint(i))
+								C.free(unsafe.Pointer(uuid_))
+								// pup back to the parent object.
+								C.duk_pop(ctx)
 							}
 						} else {
 							log.Println("---> unknow object propertie type 231")
 						}
 					} else {
-						r := C.set_property_by_index(uint32_t_To_Jerry_value_t(values), C.uint32_t(uint32(i)), uint32_t_To_Jerry_value_t(goToJs(e)))
+						// set the value on the stack.
+						setValue(ctx, e)
 						// Release the result
-						Jerry_release_value(jerry_value_t_To_uint32_t(r))
+						C.duk_put_prop_index(ctx, values, C.uint(i))
+						log.Println("---> 189")
 					}
 				}
-				Jerry_set_object_property(obj, name, values)
-
+				C.duk_put_prop_string(ctx, obj_idx, cname)
 			} else if reflect.TypeOf(value).Kind() == reflect.Map {
 				if value.(map[string]interface{})["TYPENAME"] != nil {
 					if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-						value_ := getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string))
-						Jerry_set_object_property(obj, name, value_)
+						getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
+						uuid_ := C.CString(value.(map[string]interface{})["UUID"].(string))
+						C.duk_get_global_string(ctx, uuid_)
+						C.duk_put_prop_string(ctx, obj_idx, cname)
+						C.free(unsafe.Pointer(uuid_))
+						// pup back to the parent object.
+						C.duk_pop(ctx)
 					} else {
 						log.Println("---> unknow object propertie type 245")
 					}
 				}
 			} else {
 				// Standard object property, int, string, float...
-				Jerry_set_object_property(obj, name, value)
+				setValue(ctx, value)
+				C.duk_put_prop_string(ctx, obj_idx, cname)
 			}
-		}
 
+			C.free(unsafe.Pointer(cname))
+		}
 		// set on the global object.
 		C.duk_put_global_string(ctx, uuid_value)
 
@@ -199,15 +218,16 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 		if objInfos.(map[string]interface{})["Name"] != nil {
 			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
 				// set is name as global object property
+				C.duk_get_global_string(ctx, uuid_value)
 				name_ := C.CString(objInfos.(map[string]interface{})["Name"].(string))
 				C.duk_put_global_string(ctx, name_)
 				C.free(unsafe.Pointer(name_))
 			}
 		}
 
+		// set the current stack value at object
+		C.duk_get_global_string(ctx, uuid_value)
 	}
-
-	log.Println("---> object ", uuid, "is undefined!")
 }
 
 /**
@@ -293,11 +313,58 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 				C.duk_pop(ctx)
 			}
 			return array, nil
+		} else if isFunction(ctx, index) {
+			log.Println("---> is a function: 309")
+		} else if isError(ctx, index) {
+			stack := C.CString("stack")
+			C.duk_get_prop_string(ctx, C.int(-1), stack)
+			err := errors.New(C.GoString(C.safe_to_string(ctx, C.int(-1))))
+			C.free(unsafe.Pointer(stack))
+			log.Println("323 ----> ", err)
+			return nil, err
 		} else {
-			// The object is an object
+			// The go object will be a copy of the Js object.
+			uuid_name := C.CString("uuid_")
+			log.Println("---> object: ", C.GoString(C.duk_to_string(ctx, C.int(index))))
+			if int(C.duk_has_prop_string(ctx, C.int(-1), uuid_name)) > 0 {
+				log.Println("312 ---> uuid found!")
+				/*uuid_ := Jerry_get_object_property(input, "uuid_")
+				defer Jerry_release_value(uuid_)
 
+				// Get the uuid string.
+				uuid, _ := jsToGo(uuid_)
+
+				// Return and object reference.
+				value = GoJavaScript.NewObjectRef(uuid.(string))*/
+			} else {
+				log.Println("---> no uuid found!")
+			}
+
+			/*else {
+				stringified := Jerry_json_stringfy(input)
+				// if there is no error
+				if !Jerry_value_is_error(stringified) {
+					jsonStr := jsStrToGoStr(stringified)
+					if strings.Index(jsonStr, "TYPENAME") != -1 {
+						// So here I will create a remote action and tell the client to
+						// create a Go object from jsonStr. The object will be set by
+						// the client on the server.
+						return GoJavaScript.CallGoFunction("Client", "CreateGoObject", jsonStr)
+					}
+
+					// In that case the object has no go representation...
+					// and must be use only in JS.
+					return nil, nil
+				} else {
+					// Continue any way with nil object instead of an error...
+					return nil, nil //errors.New("fail to stringfy object!")
+				}
+			}*/
+			C.free(unsafe.Pointer(uuid_name))
 		}
+
 	}
+
 	return nil, errors.New("no value found at index " + strconv.Itoa(index))
 }
 
@@ -330,19 +397,31 @@ func c_function_handler(ctx C.duk_context_ptr) C.duk_ret_t {
 
 	// Now I will get the this
 	C.duk_push_this(ctx)
-	uuid_ := C.CString("uuid_")
-	C.duk_push_string(ctx, uuid_)
-	C.free(unsafe.Pointer(uuid_))
-
-	if int(C.duk_has_prop(ctx, -3)) > 0 {
-		C.duk_pop(ctx)
+	if isObject(ctx, -1) {
+		uuid_ := C.CString("uuid_")
+		C.duk_push_string(ctx, uuid_)
+		defer C.free(unsafe.Pointer(uuid_))
+		if int(C.duk_has_prop_string(ctx, -2, uuid_)) > 0 {
+			C.duk_get_prop_string(ctx, -2, uuid_)
+			uuid, _ := getValue(ctx, -1)
+			C.duk_pop(ctx) // remove this
+			// I will now call the function.
+			result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
+			log.Println("412 ---> result is ", result)
+			if err == nil && result != nil {
+				// So here I will set the value
+				setValue(ctx, result)
+				return C.duk_ret_t(1)
+			} else if err != nil {
+				// error occured here.
+			}
+		}
 	} else {
-		C.duk_pop(ctx)
+		C.duk_pop(ctx) // remove this...
 		result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
+		log.Println("425 ---> result ", result)
 		if err == nil && result != nil {
-			// So here I will set the value
 			setValue(ctx, result)
-			// return value at top.
 			return C.duk_ret_t(1)
 		} else if err != nil {
 			// error occured here.

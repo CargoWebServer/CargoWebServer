@@ -22,10 +22,6 @@ extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src){
 	return duk_pcompile_string(ctx, DUK_COMPILE_FUNCTION, src);
 }
 
-const char* safe_to_string(duk_context_ptr ctx, duk_idx_t index){
-	return duk_safe_to_string(ctx, index);
-}
-
 // The function handler.
 extern duk_ret_t c_function_handler(duk_context_ptr ctx);
 
@@ -39,6 +35,14 @@ duk_idx_t push_c_function(duk_context_ptr ctx, const char* name){
 	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE);
 
 	return fct_idx;
+}
+
+duk_bool_t is_error(duk_context_ptr ctx, duk_idx_t index){
+	return duk_is_error(ctx, index);
+}
+
+const char* safe_to_string(duk_context_ptr ctx, duk_idx_t idx){
+	return duk_safe_to_string(ctx, idx);
 }
 
 */
@@ -133,9 +137,13 @@ func (self *Engine) CreateObject(uuid string, name string) {
 	obj_idx := C.duk_push_object(self.context)
 
 	// Now I will set the uuid property.
+
+	// uuid value
 	uuid_ := C.CString(uuid)
 	C.duk_push_string(self.context, uuid_)
 	C.free(unsafe.Pointer(uuid_))
+
+	// uuid name
 	uuid_ = C.CString("uuid_")
 	C.duk_put_prop_string(self.context, obj_idx, uuid_)
 	C.free(unsafe.Pointer(uuid_))
@@ -143,6 +151,7 @@ func (self *Engine) CreateObject(uuid string, name string) {
 	if len(name) > 0 {
 		name_ := C.CString(name)
 		C.duk_put_global_string(self.context, name_)
+		C.free(unsafe.Pointer(name_))
 	}
 }
 
@@ -218,9 +227,6 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 	uuid_ := C.CString(uuid)
 	C.duk_get_global_string(self.context, uuid_)
 
-	// get the object position.
-	log.Println("---> try to call propertie: ", name)
-
 	// Set the function name to be call
 	cstr := C.CString(name)
 	C.duk_push_string(self.context, cstr)
@@ -235,7 +241,6 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 	// Set the arguments...
 	for i := 0; i < len(params); i++ {
 		// So here I will set argument on the context.
-		log.Println("---> param : ", params[i])
 		setValue(self.context, params[i])
 	}
 
@@ -244,10 +249,8 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 		// Now the result is at -1
 		v, err := getValue(self.context, -1)
 		if err == nil {
-			log.Println("---> result ", v)
 			value.Val = v
 		}
-
 		// remove the result from the stack.
 		C.duk_pop(self.context) // Pop the call result.
 	} else {
@@ -255,6 +258,7 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 		log.Println("268 ---> error found!", err)
 		return value, err
 	}
+
 	C.duk_pop(self.context) // Pop the instance.
 
 	return value, nil
