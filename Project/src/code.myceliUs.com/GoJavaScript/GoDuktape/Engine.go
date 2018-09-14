@@ -349,15 +349,19 @@ func (self *Engine) EvalScript(src string, variables []interface{}) (GoJavaScrip
 	}
 
 	cstr := C.CString(src)
+	defer C.free(unsafe.Pointer(cstr))
 
 	// eval the script.
-	C.eval_string(self.context, cstr)
+	if int(C.eval_string(self.context, cstr)) != 0 {
+		return value, errors.New(C.GoString(C.safe_to_string(self.context, -1)))
+	}
 
 	// Now the result is at -1
 	v, err := getValue(self.context, -1)
+
 	if err == nil {
 		value.Val = v
 	}
 
-	return value, nil
+	return value, err
 }

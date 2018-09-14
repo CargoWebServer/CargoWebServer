@@ -110,7 +110,6 @@ func setObjectRefs(values []interface{}) []interface{} {
 
 // Call a go function and return it result.
 func (self *Client) callGoFunction(name string, params []interface{}) (interface{}, error) {
-	log.Println("113 ---> call ", name, params)
 	results, err := Utility.CallFunction(name, setObjectRefs(params)...)
 	if err != nil {
 		log.Println("---> call go function ", name, " fail with error: ", err)

@@ -115,6 +115,18 @@ var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "duktape")
  * Simple Hello world test.
  * Start JavaScript interpreter append simple script and run it.
  */
+func TestJavaScriptArrayVariable(t *testing.T) {
+	engine.RegisterGoFunction("print", PrintValue)
+
+	// Register the function SayHelloTo. The function take one parameter.
+	//engine.EvalScript("print('--->', [1,2,3]);", []interface{}{GoJavaScript.NewVariable("arr", []interface{}{1, 2, 3})})
+	engine.EvalScript("var arr=[1,2,3]; print('--->' + arr);", []interface{}{})
+}
+
+/**
+ * Simple Hello world test.
+ * Start JavaScript interpreter append simple script and run it.
+ */
 func TestHelloJava(t *testing.T) {
 
 	// Register the function SayHelloTo. The function take one parameter.
@@ -258,51 +270,52 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.SetGlobalVariable("Dave", p)
 
 	// Now I will eval sricpt on it...
-	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() /*+ ' your first contacts is ' + Dave.GetContacts()[0].Name()*/)}`)
+	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
 	// Eval script that contain Go object in it.
 	engine.EvalScript("Test1();", []interface{}{})
 
-	//	// Eval single return type (not array)
-	//	engine.RegisterGoFunction("GetPerson", GetPerson)
-	//	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
+	// Eval single return type (not array)
+	engine.RegisterGoFunction("GetPerson", GetPerson)
+	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
-	//	// Eval array...
-	//	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+	// Eval array...
+	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
 
-	//	// Eval object chain call...
-	//	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
+	// Eval object chain call...
+	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
 
-	//	// I will now register a function that call GetPerson in it.
-	//	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
-	//	engine.CallFunction("SayHelloToContact", []interface{}{1})
+	// I will now register a function that call GetPerson in it.
+	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
+	engine.CallFunction("SayHelloToContact", []interface{}{1})
 }
 
-///**
-// * Test calling a go function from JS.
-// */
-//func TestCreateGoObjectFromJs(t *testing.T) {
+/**
+ * Test calling a go function from JS.
+ */
+func TestCreateGoObjectFromJs(t *testing.T) {
+	engine.RegisterGoFunction("print", PrintValue)
 
-//	// Test with structure
-//	// The type must be register before being usable by the vm.
-//	engine.RegisterGoType((*Person)(nil))
+	// Test with structure
+	// The type must be register before being usable by the vm.
+	engine.RegisterGoType((*Person)(nil))
 
-//	// Register the dynamic type.
-//	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; return jerry; }`)
-//	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
+	// Register the dynamic type.
+	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; print('---> TestJsToGoStruct ' + jerry ); return jerry; }`)
+	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 
-//	if err != nil {
-//		t.Error("fail to create Go from Js: ", err)
-//	}
+	if err != nil {
+		t.Error("fail to create Go from Js: ", err)
+	}
 
-//	p_, _ := p.Export()
+	p_, _ := p.Export()
 
-//	if err == nil {
-//		t.Log(p_)
-//	} else {
-//		t.Error("test fail!")
-//	}
-//}
+	if err == nil {
+		t.Log(p_)
+	} else {
+		t.Error("test fail!")
+	}
+}
 
 func TestStopJava(t *testing.T) {
 	engine.Stop()
