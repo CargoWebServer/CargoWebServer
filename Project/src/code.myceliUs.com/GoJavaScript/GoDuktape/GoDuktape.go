@@ -19,6 +19,7 @@ import "strconv"
 import "code.myceliUs.com/GoJavaScript"
 import "log"
 import "strings"
+import "encoding/json"
 
 /**
  * Go and Javascript functions bindings.
@@ -294,7 +295,26 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 		uuid := value.(*GoJavaScript.ObjectRef).UUID
 		getJsObjectByUuid(uuid, ctx)
 	} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-		log.Println("----> 291")
+
+		jsonStr, err := json.Marshal(value)
+		if err == nil {
+			if value.(map[string]interface{})["TYPENAME"] != nil {
+				ref, err := GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(jsonStr))
+				if err == nil {
+					// In that case an object exist in the case...
+					getJsObjectByUuid(ref.(*GoJavaScript.ObjectRef).UUID, ctx)
+				} else {
+					log.Println("--> fail to Create Go object ", string(jsonStr), err)
+				}
+			} else {
+				// Not a registered type...
+				cstr := C.CString(string(jsonStr))
+				defer C.free(unsafe.Pointer(cstr))
+				C.duk_push_string(ctx, cstr)
+				C.duk_json_decode(ctx, C.int(-1))
+			}
+		}
+
 	} else {
 		log.Println("----> no type found for ", reflect.TypeOf(value).String(), value)
 	}
