@@ -73,48 +73,6 @@ type Engine interface {
 	CreateObject(uuid string, name string)
 
 	/**
-	 * Set an object property.
-	 * uuid The object reference.
-	 * name The name of the property to set
-	 * value The value of the property
-	 */
-	SetObjectProperty(uuid string, name string, value interface{}) error
-
-	/**
-	 * That function is use to get Js object property
-	 */
-	GetObjectProperty(uuid string, name string) (Value, error)
-
-	/**
-	 * Create an empty array of a given size and set it as object property.
-	 */
-	CreateObjectArray(uuid string, name string, size uint32) error
-
-	/**
-	 * Set an object property.
-	 * uuid The object reference.
-	 * name The name of the property to set
-	 * index The index of the object in the array
-	 * value The value of the property
-	 */
-	SetObjectPropertyAtIndex(uuid string, name string, index uint32, value interface{})
-
-	/**
-	 * That function is use to get Js obeject property
-	 */
-	GetObjectPropertyAtIndex(uuid string, name string, index uint32) (Value, error)
-
-	/**
-	 * set to JS object a Go function.
-	 */
-	SetGoObjectMethod(uuid, name string) error
-
-	/**
-	 * Set to JS object a Js function.
-	 */
-	SetJsObjectMethod(uuid, name string, src string) error
-
-	/**
 	 * Call object methode.
 	 */
 	CallObjectMethod(uuid string, name string, params ...interface{}) (Value, error)

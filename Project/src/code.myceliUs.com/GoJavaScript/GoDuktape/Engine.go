@@ -120,10 +120,10 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
 		} else {
 			return value, err
 		}
+		C.duk_pop(self.context)
 	}
 
 	C.free(unsafe.Pointer(cstr))
-
 	return value, nil
 }
 
@@ -153,64 +153,6 @@ func (self *Engine) CreateObject(uuid string, name string) {
 		C.duk_put_global_string(self.context, name_)
 		C.free(unsafe.Pointer(name_))
 	}
-}
-
-/**
- * Set an object property.
- * uuid The object reference.
- * name The name of the property to set
- * value The value of the property
- */
-func (self *Engine) SetObjectProperty(uuid string, name string, value interface{}) error {
-	return nil
-}
-
-/**
- * That function is use to get Js object property
- */
-func (self *Engine) GetObjectProperty(uuid string, name string) (GoJavaScript.Value, error) {
-	var value GoJavaScript.Value
-	return value, nil
-}
-
-/**
- * Create an empty array of a given size and set it as object property.
- */
-func (self *Engine) CreateObjectArray(uuid string, name string, size uint32) error {
-	return nil
-}
-
-/**
- * Set an object property.
- * uuid The object reference.
- * name The name of the property to set
- * index The index of the object in the array
- * value The value of the property
- */
-func (self *Engine) SetObjectPropertyAtIndex(uuid string, name string, index uint32, value interface{}) {
-
-}
-
-/**
- * That function is use to get Js obeject property
- */
-func (self *Engine) GetObjectPropertyAtIndex(uuid string, name string, index uint32) (GoJavaScript.Value, error) {
-	var value GoJavaScript.Value
-	return value, nil
-}
-
-/**
- * set to JS object a Go function.
- */
-func (self *Engine) SetGoObjectMethod(uuid, name string) error {
-	return nil
-}
-
-/**
- * Set to JS object a Js function.
- */
-func (self *Engine) SetJsObjectMethod(uuid, name string, src string) error {
-	return nil
 }
 
 /**

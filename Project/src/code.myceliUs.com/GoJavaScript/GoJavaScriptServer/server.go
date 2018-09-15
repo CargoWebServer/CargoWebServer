@@ -111,22 +111,8 @@ func (self *Server) processActions() {
 					self.engine.RegisterGoFunction(action.Params[0].Value.(string))
 				} else if action.Name == "CreateObject" {
 					self.engine.CreateObject(action.Params[0].Value.(string), action.Params[1].Value.(string))
-				} else if action.Name == "SetObjectProperty" {
-					self.engine.SetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value)
-				} else if action.Name == "SetGoObjectMethod" {
-					self.engine.SetGoObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string))
-				} else if action.Name == "SetJsObjectMethod" {
-					self.engine.SetJsObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.(string))
-				} else if action.Name == "GetObjectProperty" {
-					action.AppendResults(self.engine.GetObjectProperty(action.Params[0].Value.(string), action.Params[1].Value.(string)))
 				} else if action.Name == "CallObjectMethod" {
 					action.AppendResults(self.engine.CallObjectMethod(action.Params[0].Value.(string), action.Params[1].Value.(string), action.Params[2].Value.([]interface{})...))
-				} else if action.Name == "CreateObjectArray" {
-					action.AppendResults(self.engine.CreateObjectArray(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64))))
-				} else if action.Name == "SetObjectPropertyAtIndex" {
-					self.engine.SetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64)), action.Params[3].Value)
-				} else if action.Name == "GetObjectPropertyAtIndex" {
-					action.AppendResults(self.engine.GetObjectPropertyAtIndex(action.Params[0].Value.(string), action.Params[1].Value.(string), uint32(action.Params[2].Value.(float64))))
 				} else if action.Name == "SetGlobalVariable" {
 					self.engine.SetGlobalVariable(action.Params[0].Value.(string), action.Params[1].Value)
 				} else if action.Name == "GetGlobalVariable" {

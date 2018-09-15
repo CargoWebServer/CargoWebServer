@@ -13,7 +13,7 @@ const (
 	Female
 )
 
-// Golang struct...
+// A simple Go struct that contain array, properties and constant values.
 type Person struct {
 	// Must be GoJavaScript.Person
 	TYPENAME  string
@@ -64,7 +64,7 @@ func GetPerson() *Person {
 	return p
 }
 
-// A simple function.
+// Function that return a string
 func (self *Person) Name() string {
 	log.Println("---> name was called ", self.FirstName+" "+self.LastName)
 	return self.FirstName + " " + self.LastName
@@ -75,7 +75,7 @@ func (self *Person) Myself() *Person {
 	return self
 }
 
-// A method that use a Go type as pointer.
+// A method that take an object as parameter.
 func (self *Person) SayHelloTo(to *Person) string {
 	return self.FirstName + " say hello to " + to.Name() + "!"
 }
@@ -113,19 +113,6 @@ var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "duktape")
 
 /**
  * Simple Hello world test.
- * Start JavaScript interpreter append simple script and run it.
- */
-func TestJavaScriptArrayVariable(t *testing.T) {
-	engine.RegisterGoFunction("print", PrintValue)
-
-	// Register the function SayHelloTo. The function take one parameter.
-	//engine.EvalScript("print('--->', [1,2,3]);", []interface{}{GoJavaScript.NewVariable("arr", []interface{}{1, 2, 3})})
-	engine.EvalScript("var arr=[1,2,3]; print('--->' + arr);", []interface{}{})
-}
-
-/**
- * Simple Hello world test.
- * Start JavaScript interpreter append simple script and run it.
  */
 func TestHelloJava(t *testing.T) {
 
@@ -177,6 +164,8 @@ func TestBooleanValue(t *testing.T) {
  */
 func TestArray(t *testing.T) {
 	engine.RegisterJsFunction("TestArray", "function TestArray(arr, val){arr.push(val); return arr;}")
+
+	// Array of anything is supported as you can see.
 	arr, err0 := engine.CallFunction("TestArray", []interface{}{1.0, 3.0, 4.0}, 2.25)
 	if err0 == nil {
 		t.Log(arr)
@@ -187,7 +176,6 @@ func TestArray(t *testing.T) {
  * Test calling a go function from JS.
  */
 func TestGoFunction(t *testing.T) {
-
 	// First of all I will register the tow go function in the Engine.
 	engine.RegisterGoFunction("AddNumber", AddNumber)
 	engine.RegisterGoFunction("Print", PrintValue)
@@ -197,12 +185,11 @@ func TestGoFunction(t *testing.T) {
 	if err == nil {
 		t.Log("Add number result: ", addNumberResult)
 	}
-
 }
 
+// Test global variable, Set and Get
 func TestGlobalVariable(t *testing.T) {
 
-	// First of all I will register the tow go function in the Engine.
 	var toto = "This is Java"
 	engine.SetGlobalVariable("toto", toto)
 
@@ -212,11 +199,10 @@ func TestGlobalVariable(t *testing.T) {
 	if toto__ != toto {
 		t.Log("Set/Get global variables fail! ")
 	}
-
 }
 
 /**
- * Test creating JavaScript function and calling
+ * Test creating JavaScript object with go function and Js method.
  */
 func TestCreateJsObjectFromGo(t *testing.T) {
 
@@ -256,6 +242,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 	}
 }
 
+// Test using go object created from go function and from global variable.
 func TestRegisterGoObject(t *testing.T) {
 
 	engine.RegisterGoFunction("print", PrintValue)
@@ -291,7 +278,9 @@ func TestRegisterGoObject(t *testing.T) {
 }
 
 /**
- * Test calling a go function from JS.
+ * Test creating a Go object from Javascript.
+ * ** The Class, here Person, must contain a field TYPENAME and be register
+ *    with RegisterGoType
  */
 func TestCreateGoObjectFromJs(t *testing.T) {
 	engine.RegisterGoFunction("print", PrintValue)
@@ -308,6 +297,7 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 		t.Error("fail to create Go from Js: ", err)
 	}
 
+	// p_ is an instance of *Person and can be use like regular Go object.
 	p_, _ := p.Export()
 
 	if err == nil {
