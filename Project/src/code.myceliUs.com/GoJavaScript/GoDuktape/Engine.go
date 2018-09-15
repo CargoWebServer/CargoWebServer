@@ -22,6 +22,26 @@ extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src){
 	return duk_pcompile_string(ctx, DUK_COMPILE_FUNCTION, src);
 }
 
+// The object finalyser function.
+extern duk_ret_t c_finalizer(duk_context_ptr);
+
+// Set the delete callback function
+duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid){
+
+	duk_idx_t fct_idx = duk_push_c_function(ctx, c_finalizer, DUK_VARARGS);
+
+	// Set the function name as property...
+	duk_push_string(ctx, "uuid");
+	duk_push_string(ctx, uuid);
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE);
+
+	// set the object finaliser.
+	if(duk_has_prop_string(ctx, -2, "uuid_")){
+		duk_set_finalizer(ctx, -2);
+	}
+	return fct_idx;
+}
+
 // The function handler.
 extern duk_ret_t c_function_handler(duk_context_ptr ctx);
 
@@ -136,17 +156,16 @@ func (self *Engine) CreateObject(uuid string, name string) {
 	log.Println("--> create object: ", uuid, name)
 	obj_idx := C.duk_push_object(self.context)
 
-	// Now I will set the uuid property.
-
 	// uuid value
-	uuid_ := C.CString(uuid)
-	C.duk_push_string(self.context, uuid_)
-	C.free(unsafe.Pointer(uuid_))
+	uuid_value := C.CString(uuid)
+	C.duk_push_string(self.context, uuid_value)
+	uuid_name := C.CString("uuid_")
+	C.duk_put_prop_string(self.context, obj_idx, uuid_name)
 
-	// uuid name
-	uuid_ = C.CString("uuid_")
-	C.duk_put_prop_string(self.context, obj_idx, uuid_)
-	C.free(unsafe.Pointer(uuid_))
+	C.set_finalizer(self.context, uuid_value)
+
+	C.free(unsafe.Pointer(uuid_value))
+	C.free(unsafe.Pointer(uuid_name))
 
 	if len(name) > 0 {
 		name_ := C.CString(name)
@@ -164,10 +183,6 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 
 	// I will get (create the object on the stack)
 	getJsObjectByUuid(uuid, self.context)
-
-	// go to the object position.
-	uuid_ := C.CString(uuid)
-	C.duk_get_global_string(self.context, uuid_)
 
 	// Set the function name to be call
 	cstr := C.CString(name)

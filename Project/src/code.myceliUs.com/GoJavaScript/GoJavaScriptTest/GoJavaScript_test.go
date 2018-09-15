@@ -108,7 +108,7 @@ func PrintValue(value interface{}) {
 	log.Println(value)
 }
 
-// on of jerryscript, chakracore", duktape
+// one of jerryscript, chakracore, duktape
 var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "duktape")
 
 /**

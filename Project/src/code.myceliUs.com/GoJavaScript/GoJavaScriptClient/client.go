@@ -58,7 +58,7 @@ func NewClient(address string, port int, name string) *Client {
 	}
 
 	// Create the client connection, try 5 time and wait 200 millisecond each try.
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 100; i++ {
 		time.Sleep(50 * time.Millisecond)
 		err = client.peer.Connect(address, port)
 		if err == nil {

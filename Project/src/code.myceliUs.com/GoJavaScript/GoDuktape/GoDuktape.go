@@ -10,6 +10,7 @@ extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src);
 extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t index);
 extern duk_bool_t is_error(duk_context_ptr ctx, duk_idx_t index);
 extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t idx);
+extern duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid);
 */
 import "C"
 import "reflect"
@@ -135,6 +136,8 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 		uuid_name := C.CString("uuid_")
 		C.duk_put_prop_string(ctx, obj_idx, uuid_name)
 
+		C.set_finalizer(ctx, uuid_value)
+
 		defer C.free(unsafe.Pointer(uuid_name))
 
 		// Now I will set the object method.
@@ -175,12 +178,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 							if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
 								// Here I will pup the object in the stack value.
 								getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
-								uuid_ := C.CString(e.(map[string]interface{})["UUID"].(string))
-								C.duk_get_global_string(ctx, uuid_)
 								C.duk_put_prop_index(ctx, values, C.uint(i))
-								C.free(unsafe.Pointer(uuid_))
-								// pup back to the parent object.
-								C.duk_pop(ctx)
 							}
 						} else {
 							log.Println("---> unknow object propertie type 231")
@@ -197,12 +195,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 				if value.(map[string]interface{})["TYPENAME"] != nil {
 					if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
 						getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
-						uuid_ := C.CString(value.(map[string]interface{})["UUID"].(string))
-						C.duk_get_global_string(ctx, uuid_)
 						C.duk_put_prop_string(ctx, obj_idx, cname)
-						C.free(unsafe.Pointer(uuid_))
-						// pup back to the parent object.
-						C.duk_pop(ctx)
 					} else {
 						log.Println("---> unknow object propertie type 245")
 					}
@@ -215,11 +208,11 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 			C.free(unsafe.Pointer(cname))
 		}
+
 		// set on the global object.
-		C.duk_put_global_string(ctx, uuid_value)
 
 		// keep the object on the global object if name is define.
-		if objInfos.(map[string]interface{})["Name"] != nil {
+		/*if objInfos.(map[string]interface{})["Name"] != nil {
 			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
 				// set is name as global object property
 				C.duk_get_global_string(ctx, uuid_value)
@@ -227,10 +220,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 				C.duk_put_global_string(ctx, name_)
 				C.free(unsafe.Pointer(name_))
 			}
-		}
-
-		// set the current stack value at object
-		C.duk_get_global_string(ctx, uuid_value)
+		}*/
 	}
 }
 
@@ -396,6 +386,28 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 	}
 
 	return nil, errors.New("no value found at index " + strconv.Itoa(index))
+}
+
+//export c_finalizer
+func c_finalizer(ctx C.duk_context_ptr) C.duk_ret_t {
+	// Push the current function on the context
+	C.duk_push_current_function(ctx)
+
+	// Get the object uuid to delete...
+	C.duk_get_prop_string(ctx, -1, C.CString("uuid"))
+
+	uuid, err := getValue(ctx, -1)
+	if err != nil {
+		return C.duk_ret_t(0)
+	}
+	log.Println("---> remove object ", uuid)
+	C.duk_pop(ctx) // back to the context calling context.
+
+	// delete the object from the client cache.
+	// Now I will ask the client side to remove it object reference to.
+	//GoJavaScript.CallGoFunction("Client", "DeleteGoObject", uuid)
+
+	return C.duk_ret_t(1) // return undefined.
 }
 
 //export c_function_handler
