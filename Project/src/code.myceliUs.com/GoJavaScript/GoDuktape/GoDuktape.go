@@ -128,15 +128,17 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 		// Create the object JS object.
 		obj_idx := C.duk_push_object(ctx)
 
+		log.Println("---> create object ", uuid)
+
 		// Now I will set the uuid property.
 		uuid_value := C.CString(uuid)
+
+		C.set_finalizer(ctx, uuid_value)
 		C.duk_push_string(ctx, uuid_value)
 		defer C.free(unsafe.Pointer(uuid_value))
 
 		uuid_name := C.CString("uuid_")
 		C.duk_put_prop_string(ctx, obj_idx, uuid_name)
-
-		C.set_finalizer(ctx, uuid_value)
 
 		defer C.free(unsafe.Pointer(uuid_name))
 
@@ -208,19 +210,6 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 			C.free(unsafe.Pointer(cname))
 		}
-
-		// set on the global object.
-
-		// keep the object on the global object if name is define.
-		/*if objInfos.(map[string]interface{})["Name"] != nil {
-			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
-				// set is name as global object property
-				C.duk_get_global_string(ctx, uuid_value)
-				name_ := C.CString(objInfos.(map[string]interface{})["Name"].(string))
-				C.duk_put_global_string(ctx, name_)
-				C.free(unsafe.Pointer(name_))
-			}
-		}*/
 	}
 }
 
@@ -275,7 +264,6 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 		array := C.duk_push_array(ctx)
 		for i := 0; i < s.Len(); i++ {
 			// here I will set value...
-			log.Println("---> set value in array ", s.Index(i).Interface())
 			setValue(ctx, s.Index(i).Interface())
 			// And I will push it index property
 			C.duk_put_prop_index(ctx, array, C.uint(i))
@@ -284,8 +272,11 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 		// I got a Js object reference.
 		uuid := value.(*GoJavaScript.ObjectRef).UUID
 		getJsObjectByUuid(uuid, ctx)
+	} else if reflect.TypeOf(value).String() == "GoJavaScript.ObjectRef" {
+		// I got a Js object reference.
+		uuid := value.(GoJavaScript.ObjectRef).UUID
+		getJsObjectByUuid(uuid, ctx)
 	} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-
 		jsonStr, err := json.Marshal(value)
 		if err == nil {
 			if value.(map[string]interface{})["TYPENAME"] != nil {
@@ -315,18 +306,18 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
  */
 func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 	if isString(ctx, index) {
-		log.Println("---> string found")
+		//log.Println("---> string found")
 		cstr := C.duk_get_string(ctx, C.int(index))
 		return C.GoString(cstr), nil
 	} else if isBool(ctx, index) {
-		log.Println("---> boolean found")
+		//log.Println("---> boolean found")
 		return uint(C.duk_get_boolean(ctx, C.int(index))) > 0, nil
 	} else if isNumber(ctx, index) {
 		n := float64(C.duk_get_number(ctx, C.int(index)))
 		log.Println("---> number found ", n)
 		return n, nil
 	} else if isError(ctx, index) {
-		log.Println("---> error found")
+		//log.Println("---> error found")
 		stack := C.CString("stack")
 		C.duk_get_prop_string(ctx, C.int(index), stack)
 		err := errors.New(C.GoString(C.safe_to_string(ctx, C.int(-1))))
@@ -334,7 +325,7 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		log.Println("323 ----> ", err)
 		return nil, err
 	} else if isArray(ctx, index) {
-		log.Println("---> array found!")
+		//log.Println("---> array found!")
 		// The object is an array
 		size := int(C.duk_get_length(ctx, C.int(index)))
 		array := make([]interface{}, size)
@@ -393,21 +384,21 @@ func c_finalizer(ctx C.duk_context_ptr) C.duk_ret_t {
 	// Push the current function on the context
 	C.duk_push_current_function(ctx)
 
-	// Get the object uuid to delete...
+	// Get it name..
 	C.duk_get_prop_string(ctx, -1, C.CString("uuid"))
 
 	uuid, err := getValue(ctx, -1)
-	if err != nil {
-		return C.duk_ret_t(0)
-	}
-	log.Println("---> remove object ", uuid)
 	C.duk_pop(ctx) // back to the context calling context.
 
-	// delete the object from the client cache.
-	// Now I will ask the client side to remove it object reference to.
-	//GoJavaScript.CallGoFunction("Client", "DeleteGoObject", uuid)
+	if err == nil {
+		log.Println("---> remove object 395 ", uuid)
+		// delete the object from the client cache.
+		// Now I will ask the client side to remove it object reference to.
+		GoJavaScript.CallGoFunction("Client", "DeleteGoObject", uuid)
+		return C.duk_ret_t(1)
+	}
 
-	return C.duk_ret_t(1) // return undefined.
+	return C.duk_ret_t(0) // return undefined.
 }
 
 //export c_function_handler
@@ -419,57 +410,57 @@ func c_function_handler(ctx C.duk_context_ptr) C.duk_ret_t {
 	C.duk_get_prop_string(ctx, -1, C.CString("name"))
 
 	name, err := getValue(ctx, -1)
-	if err == nil {
-		log.Println("call function ", name)
-	}
-
 	C.duk_pop(ctx) // back to the context calling context.
 
-	// Now I will get back the list of arguments.
-	size := int(C.duk_get_top(ctx)) - 1
-	params := make([]interface{}, size)
-	for i := 0; i < size; i++ {
-		value, err := getValue(ctx, i)
-		if err == nil {
-			params[i] = value
-		} else {
-			log.Panicln("---> fail 393")
+	if err == nil {
+		// Now I will get back the list of arguments.
+		size := int(C.duk_get_top(ctx)) - 1
+		params := make([]interface{}, size)
+		for i := 0; i < size; i++ {
+			value, err := getValue(ctx, i)
+			if err == nil {
+				params[i] = value
+			} else {
+				log.Panicln("---> fail 393")
+			}
 		}
-	}
 
-	// Now I will get the this
-	C.duk_push_this(ctx)
+		// Now I will get the this
+		C.duk_push_this(ctx)
 
-	if isObject(ctx, -1) {
-		uuid_ := C.CString("uuid_")
-		C.duk_push_string(ctx, uuid_)
-		defer C.free(unsafe.Pointer(uuid_))
-		if int(C.duk_has_prop_string(ctx, -2, uuid_)) > 0 {
-			C.duk_get_prop_string(ctx, -2, uuid_)
-			uuid, _ := getValue(ctx, -1)
-			C.duk_pop(ctx) // remove this
-
-			// I will now call the function.
-			result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
+		if isObject(ctx, -1) {
+			uuid_ := C.CString("uuid_")
+			C.duk_push_string(ctx, uuid_)
+			defer C.free(unsafe.Pointer(uuid_))
+			if int(C.duk_has_prop_string(ctx, -2, uuid_)) > 0 {
+				C.duk_get_prop_string(ctx, -2, uuid_)
+				uuid, _ := getValue(ctx, -1)
+				C.duk_pop(ctx)
+				log.Println("---> 438 ", name, " : ", uuid)
+				// I will now call the function.
+				result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
+				if err == nil && result != nil {
+					// So here I will set the value
+					setValue(ctx, result)
+					log.Println("---> 445", name, " : ", uuid, ":", result)
+					return C.duk_ret_t(1)
+				} else if err != nil {
+					// error occured here.
+				}
+			}
+		} else {
+			log.Println("---> 451 ", name)
+			result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
 			if err == nil && result != nil {
-				// So here I will set the value
 				setValue(ctx, result)
+				log.Println("---> 454 ", name, ":", result)
+				// The value must be pop by the caller.
 				return C.duk_ret_t(1)
 			} else if err != nil {
 				// error occured here.
 			}
 		}
-	} else {
-		C.duk_pop(ctx) // remove this...
-		result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
-		if err == nil && result != nil {
-			setValue(ctx, result)
-			// The value must be pop by the caller.
-			return C.duk_ret_t(1)
-		} else if err != nil {
-			// error occured here.
-		}
 	}
-
 	return C.duk_ret_t(0) // return undefined.
+
 }

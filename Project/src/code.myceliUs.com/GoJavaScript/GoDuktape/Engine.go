@@ -28,7 +28,7 @@ extern duk_ret_t c_finalizer(duk_context_ptr);
 // Set the delete callback function
 duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid){
 
-	duk_idx_t fct_idx = duk_push_c_function(ctx, c_finalizer, DUK_VARARGS);
+	duk_idx_t fct_idx = duk_push_c_function(ctx, c_finalizer, 1);
 
 	// Set the function name as property...
 	duk_push_string(ctx, "uuid");
@@ -36,9 +36,8 @@ duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid){
 	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE);
 
 	// set the object finaliser.
-	if(duk_has_prop_string(ctx, -2, "uuid_")){
-		duk_set_finalizer(ctx, -2);
-	}
+	duk_set_finalizer(ctx, -2);
+
 	return fct_idx;
 }
 
@@ -158,11 +157,10 @@ func (self *Engine) CreateObject(uuid string, name string) {
 
 	// uuid value
 	uuid_value := C.CString(uuid)
+	C.set_finalizer(self.context, uuid_value)
 	C.duk_push_string(self.context, uuid_value)
 	uuid_name := C.CString("uuid_")
 	C.duk_put_prop_string(self.context, obj_idx, uuid_name)
-
-	C.set_finalizer(self.context, uuid_value)
 
 	C.free(unsafe.Pointer(uuid_value))
 	C.free(unsafe.Pointer(uuid_name))

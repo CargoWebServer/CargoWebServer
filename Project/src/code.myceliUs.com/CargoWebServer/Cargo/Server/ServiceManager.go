@@ -749,13 +749,11 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 			} else {
 				serverSrc += "	var " + action.GetResults()[0].M_name + " = null;\n"
 			}
-			serverSrc += "	var server = GetServer();\n"
-			serverSrc += "	" + action.GetResults()[0].M_name + " = server.Get" + serviceId + "()." + name + "(" + params_ + ");\n"
+			serverSrc += "	" + action.GetResults()[0].M_name + " = GetServer().Get" + serviceId + "()." + name + "(" + params_ + ");\n"
 			serverSrc += "	return " + action.GetResults()[0].M_name + ";\n"
 		} else {
 			// Here I will simply call the method on the service object..
-			serverSrc += "	var server = GetServer();\n"
-			serverSrc += "	server.Get" + serviceId + "()." + name + "(" + params_ + ");\n"
+			serverSrc += "	GetServer().Get" + serviceId + "()." + name + "(" + params_ + ");\n"
 		}
 
 		serverSrc += "}\n\n"

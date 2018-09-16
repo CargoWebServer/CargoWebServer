@@ -179,15 +179,6 @@ func getJsObjectByUuid(uuid string) uintptr {
 		// Set the uuid property.
 		JsSetObjectPropertyByName(obj, "uuid_", uuid)
 
-		// keep the object in the global namespace.
-		// set is uuid as global object property
-		if objInfos.(map[string]interface{})["Name"] != nil {
-			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
-				// set is name as global object property
-				JsSetObjectPropertyByName(getGlobalObject(), objInfos.(map[string]interface{})["Name"].(string), obj)
-			}
-		}
-
 		// Set native object to the object.
 		C.setNativeObjectDeleteCallback(C.JsRef(obj), nil)
 

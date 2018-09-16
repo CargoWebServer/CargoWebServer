@@ -404,13 +404,6 @@ func getJsObjectByUuid(uuid string) Uint32_t {
 		// Set the uuid property.
 		Jerry_set_object_property(obj, "uuid_", uuid)
 
-		if objInfos.(map[string]interface{})["Name"] != nil {
-			if len(objInfos.(map[string]interface{})["Name"].(string)) > 0 {
-				// set is name as global object property
-				Jerry_set_object_property(getGlobalObject(), objInfos.(map[string]interface{})["Name"].(string), obj)
-			}
-		}
-
 		// Set native object to the object.
 		C.create_native_object(C.CString(uuid), uint32_t_To_Jerry_value_t(obj))
 

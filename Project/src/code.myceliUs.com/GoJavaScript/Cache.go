@@ -3,6 +3,7 @@ package GoJavaScript
 import (
 	"log"
 	"reflect"
+	"time"
 )
 
 // The cache is simply a map of object that keep go object accessible for JavaScript.
@@ -63,6 +64,8 @@ func newCache() {
 					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(interface{})
 					//log.Println("---> cache contain: ", len(cache.m_jsObjects))
 				} else if operation["name"] == "removeObject" {
+					// The object will leave for more 30 second the time the
+					// script get object from it reference.
 					delete(cache.m_objects, operation["id"].(string))
 					obj := cache.m_jsObjects[operation["id"].(string)]
 					// remove it pointer from the interpreter.
@@ -118,10 +121,18 @@ func (cache *Cache) SetJsObject(id string, jsObject interface{}) {
 }
 
 func (cache *Cache) RemoveObject(id string) {
-	values := make(map[string]interface{})
-	values["name"] = "removeObject"
-	values["id"] = id
-	cache.m_operations <- values
+	// The server delete the reference before the cache
+	// return it result so I will give a 30 second more lifespan to
+	// the object before remove it form the client cache, other wise null
+	// values will be return.
+	delay := time.NewTimer(30 * time.Second)
+	go func() {
+		<-delay.C
+		values := make(map[string]interface{})
+		values["name"] = "removeObject"
+		values["id"] = id
+		cache.m_operations <- values
+	}()
 }
 
 // Convert objectRef to object as needed.
@@ -134,6 +145,7 @@ func GetObject(val interface{}) interface{} {
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
+		log.Println("---> object ", ref.UUID, " no more exist!")
 		return nil
 
 	} else if reflect.TypeOf(val).String() == "*GoJavaScript.ObjectRef" {
@@ -141,6 +153,7 @@ func GetObject(val interface{}) interface{} {
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
+		log.Println("---> object ", ref.UUID, " no more exist!")
 		return nil
 
 	} else if reflect.TypeOf(val).Kind() == reflect.Slice {
@@ -163,6 +176,8 @@ func GetObject(val interface{}) interface{} {
 							} else {
 								log.Println("---> fail to retreive object ", ref.UUID)
 							}
+						} else {
+							log.Println("---> object ", ref.UUID, " no more exist!")
 						}
 					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
 						ref := e.Interface().(*ObjectRef)
@@ -176,6 +191,8 @@ func GetObject(val interface{}) interface{} {
 							} else {
 								log.Println("---> fail to retreive object ", ref.UUID)
 							}
+						} else {
+							log.Println("---> object ", ref.UUID, " no more exist!")
 						}
 					}
 				}
