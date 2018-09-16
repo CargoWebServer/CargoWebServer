@@ -144,7 +144,6 @@ func TestNumericValue(t *testing.T) {
 	if number_ != 3.25 {
 		t.Error("Expected 3.25, got ", number_)
 	}
-
 }
 
 /**
