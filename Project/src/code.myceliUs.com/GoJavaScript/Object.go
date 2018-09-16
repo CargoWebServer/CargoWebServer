@@ -1,6 +1,5 @@
 package GoJavaScript
 
-import "log"
 import "code.myceliUs.com/Utility"
 import "reflect"
 
@@ -10,8 +9,6 @@ import "reflect"
  * Go representation of a JS object.
  */
 type Object struct {
-	// The typename.
-	//TYPENAME string
 
 	// The unique object identifier.
 	UUID string
@@ -38,7 +35,6 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
-	//obj.TYPENAME = "GoJavaScript.Object"
 
 	// If the name is given that's mean the object will be set as a global
 	// object so it uuid will be generated from it name.
@@ -127,8 +123,6 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
 	action.AppendParam("params", params)
-
-	log.Println("----> call remote action from the client to the server: ", name, params)
 
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)

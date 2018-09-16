@@ -223,7 +223,6 @@ func (self *Client) processActions() {
 					// Now I will call the method on the object.
 					results, err = Utility.CallMethod(target, a.Name, params)
 					if err != nil {
-						log.Println("---> target ", target)
 						log.Println("---> call Method: ", a.Name, params)
 						log.Println("---> error: ", err)
 					}

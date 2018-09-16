@@ -1,7 +1,6 @@
 package GoJavaScript
 
 import (
-	"log"
 	"reflect"
 	"time"
 )
@@ -145,7 +144,6 @@ func GetObject(val interface{}) interface{} {
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
-		log.Println("---> object ", ref.UUID, " no more exist!")
 		return nil
 
 	} else if reflect.TypeOf(val).String() == "*GoJavaScript.ObjectRef" {
@@ -153,7 +151,6 @@ func GetObject(val interface{}) interface{} {
 		if GetCache().GetObject(ref.UUID) != nil {
 			return GetCache().GetObject(ref.UUID)
 		}
-		log.Println("---> object ", ref.UUID, " no more exist!")
 		return nil
 
 	} else if reflect.TypeOf(val).Kind() == reflect.Slice {
@@ -173,11 +170,7 @@ func GetObject(val interface{}) interface{} {
 									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
 								}
 								values = reflect.Append(values, reflect.ValueOf(obj))
-							} else {
-								log.Println("---> fail to retreive object ", ref.UUID)
 							}
-						} else {
-							log.Println("---> object ", ref.UUID, " no more exist!")
 						}
 					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
 						ref := e.Interface().(*ObjectRef)
@@ -188,11 +181,7 @@ func GetObject(val interface{}) interface{} {
 									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
 								}
 								values = reflect.Append(values, reflect.ValueOf(obj))
-							} else {
-								log.Println("---> fail to retreive object ", ref.UUID)
 							}
-						} else {
-							log.Println("---> object ", ref.UUID, " no more exist!")
 						}
 					}
 				}

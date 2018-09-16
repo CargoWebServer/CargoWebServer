@@ -152,7 +152,7 @@ func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
  * set a global object property.
  */
 func (self *Engine) CreateObject(uuid string, name string) {
-	log.Println("--> create object: ", uuid, name)
+
 	obj_idx := C.duk_push_object(self.context)
 
 	// uuid value

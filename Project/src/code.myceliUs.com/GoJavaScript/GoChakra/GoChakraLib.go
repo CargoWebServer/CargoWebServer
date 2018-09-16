@@ -1,3 +1,4 @@
+// +build linux darwin
 package GoChakra
 
 //#cgo CXXFLAGS: -std=c++11  -Wno-c++11-compat-deprecated-writable-strings -Wno-deprecated-declarations -Wno-unknown-warning-option

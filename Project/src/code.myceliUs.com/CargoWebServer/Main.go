@@ -8,9 +8,10 @@ import (
 	"strconv"
 	"syscall"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Server"
-	//	"github.com/skratchdot/open-golang/open"
 	"net/http/pprof"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/Server"
+	"github.com/skratchdot/open-golang/open"
 
 	"golang.org/x/net/websocket"
 )
@@ -80,7 +81,7 @@ func main() {
 	// Start the server...
 	Server.GetServer().Start()
 
-	//open.Run("http://127.0.0.1:9393/Bridge")
+	open.Run("http://127.0.0.1:9393/Bridge")
 	log.Println("--> server is ready and listen at port ", port)
 	err := http.ListenAndServe(":"+strconv.Itoa(port), r)
 

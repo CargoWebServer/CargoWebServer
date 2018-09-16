@@ -1,3 +1,4 @@
+// +build linux darwin
 package GoJerryScript
 
 //#cgo LDFLAGS:  -L/usr/local/lib -ljerry-core -ljerry-ext -ljerry-libm -ljerry-port-default
@@ -282,7 +283,7 @@ func handler(fct C.jerry_value_t, this C.jerry_value_t, args C.uintptr_t, length
 						return uint32_t_To_Jerry_value_t(jsError)
 					}
 				} else {
-					log.Panicln("---------> uuid not found!")
+					log.Panicln("---> uuid not found!")
 				}
 
 			} else {
@@ -468,8 +469,6 @@ func getJsObjectByUuid(uuid string) Uint32_t {
 		return obj
 	}
 
-	log.Println("---> object ", uuid, "is undefined!")
-
 	// The property is undefined.
 	return nil
 }
@@ -552,18 +551,10 @@ func goToJs(value interface{}) Uint32_t {
 		// I got a Js object reference.
 		uuid := value.(GoJavaScript.ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
-		if Jerry_value_is_undefined(propValue) {
-			// If the object is not in the cache...
-			log.Panicln("----> object ", uuid, " dosent exist anymore!")
-		}
 	} else if typeOf.String() == "*GoJavaScript.ObjectRef" {
 		// I got a Js object reference.
 		uuid := value.(*GoJavaScript.ObjectRef).UUID
 		propValue = getJsObjectByUuid(uuid)
-		if Jerry_value_is_undefined(propValue) {
-			// If the object is not in the cache...
-			log.Panicln("----> object ", uuid, " dosent exist anymore!")
-		}
 	} else if typeOf.String() == "map[string]interface {}" {
 		// In that case I will create a object from the value found in the map
 		// and return it as prop value.
@@ -574,8 +565,6 @@ func goToJs(value interface{}) Uint32_t {
 				if err == nil {
 					// In that case an object exist in the case...
 					propValue = getJsObjectByUuid(ref.(*GoJavaScript.ObjectRef).UUID)
-				} else {
-					log.Println("--> fail to Create Go object ", string(data), err)
 				}
 			} else {
 				// Not a registered type...

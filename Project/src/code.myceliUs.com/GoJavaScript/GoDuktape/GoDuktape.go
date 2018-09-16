@@ -128,8 +128,6 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 		// Create the object JS object.
 		obj_idx := C.duk_push_object(ctx)
 
-		log.Println("---> create object ", uuid)
-
 		// Now I will set the uuid property.
 		uuid_value := C.CString(uuid)
 
@@ -314,7 +312,6 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		return uint(C.duk_get_boolean(ctx, C.int(index))) > 0, nil
 	} else if isNumber(ctx, index) {
 		n := float64(C.duk_get_number(ctx, C.int(index)))
-		log.Println("---> number found ", n)
 		return n, nil
 	} else if isError(ctx, index) {
 		//log.Println("---> error found")
@@ -325,7 +322,6 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		log.Println("323 ----> ", err)
 		return nil, err
 	} else if isArray(ctx, index) {
-		//log.Println("---> array found!")
 		// The object is an array
 		size := int(C.duk_get_length(ctx, C.int(index)))
 		array := make([]interface{}, size)
@@ -391,7 +387,6 @@ func c_finalizer(ctx C.duk_context_ptr) C.duk_ret_t {
 	C.duk_pop(ctx) // back to the context calling context.
 
 	if err == nil {
-		log.Println("---> remove object 395 ", uuid)
 		// delete the object from the client cache.
 		// Now I will ask the client side to remove it object reference to.
 		GoJavaScript.CallGoFunction("Client", "DeleteGoObject", uuid)
@@ -436,24 +431,20 @@ func c_function_handler(ctx C.duk_context_ptr) C.duk_ret_t {
 				C.duk_get_prop_string(ctx, -2, uuid_)
 				uuid, _ := getValue(ctx, -1)
 				C.duk_pop(ctx)
-				log.Println("---> 438 ", name, " : ", uuid)
 				// I will now call the function.
 				result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
 				if err == nil && result != nil {
 					// So here I will set the value
 					setValue(ctx, result)
-					log.Println("---> 445", name, " : ", uuid, ":", result)
 					return C.duk_ret_t(1)
 				} else if err != nil {
 					// error occured here.
 				}
 			}
 		} else {
-			log.Println("---> 451 ", name)
 			result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
 			if err == nil && result != nil {
 				setValue(ctx, result)
-				log.Println("---> 454 ", name, ":", result)
 				// The value must be pop by the caller.
 				return C.duk_ret_t(1)
 			} else if err != nil {

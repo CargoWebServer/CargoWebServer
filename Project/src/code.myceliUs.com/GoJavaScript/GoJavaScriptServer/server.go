@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/GoJavaScript/GoChakra"
 	"code.myceliUs.com/GoJavaScript/GoDuktape"
@@ -47,10 +45,10 @@ func NewServer(address string, port int, name string) *Server {
 	// The engine.
 	if name == "jerryscript" {
 		server.engine = new(GoJerryScript.Engine)
-	} else if name == "duktape" {
-		server.engine = new(GoDuktape.Engine)
 	} else if name == "chakracore" {
 		server.engine = new(GoChakra.Engine)
+	} else if name == "duktape" {
+		server.engine = new(GoDuktape.Engine)
 	}
 
 	// Start the engine
@@ -90,7 +88,6 @@ func (self *Server) processActions() {
 			// Here the action will be execute in a non-blocking way so
 			// other exec action will be possible.
 			go func() {
-				log.Println("---> call action: ", action.Name)
 				if action.Name == "RegisterJsFunction" {
 					action.AppendResults(self.engine.RegisterJsFunction(action.Params[0].Value.(string), action.Params[1].Value.(string)))
 				} else if action.Name == "EvalScript" {
@@ -118,7 +115,6 @@ func (self *Server) processActions() {
 				} else if action.Name == "GetGlobalVariable" {
 					action.AppendResults(self.engine.GetGlobalVariable(action.Params[0].Value.(string)))
 				} else if action.Name == "Stop" {
-					log.Println("--> Stop JavaScript exec!")
 					// Send back the result to client.
 					self.isRunning = false
 				}
@@ -128,5 +124,4 @@ func (self *Server) processActions() {
 		}
 	}
 	self.peer.Close()
-	log.Println("---> server stop processing incomming messages!")
 }
