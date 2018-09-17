@@ -127,15 +127,6 @@ function events_EventChannel_broadcastEvent_test() {
                 undefined)
         }
         )
-
-
-
-
-    
-
-    
-    
-
     
 }
 
