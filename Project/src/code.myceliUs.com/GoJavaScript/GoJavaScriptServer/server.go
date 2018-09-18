@@ -2,9 +2,9 @@ package main
 
 import (
 	"code.myceliUs.com/GoJavaScript"
-	"code.myceliUs.com/GoJavaScript/GoChakra"
+	//"code.myceliUs.com/GoJavaScript/GoChakra"
 	"code.myceliUs.com/GoJavaScript/GoDuktape"
-	"code.myceliUs.com/GoJavaScript/GoJerryScript"
+	//"code.myceliUs.com/GoJavaScript/GoJerryScript"
 )
 
 // The server will redirect client command to JavaScript.
@@ -43,13 +43,15 @@ func NewServer(address string, port int, name string) *Server {
 	// The underlying engine.
 
 	// The engine.
-	if name == "jerryscript" {
+	/*if name == "jerryscript" {
 		server.engine = new(GoJerryScript.Engine)
 	} else if name == "chakracore" {
 		server.engine = new(GoChakra.Engine)
 	} else if name == "duktape" {
 		server.engine = new(GoDuktape.Engine)
-	}
+	}*/
+
+	server.engine = new(GoDuktape.Engine)
 
 	// Start the engine
 	server.engine.Start(port)

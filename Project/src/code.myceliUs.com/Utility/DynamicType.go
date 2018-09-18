@@ -166,9 +166,7 @@ func initializeStructureValue(typeName string, data map[string]interface{}, setE
 }
 
 // Return an initialyse field value.
-func InitializeStructureFieldArrayValue(fieldName string, fieldType reflect.Type, values reflect.Value, setEntity func(interface{})) reflect.Value {
-	// Create a slice here.
-	slice := reflect.MakeSlice(fieldType, values.Len(), values.Len())
+func InitializeStructureFieldArrayValue(slice reflect.Value, fieldName string, fieldType reflect.Type, values reflect.Value, setEntity func(interface{})) {
 
 	// Here I will iterate over the slice
 	for i := 0; i < values.Len(); i++ {
@@ -177,6 +175,7 @@ func InitializeStructureFieldArrayValue(fieldName string, fieldType reflect.Type
 
 		// If the type is register as dynamic type.
 		if v_ != nil {
+
 			if reflect.TypeOf(v_).String() == "map[string]interface {}" {
 				// The value is a dynamic value.
 				v_ := v_.(map[string]interface{})
@@ -203,25 +202,25 @@ func InitializeStructureFieldArrayValue(fieldName string, fieldType reflect.Type
 				}
 			} else {
 				// Not an array of map[string]interface {}
-				index := slice.Index(i)
 				if reflect.TypeOf(v_).Kind() == reflect.Slice {
-					slice := InitializeStructureFieldArrayValue(fieldName, reflect.TypeOf(v_), reflect.ValueOf(v_), setEntity)
+					slice_ := reflect.MakeSlice(fieldType, reflect.ValueOf(v_).Len(), reflect.ValueOf(v_).Len())
+					InitializeStructureFieldArrayValue(slice_, fieldName, reflect.TypeOf(v_), reflect.ValueOf(v_), setEntity)
+
 					// Set the slice...
-					if slice.IsValid() {
+					if slice.Index(i).IsValid() {
 						// A sub-array.
-						index.Set(slice)
+						slice.Index(i).Set(slice_)
 					}
 				} else {
 					// Not an array
 					fv := InitializeBaseTypeValue(reflect.TypeOf(v_), v_).Convert(reflect.TypeOf(v_))
 					if fv.IsValid() {
-						index.Set(fv)
+						slice.Index(i).Set(fv)
 					}
 				}
 			}
 		}
 	}
-	return slice
 }
 
 func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType reflect.Type, fieldValue interface{}, setEntity func(interface{})) {
@@ -238,7 +237,9 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 			// Set the value...
 			v.Elem().FieldByName(fieldName).Set(reflect.ValueOf([]byte(val)))
 		} else {
-			slice := InitializeStructureFieldArrayValue(fieldName, fieldType, reflect.ValueOf(fieldValue), setEntity)
+			// Create a slice here.
+			slice := reflect.MakeSlice(fieldType, reflect.ValueOf(fieldValue).Len(), reflect.ValueOf(fieldValue).Len())
+			InitializeStructureFieldArrayValue(slice, fieldName, fieldType, reflect.ValueOf(fieldValue), setEntity)
 			// Set the slice...
 			if slice.IsValid() {
 				v.Elem().FieldByName(fieldName).Set(slice)

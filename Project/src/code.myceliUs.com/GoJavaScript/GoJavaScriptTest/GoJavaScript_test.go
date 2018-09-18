@@ -104,8 +104,10 @@ func AddNumber(a float64, b float64) float64 {
 }
 
 // Simple function handler.
-func PrintValue(value interface{}) {
-	log.Println(value)
+func PrintValue(value ...interface{}) {
+	for i := 0; i < len(value); i++ {
+		log.Println(value[i])
+	}
 }
 
 // one of jerryscript, chakracore, duktape
@@ -225,7 +227,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 	obj.Set("add", AddNumber)
 
 	// set a Js function on the object.
-	obj.SetJsMethode("helloTo", `function helloTo(to){print("Hello " + to + "!"); return "Hello " + to + "!";}`)
+	obj.SetJsMethode("helloTo", `function helloTo(to){return "Hello " + to + "!";}`)
 
 	// and call the go function on the object.
 	addReuslt, _ := obj.Call("add", 2, 3)
@@ -272,7 +274,7 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
 
 	// I will now register a function that call GetPerson in it.
-	engine.EvalScript(`function SayHelloToContact(index){print('----> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
+	engine.EvalScript(`function SayHelloToContact(index){print('---> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
 	engine.CallFunction("SayHelloToContact", []interface{}{1})
 }
 

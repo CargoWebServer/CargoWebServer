@@ -74,6 +74,14 @@ func NewClient(address string, port int, name string) *Client {
 	// process actions.
 	go client.processActions()
 
+	// Append the console.
+	console := new(GoJavaScript.Console)
+	console.TYPENAME = "GoJavaScript.Console"
+	client.RegisterGoType(console)
+
+	// Set the console.
+	client.SetGlobalVariable("console", console)
+
 	return client
 }
 
@@ -155,30 +163,42 @@ func (self *Client) objectToRef(objects interface{}) interface{} {
 				for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
 					e = e.Elem()
 				}
-
 				if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
 					// results will be register.
 					uuid := self.RegisterGoObject(slice.Index(i).Interface(), "")
 					// I will set the results a object reference.
 					objects_ = append(objects_, GoJavaScript.NewObjectRef(uuid))
+				} else {
+					objects_ = append(objects_, slice.Index(i).Interface())
 				}
 			}
 			// Set the array of object references.
 			objects = objects_
 		} else {
 			// I will test if the result is a structure or not...
-			e := reflect.ValueOf(objects)
-			// I will derefence the pointer if it a pointer.
-			for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
-				e = e.Elem()
-			}
+			if objects != nil {
+				if reflect.TypeOf(objects).Kind() == reflect.Ptr || reflect.TypeOf(objects).Kind() == reflect.Struct {
+					e := reflect.ValueOf(objects)
+					if e.IsValid() {
+						if reflect.TypeOf(objects).Kind() == reflect.Ptr {
+							if e.IsNil() {
+								return objects
+							}
+						}
+						// I will derefence the pointer if it a pointer.
+						for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
+							e = e.Elem()
+						}
+						// if the object is a structure.
+						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
+							// results will be register.
+							uuid := self.RegisterGoObject(objects, "")
+							// I will set the results a object reference.
+							objects = GoJavaScript.NewObjectRef(uuid)
+						}
 
-			// if the object is a structure.
-			if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
-				// results will be register.
-				uuid := self.RegisterGoObject(objects, "")
-				// I will set the results a object reference.
-				objects = GoJavaScript.NewObjectRef(uuid)
+					}
+				}
 			}
 		}
 	}
@@ -192,7 +212,6 @@ func (self *Client) processActions() {
 		select {
 		case action := <-self.exec_action_chan:
 			go func(a *GoJavaScript.Action) {
-				//log.Println("---> client action: ", a.Name)
 				var target interface{}
 				isJsObject := true
 				if len(a.Target) > 0 {
@@ -229,7 +248,6 @@ func (self *Client) processActions() {
 				}
 				// Keep go object in client and transfert only reference.
 				results = self.objectToRef(results)
-				//log.Println("---> retrun objects ref results: ", results)
 				// set the action result.
 				a.AppendResults(results, err)
 				// Here I will create the response and send it back to the client.
@@ -245,7 +263,6 @@ func (self *Client) processActions() {
 
 // Create Go object
 func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
-	log.Println("----> ask client to create object: ", jsonStr)
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)

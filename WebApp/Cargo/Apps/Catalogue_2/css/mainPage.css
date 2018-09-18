@@ -1,0 +1,280 @@
+body{
+    font-family: 'Questrial', sans-serif;
+}
+
+
+.sidenav {
+    width: 20rem;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    /*padding-top: 60px;*/
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+
+
+#main{
+    background-image : url('../../Catalogue_2/image/background-safran.png');
+    background-repeat : no-repeat;
+    background-size : cover;
+}
+
+.sidenav .closebtn {
+    position : relative;
+    top: 0px;
+    font-size:2rem;
+    left :15.5rem;
+    padding-top : 0px;
+}
+
+.openedNav{
+    opacity : 1;
+    left : 0;
+    height : calc(100vh - 56px);
+    
+}
+
+.closedNav{
+    opacity:0;
+    left : -20rem;
+    height :100vh;
+   
+}
+
+@media (max-width: 767px) {
+    /* CSS goes here */
+    #searchbar{
+        padding-top: 10px;
+    }
+    
+    #mySideNav{
+        
+    }
+    
+    .navItem{
+        padding-top : 8px;
+    }
+    .openedNav{
+        width:100%;
+
+    }
+    
+    .sidenav .closebtn {
+        left : 18rem;
+    }
+    
+    #main-container{
+        padding-top : 5px;
+        padding-left: 0px;
+        padding-right : 0px;
+    }
+    
+    #advancedSearchButton{
+        margin : 8px;
+    }
+    
+    
+}
+
+@media (min-width : 767px){
+    #searchbardiv{
+        width : 50%;
+    }
+    #quickSearchContentButton{
+        margin : 5px;
+    }
+    #advancedSearchButton{
+        margin : 5px;
+    }
+}
+
+@media (min-width : 767px){
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+.contentrow{
+    margin-left: 0px;
+    margin-right : 0px;
+}
+
+::-webkit-scrollbar
+{
+  width: 12px;  /* for vertical scrollbars */
+  height: 12px; /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track
+{
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.fa-sign-out:hover{
+    cursor: pointer;
+}
+
+.jumbotron{
+    background-color : #fff;
+    
+}
+
+.btn-default {
+    background-color:#868e96;
+}
+
+.fa-search {
+    color : #fff;
+}
+
+.my-4 .dark{ 
+    border-top:1px solid rgba(0,0,0,.2);
+}
+
+.smallertitle{
+    font-size:2rem;
+}
+
+.show > .dropdown-menu {
+  animation-name: slidenavAnimation;
+  animation-duration:.5s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  -webkit-animation-name: slidenavAnimation;
+  -webkit-animation-duration:.2s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease;
+  -webkit-animation-fill-mode: forwards;
+
+  -moz-animation-name: slidenavAnimation;
+  -moz-animation-duration:.2s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-timing-function: ease;
+  -moz-animation-fill-mode: forwards;
+}
+
+#notificationDiv{
+    animation-name: notifAnimation;
+  animation-duration:1s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  -webkit-animation-name: notifAnimation;
+  -webkit-animation-duration:1s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease;
+  -webkit-animation-fill-mode: forwards;
+
+  -moz-animation-name: notifAnimation;
+  -moz-animation-duration:1s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-timing-function: ease;
+  -moz-animation-fill-mode: forwards;
+}
+
+/*.fade{
+    opacity:0;
+    left : 20px;
+    transition: 2s;
+}*/
+
+
+@keyframes slidenavAnimation {
+  from {
+    opacity: 0;
+    top:0px;
+  }
+  to {
+    opacity: 1;
+    top:40px;
+  }
+}
+@-webkit-keyframes slidenavAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes notifAnimation {
+  from {
+    opacity: 0;
+    right:0px;
+  }
+  to {
+    opacity: 1;
+    right :2%;
+  }
+}
+@-webkit-keyframes notifAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sideNavCategory{
+    cursor:pointer;
+}
+
+.sideNavCategory:hover{
+    background-color:#000000;
+}
+
+.modal{
+    bottom : initial;
+    margin:20px;
+}
+
+.Pending{
+    color: #ffbd41
+}
+
+.Cancel{
+    color:red;
+}
+
+.Completed{
+    color:green;
+}
+
+.simpleLink{
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.simpleLink:hover{
+    color:steelblue;
+}
+
+.dropDown{
+    transform: translate3d(137px,0px, 0px)!important;
+}

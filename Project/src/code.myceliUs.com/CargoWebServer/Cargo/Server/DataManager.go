@@ -511,7 +511,6 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
-
 	return data
 }
 
