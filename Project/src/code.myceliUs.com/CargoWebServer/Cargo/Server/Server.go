@@ -46,7 +46,7 @@ type Server struct {
 	subConnectionIds map[string][]string
 
 	// That map contain Javascript connection object.
-	subConnections map[string]GoJavaScript.Value
+	subConnections map[string]*GoJavaScript.Object
 
 	// Contain the list of active command.
 	cmds []*exec.Cmd
@@ -84,7 +84,7 @@ func newServer() *Server {
 	}
 
 	server.subConnectionIds = make(map[string][]string, 0)
-	server.subConnections = make(map[string]GoJavaScript.Value, 0)
+	server.subConnections = make(map[string]*GoJavaScript.Object, 0)
 
 	// Active commands by session.
 	server.sessionCmds = make(map[string][]*exec.Cmd, 0)
@@ -209,8 +209,8 @@ func (this *Server) removeSubConnections(connectionId string, subConnectionId st
 func (this *Server) onClose(subConnectionId string) {
 
 	subConnection := this.subConnections[subConnectionId]
-	if subConnection.Object() != nil {
-		subConnection.Object().Call("onclose")
+	if subConnection != nil {
+		subConnection.Call("onclose")
 	}
 
 	// Remove ressource use by scripts.
@@ -244,8 +244,8 @@ func (this *Server) onClose(subConnectionId string) {
  */
 func (this *Server) onMessage(subConnectionId string) {
 	subConnection := this.subConnections[subConnectionId]
-	if subConnection.Object() != nil {
-		subConnection.Object().Call("onmessage")
+	if subConnection != nil {
+		subConnection.Call("onmessage")
 	}
 }
 
@@ -891,105 +891,61 @@ func (this *Server) Start() {
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
-		func(address string, openCallback string, closeCallback string, connectionId string, service GoJavaScript.Value, caller GoJavaScript.Value) GoJavaScript.Value {
-			values := strings.Split(address, ":")
-			var host string
-			var port int
-			log.Println("898 ---> append connection ", connectionId, " host ", host, ":", port)
+		func(sessionId string, service GoJavaScript.Object, caller interface{}) string {
+			conn_, _ := service.Get("conn")
+			conn := conn_.Val.(GoJavaScript.Object)
+
 			// Address can be ws://127.0.0.1:9393 or simply 127.0.0.1:9393
-			if len(values) == 3 {
-				host = strings.Replace(values[1], "//", "", -1)
-				port, _ = strconv.Atoi(values[2])
-			} else if len(values) == 2 {
-				host = values[0]
-				port, _ = strconv.Atoi(values[1])
-			}
+			host_, _ := conn.Get("ipv4")
+			port_, _ := conn.Get("port")
+			port := int(port_.Val.(float64))
+			host := strings.Replace(strings.Replace(host_.Val.(string), "ws:", "", -1), "//", "", -1)
 
 			// Get the new connection id.
 			subConnection, err := GetServer().connect(host, port)
-
-			// The new created connection Js object.
-			var conn GoJavaScript.Value
-
 			if err != nil {
-				return conn
+				log.Println("---> err ", err)
 			}
 
+			if err != nil {
+				return ""
+			}
+
+			// I will get the subconnection uuid.
 			subConnectionId := subConnection.GetUuid()
 
 			// I will append the connection to the session.
-			GetServer().appendSubConnectionId(connectionId, subConnectionId)
-
-			// Here I will create the connection object...
-			conn, err = JS.GetJsRuntimeManager().RunScript(connectionId, "new Connection()")
-			if err != nil {
-				log.Println("--> error found!", err)
-			}
-
-			// I will set the connection id.
-			conn.Object().Set("id", subConnectionId)
-
-			// Set the connection in the caller.
-			service.Object().Set("conn", conn)
-
-			// I will set the open callback.
-			//.RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
-			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
-			if err != nil {
-				log.Println("--> error!", err)
-			}
-
-			// Now the close callback.
-			//.RunScript(connectionId, "Connection.prototype.onclose = "+closeCallback)
-			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onclose = "+closeCallback)
-			if err != nil {
-				log.Println("-----> error!", err)
-			}
+			GetServer().appendSubConnectionId(sessionId, subConnectionId)
 
 			// Keep the connection link...
-			GetServer().subConnections[subConnectionId] = conn
+			GetServer().subConnections[subConnectionId] = &conn
 
 			// I will get the client code and inject it in the vm.
-			id := Utility.RandomUUID()
-
 			method := "GetServicesClientCode"
 			params := make([]*MessageData, 0)
 			to := make([]*WebSocketConnection, 1)
 			to[0] = subConnection
 
-			successCallback := func(connectionId string, conn GoJavaScript.Value, service GoJavaScript.Value) func(rspMsg *message, caller interface{}) {
+			successCallback := func(connectionId string, conn GoJavaScript.Object, service GoJavaScript.Object) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
-					defer func() {
-						// Stahp mean the VM was kill by the admin.
-						if caught := recover(); caught != nil {
-							if caught.(error).Error() == "Stahp" {
-								// Here the task was cancel.
-								return
-							} else {
-								//panic(caught) // Something else happened, repanic!
-								log.Println("----> panic.... ", caught.(error).Error())
-							}
-						}
-					}()
-
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+					log.Println("---> run script ", src)
 					JS.GetJsRuntimeManager().RunScript(connectionId, src)
-
 					// Call on open...
-					conn.Object().Call("onopen", service, caller)
+					// conn.Call("onopen", service, caller)
 				}
-			}(connectionId, conn, service)
+			}(sessionId, conn, service)
 
 			errorCallback := func(rspMsg *message, caller interface{}) {
 				log.Println("GetServicesClientCode error!!!")
 			}
 
-			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, caller)
+			rqst, _ := NewRequestMessage(Utility.RandomUUID(), method, params, to, successCallback, nil, errorCallback, caller)
 			go func(rqst *message) {
 				GetServer().getProcessor().m_sendRequest <- rqst
 			}(rqst)
 
-			return conn
+			return subConnectionId
 		})
 
 	////////////////////////////////////////////////////////////////////////////

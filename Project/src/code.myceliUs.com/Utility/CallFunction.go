@@ -3,6 +3,7 @@ package Utility
 import (
 	"errors"
 	"reflect"
+	"strconv"
 )
 
 /**
@@ -20,8 +21,8 @@ func RegisterFunction(name string, fct interface{}) {
 
 func CallFunction(name string, params ...interface{}) (result []reflect.Value, err error) {
 	f := reflect.ValueOf(functionRegistry[name])
-	if len(params) != f.Type().NumIn() {
-		err = errors.New("The number of params is not adapted.")
+	if len(params) != f.Type().NumIn() && !f.Type().IsVariadic() {
+		err = errors.New("Wrong number of parameter for " + name + " got " + strconv.Itoa(len(params)) + " but espect " + strconv.Itoa(f.Type().NumIn()))
 		return
 	}
 	in := make([]reflect.Value, len(params))

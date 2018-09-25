@@ -19,7 +19,9 @@ type Object struct {
 
 	// Contain method name for Go and Js method
 	// and Js code for Js method.
-	Methods map[string]string
+	// the store value can be a string or []uint8 depending if the code
+
+	Methods map[string]interface{}
 
 	// Contain the properties of the object.
 	Properties map[string]interface{}
@@ -52,7 +54,7 @@ func NewObject(name string) *Object {
 
 	// Contain method name for Go and Js method
 	// and Js code for Js method.
-	obj.Methods = make(map[string]string, 0)
+	obj.Methods = make(map[string]interface{}, 0)
 
 	// Contain the properties of the object.
 	obj.Properties = make(map[string]interface{}, 0)

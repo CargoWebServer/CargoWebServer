@@ -41,6 +41,8 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
         // The message is an error
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
+        qDebug() << "receive request " << msg.id().c_str();
+
         // Now I will call process message from the store.
         QString methodName = QString::fromStdString(msg.rqst().method());
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName, sessionId);

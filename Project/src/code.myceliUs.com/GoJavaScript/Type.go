@@ -36,3 +36,9 @@ type ObjectRef struct {
 	UUID     string
 	TYPENAME string
 }
+
+// Contain byte code.
+type ByteCode struct {
+	TYPENAME string
+	Data     []uint8
+}

@@ -139,6 +139,7 @@ type JsRuntimeManager struct {
 	// Map of channel by session.
 	m_setVariable       map[string]OperationChannel
 	m_getVariable       map[string]OperationChannel
+	m_createObject      map[string]OperationChannel
 	m_executeJsFunction map[string]OperationChannel
 	m_runScript         map[string]OperationChannel
 	m_stopVm            map[string]chan (bool)
@@ -236,6 +237,8 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
 				} else if operationInfos.m_name == "SetVar" {
 					jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				} else if operationInfos.m_name == "CreateObject" {
+					jsRuntimeManager.m_createObject[operationInfos.m_params["sessionId"].(string)] <- operationInfos
 				} else if operationInfos.m_name == "ExecuteJsFunction" {
 					jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
 				} else if operationInfos.m_name == "RunScript" {
@@ -257,12 +260,13 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 				// JS engine.
 				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_createObject[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 
 				// The session processing loop...
-				go func(vm *GoJavaScriptClient.Client, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
+				go func(vm *GoJavaScriptClient.Client, setVariable OperationChannel, getVariable OperationChannel, createObject OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
 					// The session was interrupt!
 					defer func() {
 						// Stahp mean the VM was kill by the admin.
@@ -298,6 +302,15 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								}
 							}
 							callback <- []interface{}{varInfos} // unblock the channel...
+						case operationInfos := <-createObject:
+							callback := operationInfos.m_returns
+							var varInfos JsVarInfos
+							if operationInfos.m_params["varInfos"] != nil {
+								varInfos = operationInfos.m_params["varInfos"].(JsVarInfos)
+								obj := vm.CreateObject(varInfos.m_name)
+								varInfos.m_val = obj
+							}
+							callback <- []interface{}{varInfos} // unblock the channel...
 						case operationInfos := <-executeJsFunction:
 							callback := operationInfos.m_returns
 							var jsFunctionInfos JsFunctionInfos
@@ -324,7 +337,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							}
 						}
 					}
-				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
+				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_createObject[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 			}
 			// Close vm callback...
 			callback <- []interface{}{true} // unblock the channel...
@@ -382,6 +395,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// Create sessions channel container.
 	jsRuntimeManager.m_setVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_getVariable = make(map[string]OperationChannel)
+	jsRuntimeManager.m_createObject = make(map[string]OperationChannel)
 	jsRuntimeManager.m_executeJsFunction = make(map[string]OperationChannel)
 	jsRuntimeManager.m_runScript = make(map[string]OperationChannel)
 	jsRuntimeManager.m_stopVm = make(map[string]chan (bool))
@@ -631,18 +645,6 @@ func (this *JsRuntimeManager) getExports(path string, sessionId string) (GoJavaS
 	// Set it back...
 	this.m_script = currentPath // Set back the path to the file before the call.bytes
 
-	if strings.HasSuffix(currentPath, ".js") {
-		currentPath = currentPath[0 : len(currentPath)-3]
-	}
-
-	// TODO be sure
-	/*if export, ok := this.m_exports[sessionId][currentPath]; ok {
-		log.Println("---> 670: set exports!")
-		this.m_sessions[sessionId].SetGlobalVariable("exports", export)
-	} else {
-		log.Panicln("---> no exports found for path ", currentPath)
-	}*/
-
 	return exports, nil
 
 }
@@ -681,7 +683,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 	vm.SetGlobalVariable("sessionId", sessionId)
 
 	// I will register the require function first.
-	vm.RegisterJsFunction("require", "function require(moduleId){return require_(moduleId, sessionId)}")
+	vm.RegisterJsFunction("require", "function require(moduleId){return eval(require_(moduleId, sessionId))}")
 
 	// Create the map of exports.
 	jsRuntimeManager.m_exports[sessionId] = make(map[string]GoJavaScript.Object)
@@ -702,13 +704,17 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 
 			if export, ok := this.m_exports[sessionId][exportPath]; ok {
 				// Set the function as part of the exports object.
+				log.Println("---> set function name ", name)
 				export.Set(name, function)
 			} else {
-				export = vm.CreateObject("exports")
+				// Create the export variable.
+				uuid := strings.Replace(Utility.GenerateUUID(exportPath), "-", "_", -1)
+				export = vm.CreateObject("exports_" + uuid)
 
 				// Keep it path
 				export.Set("path__", exportPath)
 				export.Set("module_id__", moduleId)
+				export.Set("exports_id__", "exports_"+uuid)
 
 				this.m_exports[sessionId][exportPath] = export
 
@@ -762,13 +768,18 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJavaSc
 		return export
 	} else {
 		// create a new path
-		log.Println("---> init script: ", path)
-		export := vm.CreateObject("exports")
+		uuid := strings.Replace(Utility.GenerateUUID(exportPath), "-", "_", -1)
+		export := vm.CreateObject("exports_" + uuid)
 		export.Set("path__", exportPath)
 		export.Set("module_id__", moduleId)
+		export.Set("exports_id__", "exports_"+uuid)
+
 		this.m_exports[sessionId][exportPath] = export
 
 		if src, ok := this.m_scripts[path]; ok {
+			// replace the exports variable by it specific name before runing the
+			// script.
+			src = strings.Replace(src, "exports.", "exports_"+uuid+".", -1)
 			_, err := vm.EvalScript(src, []interface{}{})
 			if err != nil {
 				log.Panicln("---> script running error:  ", path, err)
@@ -1056,6 +1067,28 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
 	this.m_execVmOperation <- op
 	// wait for completion
 	<-op.m_returns
+}
+
+/**
+ *
+ */
+func (this *JsRuntimeManager) CreateObject(sessionId string, name string) *GoJavaScript.Object {
+	// Protectect the map access...
+	var info JsVarInfos
+	info.m_name = name
+
+	var op OperationInfos
+	op.m_name = "CreateObject"
+	op.m_params = make(map[string]interface{})
+	op.m_params["varInfos"] = info
+	op.m_params["sessionId"] = sessionId
+	op.m_returns = make(chan ([]interface{}))
+	defer close(op.m_returns)
+	this.m_execVmOperation <- op
+
+	// wait for completion
+	results := <-op.m_returns
+	return results[0].(JsVarInfos).m_val.(*GoJavaScript.Object)
 }
 
 /**

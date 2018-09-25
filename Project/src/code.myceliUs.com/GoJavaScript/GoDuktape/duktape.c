@@ -14089,6 +14089,7 @@ static duk_uint8_t *duk__load_func(duk_hthread *thr, duk_uint8_t *p, duk_uint8_t
 }
 
 DUK_EXTERNAL void duk_dump_function(duk_hthread *thr) {
+	//return;
 	duk_hcompfunc *func;
 	duk_bufwriter_ctx bw_ctx_alloc;
 	duk_bufwriter_ctx *bw_ctx = &bw_ctx_alloc;

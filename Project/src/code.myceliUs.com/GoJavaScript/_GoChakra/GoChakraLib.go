@@ -744,7 +744,6 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 				if err == nil {
 					uuid, _ := jsToGo(propUuid_)
 					result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
-					log.Println("---> 766 call function: ", propUuid_, name, " with result ", result)
 					if err == nil && result != nil {
 						return C.JsValueRef(goToJs(result))
 					} else if err != nil {
@@ -756,7 +755,6 @@ func nativeFunctionHandler(callee C.JsValueRef, isConstructCall bool, arguments 
 			} else {
 				// There is no function owner I will simply call go function.
 				result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
-				log.Println("---> 772 call function: ", name, " with result ", result)
 				if err == nil && result != nil {
 					return C.JsValueRef(goToJs(result))
 				} else if err != nil {

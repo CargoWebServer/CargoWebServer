@@ -6,21 +6,28 @@ package JS
 
 import (
 	"log"
-
-	"code.myceliUs.com/GoJavaScript"
 )
 
 func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	this.appendFunction("require_", func(identifier string, sessionId string) GoJavaScript.Object {
+	this.appendFunction("require_", func(identifier string, sessionId string) string {
 		// resolve dependencie and return the exports.
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {
 			log.Println("---> error found in require function ", err)
 		}
-		return exports
+
+		// Get the export variable export uuid
+		uuid, err := exports.Get("exports_id__")
+		if err == nil {
+			return uuid.Val.(string)
+		}
+
+		log.Println("---> error found in require function ", err)
+
+		return ""
 	})
 
 	// The file system module.

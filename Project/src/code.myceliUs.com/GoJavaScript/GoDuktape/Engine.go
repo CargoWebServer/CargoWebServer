@@ -14,8 +14,8 @@ duk_context_ptr create_default_context(){
 }
 
 // Clear the default context.
-duk_int_t eval_string(duk_context_ptr context, const char* src){
-	return duk_peval_string(context,src);
+duk_int_t eval_string(duk_context_ptr ctx, const char* src){
+	return duk_peval_string(ctx,src);
 }
 
 extern duk_int_t compile_function_string(duk_context_ptr ctx, const char* src){
@@ -42,11 +42,40 @@ duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid){
 }
 
 // The function handler.
-extern duk_ret_t c_function_handler(duk_context_ptr ctx);
+extern duk_ret_t c_function_handler(duk_context_ptr ctx, const char* name, const char* uuid);
+
+duk_ret_t c_function_handler_(duk_context_ptr ctx){
+	// Push the current function on the context
+	duk_push_current_function(ctx);
+
+	// Get it name property.
+	duk_get_prop_string(ctx, -1, "name");
+
+	const char* name = duk_to_string(ctx, -1);
+
+	duk_pop(ctx); // pop name.
+
+	// push this in the context.
+	duk_push_this(ctx);
+
+	const char* uuid = 0;
+	if(duk_is_object(ctx, -1)){
+		if(duk_has_prop_string(ctx, -1, "uuid_")) {
+			duk_get_prop_string(ctx, -1, "uuid_");
+			uuid = duk_to_string(ctx, -1);
+			duk_pop(ctx); // pop prop value (uuid)
+		}
+	}
+
+	duk_pop(ctx); // pop this
+
+	// Call the go handler function with it parematers.
+	return c_function_handler(ctx, name, uuid);
+}
 
 // Set C function handler.
 duk_idx_t push_c_function(duk_context_ptr ctx, const char* name){
-	duk_idx_t fct_idx = duk_push_c_function(ctx, c_function_handler, DUK_VARARGS);
+	duk_idx_t fct_idx = duk_push_c_function(ctx, c_function_handler_, DUK_VARARGS);
 
 	// Set the function name as property...
 	duk_push_string(ctx, "name");
@@ -64,6 +93,11 @@ const char* safe_to_string(duk_context_ptr ctx, duk_idx_t idx){
 	return duk_safe_to_string(ctx, idx);
 }
 
+// Load a function from bytecode.
+void load_byte_code(duk_context_ptr ctx, char* bytecode, int length){
+	char* dukBuff = (char*)duk_push_fixed_buffer(ctx, length); // push a duk buffer to stack
+	memcpy(dukBuff, bytecode, length); // copy the bytecode to the duk buffer
+}
 */
 import "C"
 
@@ -73,6 +107,7 @@ import "code.myceliUs.com/GoJavaScript"
 //import "reflect"
 import "errors"
 import "log"
+import b64 "encoding/base64"
 
 /**
  * The duktape JavaScript engine.
@@ -191,7 +226,7 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 	C.duk_get_prop_string(self.context, C.int(-2), cstr)
 
 	// Put the this object pointer.
-	C.duk_dup(self.context, -2)
+	C.duk_dup(self.context, -3)
 
 	// Set the arguments...
 	for i := 0; i < len(params); i++ {
@@ -265,26 +300,37 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 	// Set the property at top of the stack.
 	ret := C.int(C.duk_get_global_string(self.context, cstr))
 	C.free(unsafe.Pointer(cstr))
-	if ret > 0 {
-		// so here the context point to the function.
-		// I will append the list of arguments.
-		// Now I will set the arguments...
-		for i := 0; i < len(params); i++ {
-			// So here I will set argument on the context.
-			setValue(self.context, params[i])
-		}
 
-		C.duk_call(self.context, C.int(len(params)))
-
-		// Now the result is at -1
-		v, err := getValue(self.context, -1)
+	if ret == 0 {
+		byteCode, err := b64.StdEncoding.DecodeString(name)
 		if err == nil {
-			value.Val = v
-		}
+			byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
+			C.load_byte_code(self.context, byteCode_, C.int(len(byteCode)))
+			C.free(unsafe.Pointer(byteCode_))
 
-		// remove the result from the stack.
-		C.duk_pop(self.context)
+			// replaces the buffer on the stack top with the original function
+			C.duk_load_function(self.context)
+		}
 	}
+
+	// so here the context point to the function.
+	// I will append the list of arguments.
+	// Now I will set the arguments...
+	for i := 0; i < len(params); i++ {
+		// So here I will set argument on the context.
+		setValue(self.context, params[i])
+	}
+
+	C.duk_call(self.context, C.int(len(params)))
+
+	// Now the result is at -1
+	v, err := getValue(self.context, -1)
+	if err == nil {
+		value.Val = v
+	}
+
+	// remove the result from the stack.
+	C.duk_pop(self.context)
 
 	return value, nil
 }

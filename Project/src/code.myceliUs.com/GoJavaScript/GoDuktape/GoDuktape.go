@@ -11,6 +11,8 @@ extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t index);
 extern duk_bool_t is_error(duk_context_ptr ctx, duk_idx_t index);
 extern const char* safe_to_string(duk_context_ptr ctx, duk_idx_t idx);
 extern duk_idx_t set_finalizer(duk_context_ptr ctx, const char* uuid);
+extern void load_byte_code(duk_context_ptr ctx, char* bytecode, int length);
+
 */
 import "C"
 import "reflect"
@@ -18,9 +20,13 @@ import "unsafe"
 import "errors"
 import "strconv"
 import "code.myceliUs.com/GoJavaScript"
+import b64 "encoding/base64"
+
+//import "code.myceliUs.com/Utility"
 import "log"
-import "strings"
 import "encoding/json"
+
+//import "strings"
 
 /**
  * Go and Javascript functions bindings.
@@ -105,12 +111,22 @@ func isBuffer(ctx C.duk_context_ptr, index int) bool {
 	return false
 }
 
-func isFunction(ctx C.duk_context_ptr, index int) bool {
-	type_ := C.duk_get_type_mask(ctx, C.int(index))
-	if type_ == C.DUK_TYPE_MASK_LIGHTFUNC {
+func isJsFunction(ctx C.duk_context_ptr, index int) bool {
+	// Here the function is compile...
+	if int(C.duk_is_ecmascript_function(ctx, C.int(index))) > 0 {
+		log.Println("---> is ecmasript function!")
 		return true
 	}
+
+	if int(C.duk_is_function(ctx, C.int(index))) > 0 {
+		return true
+	}
+
 	return false
+}
+
+func isGoFunction(ctx C.duk_context_ptr, index int) bool {
+	return int(C.duk_is_c_function(ctx, C.int(index))) > 0
 }
 
 func isError(ctx C.duk_context_ptr, index int) bool {
@@ -149,13 +165,27 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 				C.push_c_function(ctx, cstr)
 				C.duk_put_prop_string(ctx, obj_idx, cstr)
 			} else {
-				src_ := C.CString(src.(string))
-				if int(C.compile_function_string(ctx, src_)) != 0 {
-					log.Println("---> compilation fail!", src)
-					log.Println("---> error:", C.GoString(C.safe_to_string(ctx, -1)))
-				} else {
-					// Keep the function as object method.
+				byteCode, err := b64.StdEncoding.DecodeString(src.(string))
+				if err == nil {
+					byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
+					C.load_byte_code(ctx, byteCode_, C.int(len(byteCode)))
+					C.free(unsafe.Pointer(byteCode_))
+
+					// replaces the buffer on the stack top with the original function
+					C.duk_load_function(ctx)
+
+					// Now the ctx contain a function
 					C.duk_put_prop_string(ctx, obj_idx, cstr)
+
+				} else {
+					src_ := C.CString(src.(string))
+					if int(C.compile_function_string(ctx, src_)) != 0 {
+						log.Println("---> compilation fail!", src)
+						log.Println("---> error:", C.GoString(C.safe_to_string(ctx, -1)))
+					} else {
+						// Keep the function as object method.
+						C.duk_put_prop_string(ctx, obj_idx, cstr)
+					}
 				}
 			}
 			C.free(unsafe.Pointer(cstr))
@@ -323,6 +353,7 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		return nil, err
 	} else if isArray(ctx, index) {
 		// The object is an array
+		//log.Println("---> array found")
 		size := int(C.duk_get_length(ctx, C.int(index)))
 		array := make([]interface{}, size)
 		for i := 0; i < size; i++ {
@@ -335,9 +366,21 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 			C.duk_pop(ctx) // back to the array and not the value.
 		}
 		return array, nil
-	} else if isFunction(ctx, index) {
-		log.Println("---> is a function: 309")
+	} else if isGoFunction(ctx, index) {
+		// Here I will return the function name
+		log.Println("--> is go function")
+		return nil, nil
+	} else if isJsFunction(ctx, index) {
+		// I will duplicate the function on the stack and create it buffer version.
+		C.duk_dup(ctx, C.int(index))
+		// put the byte code in the stack
+		C.duk_dump_function(ctx)
+		var size int
+		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulong)(unsafe.Pointer(&size)))
+		bytcode := C.GoBytes(ptr, C.int(size))
+		return bytcode, nil
 	} else if isObject(ctx, index) {
+		//log.Println("---> is an object")
 		// Here it can be an array or an object...
 		// The go object will be a copy of the Js object.
 		uuid_name := C.CString("uuid_")
@@ -348,20 +391,44 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 			C.duk_pop(ctx) // pop the string.
 			// Return and object reference.
 			return GoJavaScript.NewObjectRef(uuid.(string)), nil
-
 		} else {
-			// if there is no error
-			jsonStr := C.GoString(C.duk_json_encode(ctx, C.int(index)))
-			C.duk_pop(ctx) // remove the string from the top of the stack
-			if strings.Index(jsonStr, "TYPENAME") != -1 {
-				// So here I will create a remote action and tell the client to
-				// create a Go object from jsonStr. The object will be set by
-				// the client on the server.
-				return GoJavaScript.CallGoFunction("Client", "CreateGoObject", jsonStr)
+			// Here i will create a Js go object that will serve as object handle from
+			// go code.
+			obj, err := GoJavaScript.CallGoFunction("Client", "CreateObject", "")
+			uuid := obj.(*GoJavaScript.ObjectRef).UUID
+
+			properties := make([]string, 0)
+			C.duk_enum(ctx, C.int(index), 0)
+			for int(C.duk_next(ctx, -1, 0)) > 0 {
+				// [ ... enum key ]
+				properties = append(properties, C.GoString(C.duk_get_string(ctx, -1)))
+				C.duk_pop(ctx) // pop key
 			}
-			// In that case the object has no go representation...
-			// and must be use only in JS.
-			return nil, nil
+
+			C.duk_pop(ctx) // pop enum object
+			for i := 0; i < len(properties); i++ {
+				name := C.CString(properties[i])
+				C.duk_get_prop_string(ctx, C.int(index), name)
+				if isJsFunction(ctx, -1) {
+					value, err := getValue(ctx, -1)
+					if err == nil {
+						GoJavaScript.CallGoFunction("Client", "SetObjectJsMethod", uuid, properties[i], value)
+					}
+				} else if isGoFunction(ctx, -1) {
+					_, err := getValue(ctx, -1)
+					if err == nil {
+						GoJavaScript.CallGoFunction("Client", "SetObjectGoMethod", uuid, properties[i])
+					}
+				} else {
+					value, err := getValue(ctx, -1)
+					if err == nil {
+						GoJavaScript.CallGoFunction("Client", "SetObjectProperty", uuid, properties[i], value)
+					}
+				}
+				C.free(unsafe.Pointer(name))
+				C.duk_pop(ctx) // pop value object
+			}
+			return obj, err
 
 		}
 		C.free(unsafe.Pointer(uuid_name))
@@ -372,7 +439,8 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		return nil, nil
 	}
 
-	return nil, errors.New("no value found at index " + strconv.Itoa(index))
+	log.Println("---> no value found!")
+	return nil, errors.New("no value found at index " + strconv.Itoa(index) + " with type index " + strconv.Itoa(int(C.duk_get_type(ctx, C.int(index)))))
 }
 
 //export c_finalizer
@@ -397,61 +465,48 @@ func c_finalizer(ctx C.duk_context_ptr) C.duk_ret_t {
 }
 
 //export c_function_handler
-func c_function_handler(ctx C.duk_context_ptr) C.duk_ret_t {
+func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.char) C.duk_ret_t {
 	// Push the current function on the context
-	C.duk_push_current_function(ctx)
+	name := C.GoString(name_cstr)
+	var uuid string
+	if uuid_cstr != nil {
+		uuid = C.GoString(uuid_cstr)
+	}
 
-	// Get it name..
-	C.duk_get_prop_string(ctx, -1, C.CString("name"))
-
-	name, err := getValue(ctx, -1)
-	C.duk_pop(ctx) // back to the context calling context.
-
-	if err == nil {
-		// Now I will get back the list of arguments.
-		size := int(C.duk_get_top(ctx)) - 1
-		params := make([]interface{}, size)
-		for i := 0; i < size; i++ {
-			value, err := getValue(ctx, i)
-			if err == nil {
-				params[i] = value
-			} else {
-				log.Panicln("---> fail 393")
-			}
-		}
-
-		// Now I will get the this
-		C.duk_push_this(ctx)
-
-		if isObject(ctx, -1) {
-			uuid_ := C.CString("uuid_")
-			C.duk_push_string(ctx, uuid_)
-			defer C.free(unsafe.Pointer(uuid_))
-			if int(C.duk_has_prop_string(ctx, -2, uuid_)) > 0 {
-				C.duk_get_prop_string(ctx, -2, uuid_)
-				uuid, _ := getValue(ctx, -1)
-				C.duk_pop(ctx)
-				// I will now call the function.
-				result, err := GoJavaScript.CallGoFunction(uuid.(string), name.(string), params...)
-				if err == nil && result != nil {
-					// So here I will set the value
-					setValue(ctx, result)
-					return C.duk_ret_t(1)
-				} else if err != nil {
-					// error occured here.
-				}
-			}
+	// Now I will get back the list of arguments.
+	size := int(C.duk_get_top(ctx)) - 1
+	params := make([]interface{}, size)
+	for i := 0; i < size; i++ {
+		value, err := getValue(ctx, i)
+		if err == nil {
+			params[i] = value
 		} else {
-			result, err := GoJavaScript.CallGoFunction("", name.(string), params...)
-			if err == nil && result != nil {
-				setValue(ctx, result)
-				// The value must be pop by the caller.
-				return C.duk_ret_t(1)
-			} else if err != nil {
-				// error occured here.
-			}
+			log.Panicln("---> fail 393")
 		}
 	}
+
+	if len(uuid) > 0 {
+		// I will now call the function.
+		result, err := GoJavaScript.CallGoFunction(uuid, name, params...)
+		if err == nil && result != nil {
+			// So here I will set the value
+			setValue(ctx, result)
+			return C.duk_ret_t(1)
+		} else if err != nil {
+			// error occured here.
+		}
+
+	} else {
+		result, err := GoJavaScript.CallGoFunction("", name, params...)
+		if err == nil && result != nil {
+			setValue(ctx, result)
+			// The value must be pop by the caller.
+			return C.duk_ret_t(1)
+		} else if err != nil {
+			// error occured here.
+		}
+	}
+
 	return C.duk_ret_t(0) // return undefined.
 
 }

@@ -74,20 +74,14 @@ func NewClient(address string, port int, name string) *Client {
 	// process actions.
 	go client.processActions()
 
-	// Append the console.
-	console := new(GoJavaScript.Console)
-	console.TYPENAME = "GoJavaScript.Console"
-	client.RegisterGoType(console)
-
 	// Set the console.
-	client.SetGlobalVariable("console", console)
+	client.SetGlobalVariable("console", getConsole())
 
 	return client
 }
 
 // Replace object reference by actual object.
 func setObjectRefs(values []interface{}) []interface{} {
-
 	for i := 0; i < len(values); i++ {
 		if reflect.TypeOf(values[i]).Kind() == reflect.Slice {
 			// Here I got a slice...
@@ -292,7 +286,7 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 			return infos, err
 		}
 
-		infos["Methods"] = make(map[string]string, 0)
+		infos["Methods"] = make(map[string]interface{}, 0)
 		element := reflect.ValueOf(obj)
 
 		for reflect.TypeOf(element.Interface()).Kind() == reflect.Ptr {
@@ -303,7 +297,7 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 		if element.Type().String() != "GoJavaScript.Object" {
 			for i := 0; i < element.Addr().NumMethod(); i++ {
 				typeMethod := element.Addr().Type().Method(i)
-				infos["Methods"].(map[string]string)[typeMethod.Name] = ""
+				infos["Methods"].(map[string]interface{})[typeMethod.Name] = ""
 			}
 		}
 
@@ -351,9 +345,9 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 						infos[fieldName] = GoJavaScript.NewObjectRef(uuid_)
 					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
 						if fieldName == "Methods" {
-							methods := fieldValue.(map[string]string)
+							methods := fieldValue.(map[string]interface{})
 							for name, src := range methods {
-								infos["Methods"].(map[string]string)[name] = src
+								infos["Methods"].(map[string]interface{})[name] = src // src can by byte code.
 							}
 						} else if fieldName == "Properties" {
 							// can be recursive?
@@ -475,6 +469,25 @@ func (self *Client) CreateObject(name string) GoJavaScript.Object {
 	obj.SetPeer(self.peer)
 
 	return *obj
+}
+
+// Set Js object property.
+func (self *Client) SetObjectProperty(uuid string, name string, value interface{}) {
+	obj := GoJavaScript.GetCache().GetObject(uuid).(GoJavaScript.Object)
+	// set the object property.
+	obj.Set(name, value)
+}
+
+func (self *Client) SetObjectJsMethod(uuid string, name string, value interface{}) {
+	obj := GoJavaScript.GetCache().GetObject(uuid).(GoJavaScript.Object)
+	// set the object property.
+	obj.Methods[name] = value
+}
+
+func (self *Client) SetObjectGoMethod(uuid string, name string) {
+	//obj := GoJavaScript.GetCache().GetObject(uuid).(GoJavaScript.Object)
+	// set the object property.
+	log.Println("---> set go function ", uuid, name)
 }
 
 /**

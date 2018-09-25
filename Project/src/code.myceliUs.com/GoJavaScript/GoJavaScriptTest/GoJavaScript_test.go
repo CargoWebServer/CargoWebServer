@@ -103,13 +103,6 @@ func AddNumber(a float64, b float64) float64 {
 	return a + b
 }
 
-// Simple function handler.
-func PrintValue(value ...interface{}) {
-	for i := 0; i < len(value); i++ {
-		log.Println(value[i])
-	}
-}
-
 // one of jerryscript, chakracore, duktape
 var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "duktape")
 
@@ -179,8 +172,7 @@ func TestArray(t *testing.T) {
 func TestGoFunction(t *testing.T) {
 	// First of all I will register the tow go function in the Engine.
 	engine.RegisterGoFunction("AddNumber", AddNumber)
-	engine.RegisterGoFunction("Print", PrintValue)
-	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); Print("The result is:" + result); return result;}`)
+	engine.RegisterJsFunction("TestAddNumber", `function TestAddNumber(){var result = AddNumber(3, 8); console.log("The result is:" + result); return result;}`)
 	addNumberResult, err := engine.CallFunction("TestAddNumber")
 
 	if err == nil {
@@ -206,8 +198,6 @@ func TestGlobalVariable(t *testing.T) {
  * Test creating JavaScript object with go function and Js method.
  */
 func TestCreateJsObjectFromGo(t *testing.T) {
-
-	engine.RegisterGoFunction("print", PrintValue)
 
 	// First of all I will create the object.
 	obj := engine.CreateObject("test")
@@ -246,8 +236,6 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 // Test using go object created from go function and from global variable.
 func TestRegisterGoObject(t *testing.T) {
 
-	engine.RegisterGoFunction("print", PrintValue)
-
 	// Create the object to register.
 	engine.RegisterGoType((*Person)(nil))
 
@@ -258,23 +246,23 @@ func TestRegisterGoObject(t *testing.T) {
 	engine.SetGlobalVariable("Dave", p)
 
 	// Now I will eval sricpt on it...
-	engine.RegisterJsFunction("Test1", `function Test1(){print('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
+	engine.RegisterJsFunction("Test1", `function Test1(){console.log('Hello ' + Dave.Name() + ' your first contacts is ' + Dave.GetContacts()[0].Name())}`)
 
 	// Eval script that contain Go object in it.
 	engine.EvalScript("Test1();", []interface{}{})
 
 	// Eval single return type (not array)
 	engine.RegisterGoFunction("GetPerson", GetPerson)
-	engine.EvalScript("print('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
+	engine.EvalScript("console.log('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
 	// Eval array...
-	engine.EvalScript("print(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
+	engine.EvalScript("console.log(Dave.SayHelloToAll(GetPerson().GetContacts()))", []interface{}{})
 
 	// Eval object chain call...
-	engine.EvalScript("print('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
+	engine.EvalScript("console.log('I am ' + GetPerson().Myself().Myself().Myself().Name() + '!')", []interface{}{})
 
 	// I will now register a function that call GetPerson in it.
-	engine.EvalScript(`function SayHelloToContact(index){print('---> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
+	engine.EvalScript(`function SayHelloToContact(index){console.log('---> '+ GetPerson().SayHelloTo(GetPerson().GetContacts()[index].Myself()))}`, []interface{}{})
 	engine.CallFunction("SayHelloToContact", []interface{}{1})
 }
 
@@ -284,14 +272,13 @@ func TestRegisterGoObject(t *testing.T) {
  *    with RegisterGoType
  */
 func TestCreateGoObjectFromJs(t *testing.T) {
-	engine.RegisterGoFunction("print", PrintValue)
 
 	// Test with structure
 	// The type must be register before being usable by the vm.
 	engine.RegisterGoType((*Person)(nil))
 
 	// Register the dynamic type.
-	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; print('---> TestJsToGoStruct ' + jerry ); return jerry; }`)
+	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; console.log('---> TestJsToGoStruct ' + jerry ); return jerry; }`)
 	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 
 	if err != nil {
@@ -306,6 +293,67 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 	} else {
 		t.Error("test fail!")
 	}
+}
+
+/**
+ * Test using javascript object in go function.
+ */
+func TestJsObjInGo(t *testing.T) {
+
+	// The test function will be use inside a JsClass method.
+	engine.RegisterGoFunction("test_", func(obj GoJavaScript.Object) {
+		// so here obj is call from toto.test();
+		// I will try to call sayHello on it.
+		obj.Call("sayHello", "Go!")
+	})
+
+	// a simple javacript function with a simple function.
+	src := "var JsClass = function(name){ this.name = name; this.sayMyName = function(){console.log('my name is ', name);}; return this; };"
+	src += "JsClass.prototype.sayHello = function(from){console.log('hello ', this.name, ' from ', from);};"
+	src += "JsClass.prototype.test = function(){test_(this);};"
+
+	// so here i will eval the script.
+	engine.EvalScript(src, []interface{}{})
+
+	// Try call toto.test()
+	engine.EvalScript("var toto = new JsClass('toto'); toto.sayMyName(); toto.test();", []interface{}{})
+}
+
+/**
+ * Test js callback function as Go function parameter.
+ */
+func TestCallback(t *testing.T) {
+
+	// test a go function that take a Js function as parameter.
+	engine.RegisterGoFunction("go_callback", func(engine *GoJavaScriptClient.Client) func(string) {
+		// Callback is a javascript bytecode containing the function pass ass go function
+		// parameter.
+		return func(callback string) {
+			engine.CallFunction(callback, []interface{}{"GoJavaScript"})
+		}
+	}(engine))
+
+	// a simple javacript function with a simple function.
+	src := `go_callback(function(name){console.log("I'm " + name + "!")});`
+
+	// so here i will eval the script.
+	engine.EvalScript(src, []interface{}{})
+
+	// Now test a Js function that take a go function as callback.
+	src = `function fct0(fct1, fct2){fct1(fct2);}; fct0(go_callback, function(name){console.log("I'm " + name + "!")})`
+	engine.EvalScript(src, []interface{}{})
+
+	// Now I will test a go function that take anoter go funciton as parameter.
+	engine.RegisterGoFunction("fct0", func(fct interface{}) {
+
+	})
+
+	engine.RegisterGoFunction("fct1", func() {
+
+	})
+
+	src = `fct0(fct1);`
+	engine.EvalScript(src, []interface{}{})
 }
 
 func TestStopJava(t *testing.T) {
