@@ -343,15 +343,18 @@ func TestCallback(t *testing.T) {
 	src = `function fct0(fct1, fct2){fct1(fct2);}; fct0(go_callback, function(name){console.log("I'm " + name + "!")})`
 	engine.EvalScript(src, []interface{}{})
 
-	// Now I will test a go function that take anoter go funciton as parameter.
+	// Now I will test a go function that take another go funciton as parameter.
 	engine.RegisterGoFunction("fct0", func(fct interface{}) {
-
+		// fct is the function itself pass as interface so I will cast it
+		// and call it with value "GoJavaScript".
+		fct.(func(toto string))("GoJavaScript!")
 	})
 
-	engine.RegisterGoFunction("fct1", func() {
-
+	engine.RegisterGoFunction("fct1", func(toto string) {
+		log.Println("---> call go function ftc0 with value ", toto)
 	})
 
+	// Here the function fct0 is call with fct1 as parameter...
 	src = `fct0(fct1);`
 	engine.EvalScript(src, []interface{}{})
 }

@@ -114,7 +114,6 @@ func isBuffer(ctx C.duk_context_ptr, index int) bool {
 func isJsFunction(ctx C.duk_context_ptr, index int) bool {
 	// Here the function is compile...
 	if int(C.duk_is_ecmascript_function(ctx, C.int(index))) > 0 {
-		log.Println("---> is ecmasript function!")
 		return true
 	}
 
@@ -368,8 +367,11 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		return array, nil
 	} else if isGoFunction(ctx, index) {
 		// Here I will return the function name
-		log.Println("--> is go function")
-		return nil, nil
+		C.duk_dup(ctx, C.int(index))
+		str := C.GoString(C.duk_to_string(ctx, -1))
+		C.duk_pop(ctx)
+		// here i will retrun the string value of the go function.
+		return str, nil
 	} else if isJsFunction(ctx, index) {
 		// I will duplicate the function on the stack and create it buffer version.
 		C.duk_dup(ctx, C.int(index))

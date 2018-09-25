@@ -13,6 +13,7 @@ import (
 	//"fmt"
 	"os/exec"
 	"reflect"
+	"strings"
 
 	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/Utility"
@@ -112,6 +113,18 @@ func setObjectRefs(values []interface{}) []interface{} {
 
 // Call a go function and return it result.
 func (self *Client) callGoFunction(name string, params []interface{}) (interface{}, error) {
+	// Replace function string by their pointer.
+	for i := 0; i < len(params); i++ {
+		if reflect.TypeOf(params[i]).Kind() == reflect.String {
+			if strings.HasPrefix(params[i].(string), "function ") && strings.HasSuffix(params[i].(string), "() { [native code] }") {
+				startIndex := strings.Index(params[i].(string), " ") + 1
+				endIndex := strings.Index(params[i].(string), "(")
+				name := params[i].(string)[startIndex:endIndex]
+				params[i] = Utility.GetFunction(name)
+			}
+		}
+	}
+
 	results, err := Utility.CallFunction(name, setObjectRefs(params)...)
 	if err != nil {
 		log.Println("---> call go function ", name, " fail with error: ", err)

@@ -19,6 +19,13 @@ func RegisterFunction(name string, fct interface{}) {
 	functionRegistry[name] = fct
 }
 
+/**
+ * Get a function from it name.
+ */
+func GetFunction(name string) interface{} {
+	return functionRegistry[name]
+}
+
 func CallFunction(name string, params ...interface{}) (result []reflect.Value, err error) {
 	f := reflect.ValueOf(functionRegistry[name])
 	if len(params) != f.Type().NumIn() && !f.Type().IsVariadic() {
