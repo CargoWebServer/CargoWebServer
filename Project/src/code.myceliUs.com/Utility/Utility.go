@@ -74,6 +74,20 @@ func PrettyPrint(b []byte) ([]byte, error) {
 	return out.Bytes(), err
 }
 
+func ToJson(obj interface{}) (string, error) {
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return "", err
+	}
+	var b_ []byte
+	b_, err = PrettyPrint(b)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b_), nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //              			Utility function...
 ////////////////////////////////////////////////////////////////////////////////

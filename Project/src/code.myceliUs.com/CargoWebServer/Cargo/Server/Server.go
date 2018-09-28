@@ -11,7 +11,6 @@ import (
 	"errors"
 	"log"
 	"os"
-
 	"strconv"
 	"strings"
 
@@ -348,7 +347,9 @@ func (this *Server) Start() {
 	/**
 	 * Made other connection side execute JS code.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("executeJsFunction", func(functionSrc string, functionParams []GoJavaScript.Value, progressCallback string, successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("executeJsFunction", func(functionSrc string, functionParams []GoJavaScript.Object, progressCallback string, successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
+
+		log.Println("---> executeJsFunction")
 
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -367,11 +368,10 @@ func (this *Server) Start() {
 		// I will create the function parameters.
 		for i := 0; i < len(functionParams); i++ {
 			param := new(MessageData)
-			paramName, _ := functionParams[i].Object().Get("name")
+			paramName, _ := functionParams[i].Get("name")
 			param.Name, _ = paramName.ToString()
 			param.TYPENAME = "Server.MessageData"
-			paramValue, _ := functionParams[i].Object().Get("dataBytes")
-
+			paramValue, _ := functionParams[i].Get("dataBytes")
 			if paramValue.IsString() {
 				val, _ := paramValue.ToString()
 				param.Value = val
@@ -406,7 +406,6 @@ func (this *Server) Start() {
 						}
 						results = append(results, val)
 					} else if param.GetType() == Data_INTEGER {
-
 						val, err := strconv.ParseInt(string(param.GetDataBytes()), 10, 64)
 						if err != nil {
 							panic(err)
@@ -525,7 +524,7 @@ func (this *Server) Start() {
 	/**
 	 * Set a ping message to the other end connection...
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.ping", func(successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.ping", func(successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 
 		id := Utility.RandomUUID()
 		method := "Ping"
@@ -594,7 +593,7 @@ func (this *Server) Start() {
 	/**
 	 * Set a executeVbSrcript message to the other end connection...
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.executeVbSrcript", func(scriptName string, args []string, successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.executeVbSrcript", func(scriptName string, args []string, successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "ExecuteVbScript"
 		params := make([]*MessageData, 0)
@@ -674,7 +673,7 @@ func (this *Server) Start() {
 	/**
 	 * Execute external command on the server.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.runCmd", func(scriptName string, args []string, successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.runCmd", func(scriptName string, args []string, successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "RunCmd"
 		params := make([]*MessageData, 0)
@@ -758,7 +757,7 @@ func (this *Server) Start() {
 	 * @param {function} errorCallback In case of error.
 	 * @param {object} caller A place to store object from the request context and get it back from the response context.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.getServicesClientCode", func(successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.getServicesClientCode", func(successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "GetServicesClientCode"
 		params := make([]*MessageData, 0)
@@ -775,7 +774,7 @@ func (this *Server) Start() {
 				params := make([]interface{}, 2)
 				params[0] = result
 				params[1] = caller
-
+				log.Println("----->780 successCallBack ", successCallback)
 				// run the success callback.
 				if rspMsg.from == nil {
 					// Here it's a request from a local JS script.
@@ -823,7 +822,7 @@ func (this *Server) Start() {
 
 	})
 
-	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.stop", func(successCallback string, errorCallback string, caller GoJavaScript.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.stop", func(successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "Stop"
 		params := make([]*MessageData, 0)
@@ -891,7 +890,8 @@ func (this *Server) Start() {
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
-		func(sessionId string, service GoJavaScript.Object, caller interface{}) string {
+		func(sessionId string, service GoJavaScript.Object, caller interface{}) {
+
 			conn_, _ := service.Get("conn")
 			conn := conn_.Val.(GoJavaScript.Object)
 
@@ -908,7 +908,8 @@ func (this *Server) Start() {
 			}
 
 			if err != nil {
-				return ""
+				log.Println("---> 914 ", err)
+				return
 			}
 
 			// I will get the subconnection uuid.
@@ -916,6 +917,9 @@ func (this *Server) Start() {
 
 			// I will append the connection to the session.
 			GetServer().appendSubConnectionId(sessionId, subConnectionId)
+
+			// Set the sub-connection id.
+			conn.Set("id", subConnectionId)
 
 			// Keep the connection link...
 			GetServer().subConnections[subConnectionId] = &conn
@@ -926,15 +930,14 @@ func (this *Server) Start() {
 			to := make([]*WebSocketConnection, 1)
 			to[0] = subConnection
 
-			successCallback := func(connectionId string, conn GoJavaScript.Object, service GoJavaScript.Object) func(rspMsg *message, caller interface{}) {
+			successCallback := func(connectionId string, conn GoJavaScript.Object, service GoJavaScript.Object, caller interface{}) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
-					log.Println("---> run script ", src)
 					JS.GetJsRuntimeManager().RunScript(connectionId, src)
 					// Call on open...
-					// conn.Call("onopen", service, caller)
+					conn.Call("onopen", service, caller)
 				}
-			}(sessionId, conn, service)
+			}(sessionId, conn, service, caller)
 
 			errorCallback := func(rspMsg *message, caller interface{}) {
 				log.Println("GetServicesClientCode error!!!")
@@ -945,7 +948,6 @@ func (this *Server) Start() {
 				GetServer().getProcessor().m_sendRequest <- rqst
 			}(rqst)
 
-			return subConnectionId
 		})
 
 	////////////////////////////////////////////////////////////////////////////
@@ -970,7 +972,6 @@ func (this *Server) Start() {
 
 		// Set service in the server object.
 		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
-			log.Println("--> Load", serviceName, "service script")
 			_, err := JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
 			if err != nil {
 				log.Fatal(err)

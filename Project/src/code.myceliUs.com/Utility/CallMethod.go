@@ -66,6 +66,8 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 	for k, param := range params {
 		if param != nil {
 			in[k] = reflect.ValueOf(param)
+		} else if !method.Type().IsVariadic() {
+			in[k] = reflect.Zero(method.Type().In(k))
 		} else {
 			var nilVal interface{}
 			in[k] = reflect.ValueOf(&nilVal).Elem()

@@ -5,8 +5,8 @@ var bodyElement = new Element(document.body, { "tag": "div", "id": "body-element
 // Here I will display the spinner.
 var spinner = new Spinner(bodyElement, 30);
     
-//var service = new Server("localhost", "127.0.0.1", 9494)
-var service = new Server("mon176", "10.67.46.210", 9494)
+var service = new Server("localhost", "127.0.0.1", 9494)
+//var service = new Server("mon176", "10.67.46.210", 9494)
 var xapian = null
 
 // The list of datastore to looking in.

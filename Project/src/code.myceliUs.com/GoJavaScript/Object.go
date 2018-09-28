@@ -124,7 +124,9 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	action := NewAction("CallObjectMethod", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
-	action.AppendParam("params", params)
+
+	// I will set parameter object ref before call.
+	action.AppendParam("params", ObjectToRef(params))
 
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)

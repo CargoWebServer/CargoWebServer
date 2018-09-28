@@ -68,7 +68,7 @@ var RpcData = function(values){
 	this.conn.onclose = onCloseConnectionCallback;
 	
 	// initialise the connection.
-	this.conn.id = initConnection(sessionId, this, caller);
+	initConnection(sessionId, this, caller);
  }
  
  /*
@@ -82,6 +82,7 @@ var RpcData = function(values){
  * Execute JavaScript function.
  */
  Server.prototype.executeJsFunction = function (functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller) {
+	console.log("---> executeJsFunction: ", functionSrc)
 	executeJsFunction(functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller, this.conn.id);
  }
 

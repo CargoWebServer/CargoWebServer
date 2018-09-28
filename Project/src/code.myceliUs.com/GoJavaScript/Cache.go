@@ -1,6 +1,7 @@
 package GoJavaScript
 
 import (
+	"log"
 	"reflect"
 	"time"
 )
@@ -69,7 +70,7 @@ func newCache() {
 					obj := cache.m_jsObjects[operation["id"].(string)]
 					// remove it pointer from the interpreter.
 					if obj != nil {
-						//log.Println("delete object ----> ", operation["id"].(string))
+						log.Println("delete object ----> ", operation["id"].(string))
 						delete(cache.m_jsObjects, operation["id"].(string))
 					}
 				}
@@ -160,19 +161,19 @@ func GetObject(val interface{}) interface{} {
 		for i := 0; i < slice.Len(); i++ {
 			e := slice.Index(i)
 			if e.IsValid() {
-				if !e.IsNil() {
-					if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
-						ref := e.Interface().(ObjectRef)
-						if GetCache().GetObject(ref.UUID) != nil {
-							obj := GetCache().GetObject(ref.UUID)
-							if obj != nil {
-								if i == 0 {
-									values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
-								}
-								values = reflect.Append(values, reflect.ValueOf(obj))
+				if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
+					ref := e.Interface().(ObjectRef)
+					if GetCache().GetObject(ref.UUID) != nil {
+						obj := GetCache().GetObject(ref.UUID)
+						if obj != nil {
+							if i == 0 {
+								values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(obj)), 0, slice.Len())
 							}
+							values = reflect.Append(values, reflect.ValueOf(obj))
 						}
-					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
+					}
+				} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
+					if !e.IsNil() {
 						ref := e.Interface().(*ObjectRef)
 						if GetCache().GetObject(ref.UUID) != nil {
 							obj := GetCache().GetObject(ref.UUID)
@@ -185,6 +186,7 @@ func GetObject(val interface{}) interface{} {
 						}
 					}
 				}
+
 			}
 		}
 		// return values with object instead of object ref.

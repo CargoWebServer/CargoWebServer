@@ -335,7 +335,6 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.references = [];\n"
 	constructorSrc += " this.IsInit = false;\n"
 	constructorSrc += " this.exist = false;\n"
-	constructorSrc += " this.initCallback = undefined;\n"
 
 	// Create field and set her initial values.
 	for i := 3; i < len(this.Fields); i++ {
@@ -357,7 +356,7 @@ func (this *EntityPrototype) generateConstructor() string {
 	// Keep the reference on the entity prototype.
 	constructorSrc += " return this;\n"
 	constructorSrc += "};\n"
-
+	//	log.Println(constructorSrc)
 	return constructorSrc
 }
 

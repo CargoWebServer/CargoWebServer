@@ -50,7 +50,9 @@ func NewClient(address string, port int, name string) *Client {
 	var err error
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
-	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+	// uncomment the following line to make it running in a comman
+	client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
+	//client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 	err = client.srv.Start()
 
 	if err != nil {
@@ -81,51 +83,23 @@ func NewClient(address string, port int, name string) *Client {
 	return client
 }
 
-// Replace object reference by actual object.
-func setObjectRefs(values []interface{}) []interface{} {
-	for i := 0; i < len(values); i++ {
-		if reflect.TypeOf(values[i]).Kind() == reflect.Slice {
-			// Here I got a slice...
-			slice := reflect.ValueOf(values[i])
-			for j := 0; j < slice.Len(); j++ {
-				e := slice.Index(j)
-				if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
-					// Replace the object reference with it actual object.
-					values[i].([]interface{})[j] = GoJavaScript.GetCache().GetObject(e.Interface().(GoJavaScript.ObjectRef).UUID)
-				} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
-					// Replace the object reference with it actual object.
-					values[i].([]interface{})[j] = GoJavaScript.GetCache().GetObject(e.Interface().(*GoJavaScript.ObjectRef).UUID)
-				}
-			}
-		} else {
-			if reflect.TypeOf(values[i]).String() == "GoJavaScript.ObjectRef" {
-				// Replace the object reference with it actual value.
-				values[i] = GoJavaScript.GetCache().GetObject(values[i].(GoJavaScript.ObjectRef).UUID)
-			} else if reflect.TypeOf(values[i]).String() == "*GoJavaScript.ObjectRef" {
-				// Replace the object reference with it actual value.
-				values[i] = GoJavaScript.GetCache().GetObject(values[i].(*GoJavaScript.ObjectRef).UUID)
-			}
-		}
-	}
-
-	return values
-}
-
 // Call a go function and return it result.
 func (self *Client) callGoFunction(name string, params []interface{}) (interface{}, error) {
 	// Replace function string by their pointer.
 	for i := 0; i < len(params); i++ {
-		if reflect.TypeOf(params[i]).Kind() == reflect.String {
-			if strings.HasPrefix(params[i].(string), "function ") && strings.HasSuffix(params[i].(string), "() { [native code] }") {
-				startIndex := strings.Index(params[i].(string), " ") + 1
-				endIndex := strings.Index(params[i].(string), "(")
-				name := params[i].(string)[startIndex:endIndex]
-				params[i] = Utility.GetFunction(name)
+		if params[i] != nil {
+			if reflect.TypeOf(params[i]).Kind() == reflect.String {
+				if strings.HasPrefix(params[i].(string), "function ") && strings.HasSuffix(params[i].(string), "() { [native code] }") {
+					startIndex := strings.Index(params[i].(string), " ") + 1
+					endIndex := strings.Index(params[i].(string), "(")
+					name := params[i].(string)[startIndex:endIndex]
+					params[i] = Utility.GetFunction(name)
+				}
 			}
 		}
 	}
 
-	results, err := Utility.CallFunction(name, setObjectRefs(params)...)
+	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params)...)
 	if err != nil {
 		log.Println("---> call go function ", name, " fail with error: ", err)
 		return nil, err
@@ -250,6 +224,10 @@ func (self *Client) processActions() {
 					results, err = Utility.CallMethod(target, a.Name, params)
 					if err != nil {
 						log.Println("---> call Method: ", a.Name, params)
+
+						str, _ := Utility.ToJson(target)
+						log.Println("---> target: ", str)
+
 						log.Println("---> error: ", err)
 					}
 				}
@@ -270,6 +248,7 @@ func (self *Client) processActions() {
 
 // Create Go object
 func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
+	log.Println("----> create go object from string ", jsonStr)
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)
@@ -280,7 +259,6 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 		} else {
 			// Here map[string]interface{} will be use.
 			return nil, nil //errors.New("No object are registered in go to back the js object!")
-
 		}
 	}
 	return value, err
@@ -378,8 +356,6 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 		}
 
 		// Return the list of infos.
-		// log.Println("343 --->  ", infos)
-
 		return infos, nil
 	}
 
@@ -395,9 +371,7 @@ func (self *Client) DeleteGoObject(uuid string) {
  */
 func (self *Client) RegisterGoType(value interface{}) {
 	// Register local object.
-	if reflect.TypeOf(value).String() != "GoJavaScript.Object" {
-		Utility.RegisterType(value)
-	}
+	GoJavaScript.RegisterGoType(value)
 }
 
 /**
@@ -405,28 +379,7 @@ func (self *Client) RegisterGoType(value interface{}) {
  */
 func (self *Client) RegisterGoObject(obj interface{}, name string) string {
 	// Here I will dynamicaly register objet type in the utility cache...
-	empty := reflect.New(reflect.TypeOf(obj))
-	self.RegisterGoType(empty.Elem().Interface())
-
-	// Random uuid.
-	var uuid string
-	if len(name) > 0 {
-		// In that case the object is in the global scope.
-		uuid = Utility.GenerateUUID(name)
-	} else {
-		// Not a global object.
-		uuid = Utility.RandomUUID()
-	}
-
-	// Do not recreate already existing object.
-	if GoJavaScript.GetCache().GetObject(uuid) != nil {
-		return uuid
-	}
-
-	// Here I will keep the object in the client cache.
-	GoJavaScript.GetCache().SetObject(uuid, obj)
-
-	return uuid
+	return GoJavaScript.RegisterGoObject(obj, name)
 }
 
 /**
@@ -487,6 +440,7 @@ func (self *Client) CreateObject(name string) GoJavaScript.Object {
 // Set Js object property.
 func (self *Client) SetObjectProperty(uuid string, name string, value interface{}) {
 	obj := GoJavaScript.GetCache().GetObject(uuid).(GoJavaScript.Object)
+
 	// set the object property.
 	obj.Set(name, value)
 }

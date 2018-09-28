@@ -1590,6 +1590,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //     )
 // }
 func (this *EntityManager) SaveEntity(values interface{}, messageId string, sessionId string) interface{} {
+	log.Println("---> save entity ", values)
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

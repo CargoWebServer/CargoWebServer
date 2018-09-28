@@ -286,7 +286,6 @@ func (self *Runtime) SetGoObjectMethod(uuid, name string) error {
 	if JsIsObject(obj) {
 		cstr := C.CString(name)
 		defer C.free(unsafe.Pointer(cstr))
-		//C.setNativeFunctionHandler(cstr, C.JsValueRef(obj))
 		fct := uintptr(C.createNativeFunctionHandler(cstr))
 		JsSetObjectPropertyByName(obj, name, fct)
 		return nil
@@ -326,7 +325,6 @@ func (self *Runtime) CallObjectMethod(uuid string, name string, params ...interf
  * Register a go function in JS
  */
 func (self *Runtime) RegisterGoFunction(name string) {
-	log.Println("---> 334 register go function: ", name, getCurrentContext())
 	cstr := C.CString(name)
 	defer C.free(unsafe.Pointer(cstr))
 	fct := uintptr(C.createNativeFunctionHandler(cstr))
@@ -342,7 +340,6 @@ func (self *Runtime) RegisterGoFunction(name string) {
  * options Can be JERRY_PARSE_NO_OPTS or JERRY_PARSE_STRICT_MODE
  */
 func (self *Runtime) RegisterJsFunction(name string, src string) error {
-	log.Println("---> 356 register ", name, getCurrentContext())
 	err := appendJsFunction(uintptr(0), name, src)
 	return err
 }
@@ -351,9 +348,7 @@ func (self *Runtime) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Runtime) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
-	log.Println("---> call ", name, params, getCurrentContext())
 	val, err := callJsFunction(getGlobalObject(), name, params)
-	log.Println("---> result: ", val, " error ", err)
 	// Call function on the global object here.
 	return *NewValue(val), err
 }

@@ -104,7 +104,6 @@ import "C"
 import "unsafe"
 import "code.myceliUs.com/GoJavaScript"
 
-//import "reflect"
 import "errors"
 import "log"
 import b64 "encoding/base64"
@@ -293,6 +292,9 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
+	// so here the context point to the function.
+	// I will append the list of arguments.
+	// Now I will set the arguments...
 	var value GoJavaScript.Value
 	value.TYPENAME = "GoJavaScript.Value"
 	cstr := C.CString(name)
@@ -313,11 +315,8 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 		}
 	}
 
-	// so here the context point to the function.
-	// I will append the list of arguments.
-	// Now I will set the arguments...
 	for i := 0; i < len(params); i++ {
-		// So here I will set argument on the context.
+		// Set value
 		setValue(self.context, params[i])
 	}
 

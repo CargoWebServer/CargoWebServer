@@ -33,8 +33,16 @@ func CallFunction(name string, params ...interface{}) (result []reflect.Value, e
 		return
 	}
 	in := make([]reflect.Value, len(params))
+
 	for k, param := range params {
-		in[k] = reflect.ValueOf(param)
+		if param != nil {
+			in[k] = reflect.ValueOf(param)
+		} else if !f.Type().IsVariadic() {
+			in[k] = reflect.Zero(f.Type().In(k))
+		} else {
+			var nilVal interface{}
+			in[k] = reflect.ValueOf(&nilVal).Elem()
+		}
 	}
 
 	result = f.Call(in)

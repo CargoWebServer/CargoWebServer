@@ -26,8 +26,6 @@ import b64 "encoding/base64"
 import "log"
 import "encoding/json"
 
-//import "strings"
-
 /**
  * Go and Javascript functions bindings.
  */
@@ -210,7 +208,9 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 								C.duk_put_prop_index(ctx, values, C.uint(i))
 							}
 						} else {
-							log.Println("---> unknow object propertie type 231")
+							setValue(ctx, e)
+							// Release the result
+							C.duk_put_prop_index(ctx, values, C.uint(i))
 						}
 					} else {
 						// set the value on the stack.
@@ -226,8 +226,12 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 						getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
 						C.duk_put_prop_string(ctx, obj_idx, cname)
 					} else {
-						log.Println("---> unknow object propertie type 245")
+						setValue(ctx, value)
+						C.duk_put_prop_string(ctx, obj_idx, cname)
 					}
+				} else {
+					setValue(ctx, value)
+					C.duk_put_prop_string(ctx, obj_idx, cname)
 				}
 			} else {
 				// Standard object property, int, string, float...
@@ -244,6 +248,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
  * Set a go value in JavaScript context.
  */
 func setValue(ctx C.duk_context_ptr, value interface{}) {
+
 	// if the value is null I will push a null value
 	// on the context.
 	if value == nil {
@@ -314,6 +319,9 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				} else {
 					log.Println("--> fail to Create Go object ", string(jsonStr), err)
 				}
+			} else if value.(map[string]interface{})["UUID"] != nil {
+				uuid := value.(map[string]interface{})["UUID"].(string)
+				getJsObjectByUuid(uuid, ctx)
 			} else {
 				// Not a registered type...
 				cstr := C.CString(string(jsonStr))
@@ -378,11 +386,11 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		// put the byte code in the stack
 		C.duk_dump_function(ctx)
 		var size int
-		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulong)(unsafe.Pointer(&size)))
+		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulonglong)(unsafe.Pointer(&size)))
 		bytcode := C.GoBytes(ptr, C.int(size))
+		C.duk_pop(ctx)
 		return bytcode, nil
 	} else if isObject(ctx, index) {
-		//log.Println("---> is an object")
 		// Here it can be an array or an object...
 		// The go object will be a copy of the Js object.
 		uuid_name := C.CString("uuid_")
@@ -394,43 +402,51 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 			// Return and object reference.
 			return GoJavaScript.NewObjectRef(uuid.(string)), nil
 		} else {
-			// Here i will create a Js go object that will serve as object handle from
-			// go code.
-			obj, err := GoJavaScript.CallGoFunction("Client", "CreateObject", "")
-			uuid := obj.(*GoJavaScript.ObjectRef).UUID
+			if int(C.duk_has_prop_string(ctx, C.int(index), C.CString("TYPENAME"))) > 0 {
+				// The js object is an entity.
+				C.duk_dup(ctx, C.int(index))
+				jsonStr := C.GoString(C.duk_json_encode(ctx, -1))
+				C.duk_pop(ctx) // pop the json string.
+				return GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(jsonStr))
+			} else {
+				// Here i will create a Js go object that will serve as object handle from
+				// go code.
+				obj, err := GoJavaScript.CallGoFunction("Client", "CreateObject", "")
+				uuid := obj.(*GoJavaScript.ObjectRef).UUID
 
-			properties := make([]string, 0)
-			C.duk_enum(ctx, C.int(index), 0)
-			for int(C.duk_next(ctx, -1, 0)) > 0 {
-				// [ ... enum key ]
-				properties = append(properties, C.GoString(C.duk_get_string(ctx, -1)))
-				C.duk_pop(ctx) // pop key
-			}
-
-			C.duk_pop(ctx) // pop enum object
-			for i := 0; i < len(properties); i++ {
-				name := C.CString(properties[i])
-				C.duk_get_prop_string(ctx, C.int(index), name)
-				if isJsFunction(ctx, -1) {
-					value, err := getValue(ctx, -1)
-					if err == nil {
-						GoJavaScript.CallGoFunction("Client", "SetObjectJsMethod", uuid, properties[i], value)
-					}
-				} else if isGoFunction(ctx, -1) {
-					_, err := getValue(ctx, -1)
-					if err == nil {
-						GoJavaScript.CallGoFunction("Client", "SetObjectGoMethod", uuid, properties[i])
-					}
-				} else {
-					value, err := getValue(ctx, -1)
-					if err == nil {
-						GoJavaScript.CallGoFunction("Client", "SetObjectProperty", uuid, properties[i], value)
-					}
+				properties := make([]string, 0)
+				C.duk_enum(ctx, C.int(index), 0)
+				for int(C.duk_next(ctx, -1, 0)) > 0 {
+					// [ ... enum key ]
+					properties = append(properties, C.GoString(C.duk_get_string(ctx, -1)))
+					C.duk_pop(ctx) // pop key
 				}
-				C.free(unsafe.Pointer(name))
-				C.duk_pop(ctx) // pop value object
+
+				C.duk_pop(ctx) // pop enum object
+				for i := 0; i < len(properties); i++ {
+					name := C.CString(properties[i])
+					C.duk_get_prop_string(ctx, C.int(index), name)
+					if isJsFunction(ctx, -1) {
+						value, err := getValue(ctx, -1)
+						if err == nil {
+							GoJavaScript.CallGoFunction("Client", "SetObjectJsMethod", uuid, properties[i], value)
+						}
+					} else if isGoFunction(ctx, -1) {
+						_, err := getValue(ctx, -1)
+						if err == nil {
+							GoJavaScript.CallGoFunction("Client", "SetObjectGoMethod", uuid, properties[i])
+						}
+					} else {
+						value, err := getValue(ctx, -1)
+						if err == nil {
+							GoJavaScript.CallGoFunction("Client", "SetObjectProperty", uuid, properties[i], value)
+						}
+					}
+					C.free(unsafe.Pointer(name))
+					C.duk_pop(ctx) // pop value object
+				}
+				return obj, err
 			}
-			return obj, err
 
 		}
 		C.free(unsafe.Pointer(uuid_name))
@@ -441,7 +457,6 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		return nil, nil
 	}
 
-	log.Println("---> no value found!")
 	return nil, errors.New("no value found at index " + strconv.Itoa(index) + " with type index " + strconv.Itoa(int(C.duk_get_type(ctx, C.int(index)))))
 }
 
@@ -489,6 +504,7 @@ func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.c
 
 	if len(uuid) > 0 {
 		// I will now call the function.
+		//log.Println("---> call go function ", uuid, name, params)
 		result, err := GoJavaScript.CallGoFunction(uuid, name, params...)
 		if err == nil && result != nil {
 			// So here I will set the value

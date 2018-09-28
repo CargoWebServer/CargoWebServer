@@ -442,7 +442,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		messageId := msg.GetId()
 		index := int(msg.GetIndex())
 		chunk := this.getChunkMessagesById(messageId)
-		log.Println("---> Transfert message: ", messageId, ":", index, "/", total)
+		//log.Println("---> Transfert message: ", messageId, ":", index, "/", total)
 		if chunk != nil {
 			// So here it's not the first message receive for the file.
 			chunk[index] = msg.GetData()
