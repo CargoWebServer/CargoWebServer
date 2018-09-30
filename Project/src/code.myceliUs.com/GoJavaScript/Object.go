@@ -87,10 +87,8 @@ func (self *Object) SetPeer(peer *Peer) {
 /**
  * Return property value.
  */
-func (self *Object) Get(name string) (Value, error) {
-	var val Value
-	val.Val = self.Properties[name]
-	return val, nil
+func (self *Object) Get(name string) (interface{}, error) {
+	return self.Properties[name], nil
 }
 
 /**
@@ -120,7 +118,7 @@ func (self *Object) SetJsMethode(name string, src string) {
 /**
  * Call a function over an object.
  */
-func (self *Object) Call(name string, params ...interface{}) (Value, error) {
+func (self *Object) Call(name string, params ...interface{}) (interface{}, error) {
 	action := NewAction("CallObjectMethod", "")
 	action.AppendParam("uuid", self.UUID)
 	action.AppendParam("name", name)
@@ -131,16 +129,16 @@ func (self *Object) Call(name string, params ...interface{}) (Value, error) {
 	// Call the action here.
 	action = self.peer.CallRemoteAction(action)
 
-	var result *Value
 	var err error
+	var result interface{}
 
 	if action.Results[0] != nil {
-		result = action.Results[0].(*Value)
+		result = RefToObject(action.Results[0])
 	}
 
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
 
-	return *result, err
+	return result, err
 }

@@ -22,7 +22,7 @@ func (this *JsRuntimeManager) initNodeJs() {
 		// Get the export variable export uuid
 		uuid, err := exports.Get("exports_id__")
 		if err == nil {
-			return uuid.Val.(string)
+			return uuid.(string)
 		}
 
 		log.Println("---> error found in require function ", err)

@@ -63,7 +63,7 @@ type Engine interface {
 	/**
 	 * Return a variable define in the global object.
 	 */
-	GetGlobalVariable(name string) (Value, error)
+	GetGlobalVariable(name string) (interface{}, error)
 
 	/////////////////// Objects //////////////////////
 	/**
@@ -75,7 +75,7 @@ type Engine interface {
 	/**
 	 * Call object methode.
 	 */
-	CallObjectMethod(uuid string, name string, params ...interface{}) (Value, error)
+	CallObjectMethod(uuid string, name string, params ...interface{}) (interface{}, error)
 
 	/////////////////// Functions //////////////////////
 
@@ -96,7 +96,7 @@ type Engine interface {
 	/**
 	 * Call a Javascript function. The function must exist...
 	 */
-	CallFunction(name string, params []interface{}) (Value, error)
+	CallFunction(name string, params []interface{}) (interface{}, error)
 
 	/**
 	 * Evaluate a script.
@@ -104,7 +104,7 @@ type Engine interface {
 	 * variables Contain the list of variable to set on the global context before
 	 * running the script.
 	 */
-	EvalScript(script string, variables []interface{}) (Value, error)
+	EvalScript(script string, variables []interface{}) (interface{}, error)
 
 	/**
 	 * Clear the VM

@@ -51,8 +51,8 @@ func NewClient(address string, port int, name string) *Client {
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
 	// uncomment the following line to make it running in a comman
-	client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
-	//client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+	//client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
+	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 	err = client.srv.Start()
 
 	if err != nil {
@@ -99,7 +99,7 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 		}
 	}
 
-	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params)...)
+	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params).([]interface{})...)
 	if err != nil {
 		log.Println("---> call go function ", name, " fail with error: ", err)
 		return nil, err
@@ -127,64 +127,6 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 		}
 	}
 	return nil, nil
-}
-
-/**
- * Convert object, or objects to their uuid reference.
- */
-func (self *Client) objectToRef(objects interface{}) interface{} {
-	if objects != nil {
-		if reflect.TypeOf(objects).Kind() == reflect.Slice {
-			// Here if the result is a slice I will test if it contains struct...
-			slice := reflect.ValueOf(objects)
-			objects_ := make([]interface{}, 0)
-			for i := 0; i < slice.Len(); i++ {
-				e := slice.Index(i)
-				// I will derefence the pointer if it's a pointer.
-				for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
-					e = e.Elem()
-				}
-				if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
-					// results will be register.
-					uuid := self.RegisterGoObject(slice.Index(i).Interface(), "")
-					// I will set the results a object reference.
-					objects_ = append(objects_, GoJavaScript.NewObjectRef(uuid))
-				} else {
-					objects_ = append(objects_, slice.Index(i).Interface())
-				}
-			}
-			// Set the array of object references.
-			objects = objects_
-		} else {
-			// I will test if the result is a structure or not...
-			if objects != nil {
-				if reflect.TypeOf(objects).Kind() == reflect.Ptr || reflect.TypeOf(objects).Kind() == reflect.Struct {
-					e := reflect.ValueOf(objects)
-					if e.IsValid() {
-						if reflect.TypeOf(objects).Kind() == reflect.Ptr {
-							if e.IsNil() {
-								return objects
-							}
-						}
-						// I will derefence the pointer if it a pointer.
-						for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
-							e = e.Elem()
-						}
-						// if the object is a structure.
-						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
-							// results will be register.
-							uuid := self.RegisterGoObject(objects, "")
-							// I will set the results a object reference.
-							objects = GoJavaScript.NewObjectRef(uuid)
-						}
-
-					}
-				}
-			}
-		}
-	}
-
-	return objects
 }
 
 // Action request by the server.
@@ -232,7 +174,7 @@ func (self *Client) processActions() {
 					}
 				}
 				// Keep go object in client and transfert only reference.
-				results = self.objectToRef(results)
+				results = GoJavaScript.ObjectToRef(results)
 				// set the action result.
 				a.AppendResults(results, err)
 				// Here I will create the response and send it back to the client.
@@ -461,7 +403,7 @@ func (self *Client) SetObjectGoMethod(uuid string, name string) {
  * Evaluate sript.
  * The list of global variables to be set before executing the script.
  */
-func (self *Client) EvalScript(script string, variables []interface{}) (GoJavaScript.Value, error) {
+func (self *Client) EvalScript(script string, variables []interface{}) (interface{}, error) {
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("EvalScript", "")
 
@@ -481,21 +423,20 @@ func (self *Client) EvalScript(script string, variables []interface{}) (GoJavaSc
 	}
 
 	// Transform object ref into object as needed.
-	value := action.Results[0].(*GoJavaScript.Value)
+	value := GoJavaScript.RefToObject(action.Results[0])
 
-	value.Export()
-
-	return *value, err
+	return value, err
 }
 
 /**
  * Call a JS/Go function with a given name and a list of parameter.
  */
-func (self *Client) CallFunction(name string, params ...interface{}) (GoJavaScript.Value, error) {
+func (self *Client) CallFunction(name string, params ...interface{}) (interface{}, error) {
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("CallFunction", "")
+
 	action.AppendParam("name", name)
-	action.AppendParam("params", params)
+	action.AppendParam("params", GoJavaScript.ObjectToRef(params))
 
 	// Call the remote action
 	action = self.peer.CallRemoteAction(action)
@@ -504,12 +445,9 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJavaScri
 		err = action.Results[1].(error)
 	}
 
-	value := action.Results[0].(*GoJavaScript.Value)
+	value := GoJavaScript.RefToObject(action.Results[0])
 
-	// Transform object ref into object as needed.
-	value.Export()
-
-	return *value, err
+	return value, err
 }
 
 /**
@@ -518,7 +456,7 @@ func (self *Client) CallFunction(name string, params ...interface{}) (GoJavaScri
 func (self *Client) SetGlobalVariable(name string, value interface{}) {
 
 	// Replace objects by their reference as needed.
-	value = self.objectToRef(value)
+	value = GoJavaScript.ObjectToRef(value)
 
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("SetGlobalVariable", "")
@@ -532,7 +470,7 @@ func (self *Client) SetGlobalVariable(name string, value interface{}) {
 /**
  * Get the global variable name.
  */
-func (self *Client) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
+func (self *Client) GetGlobalVariable(name string) (interface{}, error) {
 	action := GoJavaScript.NewAction("GetGlobalVariable", "")
 
 	action.AppendParam("name", name)
@@ -546,10 +484,9 @@ func (self *Client) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
 	}
 
 	// Transform object ref into object as needed.
-	value := action.Results[0].(*GoJavaScript.Value)
-	value.Export()
+	value := GoJavaScript.RefToObject(action.Results[0])
 
-	return *value, err
+	return value, err
 }
 
 /**

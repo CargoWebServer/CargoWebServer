@@ -919,16 +919,8 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJavaScriptClient.Client, f
 		return nil, err_.(error)
 	}
 
-	// Return the result if there is one...
-	val, err := result.Export()
-
-	if err != nil {
-		log.Panicln("---> error ", err)
-		return nil, err
-	}
-
 	// Append val to results...
-	results = append(results, val)
+	results = append(results, result)
 
 	return
 }
@@ -966,7 +958,7 @@ func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) 
 /**
  * Run given script for a given session.
  */
-func (this *JsRuntimeManager) RunScript(sessionId string, script string) (GoJavaScript.Value, error) {
+func (this *JsRuntimeManager) RunScript(sessionId string, script string) (interface{}, error) {
 	// Protectect the map access...
 	var op OperationInfos
 	op.m_name = "RunScript"
@@ -980,11 +972,11 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (GoJava
 
 	// wait for completion
 	results := <-op.m_returns
-	var value GoJavaScript.Value
+	var value interface{}
 	var err error
 
 	if results[0] != nil {
-		value = results[0].(GoJavaScript.Value)
+		value = results[0]
 	}
 
 	if results[1] != nil {

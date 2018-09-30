@@ -114,13 +114,12 @@ func TestHelloJava(t *testing.T) {
 	// Register the function SayHelloTo. The function take one parameter.
 	engine.RegisterJsFunction("SayHelloTo", "function SayHelloTo(greething, to){return greething + ' ' + to + '!';}")
 	str, _ := engine.CallFunction("SayHelloTo", "Hello", "Java Script")
-	str_, _ := str.ToString()
 
-	if str_ != "Hello Java Script!" {
+	if str.(string) != "Hello Java Script!" {
 		t.Error("Expected 'Hello Java Script!', got ", str)
 	} else {
 		// display hello jerry!
-		log.Println(str_)
+		log.Println(str)
 	}
 }
 
@@ -134,10 +133,9 @@ func TestNumericValue(t *testing.T) {
 	a := GoJavaScript.NewVariable("a", 1)
 	b := GoJavaScript.NewVariable("b", 2.25)
 	number, _ := engine.EvalScript("Add(a, b);", []interface{}{a, b})
-	number_, _ := number.Export()
 
-	if number_ != 3.25 {
-		t.Error("Expected 3.25, got ", number_)
+	if number.(float64) != 3.25 {
+		t.Error("Expected 3.25, got ", number)
 	}
 }
 
@@ -147,8 +145,8 @@ func TestNumericValue(t *testing.T) {
 func TestBooleanValue(t *testing.T) {
 	engine.RegisterJsFunction("TestBool", "function TestBool(val){return val>0;}")
 	boolean, _ := engine.CallFunction("TestBool", 1)
-	boolean_, _ := boolean.ToBoolean()
-	if boolean_ == false {
+
+	if boolean.(bool) == false {
 		t.Error("Expected true, got ", boolean)
 	}
 }
@@ -187,9 +185,8 @@ func TestGlobalVariable(t *testing.T) {
 	engine.SetGlobalVariable("toto", toto)
 
 	toto_, _ := engine.GetGlobalVariable("toto")
-	toto__, _ := toto_.Export()
 
-	if toto__ != toto {
+	if toto_ != toto {
 		t.Log("Set/Get global variables fail! ")
 	}
 }
@@ -207,8 +204,7 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 
 	number, err := obj.Get("number")
 	if err == nil {
-		number_, _ := number.ToFloat()
-		if number_ != 1.01 {
+		if number.(float64) != 1.01 {
 			t.Error("---> fail to get object property!")
 		}
 	}
@@ -221,14 +217,12 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 
 	// and call the go function on the object.
 	addReuslt, _ := obj.Call("add", 2, 3)
-	addReuslt_, _ := addReuslt.ToFloat()
-	if addReuslt_ != 5.0 {
+	if addReuslt.(float64) != 5.0 {
 		t.Error("---> fail to get object property!")
 	}
 
 	helloToResult, _ := obj.Call("helloTo", "Java")
-	helloToResult_, _ := helloToResult.ToString()
-	if helloToResult_ != "Hello Java!" {
+	if helloToResult.(string) != "Hello Java!" {
 		t.Error("---> fail to set js property!")
 	}
 }
@@ -285,11 +279,8 @@ func TestCreateGoObjectFromJs(t *testing.T) {
 		t.Error("fail to create Go from Js: ", err)
 	}
 
-	// p_ is an instance of *Person and can be use like regular Go object.
-	p_, _ := p.Export()
-
 	if err == nil {
-		t.Log(p_)
+		t.Log(p)
 	} else {
 		t.Error("test fail!")
 	}

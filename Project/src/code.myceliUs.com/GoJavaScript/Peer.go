@@ -57,7 +57,6 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	Utility.RegisterType((*Action)(nil))
 	Utility.RegisterType((*Param)(nil))
 	Utility.RegisterType((*Variable)(nil))
-	Utility.RegisterType((*Value)(nil))
 	Utility.RegisterType((*Object)(nil))
 	Utility.RegisterType((*ObjectRef)(nil))
 

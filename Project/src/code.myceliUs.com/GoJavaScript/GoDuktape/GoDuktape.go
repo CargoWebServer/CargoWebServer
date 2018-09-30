@@ -386,7 +386,7 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		// put the byte code in the stack
 		C.duk_dump_function(ctx)
 		var size int
-		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulonglong)(unsafe.Pointer(&size)))
+		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulong)(unsafe.Pointer(&size)))
 		bytcode := C.GoBytes(ptr, C.int(size))
 		C.duk_pop(ctx)
 		return bytcode, nil

@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"strings"
 
-	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/Utility"
 )
 
@@ -128,12 +127,6 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 					isIndex := Utility.Contains(prototype.Ids, k)
 					if !isIndex {
 						isIndex = Utility.Contains(prototype.Indexs, k)
-					}
-
-					// In case of GoJavaScript value...
-					if reflect.TypeOf(v).String() == "GoJavaScript.Value" {
-						v_ := v.(GoJavaScript.Value)
-						v, _ = v_.Export()
 					}
 
 					if strings.HasSuffix(fieldType, ":Ref") {

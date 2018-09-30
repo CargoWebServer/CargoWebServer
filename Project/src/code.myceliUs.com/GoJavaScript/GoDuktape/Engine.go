@@ -156,20 +156,19 @@ func (self *Engine) SetGlobalVariable(name string, value interface{}) {
 /**
  * Return a variable define in the global object.
  */
-func (self *Engine) GetGlobalVariable(name string) (GoJavaScript.Value, error) {
+func (self *Engine) GetGlobalVariable(name string) (interface{}, error) {
 
 	// first of all I will initialyse the arguments.
-	var value GoJavaScript.Value
-	value.TYPENAME = "GoJavaScript.Value"
-
+	var value interface{}
 	cstr := C.CString(name)
+
 	// Set the property at top of the stack.
 	ret := C.int(C.duk_get_global_string(self.context, cstr))
 	if ret > 0 {
 		// In case of string
 		v, err := getValue(self.context, -1)
 		if err == nil {
-			value.Val = v
+			value = v
 		} else {
 			return value, err
 		}
@@ -209,9 +208,8 @@ func (self *Engine) CreateObject(uuid string, name string) {
 /**
  * Call object methode.
  */
-func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (GoJavaScript.Value, error) {
-	var value GoJavaScript.Value
-	value.TYPENAME = "GoJavaScript.Value"
+func (self *Engine) CallObjectMethod(uuid string, name string, params ...interface{}) (interface{}, error) {
+	var value interface{}
 
 	// I will get (create the object on the stack)
 	getJsObjectByUuid(uuid, self.context)
@@ -238,7 +236,7 @@ func (self *Engine) CallObjectMethod(uuid string, name string, params ...interfa
 		// Now the result is at -1
 		v, err := getValue(self.context, -1)
 		if err == nil {
-			value.Val = v
+			value = v
 		}
 		// remove the result from the stack.
 		C.duk_pop(self.context) // Pop the call result.
@@ -291,12 +289,11 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
 /**
  * Call a Javascript function. The function must exist...
  */
-func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScript.Value, error) {
+func (self *Engine) CallFunction(name string, params []interface{}) (interface{}, error) {
 	// so here the context point to the function.
 	// I will append the list of arguments.
 	// Now I will set the arguments...
-	var value GoJavaScript.Value
-	value.TYPENAME = "GoJavaScript.Value"
+	var value interface{}
 	cstr := C.CString(name)
 
 	// Set the property at top of the stack.
@@ -325,7 +322,7 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
 	// Now the result is at -1
 	v, err := getValue(self.context, -1)
 	if err == nil {
-		value.Val = v
+		value = v
 	}
 
 	// remove the result from the stack.
@@ -340,9 +337,8 @@ func (self *Engine) CallFunction(name string, params []interface{}) (GoJavaScrip
  * variables Contain the list of variable to set on the global context before
  * running the script.
  */
-func (self *Engine) EvalScript(src string, variables []interface{}) (GoJavaScript.Value, error) {
-	var value GoJavaScript.Value
-	value.TYPENAME = "GoJavaScript.Value"
+func (self *Engine) EvalScript(src string, variables []interface{}) (interface{}, error) {
+	var value interface{}
 
 	for i := 0; i < len(variables); i++ {
 		self.SetGlobalVariable(variables[i].(*GoJavaScript.Variable).Name, variables[i].(*GoJavaScript.Variable).Value)
@@ -360,7 +356,7 @@ func (self *Engine) EvalScript(src string, variables []interface{}) (GoJavaScrip
 	v, err := getValue(self.context, -1)
 
 	if err == nil {
-		value.Val = v
+		value = v
 	}
 
 	return value, err

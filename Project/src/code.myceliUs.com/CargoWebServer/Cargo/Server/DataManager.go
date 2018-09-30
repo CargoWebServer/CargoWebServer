@@ -351,6 +351,15 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 		os.Remove(schemaPath)
 	}
 
+	// Now I will remove store from the configuraraitons.
+	dataStoreConfiguration, err_ := GetServer().GetEntityManager().getEntityById("Config.DataStoreConfiguration", "Config", []interface{}{storeId})
+	if err_ != nil {
+		return err_
+	}
+
+	// Also remove it data store configuration.
+	GetServer().GetEntityManager().deleteEntity(dataStoreConfiguration)
+
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to delete directory '"+filePath+"' with error '"+err.Error()+"'."))
 		log.Println("---> Fail to remove ", storeId, err)

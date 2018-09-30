@@ -47,35 +47,34 @@ type ByteCode struct {
 }
 
 // Replace object reference by actual object.
-func RefToObject(values []interface{}) []interface{} {
-	for i := 0; i < len(values); i++ {
-		if values[i] != nil {
-			if reflect.TypeOf(values[i]).Kind() == reflect.Slice {
-				// Here I got a slice...
-				slice := reflect.ValueOf(values[i])
-				for j := 0; j < slice.Len(); j++ {
-					e := slice.Index(j)
-					if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
-						// Replace the object reference with it actual object.
-						values[i].([]interface{})[j] = GetCache().GetObject(e.Interface().(ObjectRef).UUID)
-					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
-						// Replace the object reference with it actual object.
-						values[i].([]interface{})[j] = GetCache().GetObject(e.Interface().(*ObjectRef).UUID)
-					}
-				}
-			} else {
-				if reflect.TypeOf(values[i]).String() == "GoJavaScript.ObjectRef" {
-					// Replace the object reference with it actual value.
-					values[i] = GetCache().GetObject(values[i].(ObjectRef).UUID)
-				} else if reflect.TypeOf(values[i]).String() == "*GoJavaScript.ObjectRef" {
-					// Replace the object reference with it actual value.
-					values[i] = GetCache().GetObject(values[i].(*ObjectRef).UUID)
-				}
-			}
-		}
+func RefToObject(ref interface{}) interface{} {
+	if ref == nil {
+		return nil
 	}
 
-	return values
+	if reflect.TypeOf(ref).Kind() == reflect.Slice {
+		// Here I got a slice...
+		slice := reflect.ValueOf(ref)
+		for i := 0; i < slice.Len(); i++ {
+			e := slice.Index(i)
+			if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
+				// Replace the object reference with it actual object.
+				ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(ObjectRef).UUID)
+			} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
+				// Replace the object reference with it actual object.
+				ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(*ObjectRef).UUID)
+			}
+		}
+	} else {
+		if reflect.TypeOf(ref).String() == "GoJavaScript.ObjectRef" {
+			// Replace the object reference with it actual value.
+			ref = GetCache().GetObject(ref.(ObjectRef).UUID)
+		} else if reflect.TypeOf(ref).String() == "*GoJavaScript.ObjectRef" {
+			// Replace the object reference with it actual value.
+			ref = GetCache().GetObject(ref.(*ObjectRef).UUID)
+		}
+	}
+	return ref
 }
 
 /**
@@ -128,17 +127,21 @@ func ObjectToRef(objects interface{}) interface{} {
 			objects_ := make([]interface{}, 0)
 			for i := 0; i < slice.Len(); i++ {
 				e := slice.Index(i)
-				// I will derefence the pointer if it's a pointer.
-				for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
-					e = e.Elem()
-				}
-				if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
-					// results will be register.
-					uuid := RegisterGoObject(slice.Index(i).Interface(), "")
-					// I will set the results a object reference.
-					objects_ = append(objects_, NewObjectRef(uuid))
+				if e.IsNil() {
+					objects_ = append(objects_, nil)
 				} else {
-					objects_ = append(objects_, slice.Index(i).Interface())
+					// I will derefence the pointer if it's a pointer.
+					for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
+						e = e.Elem()
+					}
+					if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
+						// results will be register.
+						uuid := RegisterGoObject(slice.Index(i).Interface(), "")
+						// I will set the results a object reference.
+						objects_ = append(objects_, NewObjectRef(uuid))
+					} else {
+						objects_ = append(objects_, slice.Index(i).Interface())
+					}
 				}
 			}
 			// Set the array of object references.

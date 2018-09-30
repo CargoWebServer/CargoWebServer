@@ -91,6 +91,11 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		return reflect.ValueOf(nil)
 	}
 
+	if t.Kind() == reflect.Interface {
+		// The value can be anything
+		return reflect.ValueOf(value)
+	}
+
 	var v reflect.Value
 
 	switch t.Kind() {
@@ -212,9 +217,11 @@ func InitializeStructureFieldArrayValue(slice reflect.Value, fieldName string, f
 						slice.Index(i).Set(slice_)
 					}
 				} else {
-					// Not an array
-					fv := InitializeBaseTypeValue(reflect.TypeOf(v_), v_).Convert(reflect.TypeOf(v_))
+					fv := InitializeBaseTypeValue(slice.Type().Elem(), v_)
 					if fv.IsValid() {
+						if fv.Type() != slice.Index(i).Type() {
+							fv = fv.Convert(reflect.TypeOf(v_))
+						}
 						slice.Index(i).Set(fv)
 					}
 				}

@@ -369,26 +369,10 @@ func (this *Server) Start() {
 		for i := 0; i < len(functionParams); i++ {
 			param := new(MessageData)
 			paramName, _ := functionParams[i].Get("name")
-			param.Name, _ = paramName.ToString()
+			param.Name, _ = paramName.(string)
 			param.TYPENAME = "Server.MessageData"
-			paramValue, _ := functionParams[i].Get("dataBytes")
-			if paramValue.IsString() {
-				val, _ := paramValue.ToString()
-				param.Value = val
-			} else if paramValue.IsBoolean() {
-				val, _ := paramValue.ToBoolean()
-				param.Value = val
-			} else if paramValue.IsNull() {
-				param.Value = nil
-			} else if paramValue.IsNumber() {
-				val, _ := paramValue.ToFloat()
-				param.Value = val
-			} else if paramValue.IsUndefined() {
-				param.Value = nil
-			} else {
-				val, _ := paramValue.Export()
-				param.Value = val
-			}
+			param.Value, _ = functionParams[i].Get("dataBytes")
+
 			params = append(params, param)
 		}
 
@@ -893,13 +877,13 @@ func (this *Server) Start() {
 		func(sessionId string, service GoJavaScript.Object, caller interface{}) {
 
 			conn_, _ := service.Get("conn")
-			conn := conn_.Val.(GoJavaScript.Object)
+			conn := conn_.(GoJavaScript.Object)
 
 			// Address can be ws://127.0.0.1:9393 or simply 127.0.0.1:9393
 			host_, _ := conn.Get("ipv4")
 			port_, _ := conn.Get("port")
-			port := int(port_.Val.(float64))
-			host := strings.Replace(strings.Replace(host_.Val.(string), "ws:", "", -1), "//", "", -1)
+			port := int(port_.(float64))
+			host := strings.Replace(strings.Replace(host_.(string), "ws:", "", -1), "//", "", -1)
 
 			// Get the new connection id.
 			subConnection, err := GetServer().connect(host, port)
