@@ -103,9 +103,10 @@ import "C"
 
 import "unsafe"
 import "code.myceliUs.com/GoJavaScript"
-
+import "fmt"
 import "errors"
 import "log"
+import "os"
 import b64 "encoding/base64"
 
 /**
@@ -290,6 +291,14 @@ func (self *Engine) RegisterJsFunction(name string, src string) error {
  * Call a Javascript function. The function must exist...
  */
 func (self *Engine) CallFunction(name string, params []interface{}) (interface{}, error) {
+	// So here I will not crash the engine if there is error but
+	// I will display the error in the console and recover.
+	defer func() { //catch or finally
+		if err := recover(); err != nil { //catch
+			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
+		}
+	}()
+
 	// so here the context point to the function.
 	// I will append the list of arguments.
 	// Now I will set the arguments...
@@ -328,7 +337,7 @@ func (self *Engine) CallFunction(name string, params []interface{}) (interface{}
 	// remove the result from the stack.
 	C.duk_pop(self.context)
 
-	return value, nil
+	return value, err
 }
 
 /**

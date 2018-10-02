@@ -9,7 +9,7 @@ var languageInfo = {
 }
 
 /**
- * This function is the entry point of the application....
+ * This function is the entry point of the application.
  */
 function main() {
     // eventTests()
@@ -32,7 +32,8 @@ function main() {
     server.sessionManager.login("admin", "adminadmin", "localhost",
         function () {
             // Create the dynamic entity here.
-            testDynamicEntity()
+            //testDynamicEntity()
+            testCreateDynamicEntity()
         },
         function () {
             // Nothing to do here.

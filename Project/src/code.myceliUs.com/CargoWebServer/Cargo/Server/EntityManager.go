@@ -883,6 +883,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 
 	// Save the prototype...
 	err := store.CreateEntityPrototype(prototype.(*EntityPrototype))
+
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
@@ -1590,7 +1591,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //     )
 // }
 func (this *EntityManager) SaveEntity(values interface{}, messageId string, sessionId string) interface{} {
-	log.Println("---> save entity ", values)
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

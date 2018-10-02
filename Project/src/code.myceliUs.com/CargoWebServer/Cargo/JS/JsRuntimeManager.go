@@ -229,25 +229,27 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			callback <- []interface{}{true} // unblock the channel...
 		case operationInfos := <-jsRuntimeManager.m_execVmOperation:
 			// Set the function on the JS runtime...
-			var sessionId = operationInfos.m_params["sessionId"].(string)
+			go func() {
+				var sessionId = operationInfos.m_params["sessionId"].(string)
 
-			if jsRuntimeManager.m_sessions[sessionId] != nil {
-				// Here I will execute various session action.
-				if operationInfos.m_name == "GetVar" {
-					jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "SetVar" {
-					jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "CreateObject" {
-					jsRuntimeManager.m_createObject[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "ExecuteJsFunction" {
-					jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
-				} else if operationInfos.m_name == "RunScript" {
-					jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+				if jsRuntimeManager.m_sessions[sessionId] != nil {
+					// Here I will execute various session action.
+					if operationInfos.m_name == "GetVar" {
+						jsRuntimeManager.m_getVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "SetVar" {
+						jsRuntimeManager.m_setVariable[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "CreateObject" {
+						jsRuntimeManager.m_createObject[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "ExecuteJsFunction" {
+						jsRuntimeManager.m_executeJsFunction[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					} else if operationInfos.m_name == "RunScript" {
+						jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
+					}
+				} else {
+					log.Println("---> try to execute function on close channel whit id: ", sessionId)
+					// return nil, errors.New("Session " + sessionId + " is closed!")
 				}
-			} else {
-				log.Println("---> try to execute function on close channel whit id: ", sessionId)
-				// return nil, errors.New("Session " + sessionId + " is closed!")
-			}
+			}()
 
 		case operationInfos := <-jsRuntimeManager.m_createVm:
 			callback := operationInfos.m_returns
@@ -318,7 +320,6 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								jsFunctionInfos = operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
 								vm.SetGlobalVariable("messageId", jsFunctionInfos.m_messageId)
 								vm.SetGlobalVariable("sessionId", jsFunctionInfos.m_sessionId)
-								//log.Println("---> execute jsFunction: ", jsFunctionInfos.m_functionStr)
 								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							}
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
@@ -875,6 +876,8 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 
 /**
  * Execute javascript function.
+ * If the function string contain the source of the function and not only it name
+ * the funtion is evaluated before being called.
  */
 func (this *JsRuntimeManager) executeJsFunction(vm *GoJavaScriptClient.Client, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
 

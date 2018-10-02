@@ -2,6 +2,7 @@ package GoJavaScript
 
 import "reflect"
 import "code.myceliUs.com/Utility"
+import "log"
 
 /**
  * Variable with name and value.
@@ -82,7 +83,7 @@ func RefToObject(ref interface{}) interface{} {
  */
 func RegisterGoType(value interface{}) {
 	// Register local object.
-	if reflect.TypeOf(value).String() != "GoJavaScript.Object" {
+	if reflect.TypeOf(value).String() != "GoJavaScript.Object" && reflect.TypeOf(value).String() != "map[string]interface {}" {
 		Utility.RegisterType(value)
 	}
 }
@@ -139,6 +140,29 @@ func ObjectToRef(objects interface{}) interface{} {
 						uuid := RegisterGoObject(slice.Index(i).Interface(), "")
 						// I will set the results a object reference.
 						objects_ = append(objects_, NewObjectRef(uuid))
+
+					} else if reflect.TypeOf(e.Interface()).String() == "map[string]interface {}" {
+						// Here if the object is Entity I will create it object and
+						// return a reference to it.
+						if e.Interface().(map[string]interface{})["TYPENAME"] != nil && e.Interface().(map[string]interface{})["__object_infos__"] == nil {
+							// In case of object...
+							typeName := e.Interface().(map[string]interface{})["TYPENAME"].(string)
+							var uuid string
+							if e.Interface().(map[string]interface{})["UUID"] != nil {
+								uuid = e.Interface().(map[string]interface{})["UUID"].(string)
+							} else {
+								uuid = Utility.RandomUUID()
+							}
+
+							// In that case I will initialyse the object.
+							obj := Utility.MakeInstance(typeName, e.Interface().(map[string]interface{}), func(interface{}) {})
+							GetCache().SetObject(uuid, obj)
+
+							// I will set the results a object reference.
+							objects_ = append(objects_, NewObjectRef(uuid))
+						} else {
+							objects_ = append(objects_, slice.Index(i).Interface())
+						}
 					} else {
 						objects_ = append(objects_, slice.Index(i).Interface())
 					}
@@ -157,10 +181,12 @@ func ObjectToRef(objects interface{}) interface{} {
 								return objects
 							}
 						}
+
 						// I will derefence the pointer if it a pointer.
 						for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
 							e = e.Elem()
 						}
+
 						// if the object is a structure.
 						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
 							// results will be register.
@@ -169,10 +195,34 @@ func ObjectToRef(objects interface{}) interface{} {
 							objects = NewObjectRef(uuid)
 						}
 					}
+				} else if reflect.TypeOf(objects).String() == "map[string]interface {}" {
+					// Here if the object is Entity I will create it object and
+					// return a reference to it.
+					if objects.(map[string]interface{})["TYPENAME"] != nil && objects.(map[string]interface{})["__object_infos__"] == nil {
+						// In case of object...
+						typeName := objects.(map[string]interface{})["TYPENAME"].(string)
+
+						var uuid string
+						if objects.(map[string]interface{})["UUID"] != nil {
+							uuid = objects.(map[string]interface{})["UUID"].(string)
+						} else {
+							uuid = Utility.RandomUUID()
+						}
+
+						// In that case I will initialyse the object.
+						obj := Utility.MakeInstance(typeName, objects.(map[string]interface{}), func(interface{}) {})
+						GetCache().SetObject(uuid, obj)
+
+						// I will set the results a object reference.
+						objects = NewObjectRef(uuid)
+					}
+
 				}
 			}
 		}
 	}
+
+	log.Println("225 ---> objects: ", objects)
 
 	return objects
 }

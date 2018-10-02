@@ -102,7 +102,7 @@ EventHub.prototype.registerListener = function () {
     server.eventHandler.addEventListener(this,
         // callback
         function (listener) {
-            console.log("Listener" + listener.id + "was registered to the channel ", listener.channelId)
+            console.log("Listener " + listener.id + " is registered to the channel ", listener.channelId)
         }
     )
 }
@@ -263,7 +263,7 @@ EventHandler.prototype.addEventListener = function (listener, callback) {
         // Progress callback
         function () { },
         // Success callback
-        function (result, listener) {
+        function (id, result, listener) {
             // calling success call back function
             callback(listener);
         },

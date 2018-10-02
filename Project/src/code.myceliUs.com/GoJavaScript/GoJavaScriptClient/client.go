@@ -51,8 +51,8 @@ func NewClient(address string, port int, name string) *Client {
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
 	// uncomment the following line to make it running in a comman
-	//client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
-	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+	client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
+	//client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 	err = client.srv.Start()
 
 	if err != nil {
@@ -146,6 +146,9 @@ func (self *Client) processActions() {
 						target = GoJavaScript.GetCache().GetObject(a.Target)
 						isJsObject = reflect.TypeOf(target).String() == "GoJavaScript.Object" ||
 							reflect.TypeOf(target).String() == "*GoJavaScript.Object"
+						if target == nil {
+							log.Println("---> fail to retreive target ", a.Target)
+						}
 					}
 				}
 
@@ -166,15 +169,14 @@ func (self *Client) processActions() {
 					results, err = Utility.CallMethod(target, a.Name, params)
 					if err != nil {
 						log.Println("---> call Method: ", a.Name, params)
-
 						str, _ := Utility.ToJson(target)
 						log.Println("---> target: ", str)
-
 						log.Println("---> error: ", err)
 					}
 				}
 				// Keep go object in client and transfert only reference.
 				results = GoJavaScript.ObjectToRef(results)
+
 				// set the action result.
 				a.AppendResults(results, err)
 				// Here I will create the response and send it back to the client.
@@ -190,7 +192,6 @@ func (self *Client) processActions() {
 
 // Create Go object
 func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
-	log.Println("----> create go object from string ", jsonStr)
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)
@@ -200,9 +201,10 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 			value = relfectValue.Interface()
 		} else {
 			// Here map[string]interface{} will be use.
-			return nil, nil //errors.New("No object are registered in go to back the js object!")
+			err = errors.New("No object are registered in go to back the js object!")
 		}
 	}
+
 	return value, err
 }
 
@@ -212,9 +214,13 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 	obj := GoJavaScript.GetCache().GetObject(uuid)
 	var err error
 	var infos map[string]interface{}
+
 	if obj != nil {
 
 		infos = make(map[string]interface{}, 0)
+		// define object infos...
+		infos["__object_infos__"] = ""
+
 		if err != nil {
 			return infos, err
 		}
@@ -259,11 +265,9 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 								fieldValue := valueField.Index(i).Interface()
 								// If the value is a struct I need to register it to JS
 								if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
-									if reflect.TypeOf(reflect.ValueOf(fieldValue).Elem()).Kind() == reflect.Struct {
-										// Here the element is a structure so I need to create it representation.
-										uuid_ := self.RegisterGoObject(fieldValue, "")
-										values = append(values, GoJavaScript.NewObjectRef(uuid_))
-									}
+									// Here the element is a structure so I need to create it representation.
+									uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
+									values = append(values, GoJavaScript.NewObjectRef(uuid_))
 								} else {
 									values = append(values, fieldValue)
 								}
@@ -272,9 +276,9 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 							infos[fieldName] = values
 
 						}
-					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Struct {
+					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
 						// Set the struct...
-						uuid_ := self.RegisterGoObject(fieldValue, "")
+						uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
 						infos[fieldName] = GoJavaScript.NewObjectRef(uuid_)
 					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
 						if fieldName == "Methods" {
@@ -306,22 +310,6 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 
 func (self *Client) DeleteGoObject(uuid string) {
 	GoJavaScript.GetCache().RemoveObject(uuid)
-}
-
-/**
- * Register a go type to be usable as JS type.
- */
-func (self *Client) RegisterGoType(value interface{}) {
-	// Register local object.
-	GoJavaScript.RegisterGoType(value)
-}
-
-/**
- * Localy register a go object.
- */
-func (self *Client) RegisterGoObject(obj interface{}, name string) string {
-	// Here I will dynamicaly register objet type in the utility cache...
-	return GoJavaScript.RegisterGoObject(obj, name)
 }
 
 /**
@@ -404,6 +392,7 @@ func (self *Client) SetObjectGoMethod(uuid string, name string) {
  * The list of global variables to be set before executing the script.
  */
 func (self *Client) EvalScript(script string, variables []interface{}) (interface{}, error) {
+
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("EvalScript", "")
 
@@ -432,9 +421,11 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
  * Call a JS/Go function with a given name and a list of parameter.
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (interface{}, error) {
+
+	log.Println("--> function call ", name, params)
+
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("CallFunction", "")
-
 	action.AppendParam("name", name)
 	action.AppendParam("params", GoJavaScript.ObjectToRef(params))
 
@@ -503,7 +494,7 @@ func (self *Client) Stop() bool {
 	self.isRunning = false
 
 	// stop it server.
-	self.srv.Process.Kill()
+	//self.srv.Process.Kill()
 
 	// Close the peers.
 	self.peer.Close()

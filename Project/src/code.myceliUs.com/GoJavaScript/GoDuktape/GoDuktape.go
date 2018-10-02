@@ -135,6 +135,7 @@ func isError(ctx C.duk_context_ptr, index int) bool {
 func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 	// So here I will try to create a local Js representation of the object.
+	//log.Println("---> getJsObjectByUuid ", uuid)
 	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
 	if err == nil {
 		// So here I got an object map info.
@@ -209,7 +210,6 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 							}
 						} else {
 							setValue(ctx, e)
-							// Release the result
 							C.duk_put_prop_index(ctx, values, C.uint(i))
 						}
 					} else {
@@ -242,6 +242,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 			C.free(unsafe.Pointer(cname))
 		}
 	}
+
 }
 
 /**
@@ -314,7 +315,7 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 			if value.(map[string]interface{})["TYPENAME"] != nil {
 				ref, err := GoJavaScript.CallGoFunction("Client", "CreateGoObject", string(jsonStr))
 				if err == nil {
-					// In that case an object exist in the case...
+					// Put the object in the map.
 					getJsObjectByUuid(ref.(*GoJavaScript.ObjectRef).UUID, ctx)
 				} else {
 					log.Println("--> fail to Create Go object ", string(jsonStr), err)
@@ -386,7 +387,7 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		// put the byte code in the stack
 		C.duk_dump_function(ctx)
 		var size int
-		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulong)(unsafe.Pointer(&size)))
+		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulonglong)(unsafe.Pointer(&size)))
 		bytcode := C.GoBytes(ptr, C.int(size))
 		C.duk_pop(ctx)
 		return bytcode, nil
@@ -504,7 +505,6 @@ func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.c
 
 	if len(uuid) > 0 {
 		// I will now call the function.
-		//log.Println("---> call go function ", uuid, name, params)
 		result, err := GoJavaScript.CallGoFunction(uuid, name, params...)
 		if err == nil && result != nil {
 			// So here I will set the value

@@ -17,6 +17,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
 
@@ -203,7 +204,6 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 
 		return results.(error) // return an error message instead.
 	}
-
 	// Here i will append super type fields...
 	prototype.setSuperTypeFields()
 
@@ -1473,7 +1473,6 @@ func (this *GraphStore) Connect() error {
 		// I will not try to connect if a connection already exist.
 		if this.m_conn != nil {
 			if this.m_conn.IsOpen() {
-				log.Println(this.m_conn)
 				return nil
 			}
 		}

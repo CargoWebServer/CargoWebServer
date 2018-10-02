@@ -231,8 +231,6 @@ func TestCreateJsObjectFromGo(t *testing.T) {
 func TestRegisterGoObject(t *testing.T) {
 
 	// Create the object to register.
-	engine.RegisterGoType((*Person)(nil))
-
 	p := GetPerson()
 
 	// Here I will register a go Object in JavaScript and set
@@ -268,10 +266,6 @@ func TestRegisterGoObject(t *testing.T) {
 func TestCreateGoObjectFromJs(t *testing.T) {
 
 	// Test with structure
-	// The type must be register before being usable by the vm.
-	engine.RegisterGoType((*Person)(nil))
-
-	// Register the dynamic type.
 	engine.RegisterJsFunction("TestJsToGoStruct", `function TestJsToGoStruct(){var jerry = {TYPENAME:"GoJavaScriptTest.Person", FirstName:"Java", LastName:"Script", Age:20, NickNames:["toto", "titi", "tata"]}; console.log('---> TestJsToGoStruct ' + jerry ); return jerry; }`)
 	p, err := engine.EvalScript("TestJsToGoStruct();", []interface{}{})
 

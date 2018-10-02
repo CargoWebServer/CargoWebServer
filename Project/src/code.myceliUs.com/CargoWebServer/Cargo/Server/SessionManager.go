@@ -107,13 +107,13 @@ func (this *SessionManager) run() {
  * This function is used to clean all closed sessions
  */
 func (this *SessionManager) removeClosedSession() {
-
-	sessions := this.getActiveSessions()
+	sessions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Session", "CargoEntities", nil)
+	log.Println("---> there is ", len(sessions), " session to close.")
 	for i := 0; i < len(sessions); i++ {
-		sessionId := sessions[i].GetId()
+		sessionId := sessions[i].(*CargoEntities.Session).GetId()
 		if GetServer().getConnectionById(sessionId) == nil {
 			// The session is closed
-			this.closeSession(sessions[i])
+			this.closeSession(sessions[i].(*CargoEntities.Session))
 		}
 	}
 }
@@ -121,12 +121,6 @@ func (this *SessionManager) removeClosedSession() {
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {
 	// Delete the session entity
 	if !Utility.IsValidEntityReferenceName(session.GetUuid()) {
-		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.GetUuid()+"' was not found."))
-	}
-
-	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.GetUuid())
-
-	if errObj != nil {
 		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.GetUuid()+"' was not found."))
 	}
 
@@ -149,7 +143,9 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 
 	evt, _ := NewEvent(LogoutEvent, SessionEvent, eventData)
 
-	GetServer().GetEntityManager().deleteEntity(sessionEntity)
+	// Delete the session.
+	GetServer().GetEntityManager().deleteEntity(session)
+	log.Println("---> session ", session.GetId(), " is now close.")
 
 	// Send the event
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -160,7 +156,7 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 		// Remove the vm for the session.
 		connection.Close()
 	}
-
+	log.Println("session ", session.GetId(), " is now deleted!")
 	return nil
 }
 
@@ -255,7 +251,6 @@ func (this *SessionManager) OnEvent(evt interface{}) {
 // @param {callback} errorCallback In case of error.
 func (this *SessionManager) Login(accountName string, psswd string, serverId string, messageId string, sessionId string) *CargoEntities.Session {
 
-	var session *CargoEntities.Session
 	accountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountName})
 	if errObj != nil {
 		store := GetServer().GetDataManager().getDataStore("CargoEntities")
@@ -296,23 +291,23 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			}
 		}
 
-		sessionEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Session", "CargoEntities", []interface{}{sessionId})
-		if sessionEntity == nil {
+		session, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Session", "CargoEntities", []interface{}{sessionId})
+		if session == nil {
 
 			// If the session does not exist
 			session = new(CargoEntities.Session)
 
 			// The connection id is the same as the session id.
-			session.M_id = sessionId
+			session.(*CargoEntities.Session).M_id = sessionId
 
 			// Initialization of fields
-			session.M_startTime = int64(time.Now().Unix())
-			session.M_statusTime = int64(time.Now().Unix())
-			session.M_sessionState = CargoEntities.SessionState_Online
-			session.SetEntitySetter(setEntityFct)
-			session.SetEntityGetter(getEntityFct)
-			session.SetUuidGenerator(generateUuidFct)
-			session.ParentLnk = "M_sessions"
+			session.(*CargoEntities.Session).M_startTime = int64(time.Now().Unix())
+			session.(*CargoEntities.Session).M_statusTime = int64(time.Now().Unix())
+			session.(*CargoEntities.Session).M_sessionState = CargoEntities.SessionState_Online
+			session.(*CargoEntities.Session).SetEntitySetter(setEntityFct)
+			session.(*CargoEntities.Session).SetEntityGetter(getEntityFct)
+			session.(*CargoEntities.Session).SetUuidGenerator(generateUuidFct)
+			session.(*CargoEntities.Session).ParentLnk = "M_sessions"
 
 			//Set the computer reference.
 			connection := GetServer().getConnectionById(sessionId)
@@ -320,12 +315,12 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 				addr := connection.GetHostname()
 				computer, err := GetServer().GetLdapManager().getComputerByIp(addr)
 				if err == nil {
-					session.SetComputerRef(computer)
+					session.(*CargoEntities.Session).SetComputerRef(computer)
 				}
 			}
 
 			// Set the account ptr.
-			session.SetAccountPtr(account)
+			session.(*CargoEntities.Session).SetAccountPtr(account)
 
 			GetServer().GetEntityManager().createEntity(account, "M_sessions", session)
 
@@ -351,11 +346,11 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 
 		} else {
 			// Power clicker protection
-			log.Println("session aleready exist...", sessionEntity.GetUuid())
+			log.Println("session aleready exist...", session.GetUuid())
 		}
 
 		// Return the active session for that account
-		return session
+		return session.(*CargoEntities.Session)
 
 	} else {
 		// Create the error message

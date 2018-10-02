@@ -76,17 +76,17 @@ function load() {
                                 if (server[key] == undefined) {
                                     // inject the code in the client memory
                                     eval(results[key])
-
+                                    
                                     // Now I will create the listener
                                     var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
                                     server[listenerName] = eval("new " + key + "()")
                                     server[listenerName].registerListener()
-
-                                    // Register prototype manager as listener.
-                                    server["prototypeManager"] = new EntityPrototypeManager(PrototypeEvent)
-                                    server["prototypeManager"].registerListener(PrototypeEvent)
                                 }
                             }
+
+                            // Register prototype manager as listener.
+                            server["prototypeManager"] = new EntityPrototypeManager(PrototypeEvent)
+                            server["prototypeManager"].registerListener(PrototypeEvent)
 
                             // Go to the main entry point
                             // Append the listener for the entity.
@@ -101,46 +101,46 @@ function load() {
                                             if (main != null) {
                                                 // So here I will connect the file listener...
                                                 server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
-                                                        if (evt.dataMap.fileInfo !== undefined) {
-                                                            var fileInfo = evt.dataMap["fileInfo"]
-                                                            var filePath = "http://" + server.hostName + ":" + server.port + fileInfo.M_path + "/" + fileInfo.M_name
-                                                            /*if(fileInfo.M_mime == "application/javascript"){
-                                                                // First I will unload the script file.
-                                                                var old = null;
-                                                                for(var i=0; i < document.scripts.length; i++){
-                                                                    if(document.scripts[i].src.startsWith(filePath)){
-                                                                        old = document.scripts[i]
-                                                                        break;
-                                                                    }
+                                                    if (evt.dataMap.fileInfo !== undefined) {
+                                                        var fileInfo = evt.dataMap["fileInfo"]
+                                                        var filePath = "http://" + server.hostName + ":" + server.port + fileInfo.M_path + "/" + fileInfo.M_name
+                                                        /*if(fileInfo.M_mime == "application/javascript"){
+                                                            // First I will unload the script file.
+                                                            var old = null;
+                                                            for(var i=0; i < document.scripts.length; i++){
+                                                                if(document.scripts[i].src.startsWith(filePath)){
+                                                                    old = document.scripts[i]
+                                                                    break;
                                                                 }
-                                                                if(old != null){
-                                                                    old.parentElement.removeChild(old)
-                                                                }
-                                    
-                                                                // Now I will append the new script.
-                                                                loadjscssfile(filePath + "?" + fileInfo.M_checksum, "application/javascript", function(){
-                                                                    console.log("---> the file is loaded!..")
-                                                                })
                                                             }
-                                                            
-                                                            
-                                                            // Read html text file.
-                                                            if(fileInfo.M_mime == "text/html"){
-                                                                server.fileManager.readTextFile(fileInfo.M_path + "/" + fileInfo.M_name, 
-                                                                function(results, caller){
-                                                                    
-                                                                    if(caller.M_name == "index.html"){
-                                                                        //document.body.parentElement.innerHTML = results[0]
-                                                                        //document.open("text/html", "replace");
-                                                                        //document.write(results[0]);  // htmlCode is the variable you called newDocument
-                                                                    }
-                                                                },
-                                                                function(){
-                                                                    
-                                                                }, fileInfo)
-                                                            }*/
+                                                            if(old != null){
+                                                                old.parentElement.removeChild(old)
+                                                            }
+                                
+                                                            // Now I will append the new script.
+                                                            loadjscssfile(filePath + "?" + fileInfo.M_checksum, "application/javascript", function(){
+                                                                console.log("---> the file is loaded!..")
+                                                            })
                                                         }
-                                                    })
+                                                        
+                                                        
+                                                        // Read html text file.
+                                                        if(fileInfo.M_mime == "text/html"){
+                                                            server.fileManager.readTextFile(fileInfo.M_path + "/" + fileInfo.M_name, 
+                                                            function(results, caller){
+                                                                
+                                                                if(caller.M_name == "index.html"){
+                                                                    //document.body.parentElement.innerHTML = results[0]
+                                                                    //document.open("text/html", "replace");
+                                                                    //document.write(results[0]);  // htmlCode is the variable you called newDocument
+                                                                }
+                                                            },
+                                                            function(){
+                                                                
+                                                            }, fileInfo)
+                                                        }*/
+                                                    }
+                                                })
                                                 main()
                                             }
                                         },
