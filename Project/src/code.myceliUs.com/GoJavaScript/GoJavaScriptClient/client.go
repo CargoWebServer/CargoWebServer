@@ -50,9 +50,7 @@ func NewClient(address string, port int, name string) *Client {
 	var err error
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
-	// uncomment the following line to make it running in a comman
-	client.srv = exec.Command("cmd", "/K", "start", "GoJavaScriptServer.exe", strconv.Itoa(port), name)
-	//client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 	err = client.srv.Start()
 
 	if err != nil {
@@ -212,20 +210,30 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 // method names
 func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error) {
 	obj := GoJavaScript.GetCache().GetObject(uuid)
+
 	var err error
 	var infos map[string]interface{}
 
 	if obj != nil {
-
 		infos = make(map[string]interface{}, 0)
+
 		// define object infos...
 		infos["__object_infos__"] = ""
+		infos["Methods"] = make(map[string]interface{}, 0)
+		infos["UUID"] = uuid
+
+		// in case the object is a generic map with no method...
+		if reflect.TypeOf(obj).String() == "map[string]interface {}" {
+			for name, value := range obj.(map[string]interface{}) {
+				infos[name] = value
+			}
+			return infos, nil
+		}
 
 		if err != nil {
 			return infos, err
 		}
 
-		infos["Methods"] = make(map[string]interface{}, 0)
 		element := reflect.ValueOf(obj)
 
 		for reflect.TypeOf(element.Interface()).Kind() == reflect.Ptr {
@@ -300,7 +308,6 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 				}
 			}
 		}
-
 		// Return the list of infos.
 		return infos, nil
 	}
@@ -422,8 +429,6 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (interface{}, error) {
 
-	log.Println("--> function call ", name, params)
-
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("CallFunction", "")
 	action.AppendParam("name", name)
@@ -494,7 +499,7 @@ func (self *Client) Stop() bool {
 	self.isRunning = false
 
 	// stop it server.
-	//self.srv.Process.Kill()
+	self.srv.Process.Kill()
 
 	// Close the peers.
 	self.peer.Close()

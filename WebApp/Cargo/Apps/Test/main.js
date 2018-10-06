@@ -32,8 +32,8 @@ function main() {
     server.sessionManager.login("admin", "adminadmin", "localhost",
         function () {
             // Create the dynamic entity here.
-            //testDynamicEntity()
-            testCreateDynamicEntity()
+            testDynamicEntity()
+            //testCreateDynamicEntity()
         },
         function () {
             // Nothing to do here.

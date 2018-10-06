@@ -58,15 +58,20 @@ func RefToObject(ref interface{}) interface{} {
 		slice := reflect.ValueOf(ref)
 		for i := 0; i < slice.Len(); i++ {
 			e := slice.Index(i)
-			if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
-				// Replace the object reference with it actual object.
-				ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(ObjectRef).UUID)
-			} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
-				// Replace the object reference with it actual object.
-				ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(*ObjectRef).UUID)
+			if e.IsValid() {
+				if e.IsNil() == false {
+					if reflect.TypeOf(e.Interface()).String() == "GoJavaScript.ObjectRef" {
+						// Replace the object reference with it actual object.
+						ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(ObjectRef).UUID)
+					} else if reflect.TypeOf(e.Interface()).String() == "*GoJavaScript.ObjectRef" {
+						// Replace the object reference with it actual object.
+						ref.([]interface{})[i] = GetCache().GetObject(e.Interface().(*ObjectRef).UUID)
+					}
+				}
 			}
 		}
 	} else {
+
 		if reflect.TypeOf(ref).String() == "GoJavaScript.ObjectRef" {
 			// Replace the object reference with it actual value.
 			ref = GetCache().GetObject(ref.(ObjectRef).UUID)
@@ -74,6 +79,7 @@ func RefToObject(ref interface{}) interface{} {
 			// Replace the object reference with it actual value.
 			ref = GetCache().GetObject(ref.(*ObjectRef).UUID)
 		}
+
 	}
 	return ref
 }
@@ -128,44 +134,48 @@ func ObjectToRef(objects interface{}) interface{} {
 			objects_ := make([]interface{}, 0)
 			for i := 0; i < slice.Len(); i++ {
 				e := slice.Index(i)
-				if e.IsNil() {
-					objects_ = append(objects_, nil)
-				} else {
-					// I will derefence the pointer if it's a pointer.
-					for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
-						e = e.Elem()
-					}
-					if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
-						// results will be register.
-						uuid := RegisterGoObject(slice.Index(i).Interface(), "")
-						// I will set the results a object reference.
-						objects_ = append(objects_, NewObjectRef(uuid))
-
-					} else if reflect.TypeOf(e.Interface()).String() == "map[string]interface {}" {
-						// Here if the object is Entity I will create it object and
-						// return a reference to it.
-						if e.Interface().(map[string]interface{})["TYPENAME"] != nil && e.Interface().(map[string]interface{})["__object_infos__"] == nil {
-							// In case of object...
-							typeName := e.Interface().(map[string]interface{})["TYPENAME"].(string)
-							var uuid string
-							if e.Interface().(map[string]interface{})["UUID"] != nil {
-								uuid = e.Interface().(map[string]interface{})["UUID"].(string)
-							} else {
-								uuid = Utility.RandomUUID()
-							}
-
-							// In that case I will initialyse the object.
-							obj := Utility.MakeInstance(typeName, e.Interface().(map[string]interface{}), func(interface{}) {})
-							GetCache().SetObject(uuid, obj)
-
+				if e.Type().Kind() == reflect.Ptr || e.Type().Kind() == reflect.Struct || e.Type().Kind() == reflect.Map {
+					if e.IsNil() {
+						objects_ = append(objects_, nil)
+					} else {
+						// I will derefence the pointer if it's a pointer.
+						for reflect.TypeOf(e.Interface()).Kind() == reflect.Ptr {
+							e = e.Elem()
+						}
+						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
+							// results will be register.
+							uuid := RegisterGoObject(slice.Index(i).Interface(), "")
 							// I will set the results a object reference.
 							objects_ = append(objects_, NewObjectRef(uuid))
+
+						} else if reflect.TypeOf(e.Interface()).String() == "map[string]interface {}" {
+							// Here if the object is Entity I will create it object and
+							// return a reference to it.
+							if e.Interface().(map[string]interface{})["TYPENAME"] != nil && e.Interface().(map[string]interface{})["__object_infos__"] == nil {
+								// In case of object...
+								typeName := e.Interface().(map[string]interface{})["TYPENAME"].(string)
+
+								// In that case I will initialyse the object.
+								obj := Utility.MakeInstance(typeName, e.Interface().(map[string]interface{}), func(interface{}) {})
+								if reflect.TypeOf(obj).String() != "map[string]interface {}" {
+									uuid := Utility.RandomUUID()
+									// if the object is not a map i will keep it on the client side.
+									GetCache().SetObject(uuid, obj.Interface())
+									objects_ = append(objects_, NewObjectRef(uuid))
+								} else {
+									// The map will be transfert.
+									log.Println("172 ---> Dynamic object found: ", obj)
+									objects_ = append(objects_, obj)
+								}
+							} else {
+								objects_ = append(objects_, slice.Index(i).Interface())
+							}
 						} else {
 							objects_ = append(objects_, slice.Index(i).Interface())
 						}
-					} else {
-						objects_ = append(objects_, slice.Index(i).Interface())
 					}
+				} else {
+					objects_ = append(objects_, slice.Index(i).Interface())
 				}
 			}
 			// Set the array of object references.
@@ -201,28 +211,22 @@ func ObjectToRef(objects interface{}) interface{} {
 					if objects.(map[string]interface{})["TYPENAME"] != nil && objects.(map[string]interface{})["__object_infos__"] == nil {
 						// In case of object...
 						typeName := objects.(map[string]interface{})["TYPENAME"].(string)
-
-						var uuid string
-						if objects.(map[string]interface{})["UUID"] != nil {
-							uuid = objects.(map[string]interface{})["UUID"].(string)
-						} else {
-							uuid = Utility.RandomUUID()
-						}
-
 						// In that case I will initialyse the object.
 						obj := Utility.MakeInstance(typeName, objects.(map[string]interface{}), func(interface{}) {})
-						GetCache().SetObject(uuid, obj)
-
-						// I will set the results a object reference.
-						objects = NewObjectRef(uuid)
+						if reflect.TypeOf(obj).String() != "map[string]interface {}" {
+							uuid := Utility.RandomUUID()
+							GetCache().SetObject(uuid, obj.Interface())
+							// I will set the results a object reference.
+							objects = NewObjectRef(uuid)
+						} else {
+							log.Println("229 ---> Dynamic object found: ", obj)
+						}
 					}
 
 				}
 			}
 		}
 	}
-
-	log.Println("225 ---> objects: ", objects)
 
 	return objects
 }

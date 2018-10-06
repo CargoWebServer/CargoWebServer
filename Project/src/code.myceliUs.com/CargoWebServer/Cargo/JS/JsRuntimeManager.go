@@ -680,11 +680,15 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 	// Get the vm.
 	vm := this.m_sessions[sessionId]
 
+	// Global variable named exports.
+	// The value
+	vm.SetGlobalVariable("exports", "")
+
 	// Need to be set as a global variable.
 	vm.SetGlobalVariable("sessionId", sessionId)
 
 	// I will register the require function first.
-	vm.RegisterJsFunction("require", "function require(moduleId){return eval(require_(moduleId, sessionId))}")
+	vm.RegisterJsFunction("require", "function require(moduleId){var exports_ = require_(moduleId, sessionId); exports__ = eval(exports_.exports_id__); exports = Object.assign(exports__, exports_); return exports;}")
 
 	// Create the map of exports.
 	jsRuntimeManager.m_exports[sessionId] = make(map[string]GoJavaScript.Object)
@@ -710,6 +714,9 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			} else {
 				// Create the export variable.
 				uuid := strings.Replace(Utility.GenerateUUID(exportPath), "-", "_", -1)
+
+				// Set a global variable named
+				vm.SetGlobalVariable("exports_"+uuid, "")
 				export = vm.CreateObject("exports_" + uuid)
 
 				// Keep it path

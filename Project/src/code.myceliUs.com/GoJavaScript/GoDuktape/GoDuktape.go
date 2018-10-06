@@ -22,7 +22,7 @@ import "strconv"
 import "code.myceliUs.com/GoJavaScript"
 import b64 "encoding/base64"
 
-//import "code.myceliUs.com/Utility"
+import "code.myceliUs.com/Utility"
 import "log"
 import "encoding/json"
 
@@ -135,7 +135,6 @@ func isError(ctx C.duk_context_ptr, index int) bool {
 func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 
 	// So here I will try to create a local Js representation of the object.
-	//log.Println("---> getJsObjectByUuid ", uuid)
 	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
 	if err == nil {
 		// So here I got an object map info.
@@ -155,91 +154,101 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 		defer C.free(unsafe.Pointer(uuid_name))
 
 		// Now I will set the object method.
-		methods := objInfos.(map[string]interface{})["Methods"].(map[string]interface{})
-		for name, src := range methods {
-			cstr := C.CString(name)
-			if len(src.(string)) == 0 {
-				// Set the go function here.
-				C.push_c_function(ctx, cstr)
-				C.duk_put_prop_string(ctx, obj_idx, cstr)
-			} else {
-				byteCode, err := b64.StdEncoding.DecodeString(src.(string))
-				if err == nil {
-					byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
-					C.load_byte_code(ctx, byteCode_, C.int(len(byteCode)))
-					C.free(unsafe.Pointer(byteCode_))
-
-					// replaces the buffer on the stack top with the original function
-					C.duk_load_function(ctx)
-
-					// Now the ctx contain a function
+		if objInfos.(map[string]interface{})["Methods"] != nil {
+			methods := objInfos.(map[string]interface{})["Methods"].(map[string]interface{})
+			for name, src := range methods {
+				cstr := C.CString(name)
+				if len(src.(string)) == 0 {
+					// Set the go function here.
+					C.push_c_function(ctx, cstr)
 					C.duk_put_prop_string(ctx, obj_idx, cstr)
-
 				} else {
-					src_ := C.CString(src.(string))
-					if int(C.compile_function_string(ctx, src_)) != 0 {
-						log.Println("---> compilation fail!", src)
-						log.Println("---> error:", C.GoString(C.safe_to_string(ctx, -1)))
-					} else {
-						// Keep the function as object method.
+					byteCode, err := b64.StdEncoding.DecodeString(src.(string))
+					if err == nil {
+						byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
+						C.load_byte_code(ctx, byteCode_, C.int(len(byteCode)))
+						C.free(unsafe.Pointer(byteCode_))
+
+						// replaces the buffer on the stack top with the original function
+						C.duk_load_function(ctx)
+
+						// Now the ctx contain a function
 						C.duk_put_prop_string(ctx, obj_idx, cstr)
+
+					} else {
+						src_ := C.CString(src.(string))
+						if int(C.compile_function_string(ctx, src_)) != 0 {
+							log.Println("---> compilation fail!", src)
+							log.Println("---> error:", C.GoString(C.safe_to_string(ctx, -1)))
+						} else {
+							// Keep the function as object method.
+							C.duk_put_prop_string(ctx, obj_idx, cstr)
+						}
 					}
 				}
+				C.free(unsafe.Pointer(cstr))
 			}
-			C.free(unsafe.Pointer(cstr))
-		}
 
-		// I can remove the methods from the infos.
-		delete(objInfos.(map[string]interface{}), "Methods")
+			// I can remove the methods from the infos.
+			delete(objInfos.(map[string]interface{}), "Methods")
+		}
 
 		// Now the object properties.
 		for name, value := range objInfos.(map[string]interface{}) {
 			cname := C.CString(name)
-			if reflect.TypeOf(value).Kind() == reflect.Slice {
-				slice := reflect.ValueOf(value)
-				values := C.duk_push_array(ctx)
-				for i := 0; i < slice.Len(); i++ {
-					e := slice.Index(i).Interface()
-					if reflect.TypeOf(e).Kind() == reflect.Map {
-						// Here The value contain a map... so I will append
-						if e.(map[string]interface{})["TYPENAME"] != nil {
-							if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-								// Here I will pup the object in the stack value.
-								getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
+			if value != nil {
+				if reflect.TypeOf(value).Kind() == reflect.Slice {
+					slice := reflect.ValueOf(value)
+					values := C.duk_push_array(ctx)
+					for i := 0; i < slice.Len(); i++ {
+						e := slice.Index(i).Interface()
+						if reflect.TypeOf(e).Kind() == reflect.Map {
+							// Here The value contain a map... so I will append
+							if e.(map[string]interface{})["TYPENAME"] != nil {
+								if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
+									// Here I will pup the object in the stack value.
+									getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
+									C.duk_put_prop_index(ctx, values, C.uint(i))
+								} else {
+									log.Println("214 GoDukTape.go ---> unhandle case!!!!")
+								}
+							} else {
+								setValue(ctx, e)
 								C.duk_put_prop_index(ctx, values, C.uint(i))
 							}
 						} else {
+							// set the value on the stack.
 							setValue(ctx, e)
+							// Release the result
 							C.duk_put_prop_index(ctx, values, C.uint(i))
 						}
-					} else {
-						// set the value on the stack.
-						setValue(ctx, e)
-						// Release the result
-						C.duk_put_prop_index(ctx, values, C.uint(i))
 					}
-				}
-				C.duk_put_prop_string(ctx, obj_idx, cname)
-			} else if reflect.TypeOf(value).Kind() == reflect.Map {
-				if value.(map[string]interface{})["TYPENAME"] != nil {
-					if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-						getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
-						C.duk_put_prop_string(ctx, obj_idx, cname)
+					C.duk_put_prop_string(ctx, obj_idx, cname)
+				} else if reflect.TypeOf(value).Kind() == reflect.Map {
+					if value.(map[string]interface{})["TYPENAME"] != nil {
+						if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
+							getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
+							C.duk_put_prop_string(ctx, obj_idx, cname)
+						} else {
+							setValue(ctx, value)
+							C.duk_put_prop_string(ctx, obj_idx, cname)
+						}
 					} else {
 						setValue(ctx, value)
 						C.duk_put_prop_string(ctx, obj_idx, cname)
 					}
 				} else {
+					// Standard object property, int, string, float...
 					setValue(ctx, value)
 					C.duk_put_prop_string(ctx, obj_idx, cname)
 				}
+
+				C.free(unsafe.Pointer(cname))
 			} else {
-				// Standard object property, int, string, float...
-				setValue(ctx, value)
+				// set null value
+				C.duk_push_null(ctx)
 				C.duk_put_prop_string(ctx, obj_idx, cname)
 			}
-
-			C.free(unsafe.Pointer(cname))
 		}
 	}
 
@@ -387,7 +396,7 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 		// put the byte code in the stack
 		C.duk_dump_function(ctx)
 		var size int
-		ptr := C.duk_get_buffer(ctx, -1, (*_Ctype_ulonglong)(unsafe.Pointer(&size)))
+		ptr := C.duk_get_buffer(ctx, -1, (*C.duk_size_t)(unsafe.Pointer(&size)))
 		bytcode := C.GoBytes(ptr, C.int(size))
 		C.duk_pop(ctx)
 		return bytcode, nil
@@ -499,7 +508,7 @@ func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.c
 		if err == nil {
 			params[i] = value
 		} else {
-			log.Panicln("---> fail 393")
+			log.Panicln("512 GoDukTape.go")
 		}
 	}
 
@@ -512,16 +521,20 @@ func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.c
 			return C.duk_ret_t(1)
 		} else if err != nil {
 			// error occured here.
+			log.Println("525 GoDukTage.go ---> ", err)
 		}
 
 	} else {
 		result, err := GoJavaScript.CallGoFunction("", name, params...)
 		if err == nil && result != nil {
+			jsonStr, _ := Utility.ToJson(result)
+			log.Println("----> function ", name, " result ", jsonStr)
 			setValue(ctx, result)
 			// The value must be pop by the caller.
 			return C.duk_ret_t(1)
 		} else if err != nil {
 			// error occured here.
+			log.Println("536 GoDukTape.go ---> ", err)
 		}
 	}
 

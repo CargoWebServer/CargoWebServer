@@ -349,8 +349,6 @@ func (this *Server) Start() {
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("executeJsFunction", func(functionSrc string, functionParams []GoJavaScript.Object, progressCallback string, successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 
-		log.Println("---> executeJsFunction")
-
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
@@ -372,7 +370,6 @@ func (this *Server) Start() {
 			param.Name, _ = paramName.(string)
 			param.TYPENAME = "Server.MessageData"
 			param.Value, _ = functionParams[i].Get("dataBytes")
-
 			params = append(params, param)
 		}
 
@@ -407,7 +404,6 @@ func (this *Server) Start() {
 					} else if param.GetType() == Data_BYTES {
 						results = append(results, param.GetDataBytes())
 					} else if param.GetType() == Data_JSON_STR {
-
 						val := string(param.GetDataBytes())
 						val_, err := b64.StdEncoding.DecodeString(val)
 						if err == nil {
@@ -455,6 +451,7 @@ func (this *Server) Start() {
 						}
 					}
 				}
+
 				params := make([]interface{}, 2)
 				params[0] = results
 				params[1] = caller
