@@ -1,2864 +1,303 @@
-2018/10/05 14:00:40 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:00:40 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:00:40 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:00:40 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:00:40 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:00:40 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "53276ba6-607c-4d7c-8edb-7251b4b72ace",
+2018/10/06 10:10:55 ------> type:  GoJavaScript.Message  was register as dynamic type.
+2018/10/06 10:10:55 ------> type:  GoJavaScript.Action  was register as dynamic type.
+2018/10/06 10:10:55 ------> type:  GoJavaScript.Param  was register as dynamic type.
+2018/10/06 10:10:55 ------> type:  GoJavaScript.Variable  was register as dynamic type.
+2018/10/06 10:10:55 ------> type:  GoJavaScript.Object  was register as dynamic type.
+2018/10/06 10:10:55 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "cefbd363-9309-43f2-9ad6-c106b4da08c6",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "770a78e4-333b-4948-ab5e-eed4834db754",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a532c20e-48ee-4340-8b24-1e8f27c0cab6",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "63cef3cc-641e-438a-96e5-939fb69c197b",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "2a8dd6ca-77f2-4274-87c4-09beda36e11e",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "daa77609-d907-4d88-9007-322e3c1f7712"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "19f0fa40-220e-4fd0-b7d8-fdbf86af8862",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "fd9b7572-9fa0-40ee-b7a6-76851c4ef31a"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "d65aca43-50c1-467a-9b85-7b185fa7c6fb",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "95dc4f09-f94a-4314-9307-a2308efa8800",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "dbc406c2-a2ff-4eb4-bccf-fc99f134c4bb",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "0984c6cf-3e40-4f6a-b504-47eacd076f31",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "ebd79df1-8a21-43c8-aa56-6836344b8c35",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "09f0fb26-03a9-4a70-8eca-840dce4a2fd9",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "76a9a164-1456-4957-b0c7-be1e6a99dc3a",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "20bb9b7e-0ff4-49d4-875d-461e77786e8a"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "2760f84a-d371-4e98-8a5d-81e3bc5e729b",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "410f5b09-c5be-43c3-a95d-a93a24328c10"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "e74ed6f2-d2f8-4c12-be6d-399950ca3304",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "98a8e997-898a-40ea-9fab-fb2aff28968f",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "f41ad8ed-f70f-4403-a447-8df6c3d5e503",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "a310fb51-58ae-4fc1-9844-1886de34d02f",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "d9343f0e-c335-4a2f-ab8c-e9fb5290af4a",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "c4293f77-596f-4916-9c9a-9df66842ce39",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "6061bc69-8840-4054-9921-ad7dfa72b20c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "dce0292e-7bd9-46f6-935f-f3054824b0aa"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "f907300a-c543-41e3-8e6a-b053e31d6f1f",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "87169ab0-0468-40ca-b5df-2c66fe194c59"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "99604379-50cb-447c-9844-9778f9debe95",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "eb622cf0-87fd-413c-86d4-eaf0454f12e1",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "b6c8bbb8-83b9-4e82-a1b1-d7c0fcfa0eb3",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "3daa4cc9-8951-4321-b711-b6d6b0946b8d",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "d14bcac5-b934-4838-9848-cd697d416aa9",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "300af451-52f3-45cd-88f8-5b4cd5507652",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "b7d3749b-a9d5-4694-883a-9e32ef4e333d",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "b249de5f-9364-4a35-87b7-d1210d0a100c"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "ce8e4f0d-3153-45ea-820e-02c8cf1e5dfa",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "6bba38e9-55ab-4612-b740-0e3d2c7b0fe6"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "c5cedff0-c8f2-47be-b9ca-2f70a7e1007b",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "b5c1a831-5415-41af-9a94-252b5f770ae9",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "6003f84c-54f2-4312-8ae2-c58609c2a060",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "63514fa9-7315-41e3-a98d-8b5371a303bd",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a6590b25-258b-4b6d-994a-9e960ccd2d9c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "478ebf79-1747-424f-b118-582c18647720",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "981c45d6-7707-4d66-970e-51a6120c4e7d",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "f6bc92b6-46bb-4b57-9b9e-b5f3520d55d5"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "5010344f-7e64-44a1-90de-6046387619c6",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "691d75e0-93a1-4e1a-b609-19023296b3df"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "90784a54-138d-4e52-882e-6a34310bcb4a",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "9ea3ce68-a425-4ac5-9bea-c12f42f687a2",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "1cadf033-ead2-4e14-95bc-0d9998457928",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "88b154bf-ed9f-44cd-9301-f64424089a3b",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "dca75c76-abdb-4c8a-b023-b60ab7f2d18f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "2fa72e9b-04dc-42be-b19c-232d8cb1442f",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "c515f62b-3ab0-4684-beae-c3d21dca235c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "bc713f65-6bf4-4d96-b7a2-14c912a44c37"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "2f7a13f6-5fb7-4f5b-99c0-252afa1b0a69",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "cde984c0-f06e-4fbc-8e26-0fc298249621"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "e21754ec-ab72-49d7-9304-2754d2dd227a",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "3b75569a-3e5b-4e04-8289-91646101490e",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "1c324b42-d857-41d4-98a1-417bef91b4e9",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "236a03e2-6e5f-47fe-be63-bccd077d198f",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "d21a1c2d-d027-4ceb-be58-afcfd741fb2f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "69975409-090e-40e8-a6b5-3a866892f4c8",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "94cdca7e-4a1b-4436-a727-a851a204c99c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "6d92e800-bc4b-498c-aca9-b004ab0d21c0"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "6575d2bf-19dc-418c-84fe-956c22bedd36",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "0acab189-8438-46b3-9487-746a6168bdd7"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "29780757-a603-4252-8733-6d9bc0faa17c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "07eabcc1-e064-4509-a2c1-567d2a8114de",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "5abc7925-e80f-4c4f-8881-ae20c5806dbe",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "70565b81-ea8f-4d1b-ab41-be60156c7e63",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "4f838ada-f1e2-4c6b-8b6f-ca8efd78c6de",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "1c9d461b-84a3-47ee-9086-a9a62ace8fc1",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "9ed037d3-4702-4e16-8dd8-a1fa02f52640",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "cb00817c-f68f-4fbd-9641-68c40d53cf65"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "fb22e0bf-29c9-4808-a5be-3335b1394650",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "985d5ff6-7fcf-412f-ade3-0e1a360bc1b3"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "29889f01-13cd-4e72-a6cb-a8ee69259060",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "a797d922-7330-440c-94b5-8c698dfa4b00",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "c346240a-9685-4c68-8f87-49ed1d4051ad",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "650e3b3e-6525-4f71-97df-e04eedf1cf43",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "cf2967cd-c3bf-4452-976d-f6940415b24d",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "16fe33fa-b188-4be8-92eb-9fa746706534",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "223051fa-e283-4ac8-966f-702f8ee5ea76",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "36f48c7b-0552-4290-bfc6-0969c016b490"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "9eb6ecb7-44cf-4c36-9e50-cb01b8a648c9",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "50ba137f-b8d3-4b4c-979b-06e387b0d421"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a77aeebc-e3b5-405c-9ca9-ecf4ddac19cc",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "d43ff815-5d3c-4411-af05-9ed3ce1af4b7",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "b4d2e7d9-37a3-4d1e-ac09-38d3bc070c57",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "9818ec72-cbf0-4d27-8e08-9536dc8e5b6e",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "e9d8736a-7a14-492a-8450-dcedb1c96957",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "d2473cfb-eeea-47ee-a156-2b43f576026f",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "22f952aa-cb4d-439f-8edf-f26d7bd09760",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "a6313f58-1046-4cde-8e4b-7a3f475c5c89"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "bb440b93-e428-4a39-ac2b-0365ac33e0e7",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "e36e70b4-06e4-4ef9-b424-c76e40e58ccb"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "01949db7-b1ea-498a-b25f-1cb740b826c3",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "f7850e56-d790-4ec0-895b-6c2236fc822e",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "213b5282-c257-45d0-a25c-e7b081d6c043",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "bc15306b-312f-4892-8930-fac380d92c46",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "c840117a-5de7-496b-b224-a36e00e51ddf",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "48018b0e-59af-4d5a-9e9f-73cee6431bcd",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "7c294498-9dda-46a2-8a81-76d9cb485f35",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "75f20de8-d29d-4f61-bf72-6c4597f46fc8"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "1b4b30d9-bb66-4153-ad09-8db1ee4ad60a",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "c975ba90-ea73-4107-a03a-2efce1be4525"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "04f5a9b0-c9b1-4f93-ad09-97870ce3e37f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "78374ea8-06ee-409c-8712-0c507e19dcad",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "f2d45b83-2448-41cc-93d0-45c27ed0d1d8",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "8483feb8-a28d-4a74-a17d-eda266c40379",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a98d558b-d594-4ea3-a521-1a7fefcbec5b",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "1cec6022-ed7c-4697-84da-3d23e583f1ec",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "3d65b58d-03a1-451c-9624-a59782de81be",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "616b4052-207a-4ebd-8144-8b69fd31913d"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "f880863a-9cec-4bc9-b71f-01cc71d8eb8e",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "ee7c2ef0-2dbc-420d-b886-d30cf32daedb"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "cb9a633c-d169-420d-9e9d-ed918594d6a6",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "6573b55e-d40b-4601-b8c4-71d66f7c4355",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "3ca1ffff-c45e-4dda-8e81-2fd293a0d0d2",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "d167e084-8f0c-40d5-a90f-ed1f4f732af4",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "041faa94-49f7-4fe0-ba73-315dc517a097",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "ad4ec742-b4f2-4368-b67c-0096fc66c850",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "17e0ae39-215a-4f5c-8e53-812134022dee",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "1641e2ef-5936-4d28-b47d-29193d7a8da8"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "6076a39f-8193-4e18-b501-a19d8aaf6892",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "62e6799d-11d0-4e75-9401-46857c35f4f9"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "8d6909aa-aebf-4abe-86f5-9b1b51f9cbda",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "42f9ff11-d372-4c65-92a7-579d393acc28",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "df8481ac-858b-4928-ad0b-ac59210a095f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "43664eb8-ea3e-43cd-9cd2-37625254cc7d",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "b7b14aae-a7b4-41d5-a56f-e891520a31e1",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "41a1fdc4-d3f1-4bef-92da-2046bbd39046",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "ac4e94d5-f2c2-4bbf-b430-ee434f66d192",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "3af06af2-ad99-4c6a-9a37-9c7a7e997af1"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "19852f79-63e6-4a91-9265-2808195642c2",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "40bd75c6-fd06-46c2-af0f-9cfe2bf7a87d"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "791fba14-ff1a-4349-be02-96be7773958f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "f289529a-a0c8-4651-8b10-42a84d9763ba",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "92f3ebc0-0873-4371-92c2-856e4fa56910",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "bbd10369-fb2f-4710-842e-109262dc6bcf",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "469b4f50-59f9-4eaa-b8fa-065e65f04f0c",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "655e226f-fb9f-49bd-ac1b-d0e27f422037",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "29775765-cb05-4d38-828e-e29be4708825",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "759406ff-9442-4916-896c-1008d3515b2c"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "2faad19d-88ef-4820-a572-9391093f065c",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "8c702f8c-938f-49d8-b308-543fcf4fac06"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "285086c5-d91f-428e-950c-3d141b559f8f",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "1e7f3939-6163-4331-972d-e8656e421d75",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a55fbf31-c1af-4e5d-aba0-b9b9e2438bff",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "65dfe83f-9447-41b0-b59a-357e881bc589",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "1b289da2-57d2-468f-96da-d9cb7e230d31",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "f79ad335-3f94-4a40-93c5-4c5120d7a084",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "7399870d-6507-4341-9e17-c941d744b6b7",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "4d43cd57-a1e2-4814-8c07-3aa2ee47e8d9"
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "a4812542-e71e-4179-bfdf-13a1148f889f",
+2018/10/06 10:10:55 ----> function  randomUUID  result  "547d1334-9a26-40f4-8b21-6162ee4ba4ac"
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "5a937048-5b18-4716-8520-8e8a9eb968a8",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "6cadb603-cf55-4bdd-b69a-e9027aa595f6",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "0832f32b-8632-4114-82f4-ae95d62fc2a0",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  require_  result  {
-  "UUID": "49cff2cd-3215-49bf-9156-eefe6b2c79f9",
+2018/10/06 10:10:55 ----> function  require_  result  {
+  "UUID": "a617f928-2197-4a83-8da6-6f4a27d190cf",
   "TYPENAME": "GoJavaScript.ObjectRef"
 }
-2018/10/05 14:00:40 ----> function  randomUUID  result  "6dda8c56-cc87-4e5c-8c49-1ebcb1ff5cea"
-2018/10/05 14:00:40 ----> function  randomUUID  result  "a496e904-c34a-4649-bea0-544989ed9a8c"
-2018/10/05 14:00:40 ----> function  randomUUID  result  "6963eff1-f2a2-4037-8b66-a2fe259750cc"
-2018/10/05 14:00:40 ----> function  randomUUID  result  "b59033a8-25f2-4e18-bde2-ff7fbdac04a1"
-2018/10/05 14:00:40 ----> function  randomUUID  result  "89e3a5e6-a2fc-4d37-9e0e-f2206719bd59"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "3adf83e9-4b4e-4225-b417-a1b3e7452ebf"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "fe9b45c7-85bb-4e52-a701-70971b7c53e1"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "cf49a5bb-e0bd-47b6-b51e-993e781d87da"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "2566ba5e-7a5b-4301-a3ba-47d3ab6e2893"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "67a1fbfe-6dae-4100-aad3-571d7c7ac122"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "0ea7ac2a-bc8b-43be-90ef-f641fa7d2ae4"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "0a6ded32-d3ae-4e21-935c-ef8a5588c16d"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "9ecb3bb7-5c6f-47a9-bd22-abcd42a93dce"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "5a374ae4-241d-4124-8343-b3417f6f328f"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "c172df7e-4ef0-46b7-893d-81d5a80605dc"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "1d7200dd-fe86-4bed-a160-21aa27ebf9e8"
-2018/10/05 14:00:41 ----> function  randomUUID  result  "83d3c6f1-24c4-429c-8767-7cf89329077a"
-2018/10/05 14:10:08 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:10:08 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:10:08 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:10:08 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:10:08 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:10:08 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:10:08 ----> function  require_  result  {
-  "UUID": "4a8b13d7-a649-4e20-b8d8-14f0198c05e6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:12:15 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:12:15 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:12:15 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:12:15 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:12:15 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:12:15 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:14:23 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:14:24 ----> function  require_  result  {
-  "UUID": "272ac326-1afd-432d-b262-5bf343963073",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:18:33 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:18:33 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:18:33 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:18:33 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:18:33 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "5f934caf-e6cc-4c83-8182-124ea29be8e0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "70a4c712-ea35-4eed-9d11-10fdf147f37c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "e5ecbf65-6029-40c1-bc73-1db4da5d9e34",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "d6e1ef66-4cb5-4c03-b881-74b0a47b8135"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "f47d0dea-8a69-41aa-b865-b482a2e64f59",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "e62d8a6b-0409-4741-8ffa-2c8c03031d63",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "1203d935-78d5-4fef-9d2c-fd11004fc67f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "7831b6ba-f87a-42a2-9828-a43904b5f498",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "370471d5-2a27-401e-9259-634fd1166f08"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "60d6d878-6de2-45ac-afcf-5c232364acb6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "32790c11-ebaf-48a7-b3ca-981b0d2e2dd0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "dafd077a-194c-4686-a1ba-d074573bb277",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "8432bebb-3d4b-4322-8ab7-5804463b60d3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "15aa1127-1c27-4c1b-ae2c-1e42b6e781a4"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "d8f23ecc-4dde-480e-a5fa-89f57746eb2e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "ef57202a-288b-445b-93ae-16c0c587ac43",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "b7f54341-63a3-4dea-9502-1759098a6978",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "845b5d12-e914-410e-b042-fcf8193f82cc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "349f3ce9-899e-4cee-91ac-58ba301d5ea3"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "e7bb2401-2aa9-4825-82ad-7dafba9c0478",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "c250167c-6cee-400e-819a-0cbc33170f1f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "b2459e82-c77c-43c0-9775-bee280b67eac",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "9dd45779-f5c2-4209-9a8f-548ffef571ae",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "4c664515-9d57-496a-b42d-bf109b3da101"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "0f2b7215-642c-442b-af59-7161d44233d9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "b65dad0e-584f-4698-9be7-b2879a65dc0a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "359c29e3-77e9-4455-a78a-06d16f337f3e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "ad82bcd0-2db2-4524-9524-f519177b70bb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "c0fc06d8-a93c-43d9-b20d-c454f1cecb72"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "bde3e390-ca5a-4892-a3ba-9e9d6199b5e6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "910a4cc1-3518-4bab-b847-b467269598fa",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "8ce58dff-ec34-4785-9069-f6bfaa921233",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "8a6409d4-d483-4008-88c0-763fb085bf1f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "45070b49-d6dd-49d0-9832-e39cab30d1bc"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "2c011027-1668-4ef3-83c5-b08f9bb69612",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "88eb954c-7ec5-4c02-8c27-415a4b827f10",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "b09f7ee6-10c3-438e-b978-ba94cf24475d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "70eacddb-4f14-4dda-b7c7-8ce8b13cf8e3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "7f9ba932-013e-4eb6-8a58-5d8fc1036388"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "3d742f59-f183-4795-a4a4-5b1870762db7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "87a154e6-f23f-4bfe-8243-bd2cde622c37",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "55e4b7a5-3766-4cbe-9147-3f32d518d399",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "f015e4c9-e2a9-455c-af23-01e09cc19204",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "2551166c-8d5c-47df-baa7-a318ac8f19fc"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "944d720e-22e1-4360-b2e9-12b0adef247b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "1e3822ca-9b11-4e4c-a308-7fceae7b1d80",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "ea6b55ab-f5ab-47a6-bdb1-b38dd2adaba2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "22e3a9db-8942-43c5-856a-1d6b14040ca5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "9ed3bd15-dd8f-4ee1-9c17-499c70424607"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "43564fe3-dd55-4717-a45a-15058613654f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "111216d3-e885-46bf-86b4-8cf1bad5c40a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "31e9822d-2010-4b31-8bae-6093e7c7d093",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "c35bcbed-8b21-4031-91e0-80fb379c42f6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "05383f31-45dd-4165-92cf-abf4d1c307d3"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "cbd06578-71c8-4ca0-9a85-709928feeaf9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "f02b4421-21f0-422b-9f1d-57fdde84b310",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "cf726380-67b1-4ed3-9db0-6fda20f15d04",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "258f47ee-165a-4707-a842-ab0b7958d0a5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "b024aab5-6514-414e-8f33-d9da01bcb2ba"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "10fceb7c-c71f-4a29-a3fa-d4fad5280e42",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "fa6d648d-5c42-4e1f-8fbf-2bca5200a508",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "fea3232d-a68c-4f5e-a8fc-6a8a8dd8ae10",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "c11b3483-c9c0-433c-9ba7-7cb155b79433",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "17a11471-0380-41bd-bb9a-6887b0528a5e"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "0918d422-08e5-4b13-987c-560292eb2774",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "2823401a-cf8a-4ac2-849d-8d750b674565",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "591a3729-a69e-4e47-a4b1-6f2934c1477f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "f0cef2c4-11b8-4a32-b2b2-cd4514eec4ae",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "7d35fea7-2f98-483e-82af-6e7a46cab632"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "6f814214-71a8-4131-8d82-6699792ae8c4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "a1c856eb-b44e-4ec5-b964-1e5a2e7f22af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "6c08e863-2992-4e38-b477-fd709727b610",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "3894a878-e139-4a5f-b036-b1ad8895c2f7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "d85facc7-939d-40e8-8f0e-1759a70235eb"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "702548bb-5dce-4fad-81b7-66a189c4dcbf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "9c49173a-d601-4134-a8ce-f9db83e2aa13",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "ca149b7d-c891-4c03-b285-6122286140e4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "2fae8fff-1994-4629-be3b-6c4108fe2801",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "d5764f7e-f8f9-4fec-ad76-c6c4a1c5be89"
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "150f37c1-aa81-4490-9e35-6a38e712e0b0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "db082066-bcda-4e18-9979-f9519d1dedb5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  require_  result  {
-  "UUID": "0c167e64-cfe7-4d6f-bc56-7591da9ccab5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:18:33 ----> function  randomUUID  result  "2807df77-ed03-46c3-8931-d75b6c66de11"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "effd7f20-4f31-441d-aa0f-1b17be178ce5"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "74f8e474-ec7c-4af5-b5c5-f11e0826e4a9"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "f03b9cd4-08fc-457e-98da-8bd4a8c4b77f"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "239b5367-9f72-4b3b-8f3d-b12023d44750"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "b0035c13-2d96-47fe-a93d-2571e7d5010c"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "f087bcf8-de85-4578-8c37-cf521db9b954"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "9c25c6f7-d62e-428f-8a6a-8e9aee2a4683"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "6d8fe6ca-c13e-4e8d-b6c4-932bbc53add9"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "c650e66c-7886-4e5f-b16f-b3e0dd78635a"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "bd58d480-ccc4-493a-8ca0-ba1847025663"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "a15754ae-8339-44b9-9f5b-d6cae85ed4f1"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "2a8c772a-8d8c-4dc1-ae02-5ee2d7cab8bb"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "f407fa5b-fcec-49bc-9515-fc32b93640a4"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "8fd21340-a5af-44fa-9cb0-c97f88f3b66f"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "88fdaea4-d916-4aa1-aa1d-7ae3aba9b3f2"
-2018/10/05 14:18:33 ----> function  randomUUID  result  "a9279b03-c570-4da2-b3ec-0359bf36725b"
-2018/10/05 14:21:59 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:21:59 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:21:59 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:21:59 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:21:59 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:21:59 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "2a170b62-20cf-4291-a78c-b29c5540f053"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "62d319fc-192b-4550-87aa-38a2f1fe50ed"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "e5b9034e-a842-4cc0-ab73-04467aad7682"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "f56215d0-64dc-4042-8ccb-2ba3b98da2f7"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "dc163715-2128-4fd8-a377-f3c56b721f74"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "8aba07ed-8367-460d-a0c1-555a6d033745"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "233f2bce-7d84-4e0a-99e0-a6dd84a92895"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "5d858f56-94fb-43ca-917a-ae67fa5cd69c"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "4c8827f9-3bf3-44f6-8d3d-e83f4d31a8e0"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "067539f1-b1c2-465b-9886-5957a0208a27"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "9b337a47-423c-4845-8ffc-b4e3b8e9bb17"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "53788bca-6deb-43ed-8f3e-cffc0b984bd6"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "fa8a8064-1912-48c1-a8b5-027942051289"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:21:59 ----> function  randomUUID  result  "e6a932a4-f98b-44ee-a0fc-eeb149ec69a5"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:21:59 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "b961434d-5087-4ad6-9c25-88a4b666e61c"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "078e0391-cfc6-4e71-acb3-1fcd92682243"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_52db2cc5_3ec4_35f5_b611_adffd0d277e1"
-2018/10/05 14:22:00 ----> function  require_  result  "exports_4fc47f29_c243_3d50_9fc6_b8d764a13991"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "c59cf3c4-f333-4e83-a95c-a5c0d42b68eb"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "7c0fa8e5-95ed-44d4-811e-794c01dc01f0"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "4f29b639-a5ff-462c-a92e-ced6d39a90b1"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "31a7a6de-cdaa-428f-8aec-923a6f8d8d87"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "747949ba-b7e3-430b-bac5-641fce9793ae"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "e998642d-ae9d-4d1a-b117-a9d0cfc07e64"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "bc38b3e4-acb2-431f-8446-bc479f0dbd50"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "a8a52977-43da-4b19-a755-c1460e4a0a26"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "715a21fa-91ef-44bd-8c87-7a3a0fe7fef5"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "0c4c14b4-5963-41f8-9034-dea3f4c77cf0"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "b6c48f46-1f2d-42ad-bedd-d85160167205"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "35749477-5b30-423b-8b0a-baf8c56937da"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "7ba46746-56e4-4fab-8446-5cb2bf48fab5"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "2a7ec053-fd6f-4e5d-9cc1-022fc1a57258"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "93691465-2ca0-479e-8ec6-718b71af73fe"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "4688adb1-63e2-4728-a6f9-99416014f1d0"
-2018/10/05 14:22:00 ----> function  randomUUID  result  "4a13362c-5e3f-4571-9bb6-6d88f4e6b66d"
-2018/10/05 14:42:15 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:42:15 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:42:15 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:42:15 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:42:15 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:42:15 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:45:08 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "2436c760-5829-42f0-be57-48782cb9d762",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "4db193ab-97fc-442b-91c0-864e1a074c4d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "fb1625e2-cfe0-4e84-9d26-9e1a17dabb8e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "5c6de7f3-0ad6-43d5-870c-29721e642e39"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "5e5a9a3b-5e13-4e82-a2ee-83dcb26cc9af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "79e9a92e-415e-45b6-9666-37d1e3707e41",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "4b5d0354-4e21-415e-8925-bc788542ae7c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "875c0cd0-d752-4bb0-8df0-ae05e5a02780",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "debfd726-3132-4c52-a5e7-707bf7d48e37"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "c81003cf-5c30-417c-a72d-6efd24cc43f0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "1491c1fc-f237-4b98-9b35-3b619b3e1ed8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "5e5e2adb-05c4-41f8-9248-1f4aebea1517",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "d529fcbe-7ac8-4021-820a-33471e936841",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "bcb33f5e-3f13-4109-9e0b-8b954be389c4"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "1b2e13ea-27e2-4a2b-9988-e90b8e14cefe",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "890e38cd-cb50-434c-b2a6-6ebfbe949154",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "e5c300d5-2c6d-4238-8b83-9ec53bde3f70",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "a0b7ac38-0997-47cb-a857-8f19c7bb9ac4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "9d400cb5-fb63-4f38-b1ca-184166d0ace7"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "b0ed7071-c043-4e93-88de-6e41498f8726",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "2ba22670-e1de-4871-b84d-d11c84bc2091",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "0a8f3625-34cb-4a69-bf7a-7331ef31f082",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "0ae2bfc8-31c0-457f-aa01-02d12475d549",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "ef8e7a99-0bb3-4bef-b3a0-c7c37292df4e"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "89e32737-c6dc-4032-9a4d-2401c7073e37",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "4d316dd1-ed75-4fcb-bbaf-a701840ac367",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "854c02a8-ec01-491e-a4d7-db709689ad90",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "a2c09dd4-6850-4022-9c41-d34e9a46641f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "53d1a3d5-1572-4d86-ab55-cd4be413e3a8"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "4213ac41-b54e-4980-a29a-6e2552392299",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "a238e61a-a039-4bd9-bd44-7a63ef2d158e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "a96ebe35-ff9d-43c2-b0c8-0c28c4b847fe",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "56f36fd6-4fa2-4e6b-952f-50224dbc9ba4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  randomUUID  result  "794ff117-fe6b-40e6-99c0-feb086077471"
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "a15246ba-272f-4445-9e5e-9b9406262e3d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:08 ----> function  require_  result  {
-  "UUID": "ccca3aa1-878d-4d60-9df7-8e449353fcb6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "f359e089-35e2-4b16-b964-62a08cf85430",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "52fd98da-99dd-4f13-b2fa-22f49b737b34",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "5fbc0e65-9d28-46ce-a8ec-b62758bdfd24"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "1feda776-328f-4d0f-add9-ccfaf7c6be0d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "f02fa7f5-4a89-432e-bdbf-7ac0aab30d11",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "03880ba9-faa8-4633-955c-1b8150bd2848",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "dfed5c6a-d866-4b8b-8dda-68e55bd60f0f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "52096014-76c1-4201-b57f-4d5dd1f780da"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "e2defd5c-bab8-458c-a250-18d8c75532af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "ba7431eb-188b-4cde-b327-331ef36452c2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "e25aedbd-ee21-4e71-9b0d-f52f6621083d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "2640bade-6cc9-4ecd-b406-e7109b92264a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "2cfcd9aa-9aa8-4b49-a929-638fd1cceeed"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "023a8251-e089-424f-9b77-97ea52e0e0c7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "f2aee68c-2679-4179-902d-10786e97ffb3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "ef44b635-e974-46f0-9fdf-c8efe430c22b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "fe39e08b-2a5c-47d9-8048-4f157e314e40",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "624997f9-09e2-4841-acf2-6cb375184443"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "5b9ce24a-f938-48e7-bc73-c1434c4c7415",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "2216952a-0609-4953-90a3-f363cd34c28f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "2c991f8c-c301-4971-ae09-f7736b721c0e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "cb910cd9-3078-41a9-9d7a-be92c2bb9d9c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "ba353397-7126-4fe2-bb98-0dfa9157524f"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "29731729-d7a6-4bff-baa1-117b69cf087e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "88c49cba-11b2-41d2-adb0-6492c3449023",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "796ffb3b-17ce-41c6-b73b-28969ca7451c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "fa364714-8b40-4ac9-978a-23c523e66249",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "9e80cfb4-850e-471c-8cd2-21c29c048dc7"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "fd423bb0-8ccb-4280-9857-83067a58e010",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "a1f0b1a9-aba1-4b5a-9add-567dfab4a2c4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "a1450e03-9f23-4a9e-917e-255cb5f3f279",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "4e3ce11e-43f9-4462-a916-53e69fafd880",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "528c10bd-9018-4038-8e8a-4e70e6b45c36"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "e4b10328-de24-4bd8-9f4d-dfa897f4796d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "a88bbb67-9f44-4b40-913f-af11ecf2d59f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "3e957b18-2e7d-488b-ba0e-b9de7fc9f5de",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "f89e4ef7-83e2-4031-852d-2a04bc4019ce",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "0de935f4-5913-4edb-8850-15a4c715ad93"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "c1b25e35-8f51-4b63-aa7a-d14b5500c1e2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "a657268e-64d7-4fb2-85ea-2ade46a79e3b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "3d378b33-ba31-4a4e-b245-3847027f37e9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "88e60c93-2f1f-4444-bfcc-d1bb1950731d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "48732c3a-19bc-442b-8a53-ee06b612f5c5"
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "5235fc3a-28ff-4dd0-9f70-74c4f9abe0ab",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "98decc85-626f-4811-912d-e9ecefcc81fe",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  require_  result  {
-  "UUID": "8fd4fe7e-bb97-4970-ba4d-b02e66565010",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:45:09 ----> function  randomUUID  result  "9f3f79f3-2ccb-41f4-9d41-26206d853231"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "66325165-5eed-4667-bb58-b8fd1c6287e8"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "2b006076-07ec-4d55-8152-2fdff1164c13"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "e82760d4-9fb3-45ab-a453-80e81839837c"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "58f3e132-6526-4f3d-b26a-e19021454ec1"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "91c61ef4-bf11-49d8-bbb3-9f325bcb0c8f"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "abda8f2b-3a81-45cb-afb3-88e9b79147b7"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "a8f3b64f-7d9c-462a-8350-1a89d41ff83d"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "d437b2fd-83e7-4386-812c-71f838000e4c"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "a11bc70a-1254-4613-a184-94dabf17d4cc"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "0b4bf30d-0a0f-4201-a024-a56bdfaa2350"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "de8085d5-e6f9-402d-b2c8-10aa5013ddeb"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "878e3d6a-f067-4ae0-861c-0c1fa96c42a3"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "702eabf6-5d34-4306-941e-27ec2bcb78f1"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "caa6f40b-0336-4c56-8178-5d10f0137ea7"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "736b7d36-641d-4e36-87d9-a2cc92a89cbe"
-2018/10/05 14:45:09 ----> function  randomUUID  result  "8251d199-dd96-4aab-a610-5522439c8719"
-2018/10/05 14:56:01 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 14:56:01 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 14:56:01 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 14:56:01 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 14:56:01 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 14:56:01 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "ad73770b-47c9-42c8-9103-fef9be319dd8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "59e8ec60-cc5f-4044-b643-fbcab77d88e5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "fee162d1-9379-4006-99bf-808ba5fc6652",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "2e330c59-ce80-44ee-a3df-fb9f3383e0cf"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "e53b64f8-c75b-4858-a04e-6e1e52b0722a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "9ae82a3b-7629-4117-aca9-60f50bbe35bb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "dbb6eefd-6c35-414d-a0c7-c198b16a98ef",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "90618eb8-ef2a-40ab-9094-0db18457e8a9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "8df21d05-e26d-4cd7-a70e-cccb2f90f1a4"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "6147e607-0f32-476f-9381-d2a023efad8d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "d9e4d30c-6c1d-4de8-8d1a-e71f0b50da2d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "08f8e9fb-f4a7-4d9c-821a-45d61bcc30a6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "dbbeb645-f975-404f-8071-230536ca4109",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "d386aed6-a6bd-485e-8030-0c86a5d4b8bb"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "c7fb384c-1f15-48f7-bc19-faa65b7f91d8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "8a7a1916-4f60-44f4-a1a5-9ea960480b3b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "7d5cef13-eac3-4b8a-b294-8e5798cdf130",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "f55373b0-c3c2-4736-8bf3-d62291c8e764",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "f6c302a5-9dcb-46a5-807d-1136fcd58334"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "5fcdc1dc-2552-401f-88dc-07c3a1128691",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "55e3006d-27f4-4456-82a3-d75199fc9f78",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "dfa5ed6d-17b3-4fa9-8ed3-2c3d15cdfb81",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "faebea0d-a087-401c-9337-75c20fa0f06f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "2035f8a1-3d4f-4579-a0b2-f6a12f3397a2"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "e1f4c3ec-c48b-4beb-aa07-c72b2350542e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "7bc3aa22-6db7-45cd-88f0-95dd616aa323",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "ee99147c-ef66-43dd-9887-84be1bd38862",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "34a036ee-5608-4048-a476-e21955457089",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "98c675d0-4011-41aa-bb53-4a25cc424bc8"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "40c76499-efed-4015-b7d3-450fea24bd1f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "f8479013-4e55-49ce-a75c-d500cc1ceeb4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "556f9c7f-94e3-4ab0-8538-39575db70edd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "b21b7b03-400a-46ca-af63-9a23f09bf4eb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "92209e5d-c1c4-4dbe-a8bd-584c95ba16cc"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "b4dea7a9-b22d-4299-9584-79e6fee1043d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "969207ac-241a-4b04-af5b-2f5ba621f1e0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "3d70a1bf-0470-4f49-87dc-ee97dafe9749",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "65713851-3ab9-4d7a-a695-7eb117c67f1e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "41870ef0-3727-43e7-a8a4-0eccab59a7c1"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "84eaa5eb-108f-420c-b6cd-fb0896c56413",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "05d29eb8-cdac-42dd-8ccb-2ee2b3633354",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "fdfdec18-bc2f-4499-8550-2aa49d1c9d05",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "cac98ffe-7478-4377-bed0-7bf364523583",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "f6dddac6-5e88-4873-ae55-d3d92efe10b5"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "8ae2e031-5665-4c7e-bf47-f51c9ff2b77a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "2cbc2062-1597-4751-bb94-02527a2c3bcd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "ded749df-3a8c-46fb-9f02-ac7fb1680ef8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "514a1ab7-87b0-45e3-95ea-fd272ac93a08",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "f57ea76c-0929-44f7-a57b-87b52dd4ff06"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "fb52d04e-1ab8-4661-a851-1431a16dd462",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "99b81322-0aa5-47a6-a6b1-d880a26bc462",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "255ad79f-ef03-45a6-b3a8-7708b3451442",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "7e2b35dd-6302-41da-a4bd-585f51a70c7e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "c41d618b-5111-4916-904b-a623e2776050"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "804bbb12-0b04-4d1a-b8e3-26f6c4f6d558",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "122a2a7b-7594-44e6-a08b-82a986060784",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "f8b9ffa7-b59f-494b-bb58-54bd8ff3fc42",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "9ce9b109-737a-4a7c-8895-a8fa67d03aba",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "e0f4ff08-447a-4795-bc12-fb39e02637cc"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "411a0661-2751-44e8-b2ff-b3d3b735a6b8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "9f4ee595-4059-4bcd-af88-8e92896512d5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "09500cb3-9bf8-4c77-8904-590c3e34000a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "57581bdd-0870-4b04-a06d-e3e914c2abb7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "ba9fdd07-de3c-41b6-8363-ae02ec095a3c"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "f45c23f3-525e-4284-ac62-3121cf1b5bad",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "6c3c4204-3420-4282-bb3f-145f8aa99e88",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "fa66f9a0-a547-4c42-aa25-39539752bffd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "2edcd0f5-3fe0-4203-b993-774abf969448",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "8cd1d1c1-bb05-4032-81c5-999e43093747"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "a3ca2a29-2c05-404a-8587-96921ede97af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "87478558-133c-4e09-a185-a8dbe68b5f12",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "addf8d21-f1d6-4278-a48b-02ccad20c9da",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "3ee07926-1d03-4d30-a41d-1dbc979b0f93",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "b8bd3ff1-320a-4051-88e4-496d1b3c663b"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "9ccaf1ed-189a-4612-b3b1-53eda087ec75",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "5754947d-bfe7-4a71-832d-ab14fd54c846",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "68c7ae97-420e-4d47-880c-58018fe97689",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "cc9d56cf-02f9-4851-bf51-7aadbaccae64",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "84672784-bb55-4c1b-92f2-b4f2db67ec3d"
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "3bd85931-dfc3-425a-a482-6470debbf5cc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "0f73bc3b-9054-4f64-b521-79689e1eebdc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  require_  result  {
-  "UUID": "c7a8dfea-f214-4967-a595-1668e233025a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 14:56:01 ----> function  randomUUID  result  "85caff9c-83d4-4819-9d8e-b702db8e3de3"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "5b2af741-3ef4-4732-b063-faad74191aff"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "c51b8393-779e-4a39-a202-5686a76a3db7"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "86a51017-24b4-46f9-990f-1bebeb0b5d41"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "994ce141-e73a-48b8-a1b7-a259f6a00ea1"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "bde4139c-8802-4140-8063-d354dc1d589a"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "2cc1fe94-9b88-4aaf-b9ab-9addc9c98122"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "ed886f4c-68c5-4a09-8d51-8ab04991403e"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "12b5141a-1452-4434-8ccb-b4e0acf48055"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "7355b2ff-aa71-48a8-baf5-5a7bef575240"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "e1d4f382-f1d4-45bd-a04b-f25f7ae3ac84"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "b255ef43-9f7f-4f68-80ef-154f56126ce5"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "28aa594d-9212-4bdb-82ef-f498c52b0f79"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "03345f6b-5a8e-4f0a-8dec-8c7908898d8e"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "f86e46b1-40a9-4cf3-8d07-18909d0e7271"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "6cef2c4d-7c65-4cd5-a061-3fcf43413631"
-2018/10/05 14:56:01 ----> function  randomUUID  result  "5185a57c-d31a-4c7a-a72f-726970cb1c2f"
-2018/10/05 15:08:26 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 15:08:26 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 15:08:26 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 15:08:26 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 15:08:26 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 15:08:26 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "8a64b45d-cecc-4832-876c-9be7be79ccaf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "213c6ad3-bcf9-408c-876d-77be429cc79a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "5bdf9dac-ce60-4f5f-9651-80bdb2107643",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  randomUUID  result  "791b2361-f8f7-4acd-bb70-4b7448666bf6"
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "ed5bef31-68ea-4ac5-af3c-a0bc111b429f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "3f805743-166b-436c-8ee0-949df1774ae5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "f3379532-6339-4448-b0dd-e6a9a1fc32cf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "3752f42c-3c95-40a1-88c7-3052736b5e2a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  randomUUID  result  "4e73ac7d-4719-473d-b943-57c6cc8fa5b9"
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "8e160166-94f6-4820-b5cb-844716ade117",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "406017fb-b99b-4e35-a12d-aa37382a8730",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "0cc7511c-5fa6-49ef-8d6e-da245f2afc22",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "c4b51b9d-07a6-449d-a1d4-c9642a4d189f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  randomUUID  result  "1a5899ac-cb45-47b9-ab37-d3d8b338b8f7"
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "ae17ce6a-f20f-4813-9e48-4d5c8883578b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "d3a56d1e-193e-4d67-ac36-8ff5c076edf4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "2d42cb6b-f272-441b-aec5-83b6f22f91bc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "df7b2bac-60db-4c87-9e7d-be6d25943e20",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  randomUUID  result  "aafd21ef-3fff-4527-8030-3abd7823c137"
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "df3677b6-4901-4a56-b860-206517165433",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:26 ----> function  require_  result  {
-  "UUID": "20b9ade8-5d7b-4eff-87d1-963408f581f4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "3145f655-390a-4fa3-a5fc-b283e736b6e4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "f1b1c3aa-0640-4c73-9ddc-e937f73ee614",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "bb0b325d-6e75-4439-a706-3241c9024c6e"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ce84a17d-9e4e-47db-8050-bdb5e4258714",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "0168318a-0de5-47f5-869d-38194fb95c22",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "9bc636a1-f174-4bef-b226-6a490215c876",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "1900f412-ef8e-4af2-a855-3c6ec9c943c6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "ba9d101a-4e60-442b-9f4d-b16fa8d6bc61"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "40a279fc-95e7-4e7e-8068-73be6653ff04",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "2d30ad65-a46a-4e8c-b86a-c37a255cb158",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "9a1e4185-8e42-4940-b844-ab1fc7a4eff8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "8bb8dd3f-a668-40c7-99ec-e8f3dbfacbc1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "eaf22865-61e3-4ad2-a8fb-c952631eac28"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "cb39bcfc-9c50-4042-ac06-6bbfcdf17174",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "e099c015-220d-490e-9672-0b6292d848c6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "03d5d16c-856a-4a3b-8977-7029fb145022",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ecf418a2-a0b8-42a6-b2ac-acb48655fc2d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "1c3b077c-d63b-4a2c-94b1-2586381b3397"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "2547c3a3-0ec2-4595-8f8f-d4731d99dfd3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "c9f9447c-258f-4429-8226-1814605a4b65",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "0cf9a567-61ee-44d6-87ee-dbe0241ccbc2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "4634a338-ebed-4c13-a780-f9fbbb913e26",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "422042d1-6e2a-41f4-b5f6-db904d5bb7cd"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "e5e109e8-430d-43de-a4b2-738792a541f5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "248e852c-9f7f-4541-8256-0efadb802f18",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ce5b69bb-8329-4527-baef-f4f72cec98b9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "7ecd049f-1abb-41a2-a3ad-73372e53cfe6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "11e1f46c-69e6-4cd6-9a4e-c4bf72e3c3c5"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ce0fd3b7-32f0-4afc-a2a8-1344ab4360ef",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "eb5a0521-e935-4210-ac9c-e576e3157be2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "753c22b4-74d1-4206-8041-46ec5d7c37f5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "2273d8c3-090a-4095-b55c-485800f206ff",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "2367d452-51c3-4c86-abc1-8af340f80d90"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "9cdf6b57-cf99-4c63-b251-d55aaa3711af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "d18f77f0-c396-4e0f-b9d6-c63e0c01486e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "8cccea36-93b2-4e49-ba8e-5c4b0ab3bf8a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "588a2300-9b7c-4f9c-8b18-b60a26b12017",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "86ee202c-7e85-424c-82bc-602ebf66c5c5"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "0fad18ef-a8a2-4c22-9b4f-6c825d8bd459",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ef6b7f1a-268e-410d-bdae-6937f46d7105",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "99a4bdd2-517b-4ab5-8cf9-f7750fff5493",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "eb25121a-40bc-4889-845e-81caf047fcfe",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "5657e360-ed36-4bc0-9684-9a6223db3bff"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "4ba3108b-4b73-4248-9198-2dbdfc5d114f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "f6143246-966b-41d2-b652-26a74dd4c6d8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "1ecf6d77-7e2a-45de-81a6-e70dec2a6540",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "b486e210-d04f-43a6-86d8-8b0212112b04",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "0726e9d2-cf95-4c51-88e1-cbd98ebfc523"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "5fef19fb-2b89-4e8a-9e2d-7b7bdfdbd28c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "35adea41-07bf-4b33-9aca-289811928d2d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "3398e17e-e1ae-4b81-a1e4-f6814bba6cd0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "e6ebecc4-8060-4811-aec8-75aed69853f7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "df88f69b-baae-4cf9-9723-0e7130522091"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "cb1f01a1-7fc6-4be1-bc3b-ecb20dc0de4f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "efc78e5c-60f4-4fe3-baa5-639b1d3018f4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "9897fbba-77cf-4c3f-984b-7efaf8d872a5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "08cd1bf1-7f81-4449-892d-719d10c0b877",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "97ce0813-8bd7-46b8-b67a-fd3e82a6b21f"
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "997745dd-25aa-4691-a3a6-0d26bf823750",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "28f89d96-4a13-49c1-9923-a15751b5a90d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  require_  result  {
-  "UUID": "ff0fc4d7-354b-4942-8efd-69ce3debce35",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:08:27 ----> function  randomUUID  result  "48206613-cca1-4998-9119-fc182052d00c"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "98cbed7c-64d0-47a3-b4d3-bbf66b730e78"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "d426d223-a6ad-43dd-a018-d4e5b63345b0"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "692f9463-7939-4520-8412-ec9545b8f76f"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "0ef63e9c-fbbd-4697-86ff-ef10f7f30c04"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "faf33bd4-e201-48f6-8a9b-db34e617bf26"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "85c1aaf6-8972-4359-81a7-d7624828edbf"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "6c3ae337-a0e2-475b-986b-989a7cbcecf8"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "bde2db04-b093-4f09-9b8b-12b9f717bd89"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "a8e05502-3120-41ba-8731-66e18426f278"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "8630b6b2-43ee-4c63-b8d2-940916a54668"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "57f36ec4-6298-45ef-9f38-87e84409423c"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "b0b42bcf-164b-4e70-bdbf-b61d13e1c434"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "65cf25ac-c374-4470-a880-705afaae931f"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "80df5d55-2985-41cb-9e6c-b78be4f93065"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "a9c9b6b2-8afc-4568-8936-847a563c0d0b"
-2018/10/05 15:08:27 ----> function  randomUUID  result  "f830e666-3ffe-4e3b-9990-da38b77cd299"
-2018/10/05 15:10:56 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 15:10:56 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 15:10:56 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 15:10:56 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 15:10:56 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 15:10:56 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "d917cec3-9546-4552-9717-b9b588352212",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "478206d8-e464-4589-9012-717887db2d9a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "b55516c9-483b-495c-8ff7-884b02f3504e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "94d571f7-dcbb-4f04-89ef-92e3f336aa4b"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "dfd00a54-36c5-4304-aafa-b457a3f5f91d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "1c1cb3b6-0809-4e7b-bf75-e901a9e0c9c1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "733b6cde-57c4-4460-a7a6-1b9a7281e23b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "dc2968a5-d66e-47d2-a371-8e4a1992393a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "8d962cf5-e85d-47de-a1d0-bc3ea99a3d04"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "8118086c-9f89-4d2b-bad6-ac93143a3a6e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7c8f9098-2b9e-405c-b720-b29ba51175a1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7dd76ea6-f157-4cd7-8e65-b2308a38a255",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "3c3534b1-56ea-4725-a46f-83bda869cdf6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "8b3e88b9-025b-40f4-962b-62f058a3013a"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "46663392-e76e-424c-a313-b8af6dded7d1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "9c7caedb-f144-455e-a05d-f73c2fa8b954",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "d26af540-d9dd-455f-b9d1-138cfbb6b5ed",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "17e2a5d6-10bb-4ea6-bd36-e781346b1f22",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "954ac1aa-9f2b-4baa-8b64-71377cabf0ea"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "b079495e-2e14-44bd-aece-d28ce0439efd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "1e43deef-8a50-4cd8-9074-89db652079a6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "1d573e5d-3424-4e7a-b80c-d7fb2ad9677e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "c7baceb4-9990-47ac-85f1-306b140b8cf8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "b914ed21-5e3a-43be-959c-904703a261ad"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "8bdd55a0-e76a-4e4a-a821-02d6632b758d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "d55daa87-de8b-4d20-aba6-17920ea22d1e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "a7befe36-1edf-4064-ae5d-6a4772077f76",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "be87aa08-c6c3-464e-a944-3f8664405e51",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "4afca43f-9268-475b-8794-c8558814ad19"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "5333dc7a-e89c-4e49-b515-e0098577350e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "a504b0eb-3aa6-4be2-a518-319637fb2439",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "bc817a39-280f-47fb-b66e-ffdee2583b22",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "dd696228-27fa-463a-a9d6-5d3b4d2be5d4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "e879f454-3b0c-4fd1-af33-28fb481957f0"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "354a3943-a284-4afe-bf04-8244f7d8d1db",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "5b55cdf6-7875-4d7e-ac58-1428cbf671ee",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "9c2b4c50-9e3a-4987-b139-e796352659eb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "79ffca6f-f7e2-476c-b391-fcd43b64a583",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "74d5ccb8-d8b0-4b4e-b977-7d9701381782"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "6f76537a-a012-4984-ab29-e0617cf7b1d4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "40ce9ae5-bf71-4eb2-bfeb-e8ceed0d9edf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "c59daf72-ddbc-4dce-b68c-b08e51ca9275",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "8f79e4e3-45d4-4dcf-b0d5-68a24a5754d7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "ae08dc47-8133-4578-9456-82cb424556fe"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "00df3e16-e3bb-44b8-a3f4-792b7fcf4b7a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "5d815435-2a89-4f5c-82ed-6604c0aaa9ca",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "b967b368-bafd-4d26-bd2f-e69965a96ee9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "ceb65fc3-032a-4c5b-9f45-e609fbe65222",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "c922f5c4-1b20-44ab-a8e6-b1657e157a87"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "6a0056db-3e05-40e3-9148-dd88815bd3aa",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7e3fdd43-9926-4148-9168-a73f2994609b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "ae8b8602-15de-4f3d-98bb-5351a6d04a63",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "8646d4ea-bb6d-42c2-8168-448ecb6eab00",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "846ea4a9-12ab-4bff-8a6e-899d34f41b13"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "cab6472f-d5cd-4b3e-bb54-829cd1c10b5e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "729fb8f7-c3ad-417b-81ef-01df2082d367",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7293d292-4c67-40ef-960e-77e6ccf51ed5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "fad7e5f5-4073-4f73-9dcd-c9a0b1d4d092",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "51276041-6204-44ad-a09f-9ebb2562f691"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "f918bf8f-963b-4180-bf3c-9c808e361b72",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "1c6ed14f-0f32-4c6b-b589-fba6c4f106e7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "a985831b-8d90-46f5-b2f7-0cad94b322c7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "fa7de47f-f2fd-4a60-b97b-b769e86460ba",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "873d676c-55ae-4e5e-b4d2-163161da7d03"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "c24d2268-5438-4be8-b216-2470edd37236",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "44f131e0-2929-4e70-8329-7eab72f43a7b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "025eedd9-1a88-4323-9aa3-c30dc882b6f4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7262bdd5-2f2b-4824-af62-e8ed056e1ff3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "6540f855-0188-452f-94b5-b4e4f3b022d1"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "c1eb78d6-c6a0-4758-b103-c4a718d332da",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "dfc018f1-f140-4148-83eb-778081812f51",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "dbbbbf9e-c63e-4c23-bd4d-d6608f59cadb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "4e8f5e83-b535-4874-9e8a-6eed1e3827ce",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "87af03c1-ef41-448c-bf66-c818eba03528"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "9db15f82-4420-4f23-8863-7781d85aef69",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "219405b1-3de8-490d-9cc9-ba7e4d18d913",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "21790757-7253-4f45-944b-17ecb6518506",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7c8fe553-9512-4166-9148-83a2c88bdf07",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "b1f5e477-0705-44e6-91bb-b42a17f35f91"
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "900cee8b-b714-4a14-9e61-46d8334297e6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "7e71c026-96b0-4585-8912-bdb59c408276",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  require_  result  {
-  "UUID": "1712d7ac-b38e-4d8f-96ae-003effa0f8c7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:10:56 ----> function  randomUUID  result  "5bbe6ab4-f0b3-4de1-aef4-64ef658f031c"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "e69a54ea-c8bb-4f91-a463-e3e6fa7d2d6f"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "5dac186f-9f95-4052-b61e-42be41e530e9"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "3197190f-3cf2-45c2-a8eb-f9fa28e73cd0"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "2881d82f-0496-4bc8-95bd-608f079bfbc9"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "9d9aea61-bf4e-4ced-b5e0-c15cc2270035"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "22d5bfa9-463c-4965-8b0b-42fc86b4c0af"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "7319f264-3c24-47df-96ec-9279a600d4bb"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "daf1994e-a8a0-4ace-84fa-164b245e5024"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "cd140d91-49f3-417c-b17f-923f7b65e7d6"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "914885fe-9af4-4f8e-954d-31d13f59e31f"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "c8d9dd5e-4573-44bf-96a1-7fcd3130a00d"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "fb1ad25c-7170-4162-a9d1-aa3e8971f069"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "29040e2d-7a44-4e09-be77-99110b0fc08a"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "7a640990-c280-49e0-b185-a7ed00be803d"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "2f87548b-8216-43a9-8124-5ff7fdfe95c4"
-2018/10/05 15:10:56 ----> function  randomUUID  result  "a2a06bef-d2f3-48c8-accb-94ea476f829c"
-2018/10/05 15:19:02 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 15:19:02 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 15:19:02 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 15:19:02 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 15:19:02 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 15:19:02 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "e4c3452e-79ae-4381-a59d-d4d59293ec0b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "671b9813-591e-46be-8a7b-79e1e693d922",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "48aef6a9-205d-4364-854f-acaf3d0ae3af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "6017ddbb-9104-4ac4-ab82-e606b503692d"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "e79ceddf-5a61-463d-b4eb-bbae6a90c4d2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "992bdaa5-c365-487d-9505-224b355e08fa",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ebc96948-a283-4679-ac74-a4725809185a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "52d85856-17d1-4c2d-ae22-69578ec0d12a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "73bae38a-ed8a-44be-b523-d5188f762aa4"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "af97c8ee-1d12-4faf-b518-9fae80854057",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "aca660ea-c442-4fc9-aecb-2dee56bd9318",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "b95637f2-130d-4fe5-9ba1-45fba677f937",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "f041cecf-8ce0-4772-9f4e-f9e2ba0d79bc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "e7f3bd22-5caf-4b33-b3b4-6bf1e5359b2d"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "0d727538-2d07-4753-bd7c-85a655cd3190",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "55e4a096-9834-460e-9a94-c45bc0de71b3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "1123923a-7cae-49f3-8e55-5fc62a5b14b2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "c0022169-45be-462c-9ccd-422e80838750",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "68a37b97-94f7-4e7e-a93e-09b6ba37e217"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "16faf55a-a933-46aa-8c15-2c366eb11cbf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "0e3caf7e-3e6b-4957-8269-bafab85c85ff",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "df1dc2fc-fb05-4343-9515-96322f4e4c02",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "744509ff-58c9-46f9-8cb4-1119a7a54636",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "7038c4db-4759-41bb-bebc-71986d46c081"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "11d915ca-6245-4a21-a4ac-f60b2b6e8c18",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "cc4c4966-aadb-4a17-bc28-d3067601aebb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "16d8360a-8a84-4e51-aa53-d997d09925a1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "467833c4-8336-4d64-93c9-3da90f957c47",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "c812d736-8e2a-44de-85e5-4d3dda824de4"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "d45fcdbc-6629-4c13-b58f-193e60c49d69",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "330b1ec2-eb26-43f9-9b60-aee0543ff6ce",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "b7094dd2-fb2d-4209-b9c9-e28195683265",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "e6298a16-5c1b-4777-8152-7787c83aa91b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "af8e3ef8-86ee-4a7d-86af-1606866784a0"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "42c68407-7f89-4b05-978d-c5fa26f28824",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "e0e67fe9-7d68-4ff9-b55c-925af6797c6e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "f1251fe2-47f0-4822-8496-da0068da7e1f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "905c4234-24fc-4804-87ac-d5bdacff8418",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "72df0c0c-ce78-4d42-b618-1bb50da9324e"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "5fda5c9b-a760-4b64-922b-92b219f5db04",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "58e3691f-20b1-4220-a4a0-b19daa87e6da",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "700471c9-1346-40fd-a614-f6bec344597c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "af32b8cf-a0f9-4f15-a34f-6ca07804c388",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "2db32aea-2e7a-46cb-9c78-1e06a0746ccf"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "12a33884-8bbe-419b-b290-cc862175cd15",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ea4e5ac6-3ef5-4de9-a726-a320d05b877e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "00d852ab-49a4-4c21-99e0-7b81fb18cd9a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "56572614-6030-4b79-9bc1-de8efdd3a6f6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "ad82b272-3543-4f2f-a06d-9456cfcbb6d6"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "c11da221-5352-4186-8415-4efdaff2812b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "72541a05-f560-464b-a731-54fd1a611c4d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "f0a47791-db43-4631-88d4-6faf846c608d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "6d3d3b2a-43c7-4c9e-9c9e-2a02c0642fa4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "8b194a62-519a-42e9-a556-cd95939e08c6"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "69929f1d-d3ed-43f2-9c95-65bbaf9851f9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "12de8322-770f-473c-bdff-602d6630a4a9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "87c6b1d3-a20f-4e14-beaa-dac8b43688a4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "11598449-be89-48f0-8b5e-bd1786c45774",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "ddbb6d2f-0496-4904-ade5-9886aa082cc2"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "1d7620cc-02e1-43c9-9fb9-59a0bc0ec30b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "b2be4f3b-1145-4915-833f-397359e12b85",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "6a2d5acb-c69e-4077-979a-176a6c04b59f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "79259d0d-b45e-4cde-b005-d85bb4e2037b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "65766c75-1915-4651-8615-1f5fdfca4479"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "8d178a67-16f5-46cf-b9f7-bdad601cb3b2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "28f765b9-1546-453a-8993-10c36c176b8a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "edb3a395-f941-4b92-ae23-d4609696dad6",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "d46c6052-bc2a-45eb-89b5-847a244005ba",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "3d9c5881-30fd-42a3-ae5a-d655951b59bb"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "60ebd2c1-5d23-4dc9-8db8-045e92fdef76",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "d2ba5a08-0299-4da6-b5b6-8357e5504e6e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ab283b3f-b854-4e8b-8dfc-ae24d199ae50",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ba5f2584-e63d-4c8e-b570-46422ff84939",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "47a308cb-328f-4290-b2a6-304744e6d78b"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ab69ca2b-8ff1-424a-9774-d9deadc6fa5e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "f0b8181a-87a4-4b1e-9a4d-897e9c8a4bf9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "b24e9c64-8af0-4b5c-9164-1706cbf800a8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "bcb93e33-b074-4c0f-b550-fde68ef90f21",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "c545075a-5084-4597-8f70-4e3a4971885b"
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "ecbe4dac-8216-4bf1-af57-14c9f72c8295",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "72a6927e-055b-4e9c-abbb-f254d952c919",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  require_  result  {
-  "UUID": "f92f26bc-e8d3-4f57-9822-4f552ed46e64",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:19:02 ----> function  randomUUID  result  "50f9a834-097f-45bf-9bb2-88471367152a"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "25357ac5-4bf9-4731-93ac-51845fe94aa4"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "03de52dd-fb52-4785-ac85-444cf88634d2"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "f689a3d4-8169-4f35-9886-a5b29b0a1bce"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "a8f0f955-1129-4af1-8afa-fd47041e67f2"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "0e2472ec-29c3-4f7f-b73c-7979d1f17ec9"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "edc4ef47-3beb-4d5b-a190-a154190e8e5f"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "fc979961-0958-4cde-8634-9286a6c75672"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "c15247fa-9632-4cb7-bf75-7727e0d6f4c6"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "a4531a95-bfd3-4e84-94cc-02a9148f94fe"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "986f0e39-1310-40ff-a1c0-a7a997052ec4"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "b475c403-9a0c-4074-82e9-741187596fb2"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "93b0dab0-1a09-4163-9c62-c81ca194815c"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "8670738c-d76e-496f-be18-8c2330c33223"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "bf15d2a4-1ab7-42eb-b6d0-e22bd6d5e309"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "338b5151-5fff-4b9e-a0e0-3f2debbadcc8"
-2018/10/05 15:19:02 ----> function  randomUUID  result  "3ceb6e30-57f2-4832-ba24-7b1b6d6b38b8"
-2018/10/05 15:20:47 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 15:20:47 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 15:20:47 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 15:20:47 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 15:20:47 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 15:20:47 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "fc7eb36e-2fd6-4169-b5a2-127d7472cf06",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "1dd2ed9b-0e09-45de-8e8a-3e09b1529120",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "3f54b075-39c1-4c0f-acc1-abede365d8ab",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "4cebe430-9893-4919-a3ec-ad939dc68d4b"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "5e984fcc-8453-489e-b34f-8f431ec9dba0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "32960d4d-ceb4-443d-8799-dc6de5fc1122",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e9084441-3cd4-4072-bd75-b152adf85aaf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "f4168beb-90b9-43a6-aa24-8dd79d9db3dc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "476d0dca-44d7-4bd3-b6bb-7c058a09e900"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "a79c47b5-786e-4add-ad9b-01b6b2f70c65",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "f17ede94-32c4-42f0-b525-b603f027219f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "9347c66d-4a7e-46a7-898f-f31bf2cda35f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "6a62fe03-7d8b-472e-b5cd-c278ef7a4e42",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "5de66f90-b04d-49fd-b61d-65c4bd78836c"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "48e52662-3709-4ff9-8b32-3fb9d7a58a02",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "32ca0afd-d56f-4b07-bee5-9cd57083d17c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "eb6db6ec-8624-414c-b8e7-83a1ee00c141",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "ee927e98-3b0e-436b-87a8-d262096fd61c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "6763ea54-aebe-4227-864c-fa542d60a957"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e8a144e3-371a-460e-8acc-884720bc2ff0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "3d70a90d-b132-4f31-b860-0e17c04831ff",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e4f521be-2f40-4e95-83eb-a6f4c75b2fea",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "19a16a36-68d2-4790-a786-a3458cde0866",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "eb885419-b550-4802-b2c8-a3b575fc427a"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "46923b2c-6986-4dc0-9795-77088da88b50",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "3f6ce399-4ec8-4dc9-8416-735475030c4c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "7d6865a7-6a8c-4153-b167-31531cf8fc08",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "252a212e-0791-4bdc-a7c0-e35ec9342b21",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "9bb239fa-6746-4bc5-b1f4-f278291ca6c7"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e09f454b-2f36-4ce1-a738-85138e94d5dc",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "13d18714-1e7e-45f6-b550-e38391a11ef3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "bb5fe699-aead-4899-b88a-740bb903b5f4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "4b92b3f2-d615-401a-a731-e8440dda3950",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "d5e70fe0-f784-4cd3-b6c4-b44d01082468"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "ca4ebd73-1ba7-4435-8bff-786bfc15fed1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e4ca2d43-2597-4e52-9cdf-64fefb2bd393",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "560d692d-f3b8-47f6-bad8-75e259d445a8",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "f749a122-b8ba-4976-9360-49d85461c612",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "1c231b69-9885-42e5-a656-d85805cd6921"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "4a177181-c8de-4042-92fd-188b7fe9fe31",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "534894e1-bb12-470b-9036-4faf03fb67d1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "f9536b93-f322-4895-8448-a6930d1eb4e1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "782c3cb4-324a-4c74-9e99-1f6e5b435969",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "4efaa214-5d82-4392-96a4-4dde2c43483a"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "2cc10396-1ee5-4a92-bbb6-3f1a7c385e99",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "a1a7064c-c8a3-4245-bdda-604120c886da",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "7fe8c108-c352-4ddb-8b7e-a6603226754f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "56e104bb-e536-41aa-a655-3ed8b90d7a3d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "43a243f5-98fb-48ef-85a9-106ea11146fb"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "7ef9f6bd-3ef6-4e67-aafe-665968a020da",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "08196204-b227-483d-859d-4ed105e6419c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e2f60eaf-54f5-4659-8840-80109a5c9164",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "22522663-9088-4f20-a889-50ef305e9fa5",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "d41c033e-51e3-42bf-9c51-20b8eb1b307d"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "18d3202c-7a06-487e-8546-acb4fa4108e2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "b479cc67-0cbb-4bed-9921-c59e1c7460bb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "015ae4a6-b5c7-4e71-82b8-74112e1bd597",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "cdb4145e-988c-4377-a42f-b1bd120467b1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "449aece1-b340-4248-8c5e-6c03df4fb7b9"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "b1b7c229-0a1a-44bc-983e-dc5e6e97c215",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "1ced4df7-73c9-4f65-8f59-6f562d90805a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "899e196a-d3b3-4dc7-9f9f-7514723ac913",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "3b2321d5-edde-4ff9-b390-8fb9d7e4d6e3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "bd2205d9-e82e-41bb-9dd3-cb0d8d42a7aa"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "e2f17fde-c2c0-4910-9204-606ea3b2b53e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "4887d082-1b88-4afa-afdc-1c6f517c57d7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "cbbf00a9-1469-4400-a363-29bfbede5b8e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "054838a4-cf16-4513-bf39-6822a10d33fe",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "68b2c477-743d-4538-8dc1-94aa45daa675"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "896cea74-81ee-40e0-b0cd-0e08b48ae010",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "acf09d67-b96e-44ca-8000-bf10e8991c49",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "4f5b1714-85ac-4c64-ae16-4f6d7e177f59",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "634293b0-f3ff-4f13-942b-b8c8ad6d8818",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "263de720-ae36-4cad-918e-f2ba10025d07"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "0413e460-4b6c-4e46-8783-5af8599ee685",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "5949771e-4e32-438d-b030-0a4a94c0d6bd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "a3862b11-a762-4834-b290-548f3a9c16aa",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "749ce187-1c4a-4248-b4ee-7a415f6885a3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "545181ea-0c24-4f64-a7f9-85c4196687a2"
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "f4bd5e39-c19e-4ef4-a0ba-92c5f8e0cbc1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "fef53744-4b1c-4e06-8a8f-4737d6342190",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  require_  result  {
-  "UUID": "d0397b7f-37ce-4e44-86f8-a533edc121a1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:20:48 ----> function  randomUUID  result  "835c340c-8c0c-4b5b-b301-aae3b7caaf7f"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "bfea4e1e-78fa-4809-9bf0-6171178698b1"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "2c92a24c-fb3c-4c2e-ac05-f66b355339d9"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "4119316f-a0ba-402f-9cef-bb8c1eacd139"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "a5a938ad-35e1-4fe0-81f2-a810c5389ad6"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "ab04aaa2-cc62-4f2c-999a-cfa89be20a35"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "27d86f5b-9a28-47a8-9df1-2cd027a90b13"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "1e527961-5752-42a3-9e9d-7964da3aaaa8"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "ba4b640e-4628-4b3b-b716-d86bd844fe56"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "020d4a09-1c7a-48a5-b86f-6003a77723ed"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "abeef607-569e-48b8-a6e4-7876f052359d"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "1698af0a-1372-436e-b719-e32d6a72307e"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "9e65fbef-afcd-42d9-9bd3-2e97c5988d97"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "96c108ca-fc5b-41f0-88c9-b895256d0b3c"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "499ee340-5360-4cc7-98e4-c49d5e95c5c6"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "6bb8ad52-db86-483b-b603-a6cc835e9aa9"
-2018/10/05 15:20:48 ----> function  randomUUID  result  "83158bec-db64-41ff-8944-215379a99ca9"
-2018/10/05 15:22:15 ------> type:  GoJavaScript.Message  was register as dynamic type.
-2018/10/05 15:22:15 ------> type:  GoJavaScript.Action  was register as dynamic type.
-2018/10/05 15:22:15 ------> type:  GoJavaScript.Param  was register as dynamic type.
-2018/10/05 15:22:15 ------> type:  GoJavaScript.Variable  was register as dynamic type.
-2018/10/05 15:22:15 ------> type:  GoJavaScript.Object  was register as dynamic type.
-2018/10/05 15:22:15 ------> type:  GoJavaScript.ObjectRef  was register as dynamic type.
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "72bd7b89-d408-47a3-83fc-65b2ee9ca273",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "58924351-d442-4af4-8a46-cbaa5e55f20e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b642e7d6-8b13-4943-8317-c7b7a8334fcb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "e33a8f92-649f-42b6-8a5d-65549e04e9ba"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "02f6ee0d-1d2e-4ba5-85df-53fb7903ba62",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "6d22b7d1-5e07-4a29-ac83-c459eb596b19",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "c2816c84-417f-4db7-a58b-22358d33c2dd",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "a5525cd5-e4eb-4be6-b078-3db3a66dc33d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "51b377db-282c-4db4-80f9-9bbfcd57e052"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "89c8f397-29ad-490b-937c-ec9850a4827c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "5b5ea18f-b808-480e-b68d-b52b64c8a211",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b6b73a47-fbc5-4fc5-9fd1-fc9753b025bb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "cf53ad14-ac45-4f53-ba2e-9f27fd974e62",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "57d00edb-e1ab-439c-a0c5-f2945aa22c0e"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "951c706f-9c24-4081-82a5-9986a5c71094",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "73343826-88c5-419c-bdc2-8386d8d2694c",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "be045ee1-5ad5-4d08-8a48-5f269327e8ef",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "6e99e289-754c-47eb-b58b-9bc5d16da36a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "3088c4b1-19c3-4ed5-807d-ba83b995687a"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "caf14f90-15d3-4917-820e-3428ec23e9cf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "490c8ecf-4943-4b3a-a87d-819c0d877c4d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "cc9962cc-86bb-4d99-8b51-223d8f79d907",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "2e3b3475-bfa7-4888-a9a8-8e5c3e7fd934",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "94388e58-919d-48b3-bbce-f502196e66af"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "03dceaeb-becc-46e7-8830-34ef6cb3f094",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "38f2619d-68f3-45ed-8147-c1d7cf5750bb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "f199ccbe-2c49-4103-ab5c-3f667b6ffa8d",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "73565c94-53a8-4af1-b930-b0e6b1396857",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "2255daa7-f9c1-4e49-aba3-93fd190fca0c"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b2cd23c5-6d82-4bce-b1f3-4e69ad24d975",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "8d7dcc42-c76f-4a39-a3b6-79b0c706b2c3",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "218fea92-ac3a-454e-887b-8882f924d72b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "59f9e9bb-cb51-4ebc-bc0a-66aafde7a54a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "b38d0eb1-e913-4b93-87ac-9e0cca358f6a"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "8bbdc1c6-8eba-4845-893f-74d4ec908405",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "53cecc27-d72a-4200-b1a2-53825f088a08",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "f408b1d7-038c-4d0d-b177-551c1595eb0a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "5913c208-0c28-43e0-b2de-84f87e7551c2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "ff990991-9169-4667-85e6-c3807886a718"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "0821aabc-d5f8-400a-8f60-30e4e7591d19",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "39b327cb-d873-4447-ac23-ad25077061f0",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "52ec3320-ca13-4b90-a1ee-ac88aa310ae4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "ae38e721-7a31-4632-8f12-a778e0333ec2",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "0ea6f3e8-f5e5-4e3e-9c14-9cb31f837f99"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "64de7479-e6f6-4dda-98b2-2dcf0d565849",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "a13f4dd6-d4f8-4e1d-83e4-caff7c1f5cb1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "9c917b71-78c3-4c90-ba2c-faf4dde0c421",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "33186018-d8cd-43d1-988c-0602f7e61bfb",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "2a87a683-ec8e-474f-b85f-0aa2627f2738"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "8f889ded-a026-4084-8c49-7727734bd257",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "e288517a-a891-498c-b6fe-b6ff92a197a1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "e10afad9-db58-4c15-9b9c-78acc0b644db",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b94789f3-92a4-417e-b8f4-75d593e9ec98",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "ee9da6fc-a0f2-4967-b4af-2d28cedd21e3"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "eff8e2e4-eacd-4e01-b053-066b7f47f8c7",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "32e5502a-0358-4cd9-801f-591fb3a17985",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b3da6dc7-cd5f-4fd6-b26a-f87b2986d70b",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "586bfe05-f313-45d6-998e-547508b4606f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "df200c0b-58b0-4f8a-9b0c-0eb36372272e"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b4b201d5-f575-4134-b9a4-27612bb301af",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "7cf39602-527f-43b8-9f55-89f7ebd6a057",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "eef1e54c-20e7-4234-a835-ebd94770125e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "f36b67d8-c671-470b-8de8-bfb6bb65aacf",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "1793d770-13c5-4fa4-9e81-035c5a06a7de"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "cadc3721-51af-4fda-95a3-d362e75a1237",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "174838fa-cec2-498c-9c92-72caea37e61a",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "213f6d42-f091-483a-88e2-55cdb495d001",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "a51147c1-4363-4ccf-be1f-413bd61eaf79",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "69861740-8874-4c5d-8e2d-ca9c7ff1a0f7"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "53c5ce73-84dd-4592-b42e-e2e18616b0d4",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "d10877ba-052c-471e-b222-6cb68dbdc729",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "45e2f765-1902-4a26-8f18-5f9d5e891815",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "f0008215-8dcf-492f-9ba3-13041b9dfd82",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "6e8d8ae4-7939-4a28-a4df-c6a51fbbd6e2"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "54bb2b24-d2f8-46a7-b542-646a1dfc2b35",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "82e2a617-d9cd-4ff0-9819-142ccaf0fd75",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "9815c410-8639-459e-a767-8dd3c48ade6f",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "89d62d3d-6b66-4f39-9130-a47e42862e24",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "c0e241d9-fecf-4607-bedc-af2093c2726c"
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "b00b6dce-d78a-40e0-a4e8-d14b3e96d0b9",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "f1a3522c-4962-47e9-aeff-f746cd010d9e",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  require_  result  {
-  "UUID": "4f969456-32e1-46bb-8623-fc83cdcbf2a1",
-  "TYPENAME": "GoJavaScript.ObjectRef"
-}
-2018/10/05 15:22:16 ----> function  randomUUID  result  "3292d95b-a7b2-476c-83dc-6f66eee583f2"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "d666efcf-8822-4a15-bd4e-08b27deb7cee"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "b748e436-2586-43f0-9d03-cde88a607aca"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "8e1c3a89-ecb6-42bf-91d4-564ac2e51cb0"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "8ed9862b-0551-4a6c-95a6-2c1726f8ca18"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "163f02a0-f331-41d6-8be1-1aab7c739183"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "aecd3cfa-87a3-4036-a482-2f42754e6728"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "443f8989-a78a-45a1-9491-73aaa5faa805"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "7888eb33-7b8c-455e-bb15-5459149469a9"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "ea490a99-a40e-4674-a17d-a71e32776e99"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "1a0079d7-d366-4f51-ac85-5069c74703a1"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "d6d8af01-6639-4d3b-a874-1f6d16506e5e"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "af780530-c62f-45b9-9886-24c3f55d8339"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "3dbc256d-684d-4cea-b2af-eea3b745e416"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "e6b16694-7a2d-485c-8fbb-e2e5678aeef8"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "40eae35e-6a89-4874-91b6-197a180f11d7"
-2018/10/05 15:22:16 ----> function  randomUUID  result  "3a5a7bb8-ca60-4cac-b179-b5b1be9e9698"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "28e34d40-a58e-43ad-9a4a-638718d58bdb"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "c9f42eb9-581b-4489-9c77-3784f4c998e7"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "765e8a6f-0cc5-4d29-9dd4-7fa677023b47"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "f372973b-8e64-4de4-b7d6-8dd6620864ba"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "386c59d6-2168-4633-a0df-d66014d41a27"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "f54cd30a-68ae-4af1-b83c-92fdce2b882f"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "1d4d7cf8-8aa8-4fe4-beb7-14f3b6142394"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "a3636577-76b5-47c3-92c0-4baece175385"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "15c1c96b-0bc7-4f06-8490-a5cf2ade4edd"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "a1f9a4cb-d9b2-48ec-b167-c6363b946168"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "aec52d72-f8c3-4e66-95dd-dfa10a7d7104"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "b7e5059d-2bd1-43a0-8cd5-3214ec81a3bf"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "aef7b2e7-ceb9-4b76-bbc2-715596c72606"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "78d462b6-e004-4ded-b156-e28f94c73cf5"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "a2ee87ff-a3c4-4747-a618-43edfa325f09"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "d1b83608-c858-4c8d-83c3-1787105da080"
+2018/10/06 10:10:55 ----> function  randomUUID  result  "8c380952-3fc1-43b2-b519-6244aac72774"

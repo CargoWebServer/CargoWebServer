@@ -132,7 +132,7 @@ func isError(ctx C.duk_context_ptr, index int) bool {
 }
 
 // Retreive an object by it uuid as a global object property.
-func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
+func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) error {
 
 	// So here I will try to create a local Js representation of the object.
 	objInfos, err := GoJavaScript.CallGoFunction("Client", "GetGoObjectInfos", uuid)
@@ -207,8 +207,10 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 							if e.(map[string]interface{})["TYPENAME"] != nil {
 								if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
 									// Here I will pup the object in the stack value.
-									getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
-									C.duk_put_prop_index(ctx, values, C.uint(i))
+									err := getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
+									if err == nil {
+										C.duk_put_prop_index(ctx, values, C.uint(i))
+									}
 								} else {
 									log.Println("214 GoDukTape.go ---> unhandle case!!!!")
 								}
@@ -227,8 +229,10 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 				} else if reflect.TypeOf(value).Kind() == reflect.Map {
 					if value.(map[string]interface{})["TYPENAME"] != nil {
 						if value.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-							getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
-							C.duk_put_prop_string(ctx, obj_idx, cname)
+							err := getJsObjectByUuid(value.(map[string]interface{})["UUID"].(string), ctx)
+							if err == nil {
+								C.duk_put_prop_string(ctx, obj_idx, cname)
+							}
 						} else {
 							setValue(ctx, value)
 							C.duk_put_prop_string(ctx, obj_idx, cname)
@@ -251,6 +255,8 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) {
 			}
 		}
 	}
+
+	return err
 
 }
 
@@ -331,7 +337,10 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				}
 			} else if value.(map[string]interface{})["UUID"] != nil {
 				uuid := value.(map[string]interface{})["UUID"].(string)
-				getJsObjectByUuid(uuid, ctx)
+				err := getJsObjectByUuid(uuid, ctx)
+				if err != nil {
+					log.Println("----> no object found on client: ", jsonStr)
+				}
 			} else {
 				// Not a registered type...
 				cstr := C.CString(string(jsonStr))

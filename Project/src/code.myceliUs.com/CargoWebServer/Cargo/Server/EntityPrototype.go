@@ -73,6 +73,8 @@ type Restriction struct {
  * This structure is use to make query over the key value data store.
  */
 type EntityPrototype struct {
+	// Entity prototype a dynamic type.
+	TYPENAME string
 
 	// Uniquely identify the entity prototype.
 	UUID string
@@ -145,6 +147,9 @@ type EntityPrototype struct {
 func NewEntityPrototype() *EntityPrototype {
 
 	prototype := new(EntityPrototype)
+
+	// Made it a dynamic type.
+	prototype.TYPENAME = "Server.EntityPrototype"
 
 	// Uniquely identify entity prototype.
 	prototype.UUID = Utility.RandomUUID()
