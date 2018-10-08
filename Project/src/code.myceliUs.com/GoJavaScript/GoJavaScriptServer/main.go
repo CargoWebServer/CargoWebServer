@@ -3,13 +3,14 @@ package main
 
 import "os"
 import "strconv"
-import "log"
+
+//import "log"
 
 // Process command.
 func main() {
 
-	//create your file with desired read/write permissions
-	f, err := os.OpenFile("./GoJavaScript_"+os.Args[1]+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	// Uncomment to dump log to file.
+	/*f, err := os.OpenFile("./GoJavaScript_"+os.Args[1]+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -18,7 +19,7 @@ func main() {
 	defer f.Close()
 
 	//set output of logs to f
-	log.SetOutput(f)
+	log.SetOutput(f)*/
 
 	port, _ := strconv.Atoi(os.Args[1])
 	server := NewServer("127.0.0.1", port, os.Args[2])

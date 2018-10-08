@@ -9,6 +9,8 @@ import "reflect"
  * Go representation of a JS object.
  */
 type Object struct {
+	// The the type name.
+	//TYPENAME string
 
 	// The unique object identifier.
 	UUID string
@@ -37,6 +39,8 @@ func NewObject(name string) *Object {
 
 	// The object itself.
 	obj := new(Object)
+
+	//obj.TYPENAME = "GoJavaScript.Object"
 
 	// If the name is given that's mean the object will be set as a global
 	// object so it uuid will be generated from it name.

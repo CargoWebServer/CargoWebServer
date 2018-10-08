@@ -337,10 +337,7 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				}
 			} else if value.(map[string]interface{})["UUID"] != nil {
 				uuid := value.(map[string]interface{})["UUID"].(string)
-				err := getJsObjectByUuid(uuid, ctx)
-				if err != nil {
-					log.Println("----> no object found on client: ", jsonStr)
-				}
+				getJsObjectByUuid(uuid, ctx)
 			} else {
 				// Not a registered type...
 				cstr := C.CString(string(jsonStr))

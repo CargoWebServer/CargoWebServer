@@ -755,7 +755,6 @@ func (this *Server) Start() {
 				params := make([]interface{}, 2)
 				params[0] = result
 				params[1] = caller
-				log.Println("----->780 successCallBack ", successCallback)
 				// run the success callback.
 				if rspMsg.from == nil {
 					// Here it's a request from a local JS script.

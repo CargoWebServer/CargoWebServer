@@ -351,7 +351,6 @@ CodeEditor.prototype.appendFile = function (file, coord) {
     server.eventHandler.getFileEditEvents(file.UUID,
         // The success callback
         function (evts, editor) {
-            console.log(evts)
             if (evts != null) {
                 editor.playFileEvents(evts)
             }
@@ -607,7 +606,9 @@ CodeEditor.prototype.setActiveFile = function (uuid, coord) {
     // Now the toolbar...
     var toolbars = document.getElementsByClassName("toolbar")
     for (var i = 0; i < toolbars.length; i++) {
-        toolbars[i].style.display = "none" // hide toolbar.
+        if(!toolbars[i].classList.contains("file_navigator")){
+            toolbars[i].style.display = "none" // hide toolbar.
+        }
     }
 
     if (document.getElementById(uuid + "_toolbar") != undefined) {

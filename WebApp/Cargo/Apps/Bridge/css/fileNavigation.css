@@ -78,3 +78,7 @@
     left: 12px;
     top: 10px;
 }
+
+.file_selector_div{
+    display: inline-block;
+}

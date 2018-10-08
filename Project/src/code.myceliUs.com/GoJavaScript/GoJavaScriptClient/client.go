@@ -97,7 +97,9 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 		}
 	}
 
+	//log.Println("----> call go function ", name, params)
 	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params).([]interface{})...)
+
 	if err != nil {
 		log.Println("---> call go function ", name, " fail with error: ", err)
 		return nil, err
@@ -428,7 +430,10 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
  * Call a JS/Go function with a given name and a list of parameter.
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (interface{}, error) {
-
+	/*log.Println("----> call ", name)
+	for i := 0; i < len(params); i++ {
+		log.Println("----> params ", params[i])
+	}*/
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("CallFunction", "")
 	action.AppendParam("name", name)
@@ -440,7 +445,8 @@ func (self *Client) CallFunction(name string, params ...interface{}) (interface{
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
-
+	//r, _ := Utility.ToJson(action.Results[0])
+	//log.Println("---> result ", r)
 	value := GoJavaScript.RefToObject(action.Results[0])
 
 	return value, err

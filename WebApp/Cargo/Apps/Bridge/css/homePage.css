@@ -95,6 +95,7 @@
 	position: relative;
 	background-color: lightgray;
     z-index: 0;
+    overflow: hidden;
 }
 
 .workspace_div.scrolling{

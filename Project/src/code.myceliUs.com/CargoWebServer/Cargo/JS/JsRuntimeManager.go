@@ -159,8 +159,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			// Wait util the timer ends...
 			go func(intervalInfo *IntervalInfo) {
 				// Set the variable as function.
-				functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript("var "+functionName+"="+intervalInfo.callback, []interface{}{})
+				_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].CallFunction(intervalInfo.callback, []interface{}{})
 
 				// I must run the script one and at interval after it...
 				if err == nil {
@@ -169,7 +168,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						for t := range intervalInfo.ticker.C {
 							// So here I will call the callback.
 							// The callback contain unamed function...
-							_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].EvalScript(functionName+"()", []interface{}{})
+							_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].CallFunction(intervalInfo.callback, []interface{}{})
 							if err != nil {
 								log.Println("---> Run interval callback error: ", err, t)
 							}
@@ -177,13 +176,13 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					} else if intervalInfo.timer != nil {
 						// setTimeout function
 						<-intervalInfo.timer.C
-						_, err := GetJsRuntimeManager().RunScript(intervalInfo.sessionId, functionName+"()")
+						_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].CallFunction(intervalInfo.callback, []interface{}{})
 						if err != nil {
 							log.Println("---> Run timeout callback error: ", err)
 						}
 					}
 				} else {
-					log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
+					log.Println("---> Run interval callback error: ", err)
 				}
 
 			}(intervalInfo)
@@ -473,7 +472,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	////////////////////////////////////////////////////////////////////////////
 	// Timeout/Interval
 	////////////////////////////////////////////////////////////////////////////
-	jsRuntimeManager.appendFunction("setInterval_", func(callback string, interval int64, sessionId string) string {
+	jsRuntimeManager.appendFunction("setInterval_", func(callback string, interval float64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
 		intervalInfo.sessionId = sessionId
@@ -491,7 +490,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 		GetJsRuntimeManager().m_clearInterval <- uuid
 	})
 
-	jsRuntimeManager.appendFunction("setTimeout_", func(callback string, timeout int64, sessionId string) string {
+	jsRuntimeManager.appendFunction("setTimeout_", func(callback string, timeout float64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
 		intervalInfo.sessionId = sessionId
@@ -928,9 +927,8 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJavaScriptClient.Client, f
 		log.Println("Src ", functionStr)
 		return nil, err_.(error)
 	}
-
 	// Append val to results...
-	results = append(results, result)
+	results = append(results, GoJavaScript.ObjectToMap(result))
 
 	return
 }

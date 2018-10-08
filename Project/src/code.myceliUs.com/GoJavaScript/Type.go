@@ -47,6 +47,42 @@ type ByteCode struct {
 	Data     []uint8
 }
 
+// Keep properties of object only. This is equivalent to export an object into a
+// map[string]interface {}
+func ObjectToMap(ref interface{}) interface{} {
+	if ref == nil {
+		return nil
+	}
+
+	if reflect.TypeOf(ref).Kind() == reflect.Slice {
+		// Here I got a slice...
+		slice := reflect.ValueOf(ref)
+		for i := 0; i < slice.Len(); i++ {
+			e := slice.Index(i)
+			if e.IsValid() {
+				if e.IsNil() == false {
+					// In case of object, i will return it properties...
+					if reflect.TypeOf(ref.([]interface{})[i]).String() == "GoJavaScript.Object" {
+						ref.([]interface{})[i] = ref.([]interface{})[i].(Object).Properties
+						for key, val := range ref.([]interface{})[i].(map[string]interface{}) {
+							ref.([]interface{})[i].(map[string]interface{})[key] = ObjectToMap(val)
+						}
+					}
+				}
+			}
+		}
+	} else {
+		if reflect.TypeOf(ref).String() == "GoJavaScript.Object" {
+			ref = ref.(Object).Properties
+			// In case of object, i will return it properties...
+			for key, val := range ref.(map[string]interface{}) {
+				ref.(map[string]interface{})[key] = ObjectToMap(val)
+			}
+		}
+	}
+	return ref
+}
+
 // Replace object reference by actual object.
 func RefToObject(ref interface{}) interface{} {
 	if ref == nil {

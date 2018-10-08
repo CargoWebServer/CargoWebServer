@@ -58,6 +58,7 @@ var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon-util-01", "10.2.128.70", 9494)
 //var service = new Server("mon104", "10.67.44.73", 9494)
 //var service = new Server("mon176", "10.67.46.210", 9494)
+
 var xapian = null
 
 /**
@@ -94,7 +95,6 @@ function main() {
                                                             service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
                                                                 function (service) {
                                                                     return function () {
-                                                                        console.log("Service is open!")
                                                                         service.getServicesClientCode(
                                                                             // success callback
                                                                             function (results, caller) {
@@ -126,12 +126,9 @@ function main() {
                                                                             function (results, caller) {
                                                                                 // eval in that case contain the code to use the service.
                                                                                 eval(results)
-
-                                                                                // Xapian test...
+                                                                                // Initialyse the search engine.
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service)
-
                                                                                 init()
-
                                                                             },
                                                                             // error callback.
                                                                             function () {

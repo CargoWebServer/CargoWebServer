@@ -88,9 +88,10 @@ var HomePage = function () {
 
     // The toolbar div
     this.toolbarDiv = null
+    
+    this.backgroundLogo = null
 
     homePage = this
-
 
 
     // That function is use to change the theme in the project explorer.
@@ -400,6 +401,9 @@ var HomePage = function () {
         changePropertyByClassName("border-color", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
+        // set the logo color.
+        HomePage.backgroundLogo.style.fill = propertyFromStylesheet(".navigation_div", "background-color");
     })
 
 
@@ -879,6 +883,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // The workspace area
     this.workspaceDiv = new Element(rightDiv, { "tag": "div", "class": "workspace_div" })
+    this.setBackgroundLogo()
 
     // The working file grid...
     this.workingFilesDiv = this.workspaceDiv.appendElement({ "tag": "div", "id": "workingFilesDiv" }).down()
@@ -1046,6 +1051,37 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         /** Error callback */
         function (errMsg, caller) {
 
+        }, this)
+}
+
+HomePage.prototype.setBackgroundLogo =  function(){
+    // I will set the logo
+    server.fileManager.getFileByPath("/Cargo/svg/wheel.svg", 
+        function(file, caller){
+            var src = Base64.decode(file.M_data);
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(src, "image/svg+xml");
+            var svg = doc.getElementsByTagName("svg")[0]
+            svg.style.position = "absolute";
+            svg.style.marginLeft = "auto";
+            svg.style.marginRight = "auto";
+            svg.style.left = 0;
+            svg.style.right = 0;
+            svg.style.height = "45%";
+            svg.style.top = "45%";
+            svg.style.transform = "translateY(-50%)";
+            svg.style.position = "absolute";
+            svg.style.minHeight = "300px";
+        
+            // Now I will  set the color.
+            caller.backgroundLogo = svg.getElementsByTagName("path")[0]
+            caller.backgroundLogo.style.fill = propertyFromStylesheet(".navigation_div", "background-color");
+            
+            caller.workspaceDiv.element.appendChild(svg)
+
+        },
+        function(){
+            
         }, this)
 }
 
