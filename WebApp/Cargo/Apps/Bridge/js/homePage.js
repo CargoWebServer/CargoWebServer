@@ -1072,7 +1072,8 @@ HomePage.prototype.setBackgroundLogo =  function(){
             svg.style.transform = "translateY(-50%)";
             svg.style.position = "absolute";
             svg.style.minHeight = "300px";
-        
+            svg.style.zIndex = -1;
+            
             // Now I will  set the color.
             caller.backgroundLogo = svg.getElementsByTagName("path")[0]
             caller.backgroundLogo.style.fill = propertyFromStylesheet(".navigation_div", "background-color");

@@ -274,7 +274,7 @@ var SearchPage = function (parent, searchInfo) {
     this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "display: flex; flex-direction: column; top: 0px; bottom: 0px; left: 0px; right: 0px; padding-bottom: 0px; position: absolute; overflow: hidden;" }).down()
 
     /** The search input where the key words will be written */
-    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: flex; flex-basis: 30px; vertical-align: middle; position: relative;" }).down()
+    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: flex; flex-basis: 30px; align-items: center; position: relative;" }).down()
 
     this.searchInput = searchInputBar.appendElement({ "tag": "input", "style": "display: table-cell;margin: 2px; border: 1px solid; vertical-align: middle;" }).down()
 

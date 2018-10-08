@@ -4,6 +4,8 @@
     top: 0px; left: 3px; right: 0px; 
     height: 30px;
     z-index: 1;
+    display: flex;
+    align-items: center;
  }
 
 .fileNavigator{
@@ -28,7 +30,7 @@
     color:  #657383;
 }
 
-.fileNavigationBtn.active:hover{
+.fileNavigationBtn:hover{
     cursor: pointer;
     color:  #428bca;
 }

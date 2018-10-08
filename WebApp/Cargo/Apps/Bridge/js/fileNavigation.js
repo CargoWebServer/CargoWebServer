@@ -27,58 +27,37 @@ FileSelector.prototype.setFile = function(file){
 }
 
 /**
- * Append a file. 
+ * Append a file.
  */
 FileSelector.prototype.appendFile = function(file){
     console.log("append file ",file)
     this.files[file.UUID] = file
-    this.selector.appendElement({"tag":"option", "value":file.UUID, "innerHtml":file.M_name})
+    this.selector.appendElement({"tag":"option", "id":file.UUID + "_file_selector_option", "value":file.UUID, "innerHtml":file.M_name})
 }
 
 /**
  * Remove a file.
  */
-FileSelector.prototype.removeFile = function(file){
-        
+FileSelector.prototype.removeFile = function(fileId){
+    var option = document.getElementById(fileId + "_file_selector_option");
+    option.parentNode.removeChild(option)
+    delete this.files[fileId]
 }
 
 /**
  * Remove asterisk to file name.
  */
 FileSelector.prototype.resetToSave = function(file){
-                /*var tab = codeEditor.tabs[fileId]
-            if (tab != undefined) {
-                if (codeEditor.toSaves[fileId] != undefined) {
-                    tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
-
-                    // Remove from the save map
-                    delete codeEditor.toSaves[fileId]
-                }
-                var fileNameDiv = tab.getChildById("fileNameDiv")
-                var file = entities[fileId]
-                fileNameDiv.element.innerHTML = file.M_name
-            }*/
-            
-                        /*var tab = codeEditor.tabs[fileId]
-            if (tab != undefined) {
-                if (codeEditor.toSaves[fileId] != undefined) {
-                    tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
-
-                    // Remove from the save map
-                    delete codeEditor.toSaves[fileId]
-                }
-                var fileNameDiv = tab.getChildById("fileNameDiv")
-                fileNameDiv.element.innerHTML = evt.dataMap.entity.M_name
-            }*/
+    var option = document.getElementById(file.UUID + "_file_selector_option");
+    option.innerHTML = file.M_name
 }
 
 /**
  * Append the asterisk
  */
 FileSelector.prototype.setToSave = function(file){
-        //var tab = fileNavigator.tabs[fileId]
-        //tab.getChildById("fileNameDiv").element.innerHTML = "* " + fileNavigator.toSaves[fileId]
-
+    var option = document.getElementById(file.UUID + "_file_selector_option");
+    option.innerHTML = "* " + file.M_name
 }
 
 /**

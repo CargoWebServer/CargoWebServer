@@ -29,8 +29,8 @@
     font-size: 12pt;
 }
 
-.toolbarButton:hover{
+.toolbarButton i:hover{
     border: 1px solid lightgrey;
     cursor: pointer;
-    color: #428bca;;
+    color: #428bca;
 }

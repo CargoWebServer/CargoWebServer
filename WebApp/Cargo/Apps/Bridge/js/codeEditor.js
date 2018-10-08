@@ -218,7 +218,8 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
 }
 
 CodeEditor.prototype.appendFile = function (file, coord) {
-
+    // You can append file mode as needed from 
+    // https://github.com/ajaxorg/ace/tree/master/lib/ace/mode
     var fileMode = ""
     if (file.M_mime == "application/javascript") {
         fileMode = "ace/mode/javascript"
@@ -226,10 +227,28 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         fileMode = "ace/mode/css"
     } else if (file.M_mime == "text/html") {
         fileMode = "ace/mode/html"
-    } else if (file.M_mime == "text/json") {
+    } else if (file.M_mime == "application/json") {
         fileMode = "ace/mode/json"
     } else if (file.M_mime == "text/plain") {
         fileMode = "ace/mode/text"
+    }else if(file.M_name.endsWith(".proto")){
+        fileMode = "ace/mode/protobuf"
+    }else if(file.M_name.endsWith(".ts")){
+        fileMode = "ace/mode/typescript"
+    } else if(file.M_name.endsWith(".svg")){
+        fileMode = "ace/mode/svg"
+    } else if(file.M_name.endsWith(".as")){
+        fileMode = "ace/mode/actionscript"
+    } else if(file.M_name.endsWith(".ada")){
+        fileMode = "ace/mode/ada"
+    } else if(file.M_name.endsWith(".xml")){
+        fileMode = "ace/mode/xml"
+    } else if(file.M_name.endsWith(".go")){
+        fileMode = "ace/mode/golang"
+    } else if(file.M_name.endsWith(".sql")){
+        fileMode = "ace/mode/sql"
+    }else {
+        console.log("---> undefined file mode: ", file.M_mime)
     }
 
     // Here I will set the file
