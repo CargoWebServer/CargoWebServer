@@ -459,10 +459,9 @@ CodeEditor.prototype.appendFile = function (file, coord) {
         return function(evt){
             var editor = codeEditor.editors[fileUUID + "_editor"]
             if(editor.completer!==undefined){
-                
                 var popup = editor.completer.popup;
                 if(popup !== undefined){
-                    if (evt.keyCode == 27 || evt.keyCode == 13 || evt.keyCode == 8 || evt.keyCode == 9 || evt.keyCode == 16 || evt.keyCode == 17 || evt.keyCode == 18) {
+                    if (evt.keyCode == 27 || evt.keyCode == 13 || evt.keyCode == 8 || evt.keyCode == 9 || evt.keyCode == 16 || evt.keyCode == 17 || evt.keyCode == 18 || event.ctrlKey || event.shiftKey) {
                         popup.container.style.display = "";
                     }else {
                         var pos1 = editor.renderer.$cursorLayer.getPixelPosition(this.base, true);
@@ -487,6 +486,7 @@ CodeEditor.prototype.appendFile = function (file, coord) {
             if(editor.completer!==undefined){
                 var popup = editor.completer.popup;
                 popup.container.style.display = "";
+                editor.completer = undefined;
             }
         }
     }(file.UUID, this)

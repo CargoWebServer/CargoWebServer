@@ -57,7 +57,7 @@ function init() {
 var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon-util-01", "10.2.128.70", 9494)
 //var service = new Server("mon104", "10.67.44.73", 9494)
-//var service = new Server("mon176", "10.67.46.210", 9494)
+//var service = new Server("mon176", "10.67.44.52", 9494)
 
 var xapian = null
 
@@ -102,7 +102,19 @@ function main() {
                                                                                 eval(results);
                                                                                 // Xapian test...
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service);
-                                                                                init();
+                                                                                
+                                                                                // Because require is already define with an empty function
+                                                                                // i will get it from require.js and injected it here.
+                                                                                require = undefined // reset the actual one (empty)
+                                                                                server.fileManager.readTextFile("/lib/require.js", 
+                                                                                    function(results, caller){
+                                                                                        eval(results[0])
+                                                                                        init();
+                                                                                    },
+                                                                                    function(err, caller){
+                                                                                        
+                                                                                    }, {})
+                                                                               
                                                                             },
                                                                             // error callback.
                                                                             function () {

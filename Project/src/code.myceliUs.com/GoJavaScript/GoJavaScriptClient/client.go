@@ -195,7 +195,9 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 	var value interface{}
 	data := make(map[string]interface{}, 0)
 	err := json.Unmarshal([]byte(jsonStr), &data)
+
 	if err == nil {
+		// Here Only entity will be update see if other type must be updated...
 		if data["TYPENAME"] != nil {
 			relfectValue := Utility.MakeInstance(data["TYPENAME"].(string), data, SetEntity)
 			value = relfectValue.Interface()
@@ -206,6 +208,17 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 	}
 
 	return value, err
+}
+
+// Set object values.
+func (self *Client) SetObjectValues(uuid string, jsonStr string) {
+	var obj interface{}
+	var err error
+	obj, err = self.CreateGoObject(jsonStr)
+	if err == nil {
+		// Set back the object with it new values.
+		GoJavaScript.GetCache().SetObject(uuid, obj)
+	}
 }
 
 // create a string representation of the object, with is properties and also he's
@@ -222,7 +235,7 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 		// define object infos...
 		infos["__object_infos__"] = ""
 		infos["Methods"] = make(map[string]interface{}, 0)
-		infos["UUID"] = uuid
+		infos["uuid_"] = uuid
 
 		// in case the object is a generic map with no method...
 		if reflect.TypeOf(obj).String() == "map[string]interface {}" {

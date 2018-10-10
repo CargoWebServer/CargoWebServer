@@ -1,3 +1,51 @@
+// global variable use to parse JavaScript file.
+var antlr4;
+var ECMAScriptLexer;
+var ECMAScriptParser;
+
+/**
+ * That component is use to reach code symbols.
+ */
+ var CodeNavigator = function(parent){
+    // So here I will create the file parser.
+    antlr4 = require('antlr4/index');
+    ECMAScriptLexer = require('generated-parser/ECMAScriptLexer');
+    ECMAScriptParser = require('generated-parser/ECMAScriptParser');
+
+    return this;
+ }
+ 
+/**
+ * Set active file.
+ */
+CodeNavigator.prototype.setFile = function(file){
+    
+}
+
+/**
+ * Append a file.
+ */
+CodeNavigator.prototype.appendFile = function(file){
+    if(file.M_mime == "application/javascript"){
+        // The source code.
+        var input = Base64.decode(file.M_data);
+        var chars = new antlr4.InputStream(input);
+        var lexer = new ECMAScriptLexer.ECMAScriptLexer(chars);
+        var tokens  = new antlr4.CommonTokenStream(lexer);
+        var parser = new ECMAScriptParser.ECMAScriptParser(tokens);
+        parser.buildParseTrees = true;
+        var tree = parser.program(); // 'program' is the start rule.
+        console.log(tree);
+    }
+}
+
+/**
+ * Remove a file.
+ */
+CodeNavigator.prototype.removeFile = function(fileId){
+    
+}
+
 /**
  * The file selector.
  */
@@ -30,7 +78,6 @@ FileSelector.prototype.setFile = function(file){
  * Append a file.
  */
 FileSelector.prototype.appendFile = function(file){
-    console.log("append file ",file)
     this.files[file.UUID] = file
     this.selector.appendElement({"tag":"option", "id":file.UUID + "_file_selector_option", "value":file.UUID, "innerHtml":file.M_name})
 }
@@ -107,6 +154,9 @@ var FileNavigator = function (parent) {
 
     // Create the file selector.
     this.fileSelector = new FileSelector(this)
+    
+    // The code selector.
+    //this.codeNavigator = new CodeNavigator();
     
     // Now the close button.
     this.closeButton = this.panel.appendElement({"tag":"i", "class":"fa fa-times fileNavigationBtn"}).down()
@@ -255,7 +305,6 @@ var FileNavigator = function (parent) {
                 return
             }
 
-            
             // put in the list to save.
             fileNavigator.toSaves[fileId] = fileNavigator.files[fileId].M_name
 
@@ -338,6 +387,9 @@ FileNavigator.prototype.appendFile = function (file) {
 
     // Append the file to the file navigator.
     this.fileSelector.appendFile(file)
+    
+    // Append the file to the code navigator.
+   // this.codeNavigator.appendFile(file)
 
     // Set the active file.
     this.setActiveFile(file.UUID)

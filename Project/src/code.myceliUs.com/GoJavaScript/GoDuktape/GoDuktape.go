@@ -22,7 +22,6 @@ import "strconv"
 import "code.myceliUs.com/GoJavaScript"
 import b64 "encoding/base64"
 
-import "code.myceliUs.com/Utility"
 import "log"
 import "encoding/json"
 
@@ -201,28 +200,36 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) error {
 					slice := reflect.ValueOf(value)
 					values := C.duk_push_array(ctx)
 					for i := 0; i < slice.Len(); i++ {
-						e := slice.Index(i).Interface()
-						if reflect.TypeOf(e).Kind() == reflect.Map {
-							// Here The value contain a map... so I will append
-							if e.(map[string]interface{})["TYPENAME"] != nil {
-								if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
-									// Here I will pup the object in the stack value.
-									err := getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
-									if err == nil {
+						if slice.Index(i).IsValid() {
+							if slice.Index(i).IsNil() {
+								// In case of null values.
+								C.duk_push_null(ctx)
+								C.duk_put_prop_index(ctx, values, C.uint(i))
+							} else {
+								e := slice.Index(i).Interface()
+								if reflect.TypeOf(e).Kind() == reflect.Map {
+									// Here The value contain a map... so I will append
+									if e.(map[string]interface{})["TYPENAME"] != nil {
+										if e.(map[string]interface{})["TYPENAME"].(string) == "GoJavaScript.ObjectRef" {
+											// Here I will pup the object in the stack value.
+											err := getJsObjectByUuid(e.(map[string]interface{})["UUID"].(string), ctx)
+											if err == nil {
+												C.duk_put_prop_index(ctx, values, C.uint(i))
+											}
+										} else {
+											log.Println("214 GoDukTape.go ---> unhandle case!!!!")
+										}
+									} else {
+										setValue(ctx, e)
 										C.duk_put_prop_index(ctx, values, C.uint(i))
 									}
 								} else {
-									log.Println("214 GoDukTape.go ---> unhandle case!!!!")
+									// set the value on the stack.
+									setValue(ctx, e)
+									// Release the result
+									C.duk_put_prop_index(ctx, values, C.uint(i))
 								}
-							} else {
-								setValue(ctx, e)
-								C.duk_put_prop_index(ctx, values, C.uint(i))
 							}
-						} else {
-							// set the value on the stack.
-							setValue(ctx, e)
-							// Release the result
-							C.duk_put_prop_index(ctx, values, C.uint(i))
 						}
 					}
 					C.duk_put_prop_string(ctx, obj_idx, cname)
@@ -255,9 +262,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) error {
 			}
 		}
 	}
-
 	return err
-
 }
 
 /**
@@ -335,9 +340,6 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				} else {
 					log.Println("--> fail to Create Go object ", string(jsonStr), err)
 				}
-			} else if value.(map[string]interface{})["UUID"] != nil {
-				uuid := value.(map[string]interface{})["UUID"].(string)
-				getJsObjectByUuid(uuid, ctx)
 			} else {
 				// Not a registered type...
 				cstr := C.CString(string(jsonStr))
@@ -345,6 +347,10 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				C.duk_push_string(ctx, cstr)
 				C.duk_json_decode(ctx, C.int(-1))
 			}
+			/*else if value.(map[string]interface{})["uuid_"] != nil {
+				uuid := value.(map[string]interface{})["uuid_"].(string)
+				getJsObjectByUuid(uuid, ctx)
+			}*/
 		}
 
 	} else {
@@ -415,8 +421,18 @@ func getValue(ctx C.duk_context_ptr, index int) (interface{}, error) {
 			C.duk_get_prop_string(ctx, C.int(index), uuid_name)
 			uuid, _ := getValue(ctx, -1)
 			C.duk_pop(ctx) // pop the string.
+
+			// Here I must set the client object value with the value in memory.
+			C.duk_dup(ctx, C.int(index))
+			jsonStr := C.GoString(C.duk_json_encode(ctx, -1))
+			C.duk_pop(ctx) // pop the json string.
+
+			// Set the object values with values retreive in the vm object
+			GoJavaScript.CallGoFunction("Client", "SetObjectValues", uuid.(string), string(jsonStr))
+
 			// Return and object reference.
-			return GoJavaScript.NewObjectRef(uuid.(string)), nil
+			ref := GoJavaScript.NewObjectRef(uuid.(string))
+			return ref, nil
 		} else {
 			if int(C.duk_has_prop_string(ctx, C.int(index), C.CString("TYPENAME"))) > 0 {
 				// The js object is an entity.
@@ -533,8 +549,6 @@ func c_function_handler(ctx C.duk_context_ptr, name_cstr *C.char, uuid_cstr *C.c
 	} else {
 		result, err := GoJavaScript.CallGoFunction("", name, params...)
 		if err == nil && result != nil {
-			jsonStr, _ := Utility.ToJson(result)
-			log.Println("----> function ", name, " result ", jsonStr)
 			setValue(ctx, result)
 			// The value must be pop by the caller.
 			return C.duk_ret_t(1)
