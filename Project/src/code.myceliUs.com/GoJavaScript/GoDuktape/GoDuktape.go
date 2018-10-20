@@ -340,6 +340,9 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				} else {
 					log.Println("--> fail to Create Go object ", string(jsonStr), err)
 				}
+			} else if value.(map[string]interface{})["UUID"] != nil { // It's a Go Javasacript object.
+				uuid := value.(map[string]interface{})["UUID"].(string)
+				getJsObjectByUuid(uuid, ctx)
 			} else {
 				// Not a registered type...
 				cstr := C.CString(string(jsonStr))
@@ -347,10 +350,7 @@ func setValue(ctx C.duk_context_ptr, value interface{}) {
 				C.duk_push_string(ctx, cstr)
 				C.duk_json_decode(ctx, C.int(-1))
 			}
-			/*else if value.(map[string]interface{})["uuid_"] != nil {
-				uuid := value.(map[string]interface{})["uuid_"].(string)
-				getJsObjectByUuid(uuid, ctx)
-			}*/
+			/**/
 		}
 
 	} else {

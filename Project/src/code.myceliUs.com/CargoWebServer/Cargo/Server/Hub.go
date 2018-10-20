@@ -51,19 +51,25 @@ func NewHub() *Hub {
 				if conn != nil {
 					if conn.IsOpen() {
 						// Because IE close ws session after a given time I need to keep it active.
-						if reflect.TypeOf(conn).String() == "*Server.webSocketConnection" {
+						if reflect.TypeOf(conn).String() == "*Server.WebSocketConnection" {
 							id := Utility.RandomUUID()
 							method := "Ping"
 							params := make([]*MessageData, 0)
 							to := make([]*WebSocketConnection, 1)
 							to[0] = conn
-							successCallback := func(rspMsg *message, caller interface{}) {
-								//log.Println("success!!!")
-							}
 
-							errorCallback := func(rspMsg *message, caller interface{}) {
-								//log.Println("error!!!")
-							}
+							successCallback := func(conn *WebSocketConnection) func(*message, interface{}) {
+								return func(rspMsg *message, caller interface{}) {
+
+								}
+							}(conn)
+
+							errorCallback := func(conn *WebSocketConnection, id string, h *Hub) func(*message, interface{}) {
+								return func(rspMsg *message, caller interface{}) {
+									conn.Close()
+									delete(h.connections, id)
+								}
+							}(conn, id, h)
 
 							rqst, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
@@ -93,7 +99,6 @@ func (h *Hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			log.Println("----> connection ", c.GetUuid())
 			h.connections[c.GetUuid()] = c
 
 			// initialyse js interpreter for the new connection.

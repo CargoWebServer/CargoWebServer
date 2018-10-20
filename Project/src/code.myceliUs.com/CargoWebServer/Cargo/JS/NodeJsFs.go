@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	utf16 "unicode/utf16"
+
 	//utf8 "unicode/utf8"
 
 	"code.myceliUs.com/Utility"
@@ -65,6 +66,7 @@ func (this *JsRuntimeManager) initNodeJsFs() {
 	 * Returns true if the file exists, false otherwise.
 	 */
 	this.appendFunction("fs.copyFileSync", func(src string, dst string) {
+		log.Println("69 ---> copy file sync ", src, dst)
 		// I will create the directory before and the file after.
 		if strings.Index(dst, "\\") != -1 {
 			os.MkdirAll(dst[0:strings.LastIndex(dst, "\\")], 0777)

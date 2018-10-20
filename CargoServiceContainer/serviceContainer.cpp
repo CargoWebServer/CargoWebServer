@@ -284,6 +284,7 @@ QString ServiceContainer::GetServicesClientCode(){
 
        // qDebug() << "Get client code: " << (*it).toObject()["IID"];
     }
+    qDebug() << clientCode;
     return clientCode;
 }
 
@@ -326,6 +327,7 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
 
     // Now I will put the plugin objects in the engine context.
     QString function = params[1].toString();
+    //qDebug() << "evaluate " << function;
     QJSValue toEvaluate = engine->evaluate(function);
     QJSValueList args;
 

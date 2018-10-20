@@ -264,6 +264,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 							GetServer().GetEntityManager().saveEntity(actionEntity)
 
 							log.Println("service container action ", action.GetName(), "was created susscessfully with uuid ", action.GetUuid())
+
 						} else {
 							action = entity.(*CargoEntities.Action)
 							log.Println("-->Load service container action ", action.GetName(), " informations.")

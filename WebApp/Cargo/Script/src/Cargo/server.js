@@ -82,7 +82,6 @@ var RpcData = function(values){
  * Execute JavaScript function.
  */
  Server.prototype.executeJsFunction = function (functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller) {
-	console.log("---> executeJsFunction: ", functionSrc)
 	executeJsFunction(functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller, this.conn.id);
  }
 
@@ -126,7 +125,6 @@ var server = new Server("localhost", "127.0.0.1", 9393);
 
 // Export class.
 exports.server = server;
-
 exports.Server = Server;
 exports.RpcData = RpcData;
 exports.Connection = Connection;

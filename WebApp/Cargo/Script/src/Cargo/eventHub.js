@@ -1,3 +1,4 @@
+require("Cargo/server");
 AccountEvent = "AccountEvent";
 AccountRegisterSuccessEvent = 0;
 AccountConfirmationSucessEvent = 1;

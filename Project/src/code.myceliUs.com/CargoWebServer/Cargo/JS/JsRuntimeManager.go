@@ -150,6 +150,7 @@ type JsRuntimeManager struct {
 
 // The main processing loop...
 func run(jsRuntimeManager *JsRuntimeManager) {
+
 	// That function will process api call's
 	for {
 		select {
@@ -229,6 +230,11 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 		case operationInfos := <-jsRuntimeManager.m_execVmOperation:
 			// Set the function on the JS runtime...
 			go func() {
+				defer func() {
+					if recover() != nil {
+					}
+				}()
+
 				var sessionId = operationInfos.m_params["sessionId"].(string)
 
 				if jsRuntimeManager.m_sessions[sessionId] != nil {
@@ -708,7 +714,6 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 
 			if export, ok := this.m_exports[sessionId][exportPath]; ok {
 				// Set the function as part of the exports object.
-				log.Println("---> set function name ", name)
 				export.Set(name, function)
 			} else {
 				// Create the export variable.
@@ -743,7 +748,6 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			this.initScript(path, sessionId)
 		}
 	}
-
 	// Load only the Cargo directory by default,
 	// Other module will be load with use of require in server side script execution.
 	for path, _ := range this.m_scripts {
@@ -788,8 +792,9 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJavaSc
 			// script.
 			src = strings.Replace(src, "exports.", "exports_"+uuid+".", -1)
 			_, err := vm.EvalScript(src, []interface{}{})
+			//log.Println(src)
 			if err != nil {
-				log.Panicln("---> script running error:  ", path, err)
+				log.Panicln("---> script running error:  ", path, src, err)
 			}
 		}
 		return export

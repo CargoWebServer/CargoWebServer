@@ -740,8 +740,9 @@ func (this *Server) Start() {
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.getServicesClientCode", func(successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
 		id := Utility.RandomUUID()
-		method := "GetServicesClientCode"
+
 		params := make([]*MessageData, 0)
+		method := "GetServicesClientCode"
 
 		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
@@ -947,16 +948,14 @@ func (this *Server) Start() {
 		// because prototypes are created in anonymous session.
 		JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
 
-		// Initialyse the script for the default session.
-		JS.GetJsRuntimeManager().InitScripts("") // Initialyse the base session.
-
 		// Set service in the server object.
 		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
-			_, err := JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
-			if err != nil {
-				log.Fatal(err)
-			}
+			// I will register the script to be run be sub-sessions.
+			JS.GetJsRuntimeManager().AppendScript("Cargo/"+serviceName, "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();", false)
 		}
+
+		// Initialyse the script for the default session.
+		JS.GetJsRuntimeManager().InitScripts("") // Initialyse the base session.
 
 		// Now I will register actions for services container.
 		activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()

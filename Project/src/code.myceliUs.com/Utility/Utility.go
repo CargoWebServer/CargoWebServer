@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -1053,6 +1054,8 @@ func ToInt(value interface{}) int {
 		} else {
 			val = 0
 		}
+	} else if reflect.TypeOf(value).String() == "[]uint8" {
+		val = int(binary.BigEndian.Uint64(value.([]uint8)))
 	} else {
 		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to integer value")
 	}

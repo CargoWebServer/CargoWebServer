@@ -27,9 +27,7 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
 
-	// The backend...
-	"github.com/boltdb/bolt"
-	"github.com/syndtr/goleveldb/leveldb"
+	"code.myceliUs.com/TripleStore"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,12 +62,17 @@ type GraphStore struct {
 	/** The store path **/
 	m_path string
 
-	// The B+Tree That database is use to indexation of triple.
-	m_index *bolt.DB
+	// The underlying triple store.
+	m_tripleStore *TripleStore.Store
+}
 
-	// That level Db is fater in write operation so triple values will
-	// be store in it.
-	m_db *leveldb.DB
+func getServiceContainerConnection() *WebSocketConnection {
+	var conn *WebSocketConnection
+	var port int
+	port = 9494 // Try to get it from the db...
+	conn = GetServer().getConnectionByIp("127.0.0.1", port)
+
+	return conn
 }
 
 func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err error) {
@@ -97,18 +100,6 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 		log.Println("open:", err)
 	}
 
-	// Now I will open the db.
-	store.m_index, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0777, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// The triple store, speed write is better with levelDb than BoltDb
-	store.m_db, err = leveldb.OpenFile(store.m_path+"/"+store.m_id+".lvl", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Here I will register all class in the vm.
 	prototypes, err := store.GetEntityPrototypes()
 	if err == nil {
@@ -117,6 +108,9 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), false)
 		}
 	}
+
+	// Open the triple store.
+	store.m_tripleStore = TripleStore.NewStore(store.m_path, store.m_id)
 
 	return
 }
@@ -372,89 +366,6 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 
 	// Register it to the vm...
 	JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototype.TypeName, prototype.generateConstructor(), true)
-
-	// Update local entities if the store is local.
-	/*entities, _ := GetServer().GetEntityManager().getEntities(prototype_.TypeName, this.m_id, nil)
-
-	// Remove the fields
-	for i := 0; i < len(entities); i++ {
-		entity := entities[i] // Must be a dynamic entity.
-
-		// remove it...
-		for j := 0; j < len(prototype.FieldsToDelete); j++ {
-			field := prototype_.Fields[prototype.FieldsToDelete[j]]
-			if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-				// Dynamic entity.
-				entity.(*DynamicEntity).deleteValue(field)
-			}
-
-			GetServer().GetEntityManager().saveEntity(entity)
-		}
-
-		// update it...
-		for j := 0; j < len(prototype.FieldsToUpdate); j++ {
-			values := strings.Split(prototype.FieldsToUpdate[j], ":")
-			if len(values) == 2 {
-				indexFrom := prototype_.getFieldIndex(values[0])
-				indexTo := prototype.getFieldIndex(values[1])
-				if indexFrom > -1 && indexTo > -1 {
-					if values[0] != values[1] {
-						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-							// Set the new value with the old one
-							entity.(*DynamicEntity).setValue(values[1], entity.(*DynamicEntity).getValue(values[0]))
-							// Delete the old one.
-							entity.(*DynamicEntity).deleteValue(values[0])
-						}
-
-						prototype_.Fields[indexFrom] = values[1]
-					}
-					var fieldTypeTo = prototype_.FieldsType[indexTo]
-					var fieldTypeFrom = prototype.FieldsType[indexFrom]
-					if fieldTypeFrom != fieldTypeTo {
-						log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
-						// TODO set conversion rules here for each possible types.
-					}
-				}
-			}
-		}
-
-		// Now set new fields value inside existing entities with their default
-		// value.
-		for j := 0; j < len(prototype.Fields); j++ {
-			if !Utility.Contains(prototype_.Fields, prototype.Fields[j]) {
-				// I that case I will set the new field value inside the prototype.
-				var value interface{}
-				if strings.HasPrefix(prototype.FieldsType[j], "[]") {
-					value = "undefined"
-				} else {
-					if XML_Schemas.IsXsString(prototype.FieldsType[j]) {
-						value = prototype.FieldsDefaultValue[j]
-					} else if XML_Schemas.IsXsInt(prototype.FieldsType[j]) || XML_Schemas.IsXsTime(prototype.FieldsType[j]) {
-						value, _ = strconv.ParseInt(prototype.FieldsDefaultValue[j], 10, 64)
-					} else if XML_Schemas.IsXsNumeric(prototype.FieldsType[j]) {
-						value, _ = strconv.ParseFloat(prototype.FieldsDefaultValue[j], 64)
-					} else if XML_Schemas.IsXsDate(prototype.FieldsType[j]) {
-						value = Utility.MakeTimestamp()
-					} else if XML_Schemas.IsXsBoolean(prototype.FieldsType[j]) {
-						if prototype.FieldsDefaultValue[j] == "false" {
-							value = false
-						} else {
-							value = true
-						}
-					} else {
-						// Object here.
-						value = "undefined"
-					}
-				}
-				if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-					entity.(*DynamicEntity).setValue(prototype.Fields[j], value)
-				}
-			}
-		}
-
-		// Save the entity.
-		GetServer().GetEntityManager().saveEntity(entity)
-	}*/
 
 	file, err := os.Create(this.m_path + "/" + prototype.TypeName + ".gob")
 	defer file.Close()
@@ -1365,6 +1276,10 @@ func (this *GraphStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	var prototypes []*EntityPrototype
 	// Here the store is not a local, so I will use a remote call to get the
 	// list of it entity prototypes.
+	if this.m_ipv4 == "" {
+		this.m_ipv4 = "127.0.0.1"
+	}
+
 	if this.m_ipv4 != "127.0.0.1" {
 		if !this.m_conn.IsOpen() {
 			err := this.Connect()
@@ -1637,6 +1552,7 @@ func (this *GraphStore) Ping() error {
  * Create a new entry in the database.
  */
 func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId interface{}, err error) {
+
 	if this.m_ipv4 != "127.0.0.1" {
 		if this.m_conn != nil {
 			if !this.m_conn.IsOpen() {
@@ -1716,156 +1632,15 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 		return results, nil
 	}
 
-	// The triples to save...
-	/*for i := 0; i < len(triples); i++ {
-		log.Println("------> save triple ", triples[i])
-	}*/
-
-	// So here I will index the triple...
+	// Creation of triples...
 	for i := 0; i < len(triples); i++ {
 		// This will contain the value of the triple.
 		triple := triples[i].(Triple)
-		data, err := json.Marshal(&triple)
-		if err == nil {
-			// The triple uuid
-			uuid := Utility.GenerateUUID(string(data))
-			err = this.indexTriple(uuid, data)
-			if err == nil {
-				// S, ?, ?
-				err = this.index(triple.Subject, uuid, "S")
-				if err == nil {
-					// ?, P, ?
-					err = this.index(triple.Predicate, uuid, "P")
-					if err == nil {
-						if triple.IsIndex || Utility.IsValidEntityReferenceName(Utility.ToString(triple.Object)) {
-							// ?, ?, O
-							this.index(Utility.ToString(triple.Object), uuid, "O")
-						}
-						// Combine value.
-						//  S, P, ?
-						sp := Utility.GenerateUUID(triple.Subject + ":" + triple.Predicate)
-						err = this.index(sp, uuid, "SP")
-						if err == nil {
-							so := Utility.GenerateUUID(triple.Subject + ":" + Utility.ToString(triple.Object))
-							err = this.index(so, uuid, "SO")
-							if err == nil {
-								po := Utility.GenerateUUID(triple.Predicate + ":" + Utility.ToString(triple.Object))
-								err = this.index(po, uuid, "PO")
-								if err != nil {
-									log.Panicln(err)
-								}
-							} else {
-								log.Panicln(err)
-							}
-						}
-					} else {
-						log.Panicln(err)
-					}
-				} else {
-					log.Panicln(err)
-				}
-			} else {
-				log.Panicln(err)
-			}
-		} else {
-			log.Panicln(err)
-		}
+		// Append the triple.
+		this.m_tripleStore.AppendTriple(triple.Subject, triple.Predicate, Utility.ToString(triple.Object))
 	}
+
 	return
-}
-
-// Append a triple into the database.
-func (this *GraphStore) indexTriple(uuid string, data []byte) error {
-	err := this.m_db.Put([]byte(uuid), data, nil)
-	return err
-}
-
-func (this *GraphStore) removeTriple(uuid string) error {
-	err := this.m_db.Delete([]byte(uuid), nil)
-	return err
-}
-
-func (this *GraphStore) index(key string, uuid string, bucketId string) error {
-	return this.m_index.Update(func(key string, uuid string, bucketId string) func(tx *bolt.Tx) error {
-		return func(tx *bolt.Tx) error {
-			b, err := tx.CreateBucketIfNotExists([]byte(bucketId))
-			if err == nil {
-				v := b.Get([]byte(key))
-				if v != nil {
-					if strings.Index(string(v), uuid) == -1 {
-						v = []byte(string(v) + ":" + uuid)
-					}
-				} else {
-					v = []byte(uuid)
-				}
-				err = b.Put([]byte(key), v)
-			}
-			return err
-		}
-	}(key, uuid, bucketId))
-}
-
-// Remove the triple indexation from the DB.
-func (this *GraphStore) removeIndex(key string, uuid string, bucketId string) error {
-	return this.m_index.Update(func(key string, uuid string, bucketId string) func(tx *bolt.Tx) error {
-		return func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte(bucketId))
-			var err error
-			if b != nil {
-				v := b.Get([]byte(key))
-				v = []byte(strings.Replace(string(v), ":"+uuid, "", -1))
-				v = []byte(strings.Replace(string(v), uuid, "", -1))
-				if len(v) == 0 {
-					err = b.Delete([]byte(key))
-				} else {
-					err = b.Put([]byte(key), v)
-				}
-			}
-			return err
-		}
-	}(key, uuid, bucketId))
-}
-
-// Here I will retreive triple values.
-func (this *GraphStore) getTriple(key string) (*Triple, error) {
-	data, err := this.m_db.Get([]byte(key), nil)
-	triple := new(Triple)
-	err = json.Unmarshal(data, triple)
-	if err == nil {
-		return triple, nil
-	}
-	return nil, err
-}
-
-// Here I will retreive triple values.
-func (this *GraphStore) getTriples(key string, bucketId string) []Triple {
-	results := make(chan []Triple, 0)
-	go this.m_index.View(func(key string, bucketId string, results chan []Triple, store *GraphStore) func(*bolt.Tx) error {
-		return func(tx *bolt.Tx) error {
-			triples := make([]Triple, 0)
-			b := tx.Bucket([]byte(bucketId))
-			if b == nil {
-				results <- triples
-				return errors.New("Bucket " + bucketId + " not found!")
-			}
-			v := b.Get([]byte(key))
-
-			// Now I will return the found tripple.
-			keys := strings.Split(string(v), ":")
-			for i := 0; i < len(keys); i++ {
-				if len(keys[i]) > 0 {
-					triple, err := store.getTriple(keys[i])
-					if err == nil {
-						triples = append(triples, *triple)
-					}
-				}
-			}
-
-			results <- triples
-			return nil
-		}
-	}(key, bucketId, results, this))
-	return <-results
 }
 
 /**
@@ -1965,7 +1740,6 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return results.([][]interface{}), nil
 	}
 
-	var triples []Triple
 	// So query will be of the form...
 	// In case of simple query of the form (?, ?, ?)
 	if strings.HasPrefix(queryStr, "(") && strings.HasSuffix(queryStr, ")") {
@@ -1973,55 +1747,23 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		s := strings.TrimSpace(values[0])
 		p := strings.TrimSpace(values[1])
 		o := strings.TrimSpace(values[2])
-		if s == "?" && p != "?" && o != "?" { // ?, P, O
-			bucketId := "PO"
-			key := Utility.GenerateUUID(p + ":" + o)
-			triples = this.getTriples(key, bucketId)
-		} else if s != "?" && p == "?" && o != "?" { // S, ?, O
-			bucketId := "SO"
-			key := Utility.GenerateUUID(s + ":" + o)
-			triples = this.getTriples(key, bucketId)
-		} else if s != "?" && p != "?" && o == "?" { // S, P, ?
-			bucketId := "SP"
-			key := Utility.GenerateUUID(s + ":" + p)
-			triples = this.getTriples(key, bucketId)
-		} else if s != "?" && p == "?" && o == "?" { // ?, P, O
-			bucketId := "S"
-			triples = this.getTriples(s, bucketId)
-		} else if s != "?" && p != "?" && o == "?" { // S, ?, O
-			bucketId := "P"
-			triples = this.getTriples(p, bucketId)
-		} else if s == "?" && p == "?" && o != "?" { // S, P, ?
-			bucketId := "O"
-			triples = this.getTriples(o, bucketId)
-		}
 
-		if len(triples) == 0 {
-			return nil, errors.New("No values found!")
-		}
-
-		results = make([][]interface{}, 0)
-		for i := 0; i < len(triples); i++ {
-			results = append(results, []interface{}{triples[i].Subject, triples[i].Predicate, triples[i].Object})
-		}
-
-		return results, nil
-
+		results, err = this.m_tripleStore.FindTriples(s, p, o)
 	} else {
 
 		// First of all i will init the query...
 		var query EntityQuery
-		err := json.Unmarshal([]byte(queryStr), &query)
+		err = json.Unmarshal([]byte(queryStr), &query)
 		if err != nil {
 			return nil, err
 		}
 
 		if len(query.Query) > 0 {
-			searchResult, err := this.executeSearchQuery(query.Query, query.Fields)
+			var err error
+			results, err = this.executeSearchQuery(query.Query, query.Fields)
 			if err != nil {
 				return nil, err
 			}
-			return searchResult, nil
 		} else {
 			// There is no query so i will use the typename to find fields...
 			q := "( ?, TYPENAME, " + query.TypeName + " )"
@@ -2061,6 +1803,7 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 			}
 		}
 	}
+
 	return
 }
 
@@ -2157,7 +1900,7 @@ func (this *GraphStore) Update(queryStr string, triples []interface{}, params []
 
 	// The triples to save...
 	for i := 0; i < len(triples); i++ {
-		log.Println("------> save triple ", triples[i])
+
 	}
 
 	return
@@ -2250,35 +1993,8 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
-		data, err := json.Marshal(&triples[i])
-		uuid := Utility.GenerateUUID(string(data))
-		if err == nil {
-			//log.Println("remove triple: ", triples[i])
-			err = this.removeTriple(uuid)
-			if err != nil {
-				log.Println("---> fail to remove triple, ", triples[i])
-				return err
-			}
-
-			triple := triples[i].(Triple)
-
-			this.removeIndex(triple.Subject, uuid, "S")
-
-			this.removeIndex(triple.Predicate, uuid, "P")
-
-			//if triple.IsIndex {
-			this.removeIndex(Utility.ToString(triple.Object), uuid, "O")
-			//}
-
-			sp := Utility.GenerateUUID(triple.Subject + ":" + triple.Predicate)
-			this.removeIndex(sp, uuid, "SP")
-
-			so := Utility.GenerateUUID(triple.Predicate + ":" + Utility.ToString(triple.Object))
-			this.removeIndex(so, uuid, "SO")
-
-			po := Utility.GenerateUUID(triple.Predicate + ":" + Utility.ToString(triple.Object))
-			this.removeIndex(po, uuid, "PO")
-		}
+		triple := triples[i].(Triple)
+		this.m_tripleStore.RemoveTriple(triple.Subject, triple.Predicate, Utility.ToString(triple.Object))
 	}
 
 	return
@@ -2296,12 +2012,6 @@ func (this *GraphStore) Close() error {
 		}
 		return nil
 	}
-
-	// Close the datastore.
-	this.m_index.Close()
-
-	// Close level db.
-	this.m_db.Close()
 
 	return nil
 }

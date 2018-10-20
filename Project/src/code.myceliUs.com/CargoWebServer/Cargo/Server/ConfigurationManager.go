@@ -144,6 +144,7 @@ func (this *ConfigurationManager) initialize() {
 	log.Println("--> initialyze ConfigurationManager")
 	// So here if there is no configuration...
 	entity, cargoError := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
+
 	if cargoError == nil {
 		this.m_activeConfigurations = entity.(*Config.Configurations)
 	} else {
@@ -166,7 +167,6 @@ func (this *ConfigurationManager) initialize() {
 
 		// Create the configuration entity from the configuration and save it.
 		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
-
 		this.m_activeConfigurations.SetServiceConfigs(this.m_servicesConfiguration)
 
 		// Now the default server configuration...

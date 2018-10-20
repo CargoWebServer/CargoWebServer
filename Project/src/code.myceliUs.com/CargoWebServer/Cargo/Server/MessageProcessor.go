@@ -66,6 +66,7 @@ func newMessageProcessor() *MessageProcessor {
 
 	// Channel to stop the message proecessing.
 	p.abortedByEnvironment = make(chan bool)
+	
 	return p
 }
 

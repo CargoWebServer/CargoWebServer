@@ -13,16 +13,12 @@ type Triple struct {
 	Subject   string
 	Predicate string
 	Object    interface{}
-
-	// True if the object must be indexed...
-	IsIndex bool
 }
 
 /**
  * Create a map[string] interface{} from array of triples.
  */
 func FromTriples(values [][]interface{}) map[string]interface{} {
-
 	obj := make(map[string]interface{}, 0)
 	var typeName string
 	if len(values) > 0 {
@@ -107,7 +103,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 		typeName := values["TYPENAME"].(string)
 
 		// append the type name as a relation.
-		*triples = append(*triples, Triple{uuid, "TYPENAME", typeName, true})
+		*triples = append(*triples, Triple{uuid, "TYPENAME", typeName})
 		prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
 		for k, v := range values {
 			fieldIndex := prototype.getFieldIndex(k)
@@ -134,19 +130,19 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 
 							if reflect.TypeOf(v).String() == "[]string" {
 								for i := 0; i < len(v.([]string)); i++ {
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]string)[i], isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]string)[i]})
 								}
 							} else if reflect.TypeOf(v).String() == "[]interface {}" {
 								for i := 0; i < len(v.([]interface{})); i++ {
 									if v.([]interface{})[i] != nil {
-										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string)})
 									}
 								}
 							} else if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
 								for i := 0; i < len(v.([]map[string]interface{})); i++ {
 									if v.([]map[string]interface{})[i] != nil {
 										if v.([]map[string]interface{})[i]["UUID"] != nil {
-											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
+											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string)})
 										}
 									}
 								}
@@ -160,7 +156,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								}
 							} else if reflect.TypeOf(v).Kind() == reflect.String {
 								// Here I will append attribute...
-								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v})
 							} else {
 								log.Panicln("------> reference type fail!", reflect.TypeOf(v).String())
 							}
@@ -182,18 +178,18 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 											if Utility.IsValidEntityReferenceName(v.([]interface{})[0].(string)) {
 												for i := 0; i < len(v.([]interface{})); i++ {
 													uuid_ := v.([]interface{})[i].(string)
-													*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+													*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_})
 												}
 											} else {
 												str, err := json.Marshal(v)
 												if err == nil {
-													*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+													*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str)})
 												}
 											}
 										} else {
 											str, err := json.Marshal(v)
 											if err == nil {
-												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str)})
 											}
 										}
 									}
@@ -203,19 +199,19 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 									if Utility.IsValidEntityReferenceName(v.([]string)[0]) {
 										for i := 0; i < len(v.([]string)); i++ {
 											uuid_ := v.([]string)[i]
-											*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+											*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_})
 										}
 									} else {
 										str, err := json.Marshal(v)
 										if err == nil {
-											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str)})
 										}
 									}
 								}
 							} else {
 								str, err := json.Marshal(v)
 								if err == nil {
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str)})
 								}
 							}
 						} else {
@@ -234,12 +230,12 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								if reflect.TypeOf(v).Kind() == reflect.String {
 									if Utility.IsValidEntityReferenceName(v.(string)) && k != "ParentUuid" && k != "UUID" {
 										uuid_ := v.(string)
-										*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_, isIndex})
+										*triples = append(*triples, Triple{uuid, typeName + ":" + strings.Split(uuid_, "%")[0] + ":" + k, uuid_})
 									} else {
-										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+										*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v})
 									}
 								} else {
-									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v})
 								}
 							}
 						}

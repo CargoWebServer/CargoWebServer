@@ -208,9 +208,6 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(q, []interface{}{}, []interface{}{})
-	if typeName == "CatalogSchema.OrderType" {
-		log.Println("---> results: ", results)
-	}
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 		return nil, errObj
@@ -336,6 +333,7 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 		return nil, errObj
 	}
 
+	// here the id is generated with parent uuid.
 	uuid, errObj := this.getEntityUuidById(typeName, storeId, ids)
 	if errObj == nil {
 		return this.getEntityByUuid(uuid)
@@ -352,6 +350,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 		errObj := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype with name "+typeName+" not found!"))
 		return "", errObj
 	}
+
 	if len(prototype.Ids) <= 1 {
 		errObj := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No id define for the type "+typeName))
 		return "", errObj
@@ -463,7 +462,7 @@ func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]in
 	}
 
 	// I will also append the parent relationship to the list of triple to be save (help to save calculation time)
-	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), true}
+	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid()}
 	*triples = append(*triples, parentLnkTriple)
 
 	return nil
@@ -529,8 +528,8 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
 	// So here I will simply append the triples in the database...
-	log.Println("----> entity created ", entity.GetUuid())
 	_, err = store.Create("", triples)
+
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return nil, cargoError
@@ -597,7 +596,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		values = entity.(*DynamicEntity).getValues()
 	} else {
 		values, err = Utility.ToMap(entity)
-
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
@@ -659,7 +657,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Remove unchanged triples
 	for j := 0; j < len(triples) && len(triples) > 0; j++ {
 		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
-			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && triples[j].(Triple).Object == existingTriples[i][2] {
+			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && Utility.ToString(triples[j].(Triple).Object) == existingTriples[i][2] {
 				existingTriples = append(existingTriples[0:i], existingTriples[i+1:]...)
 				triples = append(triples[0:j], triples[j+1:]...)
 				j--
@@ -673,16 +671,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	if len(existingTriples) > 0 {
 		toDelete := make([]interface{}, 0)
 		for i := 0; i < len(existingTriples); i++ {
-			isIndex := false
-			if len(strings.Split(existingTriples[i][1].(string), ":")) == 3 {
-				field := strings.Split(existingTriples[i][1].(string), ":")[2]
-				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
-					isIndex = true
-				}
-			} else if existingTriples[i][1].(string) == "TYPENAME" {
-				isIndex = true
-			}
-			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2], isIndex})
+			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2]})
 		}
 		err = store.Delete("", toDelete)
 		if err != nil {
@@ -728,17 +717,8 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
 	if err_ == nil {
 		for i := 0; i < len(values); i++ {
-			isIndex := false
-			if len(strings.Split(values[i][1].(string), ":")) == 3 {
-				field := strings.Split(values[i][1].(string), ":")[2]
-				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
-					isIndex = true
-				}
-			} else if values[i][1].(string) == "TYPENAME" {
-				isIndex = true
-			}
 
-			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2], isIndex})
+			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
 			if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
 				if !Utility.Contains(uuids, values[i][0].(string)) {
 					uuids = append(uuids, values[i][0].(string))
@@ -750,17 +730,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	values, err_ = store.Read("("+entity.GetUuid()+",?,?)", []interface{}{}, []interface{}{})
 	if err_ == nil {
 		for i := 0; i < len(values); i++ {
-			isIndex := false
-			if len(strings.Split(values[i][1].(string), ":")) == 3 {
-				field := strings.Split(values[i][1].(string), ":")[2]
-				if Utility.Contains(prototype.Ids, field) || Utility.Contains(prototype.Indexs, field) {
-					isIndex = true
-				}
-			} else if values[i][1].(string) == "TYPENAME" {
-				isIndex = true
-			}
-
-			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2], isIndex})
+			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
 			if reflect.TypeOf(values[i][2]).Kind() == reflect.String {
 				if Utility.IsValidEntityReferenceName(values[i][2].(string)) {
 					if !Utility.Contains(uuids, values[i][2].(string)) {

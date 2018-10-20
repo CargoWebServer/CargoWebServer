@@ -35,17 +35,19 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
 
     // Keep message and session associated.
     this->messageSession.insert(QString::fromStdString(msg.id()), sessionId);
+   // qDebug() << "receive message " << msg.id().c_str();
 
     // Now i will determine if the message is a request, a response or an event...
     if(msg.type() == com::mycelius::message::Message_MessageType_ERROR){
         // The message is an error
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
-        qDebug() << "receive request " << msg.id().c_str();
-
         // Now I will call process message from the store.
+       // qDebug() << "receive request " << msg.id().c_str();
         QString methodName = QString::fromStdString(msg.rqst().method());
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName, sessionId);
+
+       // qDebug() << methodName;
 
         // Now I will append the parameters...
         const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&params = msg.rqst().params();

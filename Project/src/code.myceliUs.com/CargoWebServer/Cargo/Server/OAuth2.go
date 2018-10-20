@@ -1612,7 +1612,7 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// The action to be execute.
 	var errObj *CargoEntities.Error
 	var action *CargoEntities.Action
-	log.Println("----> ids: ", ids)
+
 	// I will get the action entity from the values.
 	if len(ids) == 3 {
 		var entity Entity

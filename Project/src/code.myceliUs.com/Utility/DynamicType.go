@@ -41,11 +41,11 @@ func RegisterType(typedNil interface{}) {
 		if index > 0 {
 			typeRegistry[t.PkgPath()[index+1:]+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
-			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
+			//log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
 		} else {
 			typeRegistry[t.PkgPath()+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()+"."+typeName, typedNil)
-			log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
+			//log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
 		}
 	}
 }
@@ -105,7 +105,16 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		v = reflect.ValueOf(value.(string))
 	case reflect.Bool:
 		if value != nil {
-			v = reflect.ValueOf(value.(bool))
+			if reflect.TypeOf(value).Kind() == reflect.Bool {
+				v = reflect.ValueOf(value.(bool))
+			} else if reflect.TypeOf(value).Kind() == reflect.String {
+				value_, err := strconv.ParseBool(value.(string))
+				if err != nil {
+					v = reflect.ValueOf(false)
+				} else {
+					v = reflect.ValueOf(value_)
+				}
+			}
 		} else {
 			v = reflect.ValueOf(false)
 		}

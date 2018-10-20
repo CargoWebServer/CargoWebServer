@@ -22,6 +22,36 @@ type Cache struct {
 	m_operations chan map[string]interface{}
 }
 
+func (cache *Cache) getEntity(uuid string) (Entity, error) {
+	typeName := strings.Split(uuid, "%")[0]
+	var entity Entity
+	if entry, err := cache.m_cache.Get(uuid); err == nil {
+		val, err := Utility.FromBytes(entry, typeName)
+		if err == nil {
+			if reflect.TypeOf(val).String() != "map[string]interface {}" {
+				entity = val.(Entity)
+			} else {
+				entity = NewDynamicEntity()
+				// Set the basic entity properties only.
+				entity.(*DynamicEntity).typeName = val.(map[string]interface{})["TYPENAME"].(string)
+				entity.(*DynamicEntity).uuid = val.(map[string]interface{})["UUID"].(string)
+				if val.(map[string]interface{})["ParentUuid"] != nil {
+					entity.(*DynamicEntity).parentUuid = val.(map[string]interface{})["ParentUuid"].(string)
+				}
+				if val.(map[string]interface{})["ParentLnk"] != nil {
+					entity.(*DynamicEntity).parentLnk = val.(map[string]interface{})["ParentLnk"].(string)
+				}
+			}
+		} else if Utility.IsValidEntityReferenceName(string(entry)) {
+			return cache.getEntity(string(entry))
+		} else {
+			log.Panicln("--> go error ", uuid, err)
+			return nil, err
+		}
+	}
+	return entity, nil
+}
+
 /**
  *
  */
@@ -64,31 +94,9 @@ func newCache() *Cache {
 			case operation := <-cache.m_operations:
 				if operation["name"] == "getEntity" {
 					uuid := operation["uuid"].(string)
-					//log.Println("--->cache get entity: ", uuid)
 					getEntity := operation["getEntity"].(chan Entity)
-					typeName := strings.Split(uuid, "%")[0]
-					var entity Entity
-					if entry, err := cache.m_cache.Get(uuid); err == nil {
-						val, err := Utility.FromBytes(entry, typeName)
-						if err == nil {
-							if reflect.TypeOf(val).String() != "map[string]interface {}" {
-								entity = val.(Entity)
-							} else {
-								entity = NewDynamicEntity()
-								// Set the basic entity properties only.
-								entity.(*DynamicEntity).typeName = val.(map[string]interface{})["TYPENAME"].(string)
-								entity.(*DynamicEntity).uuid = val.(map[string]interface{})["UUID"].(string)
-								if val.(map[string]interface{})["ParentUuid"] != nil {
-									entity.(*DynamicEntity).parentUuid = val.(map[string]interface{})["ParentUuid"].(string)
-								}
-								if val.(map[string]interface{})["ParentLnk"] != nil {
-									entity.(*DynamicEntity).parentLnk = val.(map[string]interface{})["ParentLnk"].(string)
-								}
-							}
-						} else {
-							log.Println("--> go error ", uuid, err)
-						}
-					}
+
+					entity, _ := cache.getEntity(uuid)
 
 					// Return the found values.
 					getEntity <- entity
@@ -107,6 +115,8 @@ func newCache() *Cache {
 							}
 							// By uuid
 							cache.m_cache.Set(entity.GetUuid(), bytes)
+						} else {
+							log.Println("---> fail to serialyse entity!")
 						}
 					}
 				} else if operation["name"] == "removeEntity" {
@@ -193,7 +203,6 @@ func newCache() *Cache {
 						}
 					}
 				} else if operation["name"] == "deleteValue" {
-
 					uuid := operation["uuid"].(string)
 					field := operation["field"].(string)
 					// log.Println("--->cache deleteValue: ", uuid)

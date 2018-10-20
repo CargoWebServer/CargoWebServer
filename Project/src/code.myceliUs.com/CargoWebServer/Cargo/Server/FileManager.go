@@ -364,7 +364,6 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		file = fileEntity.(*CargoEntities.File)
 		log.Println("Get entity for file: ", filepath+"/"+filename)
 	} else {
-		log.Println("Create entity for file: ", filepath+"/"+filename)
 		file = new(CargoEntities.File)
 		file.SetId(fileId)
 		file.SetParentUuid(parentDir.GetUuid())
@@ -692,17 +691,14 @@ func (this *FileManager) setHtmlIncludes(path string, filedata []byte) []byte {
 		}
 		if file != nil {
 			if checksum != file.GetChecksum() {
-				log.Println("--> checksum: ", file.GetChecksum())
 				// Change the actual value with the new checksum
 				a.Val = path + "?" + file.GetChecksum()
 			}
 		} else {
-			log.Println(basePath + "/" + path)
 			fileId := Utility.CreateSha1Key([]byte(basePath + "/" + path))
 			file, _ := this.getFileById(fileId)
 			if file != nil {
 				if checksum != file.GetChecksum() {
-					log.Println("--> checksum: ", file.GetChecksum())
 					// Change the actual value with the new checksum
 					a.Val = path + "?" + file.GetChecksum()
 				}
@@ -1067,7 +1063,6 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 	}
 
 	// if the file exist in the root...
-	log.Println("--> try to remove file ", this.root+"/"+filePath)
 	if _, err := os.Stat(this.root + "/" + filePath); err == nil {
 		// TODO Throw an error if err != nil ?
 		if os.IsNotExist(err) {
@@ -1813,7 +1808,6 @@ func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(w, err)
 			return
 		}
-		log.Println("--> upload file to ", path+"/"+files[i].Filename)
 		out, err := os.Create(path + "/" + files[i].Filename)
 		defer out.Close()
 		if err != nil {
