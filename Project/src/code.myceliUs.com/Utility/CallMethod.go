@@ -84,7 +84,7 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			// In case of error.
 			defer func(wait chan []interface{}, results *[]interface{}) { //catch or finally
 				if err := recover(); err != nil { //catch
-					//log.Println(os.Stderr, "Exception: %v\n", err)
+					log.Println("Exception: %v\n", err)
 					*results = []interface{}{nil, err}
 				}
 				wait <- *results

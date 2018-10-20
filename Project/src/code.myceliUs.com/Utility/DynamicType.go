@@ -96,6 +96,7 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		return reflect.ValueOf(value)
 	}
 
+	//log.Println("----> expected type: ", t.String(), " got ", reflect.TypeOf(value).String())
 	var v reflect.Value
 
 	switch t.Kind() {
@@ -104,20 +105,7 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		// I that case I will
 		v = reflect.ValueOf(value.(string))
 	case reflect.Bool:
-		if value != nil {
-			if reflect.TypeOf(value).Kind() == reflect.Bool {
-				v = reflect.ValueOf(value.(bool))
-			} else if reflect.TypeOf(value).Kind() == reflect.String {
-				value_, err := strconv.ParseBool(value.(string))
-				if err != nil {
-					v = reflect.ValueOf(false)
-				} else {
-					v = reflect.ValueOf(value_)
-				}
-			}
-		} else {
-			v = reflect.ValueOf(false)
-		}
+		v = reflect.ValueOf(ToBool(value))
 	case reflect.Int:
 		v = reflect.ValueOf(toInt(value))
 	case reflect.Int8:
@@ -137,7 +125,7 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 	case reflect.Float32:
 		v = reflect.ValueOf(value.(float32))
 	case reflect.Float64:
-		v = reflect.ValueOf(value.(float64))
+		v = reflect.ValueOf(ToNumeric(value))
 	case reflect.Array:
 		log.Panicln("--------> array found!")
 	default:

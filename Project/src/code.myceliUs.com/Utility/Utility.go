@@ -1062,6 +1062,19 @@ func ToInt(value interface{}) int {
 	return val
 }
 
+func ToBool(value interface{}) bool {
+	if reflect.TypeOf(value).Kind() == reflect.Bool {
+		return value.(bool)
+	} else if reflect.TypeOf(value).Kind() == reflect.String {
+		value_, err := strconv.ParseBool(value.(string))
+		if err != nil {
+			return false
+		} else {
+			return value_
+		}
+	}
+	return false
+}
 func ToNumeric(value interface{}) float64 {
 	var val float64
 	if reflect.TypeOf(value).Kind() == reflect.String {

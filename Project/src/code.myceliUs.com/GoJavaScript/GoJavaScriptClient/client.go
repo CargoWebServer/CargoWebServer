@@ -168,10 +168,13 @@ func (self *Client) processActions() {
 					// Now I will call the method on the object.
 					results, err = Utility.CallMethod(target, a.Name, params)
 					if err != nil {
-						log.Println("---> call Method: ", a.Name, params)
+						log.Println("---> call Method: ", a.Name)
+						for i := 0; i < len(params); i++ {
+							log.Println("param ", i, params[i], reflect.TypeOf(params[i]).String())
+						}
 						str, _ := Utility.ToJson(target)
 						log.Println("---> target: ", str)
-						log.Println("---> error: ", err)
+						log.Panicln("---> error: ", err)
 					}
 				}
 				// Keep go object in client and transfert only reference.
@@ -443,10 +446,7 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
  * Call a JS/Go function with a given name and a list of parameter.
  */
 func (self *Client) CallFunction(name string, params ...interface{}) (interface{}, error) {
-	/*log.Println("----> call ", name)
-	for i := 0; i < len(params); i++ {
-		log.Println("----> params ", params[i])
-	}*/
+
 	// So here I will create the function parameters.
 	action := GoJavaScript.NewAction("CallFunction", "")
 	action.AppendParam("name", name)
