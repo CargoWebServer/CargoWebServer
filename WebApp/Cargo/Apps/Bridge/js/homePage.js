@@ -458,22 +458,57 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // The new menu in the file menu
     var newFileMenuItem = new MenuItem("new_file_menu_item", "New", { "new_project_menu_item": newProjectMenuItem }, 1)
     
-    
     var openProjectMenuItem = new MenuItem("open_project_menu_item", "Open Project...", {}, 1,
-    function (HomePage) {
+    function (homePage) {
         return function () {
             // So here i will get the list of project from the server and display it in a dialog.
             server.projectManager.getAllProjects(
                 // success callback
                 function (results, caller) {
-                    //caller.initProjects(results)
-                    //caller.panel.element.style.display = ""
                     console.log(results)
+                    var dialog = new Dialog("open_project_dialog", caller.panel, true, "Open Project");
+                    dialog.setCentered();
+                    if(results.length == 0){
+                        // dialog.content
+                    }else{
+                        var projectInfos = {}
+                        projectInfos_ = []
+                        if(localStorage.getItem("projectsInfo") != undefined){
+                            projectInfos_ = JSON.parse(localStorage.getItem("projectsInfo"))
+                        }
+                        for(var i=0; i < results.length; i++){
+                            projectInfo = results[i];
+                            if(projectInfos_.indexOf(projectInfo.UUID) == -1){
+                                dialog.content.appendElement({"tag":"div", "style":"display: table-row"}).down()
+                                    .appendElement({"tag":"input", "id": projectInfo.UUID, "type":"checkbox"})
+                                    .appendElement({"tag":"div", "class":"open_project_line", "innerHtml":projectInfo.M_name}).down()
+                                
+                                var checkbox = dialog.content.getChildById(projectInfo.UUID)
+                                checkbox.element.onclick = function(projectInfos, projectInfo){
+                                    return function(){
+                                        if(this.checked){
+                                            projectInfos[projectInfo.UUID]=projectInfo;
+                                        }else{
+                                            delete projectInfos[projectInfo.UUID]
+                                        }
+                                    }
+                                }(projectInfos, projectInfo)
+                            }
+                                
+                        }
+                        
+                        dialog.okCallback = function(projectInfos, homePage){
+                            return function(){
+                                homePage.projectExplorer.initProjects(Object.values(projectInfos))
+                            }
+                        }(projectInfos, caller)
+                    }
+                    
                 },
                 // error callback
                 function (errorMsg, caller) {
         
-                }, this)
+                }, homePage)
 
         }
     }(this), "fa fa-files-o")

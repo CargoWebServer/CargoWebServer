@@ -49,3 +49,11 @@
     cursor: pointer;
     text-decoration: underline
 }
+
+.open_project_line {
+    display: table-cell; 
+    text-align: left;
+    padding: 2px;
+    padding-left: 10px;
+    font: 11pt Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+}

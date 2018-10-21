@@ -873,7 +873,7 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 		if errObj == nil {
 			for j := 0; j < len(entities); j++ {
 				// append the object.
-				if reflect.TypeOf(entities[i]).String() == "*Server.DynamicEntity" {
+				if reflect.TypeOf(entities[j]).String() == "*Server.DynamicEntity" {
 					infos.Data = append(infos.Data, entities[j].(*DynamicEntity).getValues())
 				} else {
 					infos.Data = append(infos.Data, entities[j])

@@ -9,41 +9,48 @@ var ProjectExplorer = function (parent) {
 
     this.panel = parent.appendElement({ "tag": "div", "class": "project_explorer" }).down()
 
-    /*server.projectManager.getAllProjects(
-        // success callback
-        function (results, caller) {
-            caller.initProjects(results)
-            //caller.panel.element.style.display = ""
-        },
-        // error callback
-        function (errorMsg, caller) {
-
-        }, this)*/
-
+    // So here I will get the list of opened project.
+    if(localStorage.getItem("projectsInfo") != undefined){
+        var projectsInfo = JSON.parse(localStorage.getItem("projectsInfo"))
+        for(var i=0; i < projectsInfo.length; i++){
+            server.entityManager.getEntityByUuid(projectsInfo[i], false, 
+             function(projectInfo, caller){
+                 new ProjectView(caller.panel, projectInfo)
+             },
+             function(errObj, caller){
+                 
+             }, this)
+        }
+    }
     return this
 }
 
-/**
- * Load a project from the server.
- */
-ProjectExplorer.prototype.loadProject = function(project){
-    
-}
-
-/**
 ProjectExplorer.prototype.initProjects = function (projectsInfo) {
+    var projectInfos_ = []
+    // Try to get project from the local storage.
+    if(localStorage.getItem("projectsInfo") != undefined){
+        projectInfos_ = JSON.parse(localStorage.getItem("projectsInfo"))
+    }
+    
     // Now I will set each project...
     for (var i = 0; i < projectsInfo.length; i++) {
         var projectInfo = projectsInfo[i]
-        var projectView = new ProjectView(this.panel, projectInfo)
+        if(projectInfos_.indexOf(projectsInfo.UUID) == -1){
+            var projectView = new ProjectView(this.panel, projectInfo)
+            projectInfos_.push(projectInfo.UUID)
+        }
     }
-}*/
+    // Keep track of open project.
+    localStorage.setItem("projectsInfo", JSON.stringify(projectInfos_))
+}
 
 /**
  * The project view object display the content of a project.
  */
 var ProjectView = function (parent, project) {
     this.parent = parent
+    this.project = project
+    
     this.panel = parent.appendElement({ "tag": "div", "class": "project_view" }).down()
     if (project.M_filesRef != undefined) {
         if (project.M_filesRef.length == 1) {
@@ -109,6 +116,9 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
         folderDiv = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
             .appendElement({ "tag": "div", "class": "project_folder", "id": dir.UUID }).down()
 
+        // keep track of the associated project.
+        folderDiv.projectUuid = this.project.UUID
+        
         /** The expend button */
         folderDiv.expandBtn = folderDiv.appendElement({ "tag": "i", "class": "fa fa-caret-right", "style": "display:none;" }).down()
 
@@ -342,9 +352,33 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                     }
                 }(dir), "fa fa-trash-o")
 
+                // Close a project
+                var closeMenuItem = new MenuItem("rename_menu", "Close", {}, 0, function (dir, folderDiv) {
+                    return function () {
+                        // Here I will close the project view.
+                        folderDiv.element.parentNode.removeChild(folderDiv.element)
+                        
+                        // Now I will remove it from the local storage.
+                        console.log(folderDiv.projectUuid);
+                        if(localStorage.getItem("projectsInfo") != undefined){
+                            var projectsInfo = JSON.parse(localStorage.getItem("projectsInfo"))
+                            var index = projectsInfo.indexOf(folderDiv.projectUuid);    // <-- Not supported in <IE9
+                            if (index !== -1) {
+                                projectsInfo.splice(index, 1);
+                            }
+                            // save back to local storage.
+                            localStorage.setItem("projectsInfo", JSON.stringify(projectsInfo))
+                        }
+                        
+                    }
+                }(dir, folderDiv), "fa fa-times")
+                
                 // The main menu will be display in the body element, so nothing will be over it.
-                var contextMenu = new PopUpMenu(folderDiv, [newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
-
+                if(dir.M_path == ""){
+                    new PopUpMenu(folderDiv, [closeMenuItem, "|", newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+                }else{
+                    new PopUpMenu(folderDiv, [newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+                }
                 return false;
             }
         }(folderDiv, dir), false);
