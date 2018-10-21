@@ -9,8 +9,7 @@ var ProjectExplorer = function (parent) {
 
     this.panel = parent.appendElement({ "tag": "div", "class": "project_explorer" }).down()
 
-    // Here I will init the projects...
-    server.projectManager.getAllProjects(
+    /*server.projectManager.getAllProjects(
         // success callback
         function (results, caller) {
             caller.initProjects(results)
@@ -19,18 +18,26 @@ var ProjectExplorer = function (parent) {
         // error callback
         function (errorMsg, caller) {
 
-        }, this)
+        }, this)*/
 
     return this
 }
 
+/**
+ * Load a project from the server.
+ */
+ProjectExplorer.prototype.loadProject = function(project){
+    
+}
+
+/**
 ProjectExplorer.prototype.initProjects = function (projectsInfo) {
     // Now I will set each project...
     for (var i = 0; i < projectsInfo.length; i++) {
         var projectInfo = projectsInfo[i]
         var projectView = new ProjectView(this.panel, projectInfo)
     }
-}
+}*/
 
 /**
  * The project view object display the content of a project.

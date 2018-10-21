@@ -126,14 +126,14 @@ func newCache() *Cache {
 						id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 						cache.m_cache.Delete(id)
 					}
-					//log.Println("--->cache delete entity: ", entity.GetUuid())
+					log.Println("--->cache delete entity: ", entity.GetUuid())
 					// Remove from the cache.
 					cache.m_cache.Delete(entity.GetUuid())
 					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
 				} else if operation["name"] == "remove" {
 					uuid := operation["uuid"].(string)
 					// Remove from the cache.
-					//log.Println("--->cache remove ", uuid)
+					log.Println("--->cache remove ", uuid)
 					cache.m_cache.Delete(uuid)
 				} else if operation["name"] == "getValue" {
 					uuid := operation["uuid"].(string)

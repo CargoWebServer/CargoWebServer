@@ -702,7 +702,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 }
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
-
+	log.Println("---> remove entity ", entity.GetUuid())
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
@@ -717,7 +717,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
 	if err_ == nil {
 		for i := 0; i < len(values); i++ {
-
 			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
 			if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
 				if !Utility.Contains(uuids, values[i][0].(string)) {
@@ -754,6 +753,16 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		infos["uuid"] = uuids[i]
 		// set the entity
 		this.m_cache.m_operations <- infos
+
+		// also remove it by it ids indexation.
+		if len(entity.Ids()) > 0 {
+			id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
+			infos := make(map[string]interface{})
+			infos["name"] = "remove"
+			infos["uuid"] = id
+		}
+		// set the entity
+		this.m_cache.m_operations <- infos
 	}
 
 	// Send event message...
@@ -776,6 +785,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
+	log.Println("---> delete complete ")
 	return nil
 }
 

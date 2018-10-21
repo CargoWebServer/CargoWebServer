@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 
+	//"log"
+
 	"code.myceliUs.com/Utility"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -125,7 +127,7 @@ func (store *Store) appendIndex(v0 uint64, v1 uint64, v2 uint64, db *leveldb.DB)
 
 // Append triple in the datastore.
 func (store *Store) AppendTriple(subject string, predicate string, object string) {
-
+	//log.Println("----> append triple: ", subject, predicate, object)
 	// Append the value into the dictionary if there not already exist
 	s := store.appendIndexValue(subject)
 	p := store.appendIndexValue(predicate)
@@ -186,7 +188,6 @@ func (store *Store) removeIndex(v0 uint64, v1 uint64, v2 uint64, db *leveldb.DB)
 
 // remove triple
 func (store *Store) RemoveTriple(subject string, predicate string, object string) {
-	//log.Panicln("---->remove triple: ", subject, predicate, object)
 
 	var s, p, o uint64
 	var err error
@@ -211,6 +212,7 @@ func (store *Store) RemoveTriple(subject string, predicate string, object string
 	// remove the triple itself.
 	spo := Utility.ToString(s) + ":" + Utility.ToString(p) + ":" + Utility.ToString(o)
 	store.dictionary.Delete([]byte(spo), nil)
+	//log.Println("---->remove triple: ", subject, predicate, object)
 
 }
 

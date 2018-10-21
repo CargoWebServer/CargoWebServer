@@ -457,6 +457,30 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // The new menu in the file menu
     var newFileMenuItem = new MenuItem("new_file_menu_item", "New", { "new_project_menu_item": newProjectMenuItem }, 1)
+    
+    
+    var openProjectMenuItem = new MenuItem("open_project_menu_item", "Open Project...", {}, 1,
+    function (HomePage) {
+        return function () {
+            // So here i will get the list of project from the server and display it in a dialog.
+            server.projectManager.getAllProjects(
+                // success callback
+                function (results, caller) {
+                    //caller.initProjects(results)
+                    //caller.panel.element.style.display = ""
+                    console.log(results)
+                },
+                // error callback
+                function (errorMsg, caller) {
+        
+                }, this)
+
+        }
+    }(this), "fa fa-files-o")
+    
+    // Open project menu.
+    var openMenuItem = new MenuItem("open_file_menu_item", "Open", { "open_project_menu_item": openProjectMenuItem }, 1)
+    
 
     // Now the import data menu
 
@@ -846,7 +870,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
 
-    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "preferences_server_menu_item": preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
+    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "open_file_menu_item": openMenuItem,  "preferences_server_menu_item": preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
 
     // The queries menu.
     var searchMenuItem = new MenuItem("search_menu_item", "Search", {}, 1,

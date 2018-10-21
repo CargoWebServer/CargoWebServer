@@ -261,19 +261,20 @@ var EntityPanelHeader = function (parent) {
 				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
 				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.header.title.element.innerText + "?" })
 
-                
-                
-				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
+				confirmDialog.ok.element.onclick = function (entityUuid, confirmDialog) {
 					return function () {
-					    server.entityManager.getEntityByUuid(entityPanel.entityUuid,false,
-					        function(entity,entityPanel){
-					            var evt = { "code": DeleteEntityEvent, "name": EntityEvent, "dataMap": { "entity": entity, "prototype" : getEntityPrototype(entityPanel.typeName) } }
-        				        server.eventHandler.broadcastLocalEvent(evt)
-        						dialog.close()
-					        },function(){}, entityPanel)
-					    
+						// I will call delete file
+						server.entityManager.removeEntity(entityUuid,
+							// Success callback 
+							function (result, caller) {
+							},
+							// Error callback
+							function (errMsg, caller) {
+
+							}, {})
+						confirmDialog.close()
 					}
-				}(confirmDialog, entityPanel)
+				}(entityPanel.entityUuid, confirmDialog)
 			}
 		}
 	}(parent)

@@ -415,6 +415,25 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 }, panel)
                         }
                     }(content.getPanel())
+                    
+                    content.getPanel().deleteCallback = function (task) {
+                        // If the task is delete I will delete it file.
+                        server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [task.M_id], false,
+                            function(fileEntity, caller){
+                                server.entityManager.removeEntity(fileEntity.UUID, 
+                                    function(result, fileUUID){
+                                        // send close event to editor.
+                                        var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
+                                        server.eventHandler.broadcastLocalEvent(evt)
+                                    }, 
+                                    function(){
+                                        
+                                    }, fileEntity)
+                            },
+                            function(){
+                                
+                            }, {})
+                    }
 
                     editBtn.element.onclick = function (ScheduledTask_M_script, entityPanel) {
                         return function () {
@@ -463,6 +482,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     }(content.getPanel().fields["M_script"].panel, content.getPanel())
 
 
+                    
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
                     contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()

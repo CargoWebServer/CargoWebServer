@@ -177,6 +177,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		delete(toDelete, fileId)
 
 		if err != nil {
+			log.Println("---> create file ", this.root+filePath__)
 			// here I will create the new entity...
 			if !f.IsDir() {
 				// Now I will open the file and create the entry in the DB.
@@ -184,6 +185,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					file, err := this.createFile(dirEntity, f.Name(), filePath_, filedata, "", 128, 128, false)
 					if err == nil {
+						file.SetParentDirPtr(dirEntity)
 						dirEntity.AppendFiles(file)
 					} else {
 						log.Panicln("--------------> fail to create file ", filePath__, err)
@@ -194,17 +196,20 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					subDir := this.synchronize(this.root + filePath__)
 					if subDir != nil {
+						subDir.SetParentDirPtr(dirEntity)
 						dirEntity.AppendFiles(subDir)
 					}
 				}
 			}
 		} else {
+			log.Println("---> synchronize file ", this.root+filePath__)
 			// I will test the checksum to see if the file has change...
 			if !f.IsDir() {
 				// Update the file checksum and save it if the file has change...
 				if !strings.HasPrefix(f.Name(), ".") {
 					filedata, _ := ioutil.ReadFile(this.root + filePath__)
 					this.saveFile(fileEntity.GetUuid(), filedata, "", 128, 128, false)
+					fileEntity.SetParentDirPtr(dirEntity)
 					dirEntity.AppendFiles(fileEntity)
 				}
 			} else {
@@ -212,6 +217,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				if !strings.HasPrefix(f.Name(), ".") {
 					subDir := this.synchronize(this.root + filePath__)
 					if subDir != nil {
+						subDir.SetParentDirPtr(dirEntity)
 						dirEntity.AppendFiles(subDir)
 					}
 				}
@@ -322,11 +328,11 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 		dir.SetParentDirPtr(parentDir.(*CargoEntities.File))
 		dir.SetEntitiesPtr(entities)
 		parentDir.(*CargoEntities.File).AppendFiles(dir)
-		GetServer().GetEntityManager().saveEntity(dir)
-	} else {
-		// Save the dir.
-		GetServer().GetEntityManager().saveEntity(dir)
 	}
+
+	// Save the dir.
+	log.Println("---> save dir ", dir.GetUuid())
+	GetServer().GetEntityManager().saveEntity(dir)
 
 	return dir, nil
 
@@ -587,6 +593,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		}
 
 		file.SetChecksum(checksum)
+		log.Println("---> save ", file.GetPath()+"/"+file.GetName())
 		err := GetServer().GetEntityManager().saveEntity(file)
 		if err != nil {
 			log.Println("---> save file error ", err)
