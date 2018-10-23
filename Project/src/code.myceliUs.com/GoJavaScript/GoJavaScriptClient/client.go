@@ -174,7 +174,7 @@ func (self *Client) processActions() {
 						}
 						str, _ := Utility.ToJson(target)
 						log.Println("---> target: ", str)
-						log.Panicln("---> error: ", err)
+						log.Println("---> error: ", err)
 					}
 				}
 				// Keep go object in client and transfert only reference.

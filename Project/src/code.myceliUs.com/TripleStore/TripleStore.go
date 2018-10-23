@@ -2,9 +2,10 @@ package TripleStore
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 
-	//"log"
+	//	"log"
 
 	"code.myceliUs.com/Utility"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -40,7 +41,7 @@ type Store struct {
 /**
  * Append a value to the dictionary and return it index.
  */
-func (store *Store) appendIndexValue(value string) uint64 {
+func (store *Store) appendIndexValue(value []byte) uint64 {
 	index, err := store.getValueIndex(value)
 	if err != nil {
 		var lastIndex uint64
@@ -56,10 +57,10 @@ func (store *Store) appendIndexValue(value string) uint64 {
 		store.dictionary.Put([]byte("last_index"), bs, nil)
 
 		// Store the value as key to retreive the index.
-		store.dictionary.Put([]byte(value), bs, nil)
+		store.dictionary.Put(value, bs, nil)
 
 		// Store the index as key to retreive it value.
-		store.dictionary.Put(bs, []byte(value), nil)
+		store.dictionary.Put(bs, value, nil)
 
 		return lastIndex
 	}
@@ -78,8 +79,8 @@ func (store *Store) getIndexValue(index uint64) (string, error) {
 	return Utility.ToString(data), nil
 }
 
-func (store *Store) getValueIndex(value string) (uint64, error) {
-	v, err := store.dictionary.Get([]byte(value), nil)
+func (store *Store) getValueIndex(value []byte) (uint64, error) {
+	v, err := store.dictionary.Get(value, nil)
 	if err != nil {
 		return uint64(0), err
 	}
@@ -126,14 +127,15 @@ func (store *Store) appendIndex(v0 uint64, v1 uint64, v2 uint64, db *leveldb.DB)
 }
 
 // Append triple in the datastore.
-func (store *Store) AppendTriple(subject string, predicate string, object string) {
+func (store *Store) AppendTriple(subject string, predicate string, object interface{}) {
 	//log.Println("----> append triple: ", subject, predicate, object)
 	// Append the value into the dictionary if there not already exist
-	s := store.appendIndexValue(subject)
-	p := store.appendIndexValue(predicate)
+	s := store.appendIndexValue([]byte(subject))
+	p := store.appendIndexValue([]byte(predicate))
 
 	// in the case of object I will set a uuid of the value
-	o := store.appendIndexValue(object)
+	o_, _ := json.Marshal(object)
+	o := store.appendIndexValue(o_)
 
 	// Test if the information already exist...
 	spo := Utility.ToString(s) + ":" + Utility.ToString(p) + ":" + Utility.ToString(o)
@@ -187,23 +189,26 @@ func (store *Store) removeIndex(v0 uint64, v1 uint64, v2 uint64, db *leveldb.DB)
 }
 
 // remove triple
-func (store *Store) RemoveTriple(subject string, predicate string, object string) {
+func (store *Store) RemoveTriple(subject string, predicate string, object interface{}) {
 
 	var s, p, o uint64
 	var err error
-	s, err = store.getValueIndex(subject)
+	s, err = store.getValueIndex([]byte(subject))
 	if err != nil {
 		return
 	}
 	store.removeIndex(s, p, o, store.subjects)
 
-	p, err = store.getValueIndex(predicate)
+	p, err = store.getValueIndex([]byte(predicate))
 	if err != nil {
 		return
 	}
 	store.removeIndex(p, s, o, store.predicates)
+	// Here I will made use of json to serialyse the information and save it in
+	// level db as a byte array. So no coversion will be made accidentaly here.
+	o_, _ := json.Marshal(object)
+	o, err = store.getValueIndex(o_)
 
-	o, err = store.getValueIndex(object)
 	if err != nil {
 		return
 	}
@@ -212,14 +217,14 @@ func (store *Store) RemoveTriple(subject string, predicate string, object string
 	// remove the triple itself.
 	spo := Utility.ToString(s) + ":" + Utility.ToString(p) + ":" + Utility.ToString(o)
 	store.dictionary.Delete([]byte(spo), nil)
-	//log.Println("---->remove triple: ", subject, predicate, object)
+	//log.Println("---->remove triple: ", subject, predicate, Utility.ToString(object))
 
 }
 
 // Find triple in the datastore.
-func (store *Store) FindTriples(subject string, predicate string, object string) ([][]interface{}, error) {
+func (store *Store) FindTriples(subject string, predicate string, object interface{}) ([][]interface{}, error) {
 	results := make([][]interface{}, 0)
-
+	//log.Println("find ", subject, predicate, Utility.ToString(object))
 	// If the subject is know
 	if subject != "?" {
 		s, err := store.dictionary.Get([]byte(subject), nil)
@@ -244,7 +249,8 @@ func (store *Store) FindTriples(subject string, predicate string, object string)
 		// Object can be specified
 		hasObject := object != "?"
 		if hasObject {
-			_, err := store.dictionary.Get([]byte(object), nil)
+			o, _ := json.Marshal(object)
+			_, err := store.dictionary.Get(o, nil)
 			if err != nil {
 				return results, err
 			}
@@ -258,13 +264,16 @@ func (store *Store) FindTriples(subject string, predicate string, object string)
 			p_, err_p := store.getIndexValue(p)
 			o_, err_o := store.getIndexValue(o)
 
+			var o__ interface{}
+			json.Unmarshal([]byte(o_), &o__)
+
 			if err_p == nil && err_o == nil {
 				if !hasObject && !hasPredicate {
-					results = append(results, []interface{}{subject, p_, o_})
-				} else if hasObject && o_ == object {
-					results = append(results, []interface{}{subject, p_, o_})
+					results = append(results, []interface{}{subject, p_, o__})
+				} else if hasObject && o__ == object {
+					results = append(results, []interface{}{subject, p_, o__})
 				} else if hasPredicate && p_ == predicate {
-					results = append(results, []interface{}{subject, p_, o_})
+					results = append(results, []interface{}{subject, p_, o__})
 				}
 			}
 		}
@@ -293,7 +302,8 @@ func (store *Store) FindTriples(subject string, predicate string, object string)
 		// Object can be specified
 		hasObject := object != "?"
 		if hasObject {
-			_, err := store.dictionary.Get([]byte(object), nil)
+			o, _ := json.Marshal(object)
+			_, err := store.dictionary.Get(o, nil)
 			if err != nil {
 				return results, err
 			}
@@ -308,19 +318,23 @@ func (store *Store) FindTriples(subject string, predicate string, object string)
 			s_, err_s := store.getIndexValue(s)
 			o_, err_o := store.getIndexValue(o)
 
+			var o__ interface{}
+			json.Unmarshal([]byte(o_), &o__)
+
 			if err_s == nil && err_o == nil {
 				if !hasSubject && !hasObject {
-					results = append(results, []interface{}{s_, predicate, o_})
+					results = append(results, []interface{}{s_, predicate, o__})
 				} else if hasSubject && subject == s_ {
-					results = append(results, []interface{}{s_, predicate, o_})
-				} else if hasObject && object == o_ {
-					results = append(results, []interface{}{s_, predicate, o_})
+					results = append(results, []interface{}{s_, predicate, o__})
+				} else if hasObject && object == o__ {
+					results = append(results, []interface{}{s_, predicate, o__})
 				}
 			}
 		}
 
 	} else if object != "?" {
-		o, err := store.dictionary.Get([]byte(object), nil)
+		o_, _ := json.Marshal(object)
+		o, err := store.dictionary.Get(o_, nil)
 		if err != nil {
 			return results, err
 		}
@@ -371,7 +385,7 @@ func (store *Store) FindTriples(subject string, predicate string, object string)
 	}
 
 	if len(results) == 0 {
-		err := errors.New("no reuslts found for " + subject + ", " + predicate + " ," + object)
+		err := errors.New("no reuslts found for " + subject + ", " + predicate + " ," + Utility.ToString(object))
 		return results, err
 	}
 

@@ -63,7 +63,7 @@ func newCache() *Cache {
 			// number of shards (must be a power of 2)
 			Shards: 1024,
 			// time after which entry can be evicted
-			LifeWindow: 10 * time.Minute,
+			LifeWindow: 2 * time.Minute,
 			// rps * lifeWindow, used only in initial memory allocation
 			MaxEntriesInWindow: 1000 * 10 * 60,
 			// max entry size in bytes, used only in initial memory allocation
@@ -73,7 +73,7 @@ func newCache() *Cache {
 			// cache will not allocate more memory than this limit, value in MB
 			// if value is reached then the oldest entries can be overridden for the new ones
 			// 0 value means no size limit
-			HardMaxCacheSize: 8192,
+			HardMaxCacheSize: 4192,
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.

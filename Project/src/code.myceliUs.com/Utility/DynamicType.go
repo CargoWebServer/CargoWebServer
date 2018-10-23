@@ -96,7 +96,10 @@ func InitializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		return reflect.ValueOf(value)
 	}
 
-	//log.Println("----> expected type: ", t.String(), " got ", reflect.TypeOf(value).String())
+	/*if t.String() != reflect.TypeOf(value).String() {
+		log.Println("----> expected type: ", t.String(), " got ", reflect.TypeOf(value).String(), " expected kind ", t.Kind())
+	}*/
+
 	var v reflect.Value
 
 	switch t.Kind() {

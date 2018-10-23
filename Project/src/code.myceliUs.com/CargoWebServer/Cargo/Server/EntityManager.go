@@ -616,7 +616,16 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Set parent entity stuff...
 	if len(entity.GetParentUuid()) > 0 {
 		var cargoError *CargoEntities.Error
-		cargoError = this.setParent(this.getEntity(entity.GetParentUuid()), entity, &triples)
+		parent, _ := this.getEntityByUuid(entity.GetParentUuid())
+
+		if parent != nil {
+			// if the parent exist...
+			cargoError = this.setParent(parent, entity, &triples)
+		} else {
+			err := errors.New("Parent " + entity.GetParentUuid() + " not found for entity " + entity.GetUuid())
+			log.Println("---> 623 ", err)
+			cargoError = NewError(Utility.FileLine(), ENTITY_UUID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
+		}
 		if cargoError != nil {
 			return cargoError
 		}
@@ -657,7 +666,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Remove unchanged triples
 	for j := 0; j < len(triples) && len(triples) > 0; j++ {
 		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
-			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && Utility.ToString(triples[j].(Triple).Object) == existingTriples[i][2] {
+			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && Utility.ToString(triples[j].(Triple).Object) == Utility.ToString(existingTriples[i][2]) {
 				existingTriples = append(existingTriples[0:i], existingTriples[i+1:]...)
 				triples = append(triples[0:j], triples[j+1:]...)
 				j--
@@ -1488,8 +1497,8 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.
 			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
-
-				_, errObj = this.createEntity(this.getEntity(parentUuid), attributeName, obj.Interface().(Entity))
+				parent, _ := this.getEntityByUuid(parentUuid)
+				_, errObj = this.createEntity(parent, attributeName, obj.Interface().(Entity))
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1498,7 +1507,8 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			} else {
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
-				_, errObj = this.createEntity(this.getEntity(parentUuid), attributeName, entity)
+				parent, _ := this.getEntityByUuid(parentUuid)
+				_, errObj = this.createEntity(parent, attributeName, entity)
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -1511,7 +1521,8 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			return nil
 		}
 	} else {
-		result, errObj := this.createEntity(this.getEntity(parentUuid), attributeName, values.(Entity))
+		parent, _ := this.getEntityByUuid(parentUuid)
+		result, errObj := this.createEntity(parent, attributeName, values.(Entity))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil

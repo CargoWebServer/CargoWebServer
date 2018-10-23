@@ -3,7 +3,6 @@ package JS
 import (
 	"bytes"
 	b64 "encoding/base64"
-	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -11,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"reflect"
 
 	"code.myceliUs.com/GoJavaScript"
 	"code.myceliUs.com/GoJavaScript/GoJavaScriptClient"
@@ -439,10 +440,20 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// JSON function...
 	////////////////////////////////////////////////////////////////////////////
 	jsRuntimeManager.appendFunction("stringify", func(object interface{}) string {
-		b, _ := json.Marshal(object)
-		b, _ = Utility.PrettyPrint(b)
-		s := string(b)
-		return s
+		// If the object is a GoJavaSricpt Object only the Properties part of the
+		// object will be set as JSON...
+		if object != nil {
+			if reflect.TypeOf(object).String() == "GoJavaScript.Object" {
+				// TODO set it recursive???
+				str, _ := Utility.ToJson(object.(GoJavaScript.Object).Properties)
+				return str
+			} else {
+				str, _ := Utility.ToJson(object)
+				return str
+			}
+		}
+		return ""
+
 	})
 
 	////////////////////////////////////////////////////////////////////////////

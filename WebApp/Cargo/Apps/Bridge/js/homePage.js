@@ -465,7 +465,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             server.projectManager.getAllProjects(
                 // success callback
                 function (results, caller) {
-                    console.log(results)
                     var dialog = new Dialog("open_project_dialog", caller.panel, true, "Open Project");
                     dialog.setCentered();
                     if(results.length == 0){
