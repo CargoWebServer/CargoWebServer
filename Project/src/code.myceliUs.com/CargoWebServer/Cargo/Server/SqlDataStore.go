@@ -84,7 +84,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_associations = make(map[string]bool, 0)
 	store.m_refInfos = make(map[string][][]string, 0)
 
-	if store.m_vendor == Config.DataStoreVendor_ARANGODB {
+	if store.m_vendor == Config.DataStoreVendor_CARGO {
 		return nil, errors.New("ArgangoDB is store not a sql store.")
 	}
 

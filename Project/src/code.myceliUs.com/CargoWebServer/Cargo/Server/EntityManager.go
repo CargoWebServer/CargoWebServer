@@ -307,7 +307,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		return nil, errObj
 	}
 
-	// Create a triple...
 	obj, err := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.

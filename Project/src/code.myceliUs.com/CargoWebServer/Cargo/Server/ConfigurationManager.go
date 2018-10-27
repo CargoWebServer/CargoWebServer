@@ -94,7 +94,7 @@ func newConfigurationManager() *ConfigurationManager {
 	// Default parameters...
 	hostName := "localhost" //serverConfig.GetHostName()
 	ipv4 := "127.0.0.1"     //serverConfig.GetIpv4()
-	port := 8529            //serverConfig.GetServerPort()
+	port := 9393            //serverConfig.GetServerPort()
 
 	// Configuration db itself.
 	cargoConfigDB := new(Config.DataStoreConfiguration)
@@ -104,7 +104,7 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoConfigDB.M_ipv4 = ipv4
 	cargoConfigDB.M_port = port
 	cargoConfigDB.M_user = "root"
-	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_ARANGODB
+	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoConfigDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
 
@@ -116,7 +116,7 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.M_ipv4 = ipv4
 	cargoEntitiesDB.M_port = port
 	cargoEntitiesDB.M_user = "root"
-	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_ARANGODB
+	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 

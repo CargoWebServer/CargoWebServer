@@ -581,8 +581,8 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(parentUuid string, xmlE
 		object.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	}
 
-	if xmlElement.M_dataStoreVendor == "##ARANGODB" {
-		object.M_dataStoreVendor = Config.DataStoreVendor_ARANGODB
+	if xmlElement.M_dataStoreVendor == "##CARGO" {
+		object.M_dataStoreVendor = Config.DataStoreVendor_CARGO
 	} else if xmlElement.M_dataStoreVendor == "##MYSQL" {
 		object.M_dataStoreVendor = Config.DataStoreVendor_MYSQL
 	} else if xmlElement.M_dataStoreVendor == "##MSSQL" {
@@ -938,8 +938,8 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 		xmlElement.M_dataStoreType = "##GRAPH_STORE"
 	}
 
-	if object.M_dataStoreVendor == Config.DataStoreVendor_ARANGODB {
-		xmlElement.M_dataStoreVendor = "##ARANGODB"
+	if object.M_dataStoreVendor == Config.DataStoreVendor_CARGO {
+		xmlElement.M_dataStoreVendor = "##CARGO"
 	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MYSQL {
 		xmlElement.M_dataStoreVendor = "##MYSQL"
 	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MSSQL {
