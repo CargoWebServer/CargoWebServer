@@ -285,6 +285,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
+		storeConfig.M_user = "root"
 		configEntity := GetServer().GetConfigurationManager().getActiveConfigurations()
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity, "M_dataStoreConfigs", storeConfig)
 		if err_ != nil {
@@ -300,6 +301,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
+		storeConfig.M_user = "root"
 		err := GetServer().GetEntityManager().saveEntity(storeConfig)
 		if err != nil {
 			return nil, err

@@ -143,7 +143,7 @@ func (this *SchemaManager) initialize() {
 			hostName := serverConfig.GetHostName()
 			ipv4 := serverConfig.GetIpv4()
 			port := serverConfig.GetServerPort()
-			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CARGO)
+			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_ARANGODB)
 			if errObj != nil {
 				//log.Println(errObj.GetBody())
 			}
@@ -267,7 +267,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()
-		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CARGO)
+		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_ARANGODB)
 		if errObj != nil {
 			return errObj
 		}

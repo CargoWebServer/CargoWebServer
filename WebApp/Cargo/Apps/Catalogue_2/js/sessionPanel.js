@@ -266,7 +266,7 @@ SessionPanel.prototype.openSession = function(session){
                     }
                     // Also broadcast the event over the network...
                     //server.eventHandler.broadcastEvent(evt)
-                    server.eventManager.broadcastNetworkEvent(
+                    server.eventManager.broadcastEventData(
                         welcomeEvent,
                         catalogMessage,
                         [evtInfo],

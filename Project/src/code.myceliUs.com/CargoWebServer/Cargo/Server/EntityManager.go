@@ -98,7 +98,6 @@ func newEntityManager() *EntityManager {
 	Utility.RegisterType((*MessageData)(nil))
 	Utility.RegisterType((*TaskInstanceInfo)(nil))
 	Utility.RegisterType((*EntityQuery)(nil))
-	Utility.RegisterType((*Triple)(nil))
 
 	// Set the get Entity function
 	getEntityFct = func(uuid string) (interface{}, error) {
@@ -197,7 +196,7 @@ func (this *EntityManager) isEntityExist(uuid string) bool {
 func (this *EntityManager) getEntities(typeName string, storeId string, query *EntityQuery) ([]Entity, *CargoEntities.Error) {
 	var q string
 	if query == nil {
-		q = "( ?, TYPENAME, " + typeName + " )"
+		q = "FOR entity IN " + strings.Replace(typeName, ".", "_", -1) + " return entity.UUID"
 	} else {
 		query.Fields = []string{"UUID"} // Only the uuid is need here...
 		val, err := json.Marshal(query)
@@ -208,6 +207,7 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(q, []interface{}{}, []interface{}{})
+
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 		return nil, errObj
@@ -297,29 +297,28 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	storeId := typeName[0:strings.Index(typeName, ".")]
 
 	// So now I will retreive the list of values associated with that uuid.
-	query := "( " + uuid + " ,? ,? )"
+	query := `FOR entity IN ` + strings.Replace(typeName, ".", "_", -1) + ` FILTER entity.UUID == "` + uuid + `" return entity`
+
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
+
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
 		return nil, errObj
 	}
 
 	// Create a triple...
-	values := FromTriples(results)
-	obj, err := Utility.InitializeStructure(values, setEntityFct)
+	obj, err := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.
-	// prototype, _ := this.getEntityPrototype(typeName, storeId)
 	if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
 		entity = obj.Interface().(Entity)
 		// Set the entity in the cache
 		this.setEntity(entity)
-
 	} else {
 		// Dynamic entity here.
 		entity = NewDynamicEntity()
-		entity.(*DynamicEntity).setObject(values)
+		entity.(*DynamicEntity).setObject(results[0][0].(map[string]interface{}))
 		// set the entity in the cache.
 		this.setEntity(entity)
 	}
@@ -335,6 +334,7 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 
 	// here the id is generated with parent uuid.
 	uuid, errObj := this.getEntityUuidById(typeName, storeId, ids)
+
 	if errObj == nil {
 		return this.getEntityByUuid(uuid)
 	}
@@ -362,13 +362,29 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	fieldType = strings.Replace(fieldType, "[]", "", -1)
 	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 
-	query := "( ?, " + typeName + ":" + fieldType + ":" + prototype.Ids[1] + ", " + Utility.ToString(ids[0]) + ")"
+	// The AQL query here.
+	query := "FOR entity IN " + strings.Replace(typeName, ".", "_", -1) + " FILTER"
+	for i := 0; i < len(ids); i++ {
+		query += " entity." + prototype.Ids[i+1] + " == "
+		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
+			query += `"` + Utility.ToString(ids[i]) + `"`
+		} else {
+			query += Utility.ToString(ids[i])
+		}
+
+		if i < len(ids)-1 && len(ids) > 1 {
+			query += " AND "
+		}
+	}
+
+	// return the entity uuid
+	query += " return entity.UUID"
 
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
 
-	if err != nil {
+	if err != nil || len(results) == 0 {
 		var idsStr string
 		for i := 0; i < len(ids); i++ {
 			idsStr += Utility.ToString(ids[i])
@@ -376,7 +392,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 				idsStr += ", "
 			}
 		}
-		//log.Println("---> fail to retrieve: ", query)
+
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
 		return "", errObj
 	}
@@ -384,7 +400,7 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	return results[0][0].(string), nil
 }
 
-func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]interface{}) *CargoEntities.Error {
+func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntities.Error {
 
 	var cargoError *CargoEntities.Error
 	var parentPrototype *EntityPrototype
@@ -395,6 +411,7 @@ func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]in
 		// It happen when the parent is reattributed...
 		return nil // Nothing todo here
 	}
+
 	fieldType := parentPrototype.FieldsType[fieldIndex]
 	if cargoError != nil {
 		return cargoError
@@ -431,7 +448,6 @@ func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]in
 		}
 		// Set the parent in the map with it value...
 		this.setEntity(parent)
-
 	} else {
 		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
 		if strings.HasPrefix(fieldType, "[]") {
@@ -460,10 +476,6 @@ func (this *EntityManager) setParent(parent Entity, entity Entity, triples *[]in
 			return cargoError
 		}
 	}
-
-	// I will also append the parent relationship to the list of triple to be save (help to save calculation time)
-	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid()}
-	*triples = append(*triples, parentLnkTriple)
 
 	return nil
 }
@@ -511,15 +523,8 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	}
 
 	// Now I will save it in the datastore.
-	triples := make([]interface{}, 0)
-	err = ToTriples(values, &triples)
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-		return nil, cargoError
-	}
-
 	// I will set the entity parent.
-	cargoError := this.setParent(parent, entity, &triples)
+	cargoError := this.setParent(parent, entity)
 	if cargoError != nil {
 		return nil, cargoError
 	}
@@ -527,8 +532,13 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	// Now entity are quadify I will save it in the graph store.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
-	// So here I will simply append the triples in the database...
-	_, err = store.Create("", triples)
+	// I will create the entity.
+	_, err = store.Create("", []interface{}{entity})
+
+	// also save it parent.
+	if parent != nil {
+		store.Update("", []interface{}{parent}, []interface{}{})
+	}
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -590,40 +600,20 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	this.setEntity(entity)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 
-	var values map[string]interface{}
-	var err error
-	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getValues()
-	} else {
-		values, err = Utility.ToMap(entity)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-			return cargoError
-		}
-	}
-
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
 	// Here is the triple to be saved.
-	triples := make([]interface{}, 0)
-	err = ToTriples(values, &triples)
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-		return cargoError
-	}
-
 	// Set parent entity stuff...
+	var parent Entity
 	if len(entity.GetParentUuid()) > 0 {
 		var cargoError *CargoEntities.Error
-		parent, _ := this.getEntityByUuid(entity.GetParentUuid())
-
+		parent, _ = this.getEntityByUuid(entity.GetParentUuid())
 		if parent != nil {
 			// if the parent exist...
-			cargoError = this.setParent(parent, entity, &triples)
+			cargoError = this.setParent(parent, entity)
 		} else {
 			err := errors.New("Parent " + entity.GetParentUuid() + " not found for entity " + entity.GetUuid())
-			log.Println("---> 623 ", err)
 			cargoError = NewError(Utility.FileLine(), ENTITY_UUID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
 		}
 		if cargoError != nil {
@@ -635,7 +625,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	msgData0 := new(MessageData)
 	msgData0.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		msgData0.Value = values
+		msgData0.Value = entity.(*DynamicEntity).getValues()
 	} else {
 		msgData0.Value = entity
 	}
@@ -646,63 +636,42 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	msgData1.Value = prototype
 	eventData[1] = msgData1
 
-	// Now I will get the triple from the triple store and I will process triple
-	// to be append, remove or update.
-	// So now I will retreive the list of values associated with that uuid.
-	query := "( " + entity.GetUuid() + " ,? ,? )"
+	// Send save event if something has change.
+	// I will get the existing value from the datastore is it exist.
 
-	// Now entity are quadify I will save it in the graph store.
+	// So now I will retreive the list of values associated with that uuid.
+	query := `FOR entity IN ` + strings.Replace(entity.GetTypeName(), ".", "_", -1) + ` FILTER entity.UUID == "` + entity.GetUuid() + `" return entity.UUID`
+
+	// Test if the entity is in the database.
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	existingTriples, err := store.Read(query, []interface{}{}, []interface{}{})
+	_, err := store.Read(query, []interface{}{}, []interface{}{})
 
 	var evt *Event
-	if len(existingTriples) == 0 {
-		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
-	} else {
-		// TODO send only the change.
+
+	if err == nil {
+		// I will create the entity.
+		err = store.Update("", []interface{}{entity}, []interface{}{})
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
-	}
-
-	// Remove unchanged triples
-	for j := 0; j < len(triples) && len(triples) > 0; j++ {
-		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
-			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && Utility.ToString(triples[j].(Triple).Object) == Utility.ToString(existingTriples[i][2]) {
-				existingTriples = append(existingTriples[0:i], existingTriples[i+1:]...)
-				triples = append(triples[0:j], triples[j+1:]...)
-				j--
-				i--
-				break
-			}
-		}
-	}
-
-	// Delete obsolete triple...
-	if len(existingTriples) > 0 {
-		toDelete := make([]interface{}, 0)
-		for i := 0; i < len(existingTriples); i++ {
-			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2]})
-		}
-		err = store.Delete("", toDelete)
+	} else {
+		_, err = store.Create("", []interface{}{entity})
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
 		}
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 	}
 
-	// Save the changed/new triples.
-	if len(triples) > 0 {
-		_, err = store.Create("", triples)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-			return cargoError
-		}
+	// also save it parent.
+	if parent != nil {
+		store.Update("", []interface{}{parent}, []interface{}{})
 	}
 
-	// Send save event if something has change.
-	if len(triples) > 0 || len(existingTriples) > 0 {
-		// Send update entity event here.
-		GetServer().GetEventManager().BroadcastEvent(evt)
-	}
+	// Send update entity event here.
+	GetServer().GetEventManager().BroadcastEvent(evt)
 
 	// Set it childs...
 	this.saveChilds(entity, prototype)
@@ -713,47 +682,47 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	log.Println("---> remove entity ", entity.GetUuid())
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
-	store := GetServer().GetDataManager().getDataStore(storeId)
-
+	//store := GetServer().GetDataManager().getDataStore(storeId)
 	uuids := make([]string, 0)
 	uuids = append(uuids, entity.GetUuid())
 
 	// Now I will clear other references...
-	var triples []interface{}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entity.GetTypeName(), storeId)
 
 	// Now entity are quadify I will save it in the graph store.
-	values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
-	if err_ == nil {
-		for i := 0; i < len(values); i++ {
-			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
-			if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
-				if !Utility.Contains(uuids, values[i][0].(string)) {
-					uuids = append(uuids, values[i][0].(string))
-				}
-			}
-		}
-	}
-
-	values, err_ = store.Read("("+entity.GetUuid()+",?,?)", []interface{}{}, []interface{}{})
-	if err_ == nil {
-		for i := 0; i < len(values); i++ {
-			triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
-			if reflect.TypeOf(values[i][2]).Kind() == reflect.String {
-				if Utility.IsValidEntityReferenceName(values[i][2].(string)) {
-					if !Utility.Contains(uuids, values[i][2].(string)) {
-						uuids = append(uuids, values[i][2].(string))
+	/*
+		var triples []interface{}
+		values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
+		if err_ == nil {
+			for i := 0; i < len(values); i++ {
+				triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
+				if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
+					if !Utility.Contains(uuids, values[i][0].(string)) {
+						uuids = append(uuids, values[i][0].(string))
 					}
 				}
 			}
 		}
-	}
 
-	err := store.Delete("", triples)
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-		return cargoError
-	}
+		values, err_ = store.Read("("+entity.GetUuid()+",?,?)", []interface{}{}, []interface{}{})
+		if err_ == nil {
+			for i := 0; i < len(values); i++ {
+				triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
+				if reflect.TypeOf(values[i][2]).Kind() == reflect.String {
+					if Utility.IsValidEntityReferenceName(values[i][2].(string)) {
+						if !Utility.Contains(uuids, values[i][2].(string)) {
+							uuids = append(uuids, values[i][2].(string))
+						}
+					}
+				}
+			}
+		}
+
+		err := store.Delete("", triples)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}*/
 
 	// Now I will remove the values from the cache.
 	for i := 0; i < len(uuids); i++ {
@@ -1835,10 +1804,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query in
 	if limit <= 0 {
 		// all results are require.
 		limit = float64(len(entities))
-	}
-
-	if strings.HasPrefix(typeName, "XPDMXML") {
-		log.Println("--> ", typeName, " found ", len(entities), " results ", entities[int(offset):int(limit)])
 	}
 
 	results := make([]interface{}, 0)

@@ -94,7 +94,7 @@ func newConfigurationManager() *ConfigurationManager {
 	// Default parameters...
 	hostName := "localhost" //serverConfig.GetHostName()
 	ipv4 := "127.0.0.1"     //serverConfig.GetIpv4()
-	port := 9393            //serverConfig.GetServerPort()
+	port := 8529            //serverConfig.GetServerPort()
 
 	// Configuration db itself.
 	cargoConfigDB := new(Config.DataStoreConfiguration)
@@ -103,7 +103,8 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoConfigDB.M_hostName = hostName
 	cargoConfigDB.M_ipv4 = ipv4
 	cargoConfigDB.M_port = port
-	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
+	cargoConfigDB.M_user = "root"
+	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_ARANGODB
 	cargoConfigDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
 
@@ -114,7 +115,8 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.M_hostName = hostName
 	cargoEntitiesDB.M_ipv4 = ipv4
 	cargoEntitiesDB.M_port = port
-	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CARGO
+	cargoEntitiesDB.M_user = "root"
+	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_ARANGODB
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
@@ -144,7 +146,6 @@ func (this *ConfigurationManager) initialize() {
 	log.Println("--> initialyze ConfigurationManager")
 	// So here if there is no configuration...
 	entity, cargoError := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
-
 	if cargoError == nil {
 		this.m_activeConfigurations = entity.(*Config.Configurations)
 	} else {

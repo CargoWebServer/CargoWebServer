@@ -84,8 +84,8 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_associations = make(map[string]bool, 0)
 	store.m_refInfos = make(map[string][][]string, 0)
 
-	if store.m_vendor == Config.DataStoreVendor_CARGO {
-		return nil, errors.New("Mycelius is a Key value store not sql.")
+	if store.m_vendor == Config.DataStoreVendor_ARANGODB {
+		return nil, errors.New("ArgangoDB is store not a sql store.")
 	}
 
 	store.m_prototypes = make(map[string]*EntityPrototype, 0)
