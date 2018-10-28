@@ -26,6 +26,11 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
+
+	// Xapian datastore.
+	base64 "encoding/base64"
+
+	"code.myceliUs.com/GoXapian"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +64,9 @@ type GraphStore struct {
 	// In case of local sotre
 	/** The store path **/
 	m_path string
+
+	// This the channel to comminicate with the datastore.
+	m_db_channel chan map[string]interface{}
 }
 
 func getServiceContainerConnection() *WebSocketConnection {
@@ -104,7 +112,79 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 		}
 	}
 
+	// Open a db channel.
+	store.m_db_channel = make(chan map[string]interface{})
+
+	// datastore operation presscessing function.
+	go func(db_channel chan map[string]interface{}) {
+		// Keep store in memory.
+		for {
+			select {
+			case op := <-db_channel:
+				if op["operation"].(string) == "openDataStore" {
+					paths := op["paths"].([]string)
+					var db xapian.Database
+					var err error
+					for i := 0; i < len(paths); i++ {
+						path := paths[i]
+						if !op["isWritable"].(bool) {
+							if Utility.Exists(path) {
+								db = xapian.NewDatabase()
+								// log.Println(db)
+								db.Add_database(xapian.NewDatabase(path))
+							} else {
+								err = errors.New("fail to open " + path)
+							}
+
+						} else {
+							// create of open de db.
+							db = xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+						}
+					}
+					// return the result to the channel.
+					op["results"].(chan []interface{}) <- []interface{}{db, err}
+				}
+			}
+		}
+
+	}(store.m_db_channel)
+
 	return
+}
+
+// Open database
+func (this *GraphStore) OpenDataStoreWrite(paths []string) (xapian.WritableDatabase, error) {
+	op := make(map[string]interface{})
+	op["operation"] = "openDataStore"
+	op["paths"] = paths
+	op["isWritable"] = true
+	op["results"] = make(chan []interface{})
+
+	this.m_db_channel <- op
+	results := <-op["results"].(chan []interface{})
+
+	if results[1] != nil {
+		return nil, results[1].(error)
+	}
+
+	return results[0].(xapian.WritableDatabase), nil
+}
+
+func (this *GraphStore) OpenDataStoreRead(paths []string) (xapian.Database, error) {
+	op := make(map[string]interface{})
+	op["operation"] = "openDataStore"
+	op["paths"] = paths
+	op["isWritable"] = false
+	op["results"] = make(chan []interface{})
+
+	this.m_db_channel <- op
+	results := <-op["results"].(chan []interface{})
+
+	if results[1] != nil {
+		return nil, results[1].(error)
+	}
+
+	return results[0].(xapian.Database), nil
 }
 
 /**
@@ -991,6 +1071,96 @@ func (this *GraphStore) Ping() error {
 	return err
 }
 
+func generatePrefix(typeName string, field string) string {
+	// remove the M_ part of the field name
+	prefix := typeName + "." + field
+	prefix = strings.Replace(prefix, ".", "_", -1) + "%"
+	return "X" + strings.ToLower(prefix)
+}
+
+// Index entity string field.
+func (this *GraphStore) indexStringField(data string, field string, typeName string, termGenerator xapian.TermGenerator) {
+
+	if Utility.IsUriBase64(data) {
+		data_, err := base64.StdEncoding.DecodeString(data)
+		if err == nil {
+			if strings.Index(data, ":text/") > -1 || strings.Index(data, ":application/") > -1 {
+				log.Println("1092 ----> base64", data_)
+			}
+		}
+	} else if Utility.IsStdBase64(data) {
+		data_, err := base64.StdEncoding.DecodeString(data)
+		if err == nil {
+			log.Println("1087 ----> base64", data_)
+			termGenerator.Index_text(strings.ToLower(string(data_)))
+			termGenerator.Index_text(strings.ToLower(string(data_)), uint(1), generatePrefix(typeName, field))
+		}
+	} else {
+		termGenerator.Index_text(strings.ToLower(data))
+		termGenerator.Index_text(strings.ToLower(data), uint(1), generatePrefix(typeName, field))
+	}
+}
+
+// Index entity field
+func (this *GraphStore) indexField(data interface{}, field string, fieldType string, typeName string, termGenerator xapian.TermGenerator, doc xapian.Document, index uint) {
+	if data != nil {
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			s := reflect.ValueOf(data)
+			for i := 0; i < s.Len(); i++ {
+				this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, index)
+			}
+		} else if reflect.TypeOf(data).Kind() == reflect.String {
+			this.indexStringField(data.(string), field, typeName, termGenerator)
+		} else {
+			doc.Add_value(index, Utility.ToString(data))
+		}
+	}
+}
+
+// index entity information.
+func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
+
+	// The term generator
+	termGenerator := xapian.NewTermGenerator()
+
+	// set english by default.
+	termGenerator.Set_stemmer(xapian.NewStem("en"))
+	termGenerator.Set_document(doc)
+
+	// Index the typename
+	termGenerator.Index_text(entity.GetTypeName(), uint(1), "S")
+
+	// Index each part it typename.
+	values_ := strings.Split(entity.GetTypeName(), ".")
+	for i := 0; i < len(values_); i++ {
+		termGenerator.Index_text(values_[i])
+		termGenerator.Increase_termpos()
+	}
+
+	prototype, _ := this.GetEntityPrototype(entity.GetTypeName())
+
+	// also index value supertype...
+	for i := 0; i < len(prototype.SuperTypeNames); i++ {
+		termGenerator.Index_text(prototype.SuperTypeNames[i], uint(1), "S")
+		values_ := strings.Split(prototype.SuperTypeNames[i], ".")
+		for j := 0; j < len(values_); j++ {
+			termGenerator.Index_text(values_[j])
+			termGenerator.Increase_termpos()
+		}
+	}
+
+	// Here I will append boolean term.
+	for i := 0; i < len(prototype.Fields); i++ {
+		value := Utility.GetProperty(entity, prototype.Fields[i])
+		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, uint(i))
+		if Utility.Contains(prototype.Ids, prototype.Fields[i]) || Utility.Contains(prototype.Indexs, prototype.Fields[i]) {
+			// append a boolean term.
+			term := generatePrefix(prototype.TypeName, prototype.Fields[i]) + strings.TrimSpace(strings.ToLower(Utility.ToString(value)))
+			doc.Add_boolean_term(term)
+		}
+	}
+}
+
 /**
  * Create a new entry in the database.
  */
@@ -1076,7 +1246,30 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 	}
 
 	// Creation of triples...
-	log.Println("---> append entity ", values)
+	for i := 0; i < len(values); i++ {
+		v := values[i]
+		// If the value is an entity...
+		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct {
+			typeName := Utility.GetProperty(v, "TYPENAME")
+			uuid := Utility.GetProperty(v, "UUID")
+			if typeName != nil {
+				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
+				if err == nil {
+					defer db.Close()
+					// So here I will index the property found in the entity.
+					doc := xapian.NewDocument()
+
+					// Keep json data...
+					data, _ := Utility.ToJson(v)
+					this.indexEntity(doc, v.(Entity))
+					doc.Set_data(data)
+					doc.Add_boolean_term("Q" + uuid.(string))
+					db.Replace_document("Q"+uuid.(string), doc)
+					log.Println("---> append entity ", v.(Entity))
+				}
+			}
+		}
+	}
 
 	return
 }
@@ -1178,8 +1371,20 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return results.([][]interface{}), nil
 	}
 
-	// Run the given query.
-	log.Println("---> run query: ", queryStr)
+	// First of all i will init the query...
+	var query EntityQuery
+	err = json.Unmarshal([]byte(queryStr), &query)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(query.Query) > 0 {
+		var err error
+		results, err = this.executeSearchQuery(query.Query, query.Fields)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return
 }
@@ -1277,6 +1482,7 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 
 	// The value to be save.
 	log.Println("---> update entity ", values)
+	// So in that case I will udate the values.
 
 	return
 }
@@ -1572,79 +1778,32 @@ func (this *GraphStore) match(ast *ast.QueryAst, values map[string]interface{}) 
 	return true, nil
 }
 
-func (this *GraphStore) getValues(uuid string, fields []string) (map[string]interface{}, error) {
-	object := make(map[string]interface{}, 0)
-
-	// So here I will retreive values for given object fields...
-	typeName := strings.Split(uuid, "%")[0]
-	var prototype, err = this.GetEntityPrototype(typeName)
+// Get potential document from the database.
+func (this *GraphStore) getIndexation(typeName string, fieldName string, expected interface{}) ([]map[string]interface{}, error) {
+	db, err := this.OpenDataStoreRead([]string{this.m_path + "/" + typeName + ".glass"})
 	if err != nil {
-		return object, err
+		return nil, err
 	}
+	defer db.Close()
 
-	for i := 0; i < len(fields); i++ {
-		fieldName := fields[i]
-		fieldIndex := prototype.getFieldIndex(fieldName)
-		if fieldIndex != -1 {
-			fieldType := prototype.FieldsType[fieldIndex]
-			fieldType_ := strings.Replace(fieldType, "[]", "", -1)
-			fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
-			predicat := typeName + ":" + fieldType_ + ":" + fieldName
+	term := generatePrefix(typeName, fieldName) + strings.TrimSpace(strings.ToLower(Utility.ToString(expected)))
+	var results []map[string]interface{}
 
-			q := "( " + uuid + ", " + predicat + ", ? )"
-			results, err := this.Read(q, []interface{}{}, []interface{}{})
-			if err == nil {
-				if len(results) > 0 {
-					// Only the first value will be keep here.
-					// In case of array values are store as json string so no more than
-					// one element must be here.
-					object[fieldName] = results[0][2]
-				}
-			}
-		}
-	}
-	return object, nil
-}
-
-func (this *GraphStore) getIndexation(typeName string, fieldName string, expected interface{}) ([]interface{}, error) {
-	// Indexations contain array of string
-	var ids []interface{}
-	var prototype, err = this.GetEntityPrototype(typeName)
-	if err != nil {
-		return ids, err
-	}
-	// I will retreive the value...
-	if len(fieldName) == 0 {
-		// Indexation by typeName...
-		q := "( ?, TYPENAME, " + typeName + " )"
-		results, err := this.Read(q, []interface{}{}, []interface{}{})
+	// Here the term will be search.
+	q := xapian.NewQuery(term)
+	enquire := xapian.NewEnquire(db)
+	enquire.Set_query(q)
+	mset := enquire.Get_mset(uint(0), uint(100000))
+	for i := 0; i < mset.Size(); i++ {
+		it := mset.Get_hit(uint(i))
+		var v map[string]interface{}
+		err := json.Unmarshal([]byte(it.Get_document().Get_data()), &v)
 		if err != nil {
-			return ids, err
+			return nil, err
 		}
-		for i := 0; i < len(results); i++ {
-			ids = append(ids, results[i][0].(string))
-		}
-	} else {
-		fieldIndex := prototype.getFieldIndex(fieldName)
-		if fieldIndex != -1 {
-			fieldType := prototype.FieldsType[fieldIndex]
-			fieldType_ := strings.Replace(fieldType, "[]", "", -1)
-			fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
-			predicat := typeName + ":" + fieldType_ + ":" + fieldName
-
-			q := "( ?, " + predicat + ", " + Utility.ToString(expected) + " )"
-			results, err := this.Read(q, []interface{}{}, []interface{}{})
-			if err != nil {
-				return ids, err
-			}
-
-			// Now I will get the results...
-			for i := 0; i < len(results); i++ {
-				ids = append(ids, results[i][0].(string))
-			}
-		}
+		results = append(results, v)
 	}
-	return ids, nil
+	return results, nil
 }
 
 /**
@@ -1653,7 +1812,6 @@ func (this *GraphStore) getIndexation(typeName string, fieldName string, expecte
 func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string]map[string]interface{}, error) {
 	// I will create the array if it dosent exist.
 	results := make(map[string]map[string]interface{}, 0)
-
 	if ast.IsComposite() {
 		// Get the sub-queries
 		ast1, operator, ast2 := ast.GetSubQueries()
@@ -1694,12 +1852,15 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 	} else {
 
 		typeName, fieldName, comparator, expected := ast.GetExpression()
-		values := make(map[string]map[string]interface{}, 0)
+
+		store := GetServer().GetDataManager().getDataStore(strings.Split(typeName, ".")[0])
+
 		// Need the prototype here.
-		prototype, err := this.GetEntityPrototype(typeName)
+		prototype, err := store.GetEntityPrototype(typeName)
 		if err != nil {
 			return nil, err
 		}
+
 		fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 		isArray := strings.HasPrefix(fieldType, "[]")
 		isRef := strings.HasSuffix(fieldType, ":Ref")
@@ -1729,23 +1890,18 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 						indexations, err := this.getIndexation(typeName, fieldName, expectedStr)
 						if err == nil {
 							for i := 0; i < len(indexations); i++ {
-								values[indexations[i].(string)], err = this.getValues(indexations[i].(string), prototype.Fields)
+								values := indexations[i]
 								if err != nil {
 									return nil, err
 								}
 								var isMatch bool
 								if isArray {
 									// Here I have an array of values to test.
-									var strValues []string
-									err = json.Unmarshal([]byte(values[indexations[i].(string)][fieldName].(string)), &strValues)
-									if err != nil {
-										return nil, err
-									}
-									for j := 0; j < len(strValues); j++ {
-										isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, strValues[j])
+									for j := 0; j < len(values[fieldName].([]interface{})); j++ {
+										isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, values[fieldName].([]interface{})[j])
 									}
 								} else {
-									isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+									isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 								}
 
 								if err != nil {
@@ -1753,7 +1909,7 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 								}
 								if isMatch {
 									// if the result match I put it inside the map result.
-									results[indexations[i].(string)] = values[indexations[i].(string)]
+									results[indexations[i]["UUID"].(string)] = values
 								}
 							}
 						}
@@ -1763,19 +1919,18 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 					indexations, err := this.getIndexation(typeName, "", "")
 					if err == nil {
 						for i := 0; i < len(indexations); i++ {
-
-							values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+							values := indexations[i]
 							if err != nil {
 								return nil, err
 							}
 
-							isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+							isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 							if err != nil {
 								return nil, err
 							}
 							if isMatch {
 								// if the result match I put it inside the map result.
-								results[indexations[i].(string)] = values[indexations[i].(string)]
+								results[indexations[i]["UUID"].(string)] = values
 							}
 						}
 					}
@@ -1788,11 +1943,12 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 				}
 			} else if isRef {
 				// In that case the only the operato == and != are define.
-				// TODO get all value for that field and test if it match the constaint...
+				// TODO get all value for that field and test if it match the constraint...
 				// ex. (?, typeName:fieldName:fieldType, ?) if the object respect the contraint put the predicate in the
 				// result map.
 				if comparator == "==" || comparator == "!=" {
-					q := "( ?, TYPENAME, " + typeName + " )"
+
+					/*q := "( ?, TYPENAME, " + typeName + " )"
 					uuids, err := this.Read(q, []interface{}{}, []interface{}{})
 
 					if err != nil {
@@ -1824,7 +1980,7 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 								}
 							}
 						}
-					}
+					}*/
 
 				} else {
 					return nil, errors.New("Unexpexted comparator " + comparator + " for regex, use \"==\" insted")
@@ -1835,23 +1991,22 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 			if !(comparator == "==" || comparator == "!=") {
 				return nil, errors.New("Unexpexted comparator " + comparator + " for bool values, use \"==\" or  \"!=\"")
 			}
-
 			// Get the boolean value.
 			indexations, err := this.getIndexation(typeName, fieldName, strconv.FormatBool(expected.(bool)))
 			if err == nil {
 				for i := 0; i < len(indexations); i++ {
-					values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+					values := indexations[i]
 					if err != nil {
 						return nil, err
 					}
 
-					isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+					isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 					if err != nil {
 						return nil, err
 					}
 					if isMatch {
 						// if the result match I put it inside the map result.
-						results[indexations[i].(string)] = values[indexations[i].(string)]
+						results[indexations[i]["UUID"].(string)] = values
 					}
 				}
 			}
@@ -1864,18 +2019,18 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 				indexations, err := this.getIndexation(typeName, fieldName, expected)
 				if err == nil {
 					for i := 0; i < len(indexations); i++ {
-						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						values := indexations[i]
 						if err != nil {
 							return nil, err
 						}
 
-						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 						if err != nil {
 							return nil, err
 						}
 						if isMatch {
 							// if the result match I put it inside the map result.
-							results[indexations[i].(string)] = values[indexations[i].(string)]
+							results[indexations[i]["UUID"].(string)] = values
 						}
 					}
 				}
@@ -1884,24 +2039,30 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 				indexations, err := this.getIndexation(typeName, "", "")
 				if err == nil {
 					for i := 0; i < len(indexations); i++ {
-						values[indexations[i].(string)], err = this.getValues(indexations[i].(string), fields)
+						values := indexations[i]
 						if err != nil {
 							return nil, err
 						}
 
-						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 						if err != nil {
 							return nil, err
 						}
 						if isMatch {
 							// if the result match I put it inside the map result.
-							results[indexations[i].(string)] = values[indexations[i].(string)]
+							results[indexations[i]["UUID"].(string)] = values
 						}
 					}
 				}
 			}
 		}
 	}
+
+	if len(results) == 0 {
+		return nil, errors.New("no result found!")
+	}
+
+	log.Println("----> 2103", results)
 	return results, nil
 }
 
@@ -1909,6 +2070,11 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
  * Execute a search query.
  */
 func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]interface{}, error) {
+
+	query = `(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"`
+	query = `CargoEntities.Entities.M_id == "CARGO_ENTITIES"`
+
+	log.Println("---> run query: ", query)
 	s := lexer.NewLexer([]byte(query))
 	p := parser.NewParser()
 	a, err := p.Parse(s)
@@ -1919,20 +2085,26 @@ func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]i
 		if err != nil {
 			return nil, err
 		}
-
 		// Here I will keep the result part...
 		results := make([][]interface{}, 0)
 		for _, object := range r {
 			results_ := make([]interface{}, 0)
-			for i := 0; i < fieldLength; i++ {
-				results_ = append(results_, object[fields[i]])
+			// if the fields are specefied i will retrun it.
+			if fieldLength > 0 {
+				for i := 0; i < fieldLength; i++ {
+					// I will keep only required fields.
+					results_ = append(results_, object[fields[i]])
+				}
+				results = append(results, results_)
+			} else {
+				// append the object in the array.
+				results = append(results, []interface{}{object})
 			}
-			results = append(results, results_)
 		}
 
 		return results, err
 	} else {
-		log.Println("--> search error ", err)
+		log.Panicln("--> search error ", err)
 	}
 	return nil, err
 }

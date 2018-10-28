@@ -194,15 +194,11 @@ func (this *EntityManager) isEntityExist(uuid string) bool {
 }
 
 func (this *EntityManager) getEntities(typeName string, storeId string, query *EntityQuery) ([]Entity, *CargoEntities.Error) {
+	query.Fields = []string{"UUID"} // Only the uuid is need here...
+	val, err := json.Marshal(query)
 	var q string
-	if query == nil {
-		q = "FOR entity IN " + strings.Replace(typeName, ".", "_", -1) + " return entity.UUID"
-	} else {
-		query.Fields = []string{"UUID"} // Only the uuid is need here...
-		val, err := json.Marshal(query)
-		if err == nil {
-			q = string(val)
-		}
+	if err == nil {
+		q = string(val)
 	}
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
@@ -297,16 +293,20 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	storeId := typeName[0:strings.Index(typeName, ".")]
 
 	// So now I will retreive the list of values associated with that uuid.
-	query := `FOR entity IN ` + strings.Replace(typeName, ".", "_", -1) + ` FILTER entity.UUID == "` + uuid + `" return entity`
+	var q EntityQuery
+	q.TYPENAME = "Server.EntityQuery"
+	q.TypeName = typeName
+	q.Query = typeName + `.UUID=="` + uuid + `"`
+	query, _ := json.Marshal(q)
 
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	results, err := store.Read(query, []interface{}{}, []interface{}{})
+	results, err := store.Read(string(query), []interface{}{}, []interface{}{})
 
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
 		return nil, errObj
 	}
-
+	log.Println("result ---> ", results)
 	obj, err := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.
@@ -361,27 +361,29 @@ func (this *EntityManager) getEntityUuidById(typeName string, storeId string, id
 	fieldType = strings.Replace(fieldType, "[]", "", -1)
 	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 
-	// The AQL query here.
-	query := "FOR entity IN " + strings.Replace(typeName, ".", "_", -1) + " FILTER"
+	var q EntityQuery
+	q.TYPENAME = "Server.EntityQuery"
+	q.Fields = append(q.Fields, "UUID")
+	q.TypeName = prototype.TypeName
+
+	// The EQL query here.
 	for i := 0; i < len(ids); i++ {
-		query += " entity." + prototype.Ids[i+1] + " == "
+		q.Query += prototype.TypeName + `.` + prototype.Ids[i+1] + `==`
 		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
-			query += `"` + Utility.ToString(ids[i]) + `"`
+			q.Query += `"` + ids[i].(string) + `"`
 		} else {
-			query += Utility.ToString(ids[i])
+			q.Query += Utility.ToString(ids[i])
 		}
 
 		if i < len(ids)-1 && len(ids) > 1 {
-			query += " AND "
+			q.Query += " && "
 		}
 	}
 
-	// return the entity uuid
-	query += " return entity.UUID"
-
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	results, err := store.Read(query, []interface{}{}, []interface{}{})
+	query, _ := json.Marshal(q)
+	results, err := store.Read(string(query), []interface{}{}, []interface{}{})
 
 	if err != nil || len(results) == 0 {
 		var idsStr string
@@ -639,11 +641,16 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// I will get the existing value from the datastore is it exist.
 
 	// So now I will retreive the list of values associated with that uuid.
-	query := `FOR entity IN ` + strings.Replace(entity.GetTypeName(), ".", "_", -1) + ` FILTER entity.UUID == "` + entity.GetUuid() + `" return entity.UUID`
+	var q EntityQuery
+	q.TYPENAME = "Server.EntityQuery"
+	q.TypeName = entity.GetTypeName()
+	q.Fields = append(q.Fields, "UUID")
+	q.Query = entity.GetTypeName() + `.UUID=="` + entity.GetUuid() + `"`
+	query, _ := json.Marshal(q)
 
 	// Test if the entity is in the database.
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	_, err := store.Read(query, []interface{}{}, []interface{}{})
+	_, err := store.Read(string(query), []interface{}{}, []interface{}{})
 
 	var evt *Event
 

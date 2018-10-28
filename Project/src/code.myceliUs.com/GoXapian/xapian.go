@@ -71,9 +71,9 @@ typedef _gostring_ swig_type_39;
 typedef _gostring_ swig_type_40;
 typedef _gostring_ swig_type_41;
 typedef _gostring_ swig_type_42;
-typedef long long swig_type_43;
+typedef _gostring_ swig_type_43;
 typedef long long swig_type_44;
-typedef _gostring_ swig_type_45;
+typedef long long swig_type_45;
 typedef _gostring_ swig_type_46;
 typedef _gostring_ swig_type_47;
 typedef _gostring_ swig_type_48;
@@ -155,8 +155,8 @@ typedef _gostring_ swig_type_123;
 typedef _gostring_ swig_type_124;
 typedef _gostring_ swig_type_125;
 typedef _gostring_ swig_type_126;
-typedef long long swig_type_127;
-typedef _gostring_ swig_type_128;
+typedef _gostring_ swig_type_127;
+typedef long long swig_type_128;
 typedef _gostring_ swig_type_129;
 typedef _gostring_ swig_type_130;
 typedef _gostring_ swig_type_131;
@@ -180,8 +180,8 @@ typedef _gostring_ swig_type_148;
 typedef _gostring_ swig_type_149;
 typedef _gostring_ swig_type_150;
 typedef _gostring_ swig_type_151;
-typedef long long swig_type_152;
-typedef _gostring_ swig_type_153;
+typedef _gostring_ swig_type_152;
+typedef long long swig_type_153;
 typedef _gostring_ swig_type_154;
 typedef _gostring_ swig_type_155;
 typedef _gostring_ swig_type_156;
@@ -207,28 +207,28 @@ typedef _gostring_ swig_type_175;
 typedef _gostring_ swig_type_176;
 typedef _gostring_ swig_type_177;
 typedef _gostring_ swig_type_178;
-typedef long long swig_type_179;
+typedef _gostring_ swig_type_179;
 typedef long long swig_type_180;
 typedef long long swig_type_181;
-typedef _gostring_ swig_type_182;
+typedef long long swig_type_182;
 typedef _gostring_ swig_type_183;
 typedef _gostring_ swig_type_184;
 typedef _gostring_ swig_type_185;
 typedef _gostring_ swig_type_186;
 typedef _gostring_ swig_type_187;
-typedef long long swig_type_188;
-typedef _gostring_ swig_type_189;
+typedef _gostring_ swig_type_188;
+typedef long long swig_type_189;
 typedef _gostring_ swig_type_190;
 typedef _gostring_ swig_type_191;
 typedef _gostring_ swig_type_192;
 typedef _gostring_ swig_type_193;
-typedef long long swig_type_194;
-typedef _gostring_ swig_type_195;
+typedef _gostring_ swig_type_194;
+typedef long long swig_type_195;
 typedef _gostring_ swig_type_196;
 typedef _gostring_ swig_type_197;
 typedef _gostring_ swig_type_198;
-typedef long long swig_type_199;
-typedef _gostring_ swig_type_200;
+typedef _gostring_ swig_type_199;
+typedef long long swig_type_200;
 typedef _gostring_ swig_type_201;
 typedef _gostring_ swig_type_202;
 typedef _gostring_ swig_type_203;
@@ -260,14 +260,14 @@ typedef _gostring_ swig_type_228;
 typedef _gostring_ swig_type_229;
 typedef _gostring_ swig_type_230;
 typedef _gostring_ swig_type_231;
-typedef long long swig_type_232;
-typedef _gostring_ swig_type_233;
-typedef long long swig_type_234;
-typedef _gostring_ swig_type_235;
-typedef long long swig_type_236;
+typedef _gostring_ swig_type_232;
+typedef long long swig_type_233;
+typedef _gostring_ swig_type_234;
+typedef long long swig_type_235;
+typedef _gostring_ swig_type_236;
 typedef long long swig_type_237;
 typedef long long swig_type_238;
-typedef _gostring_ swig_type_239;
+typedef long long swig_type_239;
 typedef _gostring_ swig_type_240;
 typedef _gostring_ swig_type_241;
 typedef _gostring_ swig_type_242;
@@ -313,12 +313,12 @@ typedef _gostring_ swig_type_281;
 typedef _gostring_ swig_type_282;
 typedef _gostring_ swig_type_283;
 typedef _gostring_ swig_type_284;
-typedef long long swig_type_285;
+typedef _gostring_ swig_type_285;
 typedef long long swig_type_286;
 typedef long long swig_type_287;
 typedef long long swig_type_288;
 typedef long long swig_type_289;
-typedef _gostring_ swig_type_290;
+typedef long long swig_type_290;
 typedef _gostring_ swig_type_291;
 typedef _gostring_ swig_type_292;
 typedef _gostring_ swig_type_293;
@@ -344,1084 +344,1107 @@ typedef _gostring_ swig_type_312;
 typedef _gostring_ swig_type_313;
 typedef _gostring_ swig_type_314;
 typedef _gostring_ swig_type_315;
-extern void _wrap_Swig_free_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_1 _wrap_version_string_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_major_version_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_minor_version_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_revision_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_BAD_VALUENO_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_CREATE_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_CREATE_OR_OPEN_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_CREATE_OR_OVERWRITE_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_OPEN_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_NO_SYNC_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_FULL_SYNC_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_DANGEROUS_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_NO_TERMLIST_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_BACKEND_CHERT_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_BACKEND_GLASS_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_BACKEND_STUB_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_RETRY_LOCK_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCHECK_SHORT_TREE_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCHECK_FULL_TREE_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCHECK_SHOW_FREELIST_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCHECK_SHOW_STATS_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCHECK_FIX_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DB_BACKEND_INMEMORY_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCOMPACT_NO_RENUMBER_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCOMPACT_MULTIPASS_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DBCOMPACT_SINGLE_FILE_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DOC_ASSUME_VALID_get_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_PositionIterator_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_PositionIterator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PositionIterator_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_2 _wrap_PositionIterator_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_PositionIterator_equals_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_intgo _wrap_PositionIterator_get_termpos_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PositionIterator_next_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_PostingIterator_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_PostingIterator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingIterator_get_wdf_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingIterator_get_doclength_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingIterator_get_unique_terms_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_PostingIterator_positionlist_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_PostingIterator_positionlist_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PostingIterator_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_3 _wrap_PostingIterator_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_PostingIterator_equals_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_intgo _wrap_PostingIterator_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PostingIterator_next_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_TermIterator_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_TermIterator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_TermIterator_get_wdf_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_TermIterator_get_termfreq_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_TermIterator_positionlist_count_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_TermIterator_positionlist_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_TermIterator_positionlist_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermIterator_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_4 arg2);
-extern swig_type_5 _wrap_TermIterator_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_TermIterator_equals_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_6 _wrap_TermIterator_get_term_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermIterator_next_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_ValueIterator_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_ValueIterator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValueIterator_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValueIterator_get_valueno_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueIterator_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern _Bool _wrap_ValueIterator_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_7 _wrap_ValueIterator_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_ValueIterator_equals_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_8 _wrap_ValueIterator_get_value_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueIterator_next_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Document_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_Document_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_9 _wrap_Document_get_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Document_add_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_type_10 arg3);
-extern void _wrap_Document_remove_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Document_clear_values_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_11 _wrap_Document_get_data_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Document_set_data_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_12 arg2);
-extern void _wrap_Document_add_posting__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_13 arg2, swig_intgo arg3, swig_intgo arg4);
-extern void _wrap_Document_add_posting__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_14 arg2, swig_intgo arg3);
-extern void _wrap_Document_add_term__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_15 arg2, swig_intgo arg3);
-extern void _wrap_Document_add_term__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_16 arg2);
-extern void _wrap_Document_add_boolean_term_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_17 arg2);
-extern void _wrap_Document_remove_posting__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_18 arg2, swig_intgo arg3, swig_intgo arg4);
-extern void _wrap_Document_remove_posting__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_19 arg2, swig_intgo arg3);
-extern void _wrap_Document_remove_term_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_20 arg2);
-extern void _wrap_Document_clear_terms_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Document_termlist_count_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Document_termlist_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Document_termlist_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Document_values_count_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Document_values_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Document_values_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Document_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_21 _wrap_Document_serialise_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Document_unserialise_xapian_1797894d64db9bab(swig_type_22 arg1);
-extern swig_type_23 _wrap_Document_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Registry_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_Registry_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Registry_register_weighting_scheme_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Registry_get_weighting_scheme_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_24 arg2);
-extern void _wrap_Registry_register_posting_source_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Registry_get_posting_source_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_25 arg2);
-extern void _wrap_Registry_register_match_spy_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Registry_get_match_spy_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_26 arg2);
-extern void _wrap_Registry_register_lat_long_metric_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Registry_get_lat_long_metric_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_27 arg2);
-extern uintptr_t _wrap_Query_MatchNothing_get_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_Query_MatchAll_get_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_AND_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_OR_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_AND_NOT_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_XOR_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_AND_MAYBE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_FILTER_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_NEAR_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_PHRASE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_VALUE_RANGE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_SCALE_WEIGHT_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_ELITE_SET_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_VALUE_GE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_VALUE_LE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_SYNONYM_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_MAX_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_WILDCARD_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_OP_INVALID_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_LEAF_TERM_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_LEAF_POSTING_SOURCE_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_LEAF_MATCH_ALL_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_LEAF_MATCH_NOTHING_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_WILDCARD_LIMIT_ERROR_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_WILDCARD_LIMIT_FIRST_Query_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_Query__SWIG_0_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_Query_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Query__SWIG_1_xapian_1797894d64db9bab(swig_type_28 arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_Query__SWIG_2_xapian_1797894d64db9bab(swig_type_29 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_Query__SWIG_3_xapian_1797894d64db9bab(swig_type_30 arg1);
-extern uintptr_t _wrap_new_Query__SWIG_4_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Query__SWIG_5_xapian_1797894d64db9bab(double arg1, uintptr_t arg2);
-extern uintptr_t _wrap_new_Query__SWIG_6_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, double arg3);
-extern uintptr_t _wrap_new_Query__SWIG_7_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
-extern uintptr_t _wrap_new_Query__SWIG_8_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_31 arg2, swig_type_32 arg3);
-extern uintptr_t _wrap_new_Query__SWIG_9_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, swig_type_33 arg3);
-extern uintptr_t _wrap_new_Query__SWIG_10_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, swig_type_34 arg3, swig_type_35 arg4);
-extern uintptr_t _wrap_new_Query__SWIG_11_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_36 arg2, swig_intgo arg3, swig_intgo arg4, swig_intgo arg5);
-extern uintptr_t _wrap_new_Query__SWIG_12_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_37 arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_new_Query__SWIG_13_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_38 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_Query__SWIG_14_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_39 arg2);
-extern uintptr_t _wrap_Query_get_terms_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Query_get_terms_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Query_get_unique_terms_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Query_get_length_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Query_empty_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_40 _wrap_Query_serialise_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Query_unserialise__SWIG_0_xapian_1797894d64db9bab(swig_type_41 arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Query_unserialise__SWIG_1_xapian_1797894d64db9bab(swig_type_42 arg1);
-extern swig_intgo _wrap_Query_get_type_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_43 _wrap_Query_get_num_subqueries_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Query_get_subquery_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_44 arg2);
-extern swig_type_45 _wrap_Query_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Query__SWIG_17_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorStemImplementation_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_StemImplementation_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_46 _wrap_StemImplementation_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_47 arg2);
-extern swig_type_48 _wrap_StemImplementation_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Stem__SWIG_0_xapian_1797894d64db9bab(swig_type_49 arg1);
-extern uintptr_t _wrap_new_Stem__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_Stem_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_50 _wrap_Stem_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_51 arg2);
-extern swig_type_52 _wrap_Stem_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_53 _wrap_Stem_get_available_languages_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_TermGenerator_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_TermGenerator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermGenerator_set_stemmer_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_TermGenerator_set_stopper__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_TermGenerator_set_stopper__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermGenerator_set_document_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_TermGenerator_get_document_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermGenerator_set_database_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_intgo _wrap_FLAG_SPELLING_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_NONE_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_SOME_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_ALL_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_ALL_Z_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STOP_NONE_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STOP_ALL_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STOP_STEMMED_TermGenerator_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_TermGenerator_set_flags__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern swig_intgo _wrap_TermGenerator_set_flags__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_TermGenerator_set_stemming_strategy_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_TermGenerator_set_stopper_strategy_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_TermGenerator_set_max_word_length_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_TermGenerator_index_text__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_54 arg2, swig_intgo arg3, swig_type_55 arg4);
-extern void _wrap_TermGenerator_index_text__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_56 arg2, swig_intgo arg3);
-extern void _wrap_TermGenerator_index_text__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_57 arg2);
-extern void _wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_58 arg2, swig_intgo arg3, swig_type_59 arg4);
-extern void _wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_60 arg2, swig_intgo arg3);
-extern void _wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_61 arg2);
-extern void _wrap_TermGenerator_increase_termpos__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_TermGenerator_increase_termpos__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_TermGenerator_get_termpos_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_TermGenerator_set_termpos_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_62 _wrap_TermGenerator_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_RSet_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_RSet_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_RSet_size_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_RSet_empty_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_RSet_add_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_RSet_add_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_RSet_remove_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_RSet_remove_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern _Bool _wrap_RSet_contains__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern _Bool _wrap_RSet_contains__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_63 _wrap_RSet_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorMatchDecider_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_MatchDecider_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_delete_MatchDecider_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_Enquire_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_Enquire_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Enquire_set_query__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, swig_intgo arg3);
-extern void _wrap_Enquire_set_query__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Enquire_get_query_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Enquire_add_matchspy_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_Enquire_clear_matchspies_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Enquire_set_weighting_scheme_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_64 arg2, double arg3);
-extern void _wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_65 arg2);
-extern void _wrap_Enquire_set_collapse_key__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern void _wrap_Enquire_set_collapse_key__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_intgo _wrap_ASCENDING_Enquire_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DESCENDING_Enquire_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DONT_CARE_Enquire_xapian_1797894d64db9bab(void);
-extern void _wrap_Enquire_set_docid_order_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Enquire_set_cutoff__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern void _wrap_Enquire_set_cutoff__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Enquire_set_sort_by_relevance_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Enquire_set_sort_by_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
-extern void _wrap_Enquire_set_sort_by_key_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
-extern void _wrap_Enquire_set_sort_by_value_then_relevance_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
-extern void _wrap_Enquire_set_sort_by_key_then_relevance_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
-extern void _wrap_Enquire_set_sort_by_relevance_then_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
-extern void _wrap_Enquire_set_sort_by_relevance_then_key_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
-extern void _wrap_Enquire_set_time_limit_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5, uintptr_t arg6);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_3_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_4_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4, uintptr_t arg5);
-extern uintptr_t _wrap_Enquire_get_mset__SWIG_5_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
-extern swig_intgo _wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, uintptr_t arg5, double arg6);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, uintptr_t arg5);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_3_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_4_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, uintptr_t arg4);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_5_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5, uintptr_t arg6, double arg7);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_6_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5, uintptr_t arg6);
-extern uintptr_t _wrap_Enquire_get_eset__SWIG_7_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5);
-extern uintptr_t _wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_66 _wrap_Enquire_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorExpandDecider_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_ExpandDecider_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_67 arg2);
-extern void _wrap_delete_ExpandDecider_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ExpandDecider_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ExpandDecider_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_ExpandDeciderAnd_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern _Bool _wrap_ExpandDeciderAnd_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_68 arg2);
-extern void _wrap_delete_ExpandDeciderAnd_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ExpandDeciderAnd_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ExpandDeciderAnd_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(swig_type_69 arg1);
-extern _Bool _wrap_ExpandDeciderFilterPrefix_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_70 arg2);
-extern void _wrap_delete_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorKeyMaker_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_71 _wrap_KeyMaker_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_delete_KeyMaker_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_KeyMaker_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_KeyMaker_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_MultiValueKeyMaker_xapian_1797894d64db9bab(void);
-extern swig_type_72 _wrap_MultiValueKeyMaker_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, _Bool arg3, swig_type_73 arg4);
-extern void _wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
-extern void _wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_delete_MultiValueKeyMaker_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_MultiValueKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_MultiValueKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorStopperStopper_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorStopper_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_74 _wrap__swig_DirectorStopper_upcall_Get_description_xapian_1797894d64db9bab(uintptr_t);
-extern _Bool _wrap_Stopper_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_75 arg2);
-extern void _wrap_delete_Stopper_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_76 _wrap_Stopper_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Stopper_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Stopper_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_SimpleStopper__SWIG_0_xapian_1797894d64db9bab(void);
-extern void _wrap_SimpleStopper_add_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_77 arg2);
-extern _Bool _wrap_SimpleStopper_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_78 arg2);
-extern swig_type_79 _wrap_SimpleStopper_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_SimpleStopper__SWIG_2_xapian_1797894d64db9bab(swig_type_80 arg1);
-extern void _wrap_delete_SimpleStopper_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_SimpleStopper_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_SimpleStopper_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_RP_SUFFIX_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_RP_REPEATED_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_RP_DATE_PREFER_MDY_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_RangeProcessor__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_RangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_81 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_RangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_82 arg2);
-extern uintptr_t _wrap_new_RangeProcessor__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1);
-extern void _wrap_delete_RangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_RangeProcessor_check_range_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_83 arg2, swig_type_84 arg3);
-extern uintptr_t _wrap_RangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_85 arg2, swig_type_86 arg3);
-extern uintptr_t _wrap_RangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_RangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_87 arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_88 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_5_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_89 arg2);
-extern uintptr_t _wrap_DateRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_90 arg2, swig_type_91 arg3);
-extern void _wrap_delete_DateRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_DateRangeProcessor_check_range_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_92 arg1, swig_type_93 arg2);
-extern uintptr_t _wrap_DateRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_DateRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_94 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_95 arg2);
-extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap_NumberRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_96 arg2, swig_type_97 arg3);
-extern void _wrap_delete_NumberRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_NumberRangeProcessor_check_range_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_92 arg1, swig_type_93 arg2);
-extern uintptr_t _wrap_NumberRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_NumberRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorValueRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_ValueRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValueRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
-extern uintptr_t _wrap_ValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_98 arg2, _Bool arg3);
-extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_99 arg2);
-extern swig_intgo _wrap_StringValueRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
-extern void _wrap_delete_StringValueRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_StringValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_StringValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, _Bool arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, _Bool arg2);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_100 arg2, _Bool arg3, _Bool arg4, swig_intgo arg5);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_101 arg2, _Bool arg3, _Bool arg4);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_5_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_102 arg2, _Bool arg3);
-extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_6_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_103 arg2);
-extern swig_intgo _wrap_DateValueRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
-extern void _wrap_delete_DateValueRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_DateValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_DateValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1);
-extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_104 arg2, _Bool arg3);
-extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, swig_type_105 arg2);
-extern swig_intgo _wrap_NumberValueRangeProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
-extern void _wrap_delete_NumberValueRangeProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorFieldProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_FieldProcessor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_FieldProcessor_Apply_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_106 arg2);
-extern uintptr_t _wrap_FieldProcessor_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_FieldProcessor_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_FLAG_BOOLEAN_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_PHRASE_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_LOVEHATE_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_WILDCARD_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_PURE_NOT_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_PARTIAL_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_SYNONYM_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_CJK_NGRAM_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FLAG_DEFAULT_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_NONE_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_SOME_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_ALL_QueryParser_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_STEM_ALL_Z_QueryParser_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_QueryParser_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_QueryParser_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_QueryParser_set_stemmer_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_QueryParser_set_stemming_strategy_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_QueryParser_set_stopper__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_QueryParser_set_stopper__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_QueryParser_set_default_op_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_intgo _wrap_QueryParser_get_default_op_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_QueryParser_set_database_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_QueryParser_set_max_expansion__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern void _wrap_QueryParser_set_max_expansion__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern void _wrap_QueryParser_set_max_expansion__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_QueryParser_set_max_wildcard_expansion_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_QueryParser_parse_query__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_107 arg2, swig_intgo arg3, swig_type_108 arg4);
-extern uintptr_t _wrap_QueryParser_parse_query__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_109 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_QueryParser_parse_query__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_110 arg2);
-extern void _wrap_QueryParser_add_prefix__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_111 arg2, swig_type_112 arg3);
-extern void _wrap_QueryParser_add_prefix__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_113 arg2, uintptr_t arg3);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_114 arg2, swig_type_115 arg3, swig_voidp arg4);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_116 arg2, swig_type_117 arg3);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_118 arg2, swig_type_119 arg3, _Bool arg4);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_120 arg2, uintptr_t arg3, swig_voidp arg4);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_121 arg2, uintptr_t arg3);
-extern void _wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_122 arg2, uintptr_t arg3, _Bool arg4);
-extern uintptr_t _wrap_QueryParser_stoplist_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_QueryParser_stoplist_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_QueryParser_unstem_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_123 arg2);
-extern uintptr_t _wrap_QueryParser_unstem_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_124 arg2);
-extern void _wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, swig_voidp arg3);
-extern void _wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_QueryParser_add_valuerangeprocessor_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_125 _wrap_QueryParser_get_corrected_query_string_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_126 _wrap_QueryParser_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_127 _wrap_sortable_serialise__xapian_1797894d64db9bab(double arg1, swig_type_128 arg2);
-extern swig_type_129 _wrap_sortable_serialise_xapian_1797894d64db9bab(double arg1);
-extern double _wrap_sortable_unserialise_xapian_1797894d64db9bab(swig_type_130 arg1);
-extern uintptr_t _wrap_new_ValueSetMatchDecider_xapian_1797894d64db9bab(swig_intgo arg1, _Bool arg2);
-extern void _wrap_ValueSetMatchDecider_add_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_131 arg2);
-extern void _wrap_ValueSetMatchDecider_remove_value_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_132 arg2);
-extern _Bool _wrap_ValueSetMatchDecider_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_delete_ValueSetMatchDecider_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_TWO_STAGE_SMOOTHING_Weight_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DIRICHLET_SMOOTHING_Weight_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_133 _wrap_Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_BoolWeight_xapian_1797894d64db9bab(void);
-extern swig_type_134 _wrap_BoolWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BoolWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_BoolWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BoolWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_BoolWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_BoolWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_BoolWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BoolWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_TfIdfWeight__SWIG_0_xapian_1797894d64db9bab(swig_type_135 arg1);
-extern uintptr_t _wrap_new_TfIdfWeight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_136 _wrap_TfIdfWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_TfIdfWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_TfIdfWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_TfIdfWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_TfIdfWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_TfIdfWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_BM25Weight__SWIG_0_xapian_1797894d64db9bab(double arg1, double arg2, double arg3, double arg4, double arg5);
-extern uintptr_t _wrap_new_BM25Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_137 _wrap_BM25Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BM25Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_BM25Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BM25Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_BM25Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_BM25Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_BM25Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BM25Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_BM25PlusWeight__SWIG_0_xapian_1797894d64db9bab(double arg1, double arg2, double arg3, double arg4, double arg5, double arg6);
-extern uintptr_t _wrap_new_BM25PlusWeight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_138 _wrap_BM25PlusWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BM25PlusWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_BM25PlusWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BM25PlusWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_BM25PlusWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_BM25PlusWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_TradWeight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_TradWeight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_139 _wrap_TradWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_TradWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_TradWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_TradWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_TradWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_TradWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_TradWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_TradWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_InL2Weight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_InL2Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_140 _wrap_InL2Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_InL2Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_InL2Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_InL2Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_InL2Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_InL2Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_InL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_InL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_IfB2Weight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_IfB2Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_141 _wrap_IfB2Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_IfB2Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_IfB2Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_IfB2Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_IfB2Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_IfB2Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_IneB2Weight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_IneB2Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_142 _wrap_IneB2Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_IneB2Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_IneB2Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_IneB2Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_IneB2Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_IneB2Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_BB2Weight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_BB2Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_143 _wrap_BB2Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BB2Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_BB2Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_BB2Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_BB2Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_BB2Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_BB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_DLHWeight_xapian_1797894d64db9bab(void);
-extern swig_type_144 _wrap_DLHWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_DLHWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_DLHWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_DLHWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_DLHWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_DLHWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_DLHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DLHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_PL2Weight__SWIG_0_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_PL2Weight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_145 _wrap_PL2Weight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_PL2Weight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_PL2Weight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_PL2Weight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_PL2Weight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_PL2Weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_PL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_PL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_PL2PlusWeight__SWIG_0_xapian_1797894d64db9bab(double arg1, double arg2);
-extern uintptr_t _wrap_new_PL2PlusWeight__SWIG_1_xapian_1797894d64db9bab(void);
-extern swig_type_146 _wrap_PL2PlusWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_PL2PlusWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_PL2PlusWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_PL2PlusWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_PL2PlusWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_PL2PlusWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_DPHWeight_xapian_1797894d64db9bab(void);
-extern swig_type_147 _wrap_DPHWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_DPHWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_DPHWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_DPHWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_DPHWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_DPHWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_DPHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DPHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_LMWeight__SWIG_0_xapian_1797894d64db9bab(double arg1, swig_intgo arg2, double arg3, double arg4);
-extern uintptr_t _wrap_new_LMWeight__SWIG_1_xapian_1797894d64db9bab(double arg1, swig_intgo arg2, double arg3);
-extern uintptr_t _wrap_new_LMWeight__SWIG_2_xapian_1797894d64db9bab(double arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_LMWeight__SWIG_3_xapian_1797894d64db9bab(double arg1);
-extern uintptr_t _wrap_new_LMWeight__SWIG_4_xapian_1797894d64db9bab(void);
-extern swig_type_148 _wrap_LMWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_LMWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_LMWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_LMWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_LMWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_LMWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_LMWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_LMWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_CoordWeight_init_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern uintptr_t _wrap_new_CoordWeight_xapian_1797894d64db9bab(void);
-extern swig_type_149 _wrap_CoordWeight_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_CoordWeight_get_sumpart_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern double _wrap_CoordWeight_get_maxpart_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_CoordWeight_get_sumextra_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern double _wrap_CoordWeight_get_maxextra_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_CoordWeight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_CoordWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_CoordWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorCompactorCompactor_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorCompactor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap__swig_DirectorCompactor_upcall_Set_status_xapian_1797894d64db9bab(uintptr_t, swig_type_150 table, swig_type_151 status);
-extern swig_intgo _wrap_STANDARD_Compactor_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FULL_Compactor_xapian_1797894d64db9bab(void);
-extern swig_intgo _wrap_FULLER_Compactor_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_Compactor_xapian_1797894d64db9bab(void);
-extern void _wrap_delete_Compactor_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Compactor_set_block_size_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_152 arg2);
-extern void _wrap_Compactor_set_renumber_xapian_1797894d64db9bab(uintptr_t arg1, _Bool arg2);
-extern void _wrap_Compactor_set_multipass_xapian_1797894d64db9bab(uintptr_t arg1, _Bool arg2);
-extern void _wrap_Compactor_set_compaction_level_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Compactor_set_destdir_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_153 arg2);
-extern void _wrap_Compactor_add_source_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_154 arg2);
-extern void _wrap_Compactor_compact_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Compactor_set_status_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_150 arg2, swig_type_151 arg3);
-extern uintptr_t _wrap__swig_NewDirectorPostingSourcePostingSource_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorPostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_1797894d64db9bab(uintptr_t);
-extern void _wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_1797894d64db9bab(uintptr_t, swig_intgo did, double min_wt);
-extern _Bool _wrap__swig_DirectorPostingSource_upcall_Check_xapian_1797894d64db9bab(uintptr_t, swig_intgo did, double min_wt);
-extern swig_type_155 _wrap__swig_DirectorPostingSource_upcall_Name_xapian_1797894d64db9bab(uintptr_t);
-extern swig_type_156 _wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_1797894d64db9bab(uintptr_t);
-extern void _wrap_delete_PostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern double _wrap_PostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_PostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_PostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PostingSource_next_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern void _wrap_PostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_PostingSource_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_PostingSource_at_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_157 _wrap_PostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_PostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_158 _wrap_PostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_PostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_PostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_ValuePostingSource_xapian_1797894d64db9bab(swig_intgo arg1);
-extern swig_intgo _wrap_ValuePostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValuePostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValuePostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValuePostingSource_next_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern void _wrap_ValuePostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_ValuePostingSource_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_ValuePostingSource_at_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValuePostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValuePostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_ValuePostingSource_get_database_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValuePostingSource_get_slot_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_159 _wrap_ValuePostingSource_get_value_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValuePostingSource_done_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_ValuePostingSource_get_started_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValuePostingSource_set_termfreq_min_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_ValuePostingSource_set_termfreq_est_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_ValuePostingSource_set_termfreq_max_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_delete_ValuePostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValuePostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_ValuePostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern double _wrap_ValuePostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_160 _wrap_ValuePostingSource_name_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_161 _wrap_ValuePostingSource_get_description_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValuePostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValuePostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_ValueWeightPostingSource_xapian_1797894d64db9bab(swig_intgo arg1);
-extern double _wrap_ValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_162 _wrap_ValueWeightPostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueWeightPostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_163 _wrap_ValueWeightPostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_ValueWeightPostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueWeightPostingSource_next_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern void _wrap_ValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, double arg2);
-extern _Bool _wrap_ValueWeightPostingSource_check_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, double arg2);
-extern _Bool _wrap_ValueWeightPostingSource_at_end_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueWeightPostingSource_get_database_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_164 _wrap_ValueWeightPostingSource_get_value_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueWeightPostingSource_done_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_ValueWeightPostingSource_get_started_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_ValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1);
-extern double _wrap_DecreasingValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_165 _wrap_DecreasingValueWeightPostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_DecreasingValueWeightPostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_DecreasingValueWeightPostingSource_next_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern void _wrap_DecreasingValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_DecreasingValueWeightPostingSource_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern swig_type_166 _wrap_DecreasingValueWeightPostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_DecreasingValueWeightPostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DecreasingValueWeightPostingSource_at_end_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_DecreasingValueWeightPostingSource_get_database_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_167 _wrap_DecreasingValueWeightPostingSource_get_value_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_DecreasingValueWeightPostingSource_done_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_DecreasingValueWeightPostingSource_get_started_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_ValueMapPostingSource_xapian_1797894d64db9bab(swig_intgo arg1);
-extern void _wrap_ValueMapPostingSource_add_mapping_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_168 arg2, double arg3);
-extern void _wrap_ValueMapPostingSource_clear_mappings_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueMapPostingSource_set_default_weight_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern double _wrap_ValueMapPostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_169 _wrap_ValueMapPostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueMapPostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_170 _wrap_ValueMapPostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_ValueMapPostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueMapPostingSource_next_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern void _wrap_ValueMapPostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, double arg2);
-extern _Bool _wrap_ValueMapPostingSource_check_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, double arg2);
-extern _Bool _wrap_ValueMapPostingSource_at_end_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueMapPostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueMapPostingSource_get_database_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_ValueMapPostingSource_get_slot_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_171 _wrap_ValueMapPostingSource_get_value_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueMapPostingSource_done_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_ValueMapPostingSource_get_started_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_ValueMapPostingSource_set_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueMapPostingSource_set_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueMapPostingSource_set_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_ValueMapPostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_ValueMapPostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueMapPostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueMapPostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_FixedWeightPostingSource_xapian_1797894d64db9bab(double arg1);
-extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_FixedWeightPostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_FixedWeightPostingSource_next_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern void _wrap_FixedWeightPostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_FixedWeightPostingSource_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_FixedWeightPostingSource_at_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_FixedWeightPostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_172 _wrap_FixedWeightPostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_FixedWeightPostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_173 _wrap_FixedWeightPostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_FixedWeightPostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_FixedWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_FixedWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_FixedWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_FixedWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorMatchSpy_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_174 _wrap__swig_DirectorMatchSpy_upcall_Name_xapian_1797894d64db9bab(uintptr_t);
-extern void _wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_1797894d64db9bab(uintptr_t, swig_type_175 serialised);
-extern swig_type_176 _wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_1797894d64db9bab(uintptr_t);
-extern void _wrap_delete_MatchSpy_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_MatchSpy_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, double arg3);
-extern swig_type_177 _wrap_MatchSpy_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_MatchSpy_merge_results_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_175 arg2);
-extern swig_type_178 _wrap_MatchSpy_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_MatchSpy_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_MatchSpy_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_ValueCountMatchSpy__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_ValueCountMatchSpy__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1);
-extern swig_type_179 _wrap_ValueCountMatchSpy_get_total_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ValueCountMatchSpy_values_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ValueCountMatchSpy_values_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ValueCountMatchSpy_top_values_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_180 arg2);
-extern uintptr_t _wrap_ValueCountMatchSpy_top_values_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_181 arg2);
-extern void _wrap_ValueCountMatchSpy_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, double arg3);
-extern swig_type_182 _wrap_ValueCountMatchSpy_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_ValueCountMatchSpy_merge_results_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_183 arg2);
-extern swig_type_184 _wrap_ValueCountMatchSpy_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_ValueCountMatchSpy_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_ValueCountMatchSpy_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_ValueCountMatchSpy_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern double _wrap_miles_to_metres_xapian_1797894d64db9bab(double arg1);
-extern double _wrap_metres_to_miles_xapian_1797894d64db9bab(double arg1);
-extern void _wrap_LatLongCoord_latitude_set_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern double _wrap_LatLongCoord_latitude_get_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongCoord_longitude_set_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern double _wrap_LatLongCoord_longitude_get_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_LatLongCoord__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_LatLongCoord__SWIG_1_xapian_1797894d64db9bab(double arg1, double arg2);
-extern void _wrap_LatLongCoord_unserialise_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_185 arg2);
-extern swig_type_186 _wrap_LatLongCoord_serialise_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_187 _wrap_LatLongCoord_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_LatLongCoord_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_LatLongCoordsIterator_xapian_1797894d64db9bab(void);
-extern _Bool _wrap_LatLongCoordsIterator_equals_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_LatLongCoordsIterator_get_coord_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongCoordsIterator_next_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_LatLongCoordsIterator_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_LatLongCoords_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_LatLongCoords_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_188 _wrap_LatLongCoords_size_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_LatLongCoords_empty_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongCoords_append_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_new_LatLongCoords__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_LatLongCoords__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongCoords_unserialise_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_189 arg2);
-extern swig_type_190 _wrap_LatLongCoords_serialise_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_191 _wrap_LatLongCoords_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_LatLongCoords_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_1797894d64db9bab(int);
-extern void _wrap_DeleteDirectorLatLongMetric_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_LatLongMetric_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_LatLongMetric_pointwise_distance_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
-extern double _wrap_LatLongMetric_Apply__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
-extern double _wrap_LatLongMetric_Apply__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, swig_type_192 arg3);
-extern double _wrap_LatLongMetric_Apply__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, swig_type_193 arg3, swig_type_194 arg4);
-extern swig_type_195 _wrap_LatLongMetric_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_GreatCircleMetric__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_GreatCircleMetric__SWIG_1_xapian_1797894d64db9bab(double arg1);
-extern double _wrap_GreatCircleMetric_pointwise_distance_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
-extern swig_type_196 _wrap_GreatCircleMetric_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_delete_GreatCircleMetric_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_GreatCircleMetric_Apply__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, uintptr_t arg1, uintptr_t arg2);
-extern double _wrap_GreatCircleMetric_Apply__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base, uintptr_t arg1, swig_type_197 arg2);
-extern double _wrap_GreatCircleMetric_Apply__SWIG_2_xapian_1797894d64db9bab(uintptr_t _swig_base, uintptr_t arg1, swig_type_198 arg2, swig_type_199 arg3);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4, double arg5, double arg6);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4, double arg5);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, double arg3, double arg4, double arg5);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, double arg3, double arg4);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, double arg3);
-extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2);
-extern void _wrap_delete_LatLongDistancePostingSource_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongDistancePostingSource_next_xapian_1797894d64db9bab(uintptr_t arg1, double arg2);
-extern void _wrap_LatLongDistancePostingSource_skip_to_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern _Bool _wrap_LatLongDistancePostingSource_check_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, double arg3);
-extern double _wrap_LatLongDistancePostingSource_get_weight_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_200 _wrap_LatLongDistancePostingSource_name_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_LatLongDistancePostingSource_init_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_201 _wrap_LatLongDistancePostingSource_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_LatLongDistancePostingSource_at_end_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_LatLongDistancePostingSource_get_docid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_LatLongDistancePostingSource_get_database_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_LatLongDistancePostingSource_get_slot_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_202 _wrap_LatLongDistancePostingSource_get_value_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_LatLongDistancePostingSource_done_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_LatLongDistancePostingSource_get_started_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_LatLongDistancePostingSource_set_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base, double arg1);
-extern double _wrap_LatLongDistancePostingSource_get_maxweight_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
-extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_1797894d64db9bab(swig_intgo arg1, uintptr_t arg2);
-extern void _wrap_delete_LatLongDistanceKeyMaker_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_203 _wrap_LatLongDistanceKeyMaker_Apply_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_Database_add_database_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern uintptr_t _wrap_new_Database__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_Database__SWIG_1_xapian_1797894d64db9bab(swig_type_204 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_Database__SWIG_2_xapian_1797894d64db9bab(swig_type_205 arg1);
-extern uintptr_t _wrap_new_Database__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_Database__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1);
-extern void _wrap_delete_Database_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Database_reopen_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_Database_close_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_206 _wrap_Database_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_postlist_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_207 arg2);
-extern uintptr_t _wrap_Database_postlist_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_208 arg2);
-extern uintptr_t _wrap_Database_termlist_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_Database_termlist_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern _Bool _wrap_Database_has_positions_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_positionlist_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_type_209 arg3);
-extern uintptr_t _wrap_Database_positionlist_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_type_210 arg3);
-extern uintptr_t _wrap_Database_allterms_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_211 arg2);
-extern uintptr_t _wrap_Database_allterms_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_allterms_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_212 arg2);
-extern uintptr_t _wrap_Database_allterms_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Database_get_doccount_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Database_get_lastdocid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern double _wrap_Database_get_avlength_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_get_total_length_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Database_get_termfreq_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_213 arg2);
-extern _Bool _wrap_Database_term_exists_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_214 arg2);
-extern swig_intgo _wrap_Database_get_collection_freq_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_215 arg2);
-extern swig_intgo _wrap_Database_get_value_freq_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_216 _wrap_Database_get_value_lower_bound_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_type_217 _wrap_Database_get_value_upper_bound_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_intgo _wrap_Database_get_doclength_lower_bound_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Database_get_doclength_upper_bound_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_Database_get_wdf_upper_bound_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_218 arg2);
-extern uintptr_t _wrap_Database_valuestream_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_Database_valuestream_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_intgo _wrap_Database_get_doclength_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern swig_intgo _wrap_Database_get_unique_terms_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Database_keep_alive_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_get_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern uintptr_t _wrap_Database_get_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern swig_type_219 _wrap_Database_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_220 arg2, swig_intgo arg3);
-extern swig_type_221 _wrap_Database_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_222 arg2);
-extern uintptr_t _wrap_Database_spellings_begin_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_spellings_end_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_synonyms_begin_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_223 arg2);
-extern uintptr_t _wrap_Database_synonyms_end_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_224 arg2);
-extern uintptr_t _wrap_Database_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_225 arg2);
-extern uintptr_t _wrap_Database_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_226 arg2);
-extern uintptr_t _wrap_Database_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_227 _wrap_Database_get_metadata_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_228 arg2);
-extern uintptr_t _wrap_Database_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_229 arg2);
-extern uintptr_t _wrap_Database_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_230 arg2);
-extern uintptr_t _wrap_Database_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_231 _wrap_Database_get_uuid_xapian_1797894d64db9bab(uintptr_t arg1);
-extern _Bool _wrap_Database_locked_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_Database_get_revision_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_type_232 _wrap_Database_check__SWIG_0_xapian_1797894d64db9bab(swig_type_233 arg1, swig_intgo arg2);
-extern swig_type_234 _wrap_Database_check__SWIG_1_xapian_1797894d64db9bab(swig_type_235 arg1);
-extern swig_type_236 _wrap_Database_check__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, uintptr_t arg3);
-extern swig_type_237 _wrap_Database_check__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2);
-extern swig_type_238 _wrap_Database_check__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1);
-extern void _wrap_Database_compact__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_239 arg2, swig_intgo arg3, swig_intgo arg4);
-extern void _wrap_Database_compact__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_240 arg2, swig_intgo arg3);
-extern void _wrap_Database_compact__SWIG_2_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_241 arg2);
-extern void _wrap_Database_compact__SWIG_3_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern void _wrap_Database_compact__SWIG_4_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
-extern void _wrap_Database_compact__SWIG_5_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_Database_compact__SWIG_6_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_242 arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
-extern void _wrap_Database_compact__SWIG_7_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
-extern void _wrap_delete_WritableDatabase_xapian_1797894d64db9bab(uintptr_t arg1);
-extern uintptr_t _wrap_new_WritableDatabase__SWIG_0_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_new_WritableDatabase__SWIG_1_xapian_1797894d64db9bab(swig_type_243 arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_new_WritableDatabase__SWIG_2_xapian_1797894d64db9bab(swig_type_244 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_new_WritableDatabase__SWIG_3_xapian_1797894d64db9bab(swig_type_245 arg1);
-extern void _wrap_WritableDatabase_commit_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_WritableDatabase_flush_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, _Bool arg2);
-extern void _wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_WritableDatabase_commit_transaction_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_WritableDatabase_cancel_transaction_xapian_1797894d64db9bab(uintptr_t arg1);
-extern swig_intgo _wrap_WritableDatabase_add_document_xapian_1797894d64db9bab(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_WritableDatabase_delete_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_WritableDatabase_delete_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_246 arg2);
-extern void _wrap_WritableDatabase_replace_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3);
-extern swig_intgo _wrap_WritableDatabase_replace_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_247 arg2, uintptr_t arg3);
-extern void _wrap_WritableDatabase_add_spelling__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_248 arg2, swig_intgo arg3);
-extern void _wrap_WritableDatabase_add_spelling__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_249 arg2);
-extern void _wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_250 arg2, swig_intgo arg3);
-extern void _wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_251 arg2);
-extern void _wrap_WritableDatabase_add_synonym_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_252 arg2, swig_type_253 arg3);
-extern void _wrap_WritableDatabase_remove_synonym_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_254 arg2, swig_type_255 arg3);
-extern void _wrap_WritableDatabase_clear_synonyms_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_256 arg2);
-extern void _wrap_WritableDatabase_set_metadata_xapian_1797894d64db9bab(uintptr_t arg1, swig_type_257 arg2, swig_type_258 arg3);
-extern swig_type_259 _wrap_WritableDatabase_get_description_xapian_1797894d64db9bab(uintptr_t arg1);
-extern void _wrap_WritableDatabase_add_database_xapian_1797894d64db9bab(uintptr_t _swig_base, uintptr_t arg1);
-extern _Bool _wrap_WritableDatabase_reopen_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern void _wrap_WritableDatabase_close_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_postlist_begin_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_260 arg1);
-extern uintptr_t _wrap_WritableDatabase_postlist_end_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_261 arg1);
-extern uintptr_t _wrap_WritableDatabase_termlist_begin_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern uintptr_t _wrap_WritableDatabase_termlist_end_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern _Bool _wrap_WritableDatabase_has_positions_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_positionlist_begin_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_type_262 arg2);
-extern uintptr_t _wrap_WritableDatabase_positionlist_end_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_type_263 arg2);
-extern uintptr_t _wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_264 arg1);
-extern uintptr_t _wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_allterms_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_265 arg1);
-extern uintptr_t _wrap_WritableDatabase_allterms_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_WritableDatabase_get_doccount_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_WritableDatabase_get_lastdocid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern double _wrap_WritableDatabase_get_avlength_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_get_total_length_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_WritableDatabase_get_termfreq_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_266 arg1);
-extern _Bool _wrap_WritableDatabase_term_exists_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_267 arg1);
-extern swig_intgo _wrap_WritableDatabase_get_collection_freq_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_268 arg1);
-extern swig_intgo _wrap_WritableDatabase_get_value_freq_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern swig_type_269 _wrap_WritableDatabase_get_value_lower_bound_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern swig_type_270 _wrap_WritableDatabase_get_value_upper_bound_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern swig_intgo _wrap_WritableDatabase_get_doclength_lower_bound_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_WritableDatabase_get_doclength_upper_bound_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_intgo _wrap_WritableDatabase_get_wdf_upper_bound_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_271 arg1);
-extern uintptr_t _wrap_WritableDatabase_valuestream_begin_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern uintptr_t _wrap_WritableDatabase_valuestream_end_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern swig_intgo _wrap_WritableDatabase_get_doclength_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern swig_intgo _wrap_WritableDatabase_get_unique_terms_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_WritableDatabase_keep_alive_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_get_document__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern uintptr_t _wrap_WritableDatabase_get_document__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2);
-extern swig_type_272 _wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_273 arg1, swig_intgo arg2);
-extern swig_type_274 _wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_275 arg1);
-extern uintptr_t _wrap_WritableDatabase_spellings_begin_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_spellings_end_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_synonyms_begin_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_276 arg1);
-extern uintptr_t _wrap_WritableDatabase_synonyms_end_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_277 arg1);
-extern uintptr_t _wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_278 arg1);
-extern uintptr_t _wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_279 arg1);
-extern uintptr_t _wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_280 _wrap_WritableDatabase_get_metadata_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_281 arg1);
-extern uintptr_t _wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_282 arg1);
-extern uintptr_t _wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_283 arg1);
-extern uintptr_t _wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_284 _wrap_WritableDatabase_get_uuid_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern _Bool _wrap_WritableDatabase_locked_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern uintptr_t _wrap_WritableDatabase_get_revision_xapian_1797894d64db9bab(uintptr_t _swig_base);
-extern swig_type_285 _wrap_WritableDatabase_check__SWIG_0_xapian_1797894d64db9bab(swig_type_233 arg1, swig_intgo arg2);
-extern swig_type_286 _wrap_WritableDatabase_check__SWIG_1_xapian_1797894d64db9bab(swig_type_235 arg1);
-extern swig_type_287 _wrap_WritableDatabase_check__SWIG_2_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2, uintptr_t arg3);
-extern swig_type_288 _wrap_WritableDatabase_check__SWIG_3_xapian_1797894d64db9bab(swig_intgo arg1, swig_intgo arg2);
-extern swig_type_289 _wrap_WritableDatabase_check__SWIG_4_xapian_1797894d64db9bab(swig_intgo arg1);
-extern void _wrap_WritableDatabase_compact__SWIG_0_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_290 arg1, swig_intgo arg2, swig_intgo arg3);
-extern void _wrap_WritableDatabase_compact__SWIG_1_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_291 arg1, swig_intgo arg2);
-extern void _wrap_WritableDatabase_compact__SWIG_2_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_292 arg1);
-extern void _wrap_WritableDatabase_compact__SWIG_3_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
-extern void _wrap_WritableDatabase_compact__SWIG_4_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2);
-extern void _wrap_WritableDatabase_compact__SWIG_5_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1);
-extern void _wrap_WritableDatabase_compact__SWIG_6_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_type_293 arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
-extern void _wrap_WritableDatabase_compact__SWIG_7_xapian_1797894d64db9bab(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
-extern uintptr_t _wrap_open_stub__SWIG_0_xapian_1797894d64db9bab(swig_type_294 arg1);
-extern uintptr_t _wrap_open_stub__SWIG_1_xapian_1797894d64db9bab(swig_type_295 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_inmemory_open_xapian_1797894d64db9bab(void);
-extern uintptr_t _wrap_chert_open__SWIG_0_xapian_1797894d64db9bab(swig_type_296 arg1);
-extern uintptr_t _wrap_chert_open__SWIG_1_xapian_1797894d64db9bab(swig_type_297 arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_chert_open__SWIG_2_xapian_1797894d64db9bab(swig_type_298 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_remote_open__SWIG_0_xapian_1797894d64db9bab(swig_type_299 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_remote_open__SWIG_1_xapian_1797894d64db9bab(swig_type_300 arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_remote_open__SWIG_2_xapian_1797894d64db9bab(swig_type_301 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_remote_open_writable__SWIG_0_xapian_1797894d64db9bab(swig_type_302 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, swig_intgo arg5);
-extern uintptr_t _wrap_remote_open_writable__SWIG_1_xapian_1797894d64db9bab(swig_type_303 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_remote_open_writable__SWIG_2_xapian_1797894d64db9bab(swig_type_304 arg1, swig_intgo arg2, swig_intgo arg3);
-extern uintptr_t _wrap_remote_open_writable__SWIG_3_xapian_1797894d64db9bab(swig_type_305 arg1, swig_intgo arg2);
-extern uintptr_t _wrap_remote_open__SWIG_3_xapian_1797894d64db9bab(swig_type_306 arg1, swig_type_307 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_remote_open__SWIG_4_xapian_1797894d64db9bab(swig_type_308 arg1, swig_type_309 arg2);
-extern uintptr_t _wrap_remote_open_writable__SWIG_4_xapian_1797894d64db9bab(swig_type_310 arg1, swig_type_311 arg2, swig_intgo arg3, swig_intgo arg4);
-extern uintptr_t _wrap_remote_open_writable__SWIG_5_xapian_1797894d64db9bab(swig_type_312 arg1, swig_type_313 arg2, swig_intgo arg3);
-extern uintptr_t _wrap_remote_open_writable__SWIG_6_xapian_1797894d64db9bab(swig_type_314 arg1, swig_type_315 arg2);
+typedef _gostring_ swig_type_316;
+extern void _wrap_Swig_free_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_MSet_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_MSet_get_document_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_MSet_get_hit_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_MSet_get_document_percentage_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_MSet_size_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_MSet_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_MSet_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ESet_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_ESet_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_MSetIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_intgo _wrap_MSetIterator_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_MSetIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_MSetIterator_prev_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_MSetIterator_get_document_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_MSetIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_MSetIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_ESetIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_1 _wrap_ESetIterator_get_term_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ESetIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ESetIterator_prev_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ESetIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_ESetIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_2 _wrap_version_string_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_major_version_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_minor_version_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_revision_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_BAD_VALUENO_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_CREATE_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_CREATE_OR_OPEN_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_CREATE_OR_OVERWRITE_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_OPEN_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_NO_SYNC_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_FULL_SYNC_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_DANGEROUS_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_NO_TERMLIST_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_BACKEND_CHERT_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_BACKEND_GLASS_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_BACKEND_STUB_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_RETRY_LOCK_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCHECK_SHORT_TREE_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCHECK_FULL_TREE_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCHECK_SHOW_FREELIST_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCHECK_SHOW_STATS_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCHECK_FIX_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DB_BACKEND_INMEMORY_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCOMPACT_NO_RENUMBER_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCOMPACT_MULTIPASS_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DBCOMPACT_SINGLE_FILE_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DOC_ASSUME_VALID_get_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_PositionIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_PositionIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PositionIterator_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_3 _wrap_PositionIterator_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_PositionIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_intgo _wrap_PositionIterator_get_termpos_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PositionIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_PostingIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_PostingIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingIterator_get_wdf_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingIterator_get_doclength_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingIterator_get_unique_terms_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_PostingIterator_positionlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_PostingIterator_positionlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PostingIterator_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_4 _wrap_PostingIterator_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_PostingIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_intgo _wrap_PostingIterator_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PostingIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_TermIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_TermIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_TermIterator_get_wdf_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_TermIterator_get_termfreq_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_TermIterator_positionlist_count_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_TermIterator_positionlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_TermIterator_positionlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermIterator_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_5 arg2);
+extern swig_type_6 _wrap_TermIterator_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_TermIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_7 _wrap_TermIterator_get_term_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ValueIterator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_ValueIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValueIterator_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValueIterator_get_valueno_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueIterator_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern _Bool _wrap_ValueIterator_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_8 _wrap_ValueIterator_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_ValueIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_9 _wrap_ValueIterator_get_value_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Document_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_Document_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_10 _wrap_Document_get_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Document_add_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_type_11 arg3);
+extern void _wrap_Document_remove_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Document_clear_values_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_12 _wrap_Document_get_data_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Document_set_data_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_13 arg2);
+extern void _wrap_Document_add_posting__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_14 arg2, swig_intgo arg3, swig_intgo arg4);
+extern void _wrap_Document_add_posting__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_15 arg2, swig_intgo arg3);
+extern void _wrap_Document_add_term__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_16 arg2, swig_intgo arg3);
+extern void _wrap_Document_add_term__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_17 arg2);
+extern void _wrap_Document_add_boolean_term_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_18 arg2);
+extern void _wrap_Document_remove_posting__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_19 arg2, swig_intgo arg3, swig_intgo arg4);
+extern void _wrap_Document_remove_posting__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_20 arg2, swig_intgo arg3);
+extern void _wrap_Document_remove_term_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_21 arg2);
+extern void _wrap_Document_clear_terms_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Document_termlist_count_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Document_termlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Document_termlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Document_values_count_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Document_values_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Document_values_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Document_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_22 _wrap_Document_serialise_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Document_unserialise_xapian_245a1afe1629f0b1(swig_type_23 arg1);
+extern swig_type_24 _wrap_Document_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Registry_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_Registry_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Registry_register_weighting_scheme_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Registry_get_weighting_scheme_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_25 arg2);
+extern void _wrap_Registry_register_posting_source_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Registry_get_posting_source_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_26 arg2);
+extern void _wrap_Registry_register_match_spy_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Registry_get_match_spy_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_27 arg2);
+extern void _wrap_Registry_register_lat_long_metric_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Registry_get_lat_long_metric_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_28 arg2);
+extern uintptr_t _wrap_Query_MatchNothing_get_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_Query_MatchAll_get_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_AND_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_OR_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_AND_NOT_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_XOR_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_AND_MAYBE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_FILTER_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_NEAR_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_PHRASE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_VALUE_RANGE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_SCALE_WEIGHT_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_ELITE_SET_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_VALUE_GE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_VALUE_LE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_SYNONYM_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_MAX_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_WILDCARD_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_OP_INVALID_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_LEAF_TERM_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_LEAF_POSTING_SOURCE_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_LEAF_MATCH_ALL_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_LEAF_MATCH_NOTHING_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_WILDCARD_LIMIT_ERROR_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_WILDCARD_LIMIT_FIRST_Query_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_Query__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_Query_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Query__SWIG_1_xapian_245a1afe1629f0b1(swig_type_29 arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_Query__SWIG_2_xapian_245a1afe1629f0b1(swig_type_30 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_Query__SWIG_3_xapian_245a1afe1629f0b1(swig_type_31 arg1);
+extern uintptr_t _wrap_new_Query__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Query__SWIG_5_xapian_245a1afe1629f0b1(double arg1, uintptr_t arg2);
+extern uintptr_t _wrap_new_Query__SWIG_6_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, double arg3);
+extern uintptr_t _wrap_new_Query__SWIG_7_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
+extern uintptr_t _wrap_new_Query__SWIG_8_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_32 arg2, swig_type_33 arg3);
+extern uintptr_t _wrap_new_Query__SWIG_9_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, swig_type_34 arg3);
+extern uintptr_t _wrap_new_Query__SWIG_10_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, swig_type_35 arg3, swig_type_36 arg4);
+extern uintptr_t _wrap_new_Query__SWIG_11_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_37 arg2, swig_intgo arg3, swig_intgo arg4, swig_intgo arg5);
+extern uintptr_t _wrap_new_Query__SWIG_12_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_38 arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_new_Query__SWIG_13_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_39 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_Query__SWIG_14_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_40 arg2);
+extern uintptr_t _wrap_Query_get_terms_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Query_get_terms_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Query_get_unique_terms_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Query_get_length_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Query_empty_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_41 _wrap_Query_serialise_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Query_unserialise__SWIG_0_xapian_245a1afe1629f0b1(swig_type_42 arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Query_unserialise__SWIG_1_xapian_245a1afe1629f0b1(swig_type_43 arg1);
+extern swig_intgo _wrap_Query_get_type_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_44 _wrap_Query_get_num_subqueries_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Query_get_subquery_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_45 arg2);
+extern swig_type_46 _wrap_Query_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Query__SWIG_17_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorStemImplementation_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_StemImplementation_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_47 _wrap_StemImplementation_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_48 arg2);
+extern swig_type_49 _wrap_StemImplementation_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Stem__SWIG_0_xapian_245a1afe1629f0b1(swig_type_50 arg1);
+extern uintptr_t _wrap_new_Stem__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_Stem_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_51 _wrap_Stem_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_52 arg2);
+extern swig_type_53 _wrap_Stem_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_54 _wrap_Stem_get_available_languages_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_TermGenerator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermGenerator_set_stemmer_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_TermGenerator_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_TermGenerator_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermGenerator_set_document_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_TermGenerator_get_document_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermGenerator_set_database_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_intgo _wrap_FLAG_SPELLING_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_NONE_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_SOME_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_ALL_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_ALL_Z_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STOP_NONE_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STOP_ALL_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STOP_STEMMED_TermGenerator_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_TermGenerator_set_flags__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern swig_intgo _wrap_TermGenerator_set_flags__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_TermGenerator_set_stemming_strategy_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_TermGenerator_set_stopper_strategy_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_TermGenerator_set_max_word_length_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_TermGenerator_index_text__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_55 arg2, swig_intgo arg3, swig_type_56 arg4);
+extern void _wrap_TermGenerator_index_text__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_57 arg2, swig_intgo arg3);
+extern void _wrap_TermGenerator_index_text__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_58 arg2);
+extern void _wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_59 arg2, swig_intgo arg3, swig_type_60 arg4);
+extern void _wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_61 arg2, swig_intgo arg3);
+extern void _wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_62 arg2);
+extern void _wrap_TermGenerator_increase_termpos__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_TermGenerator_increase_termpos__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_TermGenerator_get_termpos_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_TermGenerator_set_termpos_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_63 _wrap_TermGenerator_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_RSet_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_RSet_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_RSet_size_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_RSet_empty_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_RSet_add_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_RSet_add_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_RSet_remove_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_RSet_remove_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern _Bool _wrap_RSet_contains__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern _Bool _wrap_RSet_contains__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_64 _wrap_RSet_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorMatchDecider_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_MatchDecider_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_delete_MatchDecider_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_Enquire_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_Enquire_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Enquire_set_query__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, swig_intgo arg3);
+extern void _wrap_Enquire_set_query__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Enquire_get_query_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Enquire_add_matchspy_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_Enquire_clear_matchspies_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Enquire_set_weighting_scheme_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_65 arg2, double arg3);
+extern void _wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_66 arg2);
+extern void _wrap_Enquire_set_collapse_key__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern void _wrap_Enquire_set_collapse_key__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_ASCENDING_Enquire_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DESCENDING_Enquire_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DONT_CARE_Enquire_xapian_245a1afe1629f0b1(void);
+extern void _wrap_Enquire_set_docid_order_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Enquire_set_cutoff__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern void _wrap_Enquire_set_cutoff__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Enquire_set_sort_by_relevance_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Enquire_set_sort_by_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
+extern void _wrap_Enquire_set_sort_by_key_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
+extern void _wrap_Enquire_set_sort_by_value_then_relevance_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
+extern void _wrap_Enquire_set_sort_by_key_then_relevance_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
+extern void _wrap_Enquire_set_sort_by_relevance_then_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
+extern void _wrap_Enquire_set_sort_by_relevance_then_key_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, _Bool arg3);
+extern void _wrap_Enquire_set_time_limit_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5, uintptr_t arg6);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_3_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4, uintptr_t arg5);
+extern uintptr_t _wrap_Enquire_get_mset__SWIG_5_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
+extern swig_intgo _wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, uintptr_t arg5, double arg6);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, uintptr_t arg5);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_3_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, uintptr_t arg4);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_5_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5, uintptr_t arg6, double arg7);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_6_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5, uintptr_t arg6);
+extern uintptr_t _wrap_Enquire_get_eset__SWIG_7_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3, swig_intgo arg4, double arg5);
+extern uintptr_t _wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_67 _wrap_Enquire_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorExpandDecider_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_ExpandDecider_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_68 arg2);
+extern void _wrap_delete_ExpandDecider_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ExpandDecider_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ExpandDecider_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ExpandDeciderAnd_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern _Bool _wrap_ExpandDeciderAnd_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_69 arg2);
+extern void _wrap_delete_ExpandDeciderAnd_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ExpandDeciderAnd_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ExpandDeciderAnd_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(swig_type_70 arg1);
+extern _Bool _wrap_ExpandDeciderFilterPrefix_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_71 arg2);
+extern void _wrap_delete_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorKeyMaker_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_72 _wrap_KeyMaker_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_delete_KeyMaker_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_KeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_KeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_MultiValueKeyMaker_xapian_245a1afe1629f0b1(void);
+extern swig_type_73 _wrap_MultiValueKeyMaker_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, _Bool arg3, swig_type_74 arg4);
+extern void _wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, _Bool arg3);
+extern void _wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_delete_MultiValueKeyMaker_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_MultiValueKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_MultiValueKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorStopperStopper_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorStopper_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_75 _wrap__swig_DirectorStopper_upcall_Get_description_xapian_245a1afe1629f0b1(uintptr_t);
+extern _Bool _wrap_Stopper_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_76 arg2);
+extern void _wrap_delete_Stopper_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_77 _wrap_Stopper_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Stopper_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Stopper_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_SimpleStopper__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern void _wrap_SimpleStopper_add_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_78 arg2);
+extern _Bool _wrap_SimpleStopper_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_79 arg2);
+extern swig_type_80 _wrap_SimpleStopper_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_SimpleStopper__SWIG_2_xapian_245a1afe1629f0b1(swig_type_81 arg1);
+extern void _wrap_delete_SimpleStopper_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_SimpleStopper_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_SimpleStopper_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_RP_SUFFIX_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_RP_REPEATED_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_RP_DATE_PREFER_MDY_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_RangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_RangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_82 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_RangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_83 arg2);
+extern uintptr_t _wrap_new_RangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern void _wrap_delete_RangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_RangeProcessor_check_range_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_84 arg2, swig_type_85 arg3);
+extern uintptr_t _wrap_RangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_86 arg2, swig_type_87 arg3);
+extern uintptr_t _wrap_RangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_RangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_88 arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_89 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_DateRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_90 arg2);
+extern uintptr_t _wrap_DateRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_91 arg2, swig_type_92 arg3);
+extern void _wrap_delete_DateRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_DateRangeProcessor_check_range_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_93 arg1, swig_type_94 arg2);
+extern uintptr_t _wrap_DateRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_DateRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_95 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_96 arg2);
+extern uintptr_t _wrap_new_NumberRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap_NumberRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_97 arg2, swig_type_98 arg3);
+extern void _wrap_delete_NumberRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_NumberRangeProcessor_check_range_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_93 arg1, swig_type_94 arg2);
+extern uintptr_t _wrap_NumberRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_NumberRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorValueRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_ValueRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
+extern uintptr_t _wrap_ValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_99 arg2, _Bool arg3);
+extern uintptr_t _wrap_new_StringValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_100 arg2);
+extern swig_intgo _wrap_StringValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
+extern void _wrap_delete_StringValueRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_StringValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_StringValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, _Bool arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, _Bool arg2);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_101 arg2, _Bool arg3, _Bool arg4, swig_intgo arg5);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_102 arg2, _Bool arg3, _Bool arg4);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_103 arg2, _Bool arg3);
+extern uintptr_t _wrap_new_DateValueRangeProcessor__SWIG_6_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_104 arg2);
+extern swig_intgo _wrap_DateValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
+extern void _wrap_delete_DateValueRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_DateValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_DateValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_105 arg2, _Bool arg3);
+extern uintptr_t _wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_type_106 arg2);
+extern swig_intgo _wrap_NumberValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_voidp arg2, swig_voidp arg3);
+extern void _wrap_delete_NumberValueRangeProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorFieldProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_FieldProcessor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_FieldProcessor_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_107 arg2);
+extern uintptr_t _wrap_FieldProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_FieldProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_FLAG_BOOLEAN_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_PHRASE_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_LOVEHATE_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_WILDCARD_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_PURE_NOT_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_PARTIAL_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_SYNONYM_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_CJK_NGRAM_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FLAG_DEFAULT_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_NONE_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_SOME_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_ALL_QueryParser_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_STEM_ALL_Z_QueryParser_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_QueryParser_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_QueryParser_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_QueryParser_set_stemmer_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_QueryParser_set_stemming_strategy_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_QueryParser_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_QueryParser_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_QueryParser_set_default_op_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_QueryParser_get_default_op_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_QueryParser_set_database_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_QueryParser_set_max_expansion__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern void _wrap_QueryParser_set_max_expansion__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern void _wrap_QueryParser_set_max_expansion__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_QueryParser_set_max_wildcard_expansion_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_QueryParser_parse_query__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_108 arg2, swig_intgo arg3, swig_type_109 arg4);
+extern uintptr_t _wrap_QueryParser_parse_query__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_110 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_QueryParser_parse_query__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_111 arg2);
+extern void _wrap_QueryParser_add_prefix__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_112 arg2, swig_type_113 arg3);
+extern void _wrap_QueryParser_add_prefix__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_114 arg2, uintptr_t arg3);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_115 arg2, swig_type_116 arg3, swig_voidp arg4);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_117 arg2, swig_type_118 arg3);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_119 arg2, swig_type_120 arg3, _Bool arg4);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_121 arg2, uintptr_t arg3, swig_voidp arg4);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_122 arg2, uintptr_t arg3);
+extern void _wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_123 arg2, uintptr_t arg3, _Bool arg4);
+extern uintptr_t _wrap_QueryParser_stoplist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_QueryParser_stoplist_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_QueryParser_unstem_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_124 arg2);
+extern uintptr_t _wrap_QueryParser_unstem_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_125 arg2);
+extern void _wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, swig_voidp arg3);
+extern void _wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_QueryParser_add_valuerangeprocessor_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_126 _wrap_QueryParser_get_corrected_query_string_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_127 _wrap_QueryParser_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_128 _wrap_sortable_serialise__xapian_245a1afe1629f0b1(double arg1, swig_type_129 arg2);
+extern swig_type_130 _wrap_sortable_serialise_xapian_245a1afe1629f0b1(double arg1);
+extern double _wrap_sortable_unserialise_xapian_245a1afe1629f0b1(swig_type_131 arg1);
+extern uintptr_t _wrap_new_ValueSetMatchDecider_xapian_245a1afe1629f0b1(swig_intgo arg1, _Bool arg2);
+extern void _wrap_ValueSetMatchDecider_add_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_132 arg2);
+extern void _wrap_ValueSetMatchDecider_remove_value_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_133 arg2);
+extern _Bool _wrap_ValueSetMatchDecider_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_delete_ValueSetMatchDecider_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_TWO_STAGE_SMOOTHING_Weight_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DIRICHLET_SMOOTHING_Weight_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_134 _wrap_Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_BoolWeight_xapian_245a1afe1629f0b1(void);
+extern swig_type_135 _wrap_BoolWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BoolWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_BoolWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BoolWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_BoolWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_BoolWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_BoolWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BoolWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_TfIdfWeight__SWIG_0_xapian_245a1afe1629f0b1(swig_type_136 arg1);
+extern uintptr_t _wrap_new_TfIdfWeight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_137 _wrap_TfIdfWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_TfIdfWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_TfIdfWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_TfIdfWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_TfIdfWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_TfIdfWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_BM25Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1, double arg2, double arg3, double arg4, double arg5);
+extern uintptr_t _wrap_new_BM25Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_138 _wrap_BM25Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BM25Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_BM25Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BM25Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_BM25Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_BM25Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_BM25Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BM25Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_BM25PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(double arg1, double arg2, double arg3, double arg4, double arg5, double arg6);
+extern uintptr_t _wrap_new_BM25PlusWeight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_139 _wrap_BM25PlusWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BM25PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_BM25PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BM25PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_BM25PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_BM25PlusWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_TradWeight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_TradWeight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_140 _wrap_TradWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_TradWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_TradWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_TradWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_TradWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_TradWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_TradWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_TradWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_InL2Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_InL2Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_141 _wrap_InL2Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_InL2Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_InL2Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_InL2Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_InL2Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_InL2Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_InL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_InL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_IfB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_IfB2Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_142 _wrap_IfB2Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_IfB2Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_IfB2Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_IfB2Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_IfB2Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_IfB2Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_IneB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_IneB2Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_143 _wrap_IneB2Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_IneB2Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_IneB2Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_IneB2Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_IneB2Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_IneB2Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_BB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_BB2Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_144 _wrap_BB2Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BB2Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_BB2Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_BB2Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_BB2Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_BB2Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_BB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_DLHWeight_xapian_245a1afe1629f0b1(void);
+extern swig_type_145 _wrap_DLHWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_DLHWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_DLHWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_DLHWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_DLHWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_DLHWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_DLHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DLHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_PL2Weight__SWIG_0_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_PL2Weight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_146 _wrap_PL2Weight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_PL2Weight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_PL2Weight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_PL2Weight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_PL2Weight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_PL2Weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_PL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_PL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_PL2PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(double arg1, double arg2);
+extern uintptr_t _wrap_new_PL2PlusWeight__SWIG_1_xapian_245a1afe1629f0b1(void);
+extern swig_type_147 _wrap_PL2PlusWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_PL2PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_PL2PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_PL2PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_PL2PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_PL2PlusWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_DPHWeight_xapian_245a1afe1629f0b1(void);
+extern swig_type_148 _wrap_DPHWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_DPHWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_DPHWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_DPHWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_DPHWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_DPHWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_DPHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DPHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_LMWeight__SWIG_0_xapian_245a1afe1629f0b1(double arg1, swig_intgo arg2, double arg3, double arg4);
+extern uintptr_t _wrap_new_LMWeight__SWIG_1_xapian_245a1afe1629f0b1(double arg1, swig_intgo arg2, double arg3);
+extern uintptr_t _wrap_new_LMWeight__SWIG_2_xapian_245a1afe1629f0b1(double arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_LMWeight__SWIG_3_xapian_245a1afe1629f0b1(double arg1);
+extern uintptr_t _wrap_new_LMWeight__SWIG_4_xapian_245a1afe1629f0b1(void);
+extern swig_type_149 _wrap_LMWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_LMWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_LMWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_LMWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_LMWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_LMWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_LMWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_LMWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_CoordWeight_init_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern uintptr_t _wrap_new_CoordWeight_xapian_245a1afe1629f0b1(void);
+extern swig_type_150 _wrap_CoordWeight_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_CoordWeight_get_sumpart_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern double _wrap_CoordWeight_get_maxpart_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_CoordWeight_get_sumextra_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern double _wrap_CoordWeight_get_maxextra_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_CoordWeight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_CoordWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_CoordWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorCompactorCompactor_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorCompactor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap__swig_DirectorCompactor_upcall_Set_status_xapian_245a1afe1629f0b1(uintptr_t, swig_type_151 table, swig_type_152 status);
+extern swig_intgo _wrap_STANDARD_Compactor_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FULL_Compactor_xapian_245a1afe1629f0b1(void);
+extern swig_intgo _wrap_FULLER_Compactor_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_Compactor_xapian_245a1afe1629f0b1(void);
+extern void _wrap_delete_Compactor_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Compactor_set_block_size_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_153 arg2);
+extern void _wrap_Compactor_set_renumber_xapian_245a1afe1629f0b1(uintptr_t arg1, _Bool arg2);
+extern void _wrap_Compactor_set_multipass_xapian_245a1afe1629f0b1(uintptr_t arg1, _Bool arg2);
+extern void _wrap_Compactor_set_compaction_level_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Compactor_set_destdir_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_154 arg2);
+extern void _wrap_Compactor_add_source_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_155 arg2);
+extern void _wrap_Compactor_compact_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Compactor_set_status_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_151 arg2, swig_type_152 arg3);
+extern uintptr_t _wrap__swig_NewDirectorPostingSourcePostingSource_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorPostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_245a1afe1629f0b1(uintptr_t);
+extern void _wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_245a1afe1629f0b1(uintptr_t, swig_intgo did, double min_wt);
+extern _Bool _wrap__swig_DirectorPostingSource_upcall_Check_xapian_245a1afe1629f0b1(uintptr_t, swig_intgo did, double min_wt);
+extern swig_type_156 _wrap__swig_DirectorPostingSource_upcall_Name_xapian_245a1afe1629f0b1(uintptr_t);
+extern swig_type_157 _wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_245a1afe1629f0b1(uintptr_t);
+extern void _wrap_delete_PostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern double _wrap_PostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_PostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_PostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PostingSource_next_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern void _wrap_PostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_PostingSource_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_PostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_158 _wrap_PostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_PostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_159 _wrap_PostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_PostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_PostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ValuePostingSource_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern swig_intgo _wrap_ValuePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValuePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValuePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValuePostingSource_next_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern void _wrap_ValuePostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_ValuePostingSource_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_ValuePostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValuePostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValuePostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_ValuePostingSource_get_database_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValuePostingSource_get_slot_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_160 _wrap_ValuePostingSource_get_value_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValuePostingSource_done_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_ValuePostingSource_get_started_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValuePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_ValuePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_ValuePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_delete_ValuePostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValuePostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_ValuePostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern double _wrap_ValuePostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_161 _wrap_ValuePostingSource_name_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_162 _wrap_ValuePostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValuePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValuePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_ValueWeightPostingSource_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern double _wrap_ValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_163 _wrap_ValueWeightPostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueWeightPostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_164 _wrap_ValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_ValueWeightPostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueWeightPostingSource_next_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern void _wrap_ValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, double arg2);
+extern _Bool _wrap_ValueWeightPostingSource_check_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, double arg2);
+extern _Bool _wrap_ValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_165 _wrap_ValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueWeightPostingSource_done_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_ValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_ValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern double _wrap_DecreasingValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_166 _wrap_DecreasingValueWeightPostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_DecreasingValueWeightPostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_DecreasingValueWeightPostingSource_next_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern void _wrap_DecreasingValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_DecreasingValueWeightPostingSource_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern swig_type_167 _wrap_DecreasingValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_DecreasingValueWeightPostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DecreasingValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_DecreasingValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_DecreasingValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_168 _wrap_DecreasingValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_DecreasingValueWeightPostingSource_done_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_DecreasingValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_ValueMapPostingSource_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern void _wrap_ValueMapPostingSource_add_mapping_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_169 arg2, double arg3);
+extern void _wrap_ValueMapPostingSource_clear_mappings_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueMapPostingSource_set_default_weight_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern double _wrap_ValueMapPostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_170 _wrap_ValueMapPostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueMapPostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_171 _wrap_ValueMapPostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_ValueMapPostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueMapPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueMapPostingSource_next_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern void _wrap_ValueMapPostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, double arg2);
+extern _Bool _wrap_ValueMapPostingSource_check_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, double arg2);
+extern _Bool _wrap_ValueMapPostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueMapPostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueMapPostingSource_get_database_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_ValueMapPostingSource_get_slot_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_172 _wrap_ValueMapPostingSource_get_value_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueMapPostingSource_done_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_ValueMapPostingSource_get_started_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_ValueMapPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueMapPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueMapPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_ValueMapPostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_ValueMapPostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueMapPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueMapPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_FixedWeightPostingSource_xapian_245a1afe1629f0b1(double arg1);
+extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_FixedWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_FixedWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_FixedWeightPostingSource_next_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern void _wrap_FixedWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_FixedWeightPostingSource_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_FixedWeightPostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_FixedWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_173 _wrap_FixedWeightPostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_FixedWeightPostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_174 _wrap_FixedWeightPostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_FixedWeightPostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_FixedWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_FixedWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_FixedWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_FixedWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorMatchSpy_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_175 _wrap__swig_DirectorMatchSpy_upcall_Name_xapian_245a1afe1629f0b1(uintptr_t);
+extern void _wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_245a1afe1629f0b1(uintptr_t, swig_type_176 serialised);
+extern swig_type_177 _wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_245a1afe1629f0b1(uintptr_t);
+extern void _wrap_delete_MatchSpy_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_MatchSpy_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, double arg3);
+extern swig_type_178 _wrap_MatchSpy_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_MatchSpy_merge_results_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_176 arg2);
+extern swig_type_179 _wrap_MatchSpy_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_MatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_MatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_ValueCountMatchSpy__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_ValueCountMatchSpy__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern swig_type_180 _wrap_ValueCountMatchSpy_get_total_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ValueCountMatchSpy_values_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ValueCountMatchSpy_values_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ValueCountMatchSpy_top_values_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_181 arg2);
+extern uintptr_t _wrap_ValueCountMatchSpy_top_values_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_182 arg2);
+extern void _wrap_ValueCountMatchSpy_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, double arg3);
+extern swig_type_183 _wrap_ValueCountMatchSpy_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_ValueCountMatchSpy_merge_results_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_184 arg2);
+extern swig_type_185 _wrap_ValueCountMatchSpy_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_ValueCountMatchSpy_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_ValueCountMatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_ValueCountMatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern double _wrap_miles_to_metres_xapian_245a1afe1629f0b1(double arg1);
+extern double _wrap_metres_to_miles_xapian_245a1afe1629f0b1(double arg1);
+extern void _wrap_LatLongCoord_latitude_set_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern double _wrap_LatLongCoord_latitude_get_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongCoord_longitude_set_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern double _wrap_LatLongCoord_longitude_get_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_LatLongCoord__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_LatLongCoord__SWIG_1_xapian_245a1afe1629f0b1(double arg1, double arg2);
+extern void _wrap_LatLongCoord_unserialise_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_186 arg2);
+extern swig_type_187 _wrap_LatLongCoord_serialise_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_188 _wrap_LatLongCoord_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_LatLongCoord_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_LatLongCoordsIterator_xapian_245a1afe1629f0b1(void);
+extern _Bool _wrap_LatLongCoordsIterator_equals_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_LatLongCoordsIterator_get_coord_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongCoordsIterator_next_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_LatLongCoordsIterator_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_LatLongCoords_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_LatLongCoords_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_189 _wrap_LatLongCoords_size_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_LatLongCoords_empty_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongCoords_append_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_new_LatLongCoords__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_LatLongCoords__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongCoords_unserialise_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_190 arg2);
+extern swig_type_191 _wrap_LatLongCoords_serialise_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_192 _wrap_LatLongCoords_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_LatLongCoords_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_245a1afe1629f0b1(int);
+extern void _wrap_DeleteDirectorLatLongMetric_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_LatLongMetric_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_LatLongMetric_pointwise_distance_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
+extern double _wrap_LatLongMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
+extern double _wrap_LatLongMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, swig_type_193 arg3);
+extern double _wrap_LatLongMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, swig_type_194 arg3, swig_type_195 arg4);
+extern swig_type_196 _wrap_LatLongMetric_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_GreatCircleMetric__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_GreatCircleMetric__SWIG_1_xapian_245a1afe1629f0b1(double arg1);
+extern double _wrap_GreatCircleMetric_pointwise_distance_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
+extern swig_type_197 _wrap_GreatCircleMetric_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_delete_GreatCircleMetric_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_GreatCircleMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, uintptr_t arg1, uintptr_t arg2);
+extern double _wrap_GreatCircleMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base, uintptr_t arg1, swig_type_198 arg2);
+extern double _wrap_GreatCircleMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t _swig_base, uintptr_t arg1, swig_type_199 arg2, swig_type_200 arg3);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4, double arg5, double arg6);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4, double arg5);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, double arg3, double arg4, double arg5);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, double arg3, double arg4);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, double arg3);
+extern uintptr_t _wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2);
+extern void _wrap_delete_LatLongDistancePostingSource_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongDistancePostingSource_next_xapian_245a1afe1629f0b1(uintptr_t arg1, double arg2);
+extern void _wrap_LatLongDistancePostingSource_skip_to_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern _Bool _wrap_LatLongDistancePostingSource_check_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, double arg3);
+extern double _wrap_LatLongDistancePostingSource_get_weight_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_201 _wrap_LatLongDistancePostingSource_name_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_LatLongDistancePostingSource_init_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_202 _wrap_LatLongDistancePostingSource_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_LatLongDistancePostingSource_at_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_LatLongDistancePostingSource_get_docid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_LatLongDistancePostingSource_get_database_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_LatLongDistancePostingSource_get_slot_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_203 _wrap_LatLongDistancePostingSource_get_value_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_LatLongDistancePostingSource_done_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_LatLongDistancePostingSource_get_started_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_LatLongDistancePostingSource_set_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base, double arg1);
+extern double _wrap_LatLongDistancePostingSource_get_maxweight_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3, double arg4);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2, uintptr_t arg3);
+extern uintptr_t _wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_245a1afe1629f0b1(swig_intgo arg1, uintptr_t arg2);
+extern void _wrap_delete_LatLongDistanceKeyMaker_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_204 _wrap_LatLongDistanceKeyMaker_Apply_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_Database_add_database_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern uintptr_t _wrap_new_Database__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_Database__SWIG_1_xapian_245a1afe1629f0b1(swig_type_205 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_Database__SWIG_2_xapian_245a1afe1629f0b1(swig_type_206 arg1);
+extern uintptr_t _wrap_new_Database__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_Database__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern void _wrap_delete_Database_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Database_reopen_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_Database_close_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_207 _wrap_Database_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_postlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_208 arg2);
+extern uintptr_t _wrap_Database_postlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_209 arg2);
+extern uintptr_t _wrap_Database_termlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_Database_termlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern _Bool _wrap_Database_has_positions_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_positionlist_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_type_210 arg3);
+extern uintptr_t _wrap_Database_positionlist_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_type_211 arg3);
+extern uintptr_t _wrap_Database_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_212 arg2);
+extern uintptr_t _wrap_Database_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_213 arg2);
+extern uintptr_t _wrap_Database_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Database_get_doccount_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Database_get_lastdocid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern double _wrap_Database_get_avlength_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_get_total_length_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Database_get_termfreq_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_214 arg2);
+extern _Bool _wrap_Database_term_exists_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_215 arg2);
+extern swig_intgo _wrap_Database_get_collection_freq_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_216 arg2);
+extern swig_intgo _wrap_Database_get_value_freq_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_217 _wrap_Database_get_value_lower_bound_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_type_218 _wrap_Database_get_value_upper_bound_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_Database_get_doclength_lower_bound_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Database_get_doclength_upper_bound_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_Database_get_wdf_upper_bound_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_219 arg2);
+extern uintptr_t _wrap_Database_valuestream_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_Database_valuestream_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_Database_get_doclength_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern swig_intgo _wrap_Database_get_unique_terms_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Database_keep_alive_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_get_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern uintptr_t _wrap_Database_get_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern swig_type_220 _wrap_Database_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_221 arg2, swig_intgo arg3);
+extern swig_type_222 _wrap_Database_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_223 arg2);
+extern uintptr_t _wrap_Database_spellings_begin_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_spellings_end_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_synonyms_begin_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_224 arg2);
+extern uintptr_t _wrap_Database_synonyms_end_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_225 arg2);
+extern uintptr_t _wrap_Database_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_226 arg2);
+extern uintptr_t _wrap_Database_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_227 arg2);
+extern uintptr_t _wrap_Database_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_228 _wrap_Database_get_metadata_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_229 arg2);
+extern uintptr_t _wrap_Database_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_230 arg2);
+extern uintptr_t _wrap_Database_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_231 arg2);
+extern uintptr_t _wrap_Database_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_232 _wrap_Database_get_uuid_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern _Bool _wrap_Database_locked_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_Database_get_revision_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_type_233 _wrap_Database_check__SWIG_0_xapian_245a1afe1629f0b1(swig_type_234 arg1, swig_intgo arg2);
+extern swig_type_235 _wrap_Database_check__SWIG_1_xapian_245a1afe1629f0b1(swig_type_236 arg1);
+extern swig_type_237 _wrap_Database_check__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, uintptr_t arg3);
+extern swig_type_238 _wrap_Database_check__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2);
+extern swig_type_239 _wrap_Database_check__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern void _wrap_Database_compact__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_240 arg2, swig_intgo arg3, swig_intgo arg4);
+extern void _wrap_Database_compact__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_241 arg2, swig_intgo arg3);
+extern void _wrap_Database_compact__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_242 arg2);
+extern void _wrap_Database_compact__SWIG_3_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern void _wrap_Database_compact__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3);
+extern void _wrap_Database_compact__SWIG_5_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_Database_compact__SWIG_6_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_243 arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
+extern void _wrap_Database_compact__SWIG_7_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, uintptr_t arg5);
+extern void _wrap_delete_WritableDatabase_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern uintptr_t _wrap_new_WritableDatabase__SWIG_0_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_new_WritableDatabase__SWIG_1_xapian_245a1afe1629f0b1(swig_type_244 arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_new_WritableDatabase__SWIG_2_xapian_245a1afe1629f0b1(swig_type_245 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_new_WritableDatabase__SWIG_3_xapian_245a1afe1629f0b1(swig_type_246 arg1);
+extern void _wrap_WritableDatabase_commit_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_WritableDatabase_flush_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, _Bool arg2);
+extern void _wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_WritableDatabase_commit_transaction_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_WritableDatabase_cancel_transaction_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern swig_intgo _wrap_WritableDatabase_add_document_xapian_245a1afe1629f0b1(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_WritableDatabase_delete_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_WritableDatabase_delete_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_247 arg2);
+extern void _wrap_WritableDatabase_replace_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_intgo arg2, uintptr_t arg3);
+extern swig_intgo _wrap_WritableDatabase_replace_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_248 arg2, uintptr_t arg3);
+extern void _wrap_WritableDatabase_add_spelling__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_249 arg2, swig_intgo arg3);
+extern void _wrap_WritableDatabase_add_spelling__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_250 arg2);
+extern void _wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_251 arg2, swig_intgo arg3);
+extern void _wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_252 arg2);
+extern void _wrap_WritableDatabase_add_synonym_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_253 arg2, swig_type_254 arg3);
+extern void _wrap_WritableDatabase_remove_synonym_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_255 arg2, swig_type_256 arg3);
+extern void _wrap_WritableDatabase_clear_synonyms_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_257 arg2);
+extern void _wrap_WritableDatabase_set_metadata_xapian_245a1afe1629f0b1(uintptr_t arg1, swig_type_258 arg2, swig_type_259 arg3);
+extern swig_type_260 _wrap_WritableDatabase_get_description_xapian_245a1afe1629f0b1(uintptr_t arg1);
+extern void _wrap_WritableDatabase_add_database_xapian_245a1afe1629f0b1(uintptr_t _swig_base, uintptr_t arg1);
+extern _Bool _wrap_WritableDatabase_reopen_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern void _wrap_WritableDatabase_close_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_postlist_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_261 arg1);
+extern uintptr_t _wrap_WritableDatabase_postlist_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_262 arg1);
+extern uintptr_t _wrap_WritableDatabase_termlist_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern uintptr_t _wrap_WritableDatabase_termlist_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern _Bool _wrap_WritableDatabase_has_positions_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_positionlist_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_type_263 arg2);
+extern uintptr_t _wrap_WritableDatabase_positionlist_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_type_264 arg2);
+extern uintptr_t _wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_265 arg1);
+extern uintptr_t _wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_266 arg1);
+extern uintptr_t _wrap_WritableDatabase_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_WritableDatabase_get_doccount_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_WritableDatabase_get_lastdocid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern double _wrap_WritableDatabase_get_avlength_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_get_total_length_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_WritableDatabase_get_termfreq_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_267 arg1);
+extern _Bool _wrap_WritableDatabase_term_exists_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_268 arg1);
+extern swig_intgo _wrap_WritableDatabase_get_collection_freq_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_269 arg1);
+extern swig_intgo _wrap_WritableDatabase_get_value_freq_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern swig_type_270 _wrap_WritableDatabase_get_value_lower_bound_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern swig_type_271 _wrap_WritableDatabase_get_value_upper_bound_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern swig_intgo _wrap_WritableDatabase_get_doclength_lower_bound_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_WritableDatabase_get_doclength_upper_bound_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_intgo _wrap_WritableDatabase_get_wdf_upper_bound_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_272 arg1);
+extern uintptr_t _wrap_WritableDatabase_valuestream_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern uintptr_t _wrap_WritableDatabase_valuestream_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern swig_intgo _wrap_WritableDatabase_get_doclength_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern swig_intgo _wrap_WritableDatabase_get_unique_terms_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_WritableDatabase_keep_alive_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_get_document__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern uintptr_t _wrap_WritableDatabase_get_document__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2);
+extern swig_type_273 _wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_274 arg1, swig_intgo arg2);
+extern swig_type_275 _wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_276 arg1);
+extern uintptr_t _wrap_WritableDatabase_spellings_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_spellings_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_synonyms_begin_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_277 arg1);
+extern uintptr_t _wrap_WritableDatabase_synonyms_end_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_278 arg1);
+extern uintptr_t _wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_279 arg1);
+extern uintptr_t _wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_280 arg1);
+extern uintptr_t _wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_281 _wrap_WritableDatabase_get_metadata_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_282 arg1);
+extern uintptr_t _wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_283 arg1);
+extern uintptr_t _wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_284 arg1);
+extern uintptr_t _wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_285 _wrap_WritableDatabase_get_uuid_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern _Bool _wrap_WritableDatabase_locked_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern uintptr_t _wrap_WritableDatabase_get_revision_xapian_245a1afe1629f0b1(uintptr_t _swig_base);
+extern swig_type_286 _wrap_WritableDatabase_check__SWIG_0_xapian_245a1afe1629f0b1(swig_type_234 arg1, swig_intgo arg2);
+extern swig_type_287 _wrap_WritableDatabase_check__SWIG_1_xapian_245a1afe1629f0b1(swig_type_236 arg1);
+extern swig_type_288 _wrap_WritableDatabase_check__SWIG_2_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2, uintptr_t arg3);
+extern swig_type_289 _wrap_WritableDatabase_check__SWIG_3_xapian_245a1afe1629f0b1(swig_intgo arg1, swig_intgo arg2);
+extern swig_type_290 _wrap_WritableDatabase_check__SWIG_4_xapian_245a1afe1629f0b1(swig_intgo arg1);
+extern void _wrap_WritableDatabase_compact__SWIG_0_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_291 arg1, swig_intgo arg2, swig_intgo arg3);
+extern void _wrap_WritableDatabase_compact__SWIG_1_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_292 arg1, swig_intgo arg2);
+extern void _wrap_WritableDatabase_compact__SWIG_2_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_293 arg1);
+extern void _wrap_WritableDatabase_compact__SWIG_3_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2, swig_intgo arg3);
+extern void _wrap_WritableDatabase_compact__SWIG_4_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2);
+extern void _wrap_WritableDatabase_compact__SWIG_5_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1);
+extern void _wrap_WritableDatabase_compact__SWIG_6_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_type_294 arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
+extern void _wrap_WritableDatabase_compact__SWIG_7_xapian_245a1afe1629f0b1(uintptr_t _swig_base, swig_intgo arg1, swig_intgo arg2, swig_intgo arg3, uintptr_t arg4);
+extern uintptr_t _wrap_open_stub__SWIG_0_xapian_245a1afe1629f0b1(swig_type_295 arg1);
+extern uintptr_t _wrap_open_stub__SWIG_1_xapian_245a1afe1629f0b1(swig_type_296 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_inmemory_open_xapian_245a1afe1629f0b1(void);
+extern uintptr_t _wrap_chert_open__SWIG_0_xapian_245a1afe1629f0b1(swig_type_297 arg1);
+extern uintptr_t _wrap_chert_open__SWIG_1_xapian_245a1afe1629f0b1(swig_type_298 arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_chert_open__SWIG_2_xapian_245a1afe1629f0b1(swig_type_299 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_remote_open__SWIG_0_xapian_245a1afe1629f0b1(swig_type_300 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_remote_open__SWIG_1_xapian_245a1afe1629f0b1(swig_type_301 arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_remote_open__SWIG_2_xapian_245a1afe1629f0b1(swig_type_302 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_remote_open_writable__SWIG_0_xapian_245a1afe1629f0b1(swig_type_303 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4, swig_intgo arg5);
+extern uintptr_t _wrap_remote_open_writable__SWIG_1_xapian_245a1afe1629f0b1(swig_type_304 arg1, swig_intgo arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_remote_open_writable__SWIG_2_xapian_245a1afe1629f0b1(swig_type_305 arg1, swig_intgo arg2, swig_intgo arg3);
+extern uintptr_t _wrap_remote_open_writable__SWIG_3_xapian_245a1afe1629f0b1(swig_type_306 arg1, swig_intgo arg2);
+extern uintptr_t _wrap_remote_open__SWIG_3_xapian_245a1afe1629f0b1(swig_type_307 arg1, swig_type_308 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_remote_open__SWIG_4_xapian_245a1afe1629f0b1(swig_type_309 arg1, swig_type_310 arg2);
+extern uintptr_t _wrap_remote_open_writable__SWIG_4_xapian_245a1afe1629f0b1(swig_type_311 arg1, swig_type_312 arg2, swig_intgo arg3, swig_intgo arg4);
+extern uintptr_t _wrap_remote_open_writable__SWIG_5_xapian_245a1afe1629f0b1(swig_type_313 arg1, swig_type_314 arg2, swig_intgo arg3);
+extern uintptr_t _wrap_remote_open_writable__SWIG_6_xapian_245a1afe1629f0b1(swig_type_315 arg1, swig_type_316 arg2);
 #undef intgo
 */
 import "C"
@@ -1454,12 +1477,225 @@ func swigCopyString(s string) string {
 
 func Swig_free(arg1 uintptr) {
 	_swig_i_0 := arg1
-	C._wrap_Swig_free_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Swig_free_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+type SwigcptrMSet uintptr
+
+func (p SwigcptrMSet) Swigcptr() uintptr {
+	return (uintptr)(p)
+}
+
+func (p SwigcptrMSet) SwigIsMSet() {
+}
+
+func (arg1 SwigcptrMSet) Get_docid(arg2 uint) (_swig_ret uint) {
+	var swig_r uint
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2
+	swig_r = (uint)(C._wrap_MSet_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSet) Get_document(arg2 uint) (_swig_ret Document) {
+	var swig_r Document
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2
+	swig_r = (Document)(SwigcptrDocument(C._wrap_MSet_get_document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSet) Get_hit(arg2 uint) (_swig_ret MSetIterator) {
+	var swig_r MSetIterator
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2
+	swig_r = (MSetIterator)(SwigcptrMSetIterator(C._wrap_MSet_get_hit_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSet) Get_document_percentage(arg2 uint) (_swig_ret int) {
+	var swig_r int
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2
+	swig_r = (int)(C._wrap_MSet_get_document_percentage_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSet) Size() (_swig_ret int) {
+	var swig_r int
+	_swig_i_0 := arg1
+	swig_r = (int)(C._wrap_MSet_size_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
+	return swig_r
+}
+
+func NewMSet() (_swig_ret MSet) {
+	var swig_r MSet
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_new_MSet_xapian_245a1afe1629f0b1()))
+	return swig_r
+}
+
+func DeleteMSet(arg1 MSet) {
+	_swig_i_0 := arg1.Swigcptr()
+	C._wrap_delete_MSet_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+type MSet interface {
+	Swigcptr() uintptr
+	SwigIsMSet()
+	Get_docid(arg2 uint) (_swig_ret uint)
+	Get_document(arg2 uint) (_swig_ret Document)
+	Get_hit(arg2 uint) (_swig_ret MSetIterator)
+	Get_document_percentage(arg2 uint) (_swig_ret int)
+	Size() (_swig_ret int)
+}
+
+type SwigcptrESet uintptr
+
+func (p SwigcptrESet) Swigcptr() uintptr {
+	return (uintptr)(p)
+}
+
+func (p SwigcptrESet) SwigIsESet() {
+}
+
+func NewESet() (_swig_ret ESet) {
+	var swig_r ESet
+	swig_r = (ESet)(SwigcptrESet(C._wrap_new_ESet_xapian_245a1afe1629f0b1()))
+	return swig_r
+}
+
+func DeleteESet(arg1 ESet) {
+	_swig_i_0 := arg1.Swigcptr()
+	C._wrap_delete_ESet_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+type ESet interface {
+	Swigcptr() uintptr
+	SwigIsESet()
+}
+
+type SwigcptrMSetIterator uintptr
+
+func (p SwigcptrMSetIterator) Swigcptr() uintptr {
+	return (uintptr)(p)
+}
+
+func (p SwigcptrMSetIterator) SwigIsMSetIterator() {
+}
+
+func (arg1 SwigcptrMSetIterator) Equals(arg2 MSetIterator) (_swig_ret bool) {
+	var swig_r bool
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2.Swigcptr()
+	swig_r = (bool)(C._wrap_MSetIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSetIterator) Get_docid() (_swig_ret uint) {
+	var swig_r uint
+	_swig_i_0 := arg1
+	swig_r = (uint)(C._wrap_MSetIterator_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
+	return swig_r
+}
+
+func (arg1 SwigcptrMSetIterator) Next() {
+	_swig_i_0 := arg1
+	C._wrap_MSetIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+func (arg1 SwigcptrMSetIterator) Prev() {
+	_swig_i_0 := arg1
+	C._wrap_MSetIterator_prev_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+func (arg1 SwigcptrMSetIterator) Get_document() (_swig_ret Document) {
+	var swig_r Document
+	_swig_i_0 := arg1
+	swig_r = (Document)(SwigcptrDocument(C._wrap_MSetIterator_get_document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
+	return swig_r
+}
+
+func NewMSetIterator() (_swig_ret MSetIterator) {
+	var swig_r MSetIterator
+	swig_r = (MSetIterator)(SwigcptrMSetIterator(C._wrap_new_MSetIterator_xapian_245a1afe1629f0b1()))
+	return swig_r
+}
+
+func DeleteMSetIterator(arg1 MSetIterator) {
+	_swig_i_0 := arg1.Swigcptr()
+	C._wrap_delete_MSetIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+type MSetIterator interface {
+	Swigcptr() uintptr
+	SwigIsMSetIterator()
+	Equals(arg2 MSetIterator) (_swig_ret bool)
+	Get_docid() (_swig_ret uint)
+	Next()
+	Prev()
+	Get_document() (_swig_ret Document)
+}
+
+type SwigcptrESetIterator uintptr
+
+func (p SwigcptrESetIterator) Swigcptr() uintptr {
+	return (uintptr)(p)
+}
+
+func (p SwigcptrESetIterator) SwigIsESetIterator() {
+}
+
+func (arg1 SwigcptrESetIterator) Equals(arg2 ESetIterator) (_swig_ret bool) {
+	var swig_r bool
+	_swig_i_0 := arg1
+	_swig_i_1 := arg2.Swigcptr()
+	swig_r = (bool)(C._wrap_ESetIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	return swig_r
+}
+
+func (arg1 SwigcptrESetIterator) Get_term() (_swig_ret string) {
+	var swig_r string
+	_swig_i_0 := arg1
+	swig_r_p := C._wrap_ESetIterator_get_term_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
+	var swig_r_1 string
+	swig_r_1 = swigCopyString(swig_r)
+	return swig_r_1
+}
+
+func (arg1 SwigcptrESetIterator) Next() {
+	_swig_i_0 := arg1
+	C._wrap_ESetIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+func (arg1 SwigcptrESetIterator) Prev() {
+	_swig_i_0 := arg1
+	C._wrap_ESetIterator_prev_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+func NewESetIterator() (_swig_ret ESetIterator) {
+	var swig_r ESetIterator
+	swig_r = (ESetIterator)(SwigcptrESetIterator(C._wrap_new_ESetIterator_xapian_245a1afe1629f0b1()))
+	return swig_r
+}
+
+func DeleteESetIterator(arg1 ESetIterator) {
+	_swig_i_0 := arg1.Swigcptr()
+	C._wrap_delete_ESetIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
+}
+
+type ESetIterator interface {
+	Swigcptr() uintptr
+	SwigIsESetIterator()
+	Equals(arg2 ESetIterator) (_swig_ret bool)
+	Get_term() (_swig_ret string)
+	Next()
+	Prev()
 }
 
 func Version_string() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_version_string_xapian_1797894d64db9bab()
+	swig_r_p := C._wrap_version_string_xapian_245a1afe1629f0b1()
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -1468,31 +1704,31 @@ func Version_string() (_swig_ret string) {
 
 func Major_version() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_major_version_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_major_version_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func Minor_version() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_minor_version_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_minor_version_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func Revision() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_revision_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_revision_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func GetBAD_VALUENO() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_BAD_VALUENO_get_xapian_1797894d64db9bab())
+	swig_r = (uint)(C._wrap_BAD_VALUENO_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func _swig_getDB_CREATE() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_CREATE_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_CREATE_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1500,7 +1736,7 @@ var DB_CREATE int = _swig_getDB_CREATE()
 
 func _swig_getDB_CREATE_OR_OPEN() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_CREATE_OR_OPEN_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_CREATE_OR_OPEN_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1508,7 +1744,7 @@ var DB_CREATE_OR_OPEN int = _swig_getDB_CREATE_OR_OPEN()
 
 func _swig_getDB_CREATE_OR_OVERWRITE() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_CREATE_OR_OVERWRITE_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_CREATE_OR_OVERWRITE_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1516,7 +1752,7 @@ var DB_CREATE_OR_OVERWRITE int = _swig_getDB_CREATE_OR_OVERWRITE()
 
 func _swig_getDB_OPEN() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_OPEN_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_OPEN_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1524,7 +1760,7 @@ var DB_OPEN int = _swig_getDB_OPEN()
 
 func _swig_getDB_NO_SYNC() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_NO_SYNC_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_NO_SYNC_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1532,7 +1768,7 @@ var DB_NO_SYNC int = _swig_getDB_NO_SYNC()
 
 func _swig_getDB_FULL_SYNC() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_FULL_SYNC_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_FULL_SYNC_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1540,7 +1776,7 @@ var DB_FULL_SYNC int = _swig_getDB_FULL_SYNC()
 
 func _swig_getDB_DANGEROUS() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_DANGEROUS_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_DANGEROUS_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1548,7 +1784,7 @@ var DB_DANGEROUS int = _swig_getDB_DANGEROUS()
 
 func _swig_getDB_NO_TERMLIST() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_NO_TERMLIST_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_NO_TERMLIST_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1556,7 +1792,7 @@ var DB_NO_TERMLIST int = _swig_getDB_NO_TERMLIST()
 
 func _swig_getDB_BACKEND_CHERT() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_BACKEND_CHERT_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_BACKEND_CHERT_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1564,7 +1800,7 @@ var DB_BACKEND_CHERT int = _swig_getDB_BACKEND_CHERT()
 
 func _swig_getDB_BACKEND_GLASS() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_BACKEND_GLASS_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_BACKEND_GLASS_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1572,7 +1808,7 @@ var DB_BACKEND_GLASS int = _swig_getDB_BACKEND_GLASS()
 
 func _swig_getDB_BACKEND_STUB() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_BACKEND_STUB_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_BACKEND_STUB_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1580,7 +1816,7 @@ var DB_BACKEND_STUB int = _swig_getDB_BACKEND_STUB()
 
 func _swig_getDB_RETRY_LOCK() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_RETRY_LOCK_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_RETRY_LOCK_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1588,7 +1824,7 @@ var DB_RETRY_LOCK int = _swig_getDB_RETRY_LOCK()
 
 func _swig_getDBCHECK_SHORT_TREE() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCHECK_SHORT_TREE_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCHECK_SHORT_TREE_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1596,7 +1832,7 @@ var DBCHECK_SHORT_TREE int = _swig_getDBCHECK_SHORT_TREE()
 
 func _swig_getDBCHECK_FULL_TREE() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCHECK_FULL_TREE_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCHECK_FULL_TREE_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1604,7 +1840,7 @@ var DBCHECK_FULL_TREE int = _swig_getDBCHECK_FULL_TREE()
 
 func _swig_getDBCHECK_SHOW_FREELIST() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCHECK_SHOW_FREELIST_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCHECK_SHOW_FREELIST_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1612,7 +1848,7 @@ var DBCHECK_SHOW_FREELIST int = _swig_getDBCHECK_SHOW_FREELIST()
 
 func _swig_getDBCHECK_SHOW_STATS() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCHECK_SHOW_STATS_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCHECK_SHOW_STATS_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1620,7 +1856,7 @@ var DBCHECK_SHOW_STATS int = _swig_getDBCHECK_SHOW_STATS()
 
 func _swig_getDBCHECK_FIX() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCHECK_FIX_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCHECK_FIX_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1628,31 +1864,31 @@ var DBCHECK_FIX int = _swig_getDBCHECK_FIX()
 
 func GetDB_BACKEND_INMEMORY() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DB_BACKEND_INMEMORY_get_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DB_BACKEND_INMEMORY_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func GetDBCOMPACT_NO_RENUMBER() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCOMPACT_NO_RENUMBER_get_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCOMPACT_NO_RENUMBER_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func GetDBCOMPACT_MULTIPASS() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCOMPACT_MULTIPASS_get_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCOMPACT_MULTIPASS_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func GetDBCOMPACT_SINGLE_FILE() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DBCOMPACT_SINGLE_FILE_get_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DBCOMPACT_SINGLE_FILE_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
 func GetDOC_ASSUME_VALID() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DOC_ASSUME_VALID_get_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DOC_ASSUME_VALID_get_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -1667,25 +1903,25 @@ func (p SwigcptrPositionIterator) SwigIsPositionIterator() {
 
 func NewPositionIterator() (_swig_ret PositionIterator) {
 	var swig_r PositionIterator
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_new_PositionIterator_xapian_1797894d64db9bab()))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_new_PositionIterator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeletePositionIterator(arg1 PositionIterator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_PositionIterator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_PositionIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrPositionIterator) Skip_to(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_PositionIterator_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_PositionIterator_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrPositionIterator) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PositionIterator_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PositionIterator_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -1696,20 +1932,20 @@ func (arg1 SwigcptrPositionIterator) Equals(arg2 PositionIterator) (_swig_ret bo
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_PositionIterator_equals_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_PositionIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPositionIterator) Get_termpos() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PositionIterator_get_termpos_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PositionIterator_get_termpos_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPositionIterator) Next() {
 	_swig_i_0 := arg1
-	C._wrap_PositionIterator_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_PositionIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type PositionIterator interface {
@@ -1733,60 +1969,60 @@ func (p SwigcptrPostingIterator) SwigIsPostingIterator() {
 
 func NewPostingIterator() (_swig_ret PostingIterator) {
 	var swig_r PostingIterator
-	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_new_PostingIterator_xapian_1797894d64db9bab()))
+	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_new_PostingIterator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeletePostingIterator(arg1 PostingIterator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_PostingIterator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_PostingIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrPostingIterator) Get_wdf() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingIterator_get_wdf_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingIterator_get_wdf_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Get_doclength() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingIterator_get_doclength_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingIterator_get_doclength_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Get_unique_terms() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingIterator_get_unique_terms_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingIterator_get_unique_terms_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Positionlist_begin() (_swig_ret PositionIterator) {
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_PostingIterator_positionlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_PostingIterator_positionlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Positionlist_end() (_swig_ret PositionIterator) {
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_PostingIterator_positionlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_PostingIterator_positionlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Skip_to(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_PostingIterator_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_PostingIterator_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrPostingIterator) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PostingIterator_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PostingIterator_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -1797,20 +2033,20 @@ func (arg1 SwigcptrPostingIterator) Equals(arg2 PostingIterator) (_swig_ret bool
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_PostingIterator_equals_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_PostingIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingIterator_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingIterator_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingIterator) Next() {
 	_swig_i_0 := arg1
-	C._wrap_PostingIterator_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_PostingIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type PostingIterator interface {
@@ -1839,54 +2075,54 @@ func (p SwigcptrTermIterator) SwigIsTermIterator() {
 
 func NewTermIterator() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_new_TermIterator_xapian_1797894d64db9bab()))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_new_TermIterator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteTermIterator(arg1 TermIterator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_TermIterator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_TermIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrTermIterator) Get_wdf() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_TermIterator_get_wdf_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_TermIterator_get_wdf_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Get_termfreq() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_TermIterator_get_termfreq_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_TermIterator_get_termfreq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Positionlist_count() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_TermIterator_positionlist_count_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_TermIterator_positionlist_count_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Positionlist_begin() (_swig_ret PositionIterator) {
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_TermIterator_positionlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_TermIterator_positionlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Positionlist_end() (_swig_ret PositionIterator) {
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_TermIterator_positionlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_TermIterator_positionlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Skip_to(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermIterator_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_4)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_TermIterator_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_5)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -1895,7 +2131,7 @@ func (arg1 SwigcptrTermIterator) Skip_to(arg2 string) {
 func (arg1 SwigcptrTermIterator) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_TermIterator_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_TermIterator_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -1906,14 +2142,14 @@ func (arg1 SwigcptrTermIterator) Equals(arg2 TermIterator) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_TermIterator_equals_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_TermIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermIterator) Get_term() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_TermIterator_get_term_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_TermIterator_get_term_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -1922,7 +2158,7 @@ func (arg1 SwigcptrTermIterator) Get_term() (_swig_ret string) {
 
 func (arg1 SwigcptrTermIterator) Next() {
 	_swig_i_0 := arg1
-	C._wrap_TermIterator_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_TermIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type TermIterator interface {
@@ -1951,47 +2187,47 @@ func (p SwigcptrValueIterator) SwigIsValueIterator() {
 
 func NewValueIterator() (_swig_ret ValueIterator) {
 	var swig_r ValueIterator
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_new_ValueIterator_xapian_1797894d64db9bab()))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_new_ValueIterator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteValueIterator(arg1 ValueIterator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueIterator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrValueIterator) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValueIterator_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValueIterator_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueIterator) Get_valueno() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValueIterator_get_valueno_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValueIterator_get_valueno_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueIterator) Skip_to(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueIterator_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_ValueIterator_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrValueIterator) Check(arg2 uint) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ValueIterator_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (bool)(C._wrap_ValueIterator_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueIterator) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueIterator_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueIterator_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2002,14 +2238,14 @@ func (arg1 SwigcptrValueIterator) Equals(arg2 ValueIterator) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_ValueIterator_equals_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_ValueIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueIterator) Get_value() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueIterator_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueIterator_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2018,7 +2254,7 @@ func (arg1 SwigcptrValueIterator) Get_value() (_swig_ret string) {
 
 func (arg1 SwigcptrValueIterator) Next() {
 	_swig_i_0 := arg1
-	C._wrap_ValueIterator_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_ValueIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type ValueIterator interface {
@@ -2045,20 +2281,20 @@ func (p SwigcptrDocument) SwigIsDocument() {
 
 func NewDocument() (_swig_ret Document) {
 	var swig_r Document
-	swig_r = (Document)(SwigcptrDocument(C._wrap_new_Document_xapian_1797894d64db9bab()))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_new_Document_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteDocument(arg1 Document) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Document_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDocument) Get_value(arg2 uint) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Document_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	swig_r_p := C._wrap_Document_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2069,7 +2305,7 @@ func (arg1 SwigcptrDocument) Add_value(arg2 uint, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Document_add_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_10)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_Document_add_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_11)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -2078,18 +2314,18 @@ func (arg1 SwigcptrDocument) Add_value(arg2 uint, arg3 string) {
 func (arg1 SwigcptrDocument) Remove_value(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Document_remove_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Document_remove_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrDocument) Clear_values() {
 	_swig_i_0 := arg1
-	C._wrap_Document_clear_values_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Document_clear_values_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDocument) Get_data() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Document_get_data_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Document_get_data_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2099,7 +2335,7 @@ func (arg1 SwigcptrDocument) Get_data() (_swig_ret string) {
 func (arg1 SwigcptrDocument) Set_data(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Document_set_data_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_12)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Document_set_data_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_13)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2110,7 +2346,7 @@ func (arg1 SwigcptrDocument) Add_posting__SWIG_0(arg2 string, arg3 uint, arg4 ui
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_Document_add_posting__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_13)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
+	C._wrap_Document_add_posting__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_14)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2120,7 +2356,7 @@ func (arg1 SwigcptrDocument) Add_posting__SWIG_1(arg2 string, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Document_add_posting__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_14)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_Document_add_posting__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_15)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2143,7 +2379,7 @@ func (arg1 SwigcptrDocument) Add_term__SWIG_0(arg2 string, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Document_add_term__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_15)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_Document_add_term__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_16)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2152,7 +2388,7 @@ func (arg1 SwigcptrDocument) Add_term__SWIG_0(arg2 string, arg3 uint) {
 func (arg1 SwigcptrDocument) Add_term__SWIG_1(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Document_add_term__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_16)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Document_add_term__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_17)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2174,7 +2410,7 @@ func (p SwigcptrDocument) Add_term(a ...interface{}) {
 func (arg1 SwigcptrDocument) Add_boolean_term(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Document_add_boolean_term_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_17)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Document_add_boolean_term_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_18)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2185,7 +2421,7 @@ func (arg1 SwigcptrDocument) Remove_posting__SWIG_0(arg2 string, arg3 uint, arg4
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_Document_remove_posting__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_18)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
+	C._wrap_Document_remove_posting__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_19)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2195,7 +2431,7 @@ func (arg1 SwigcptrDocument) Remove_posting__SWIG_1(arg2 string, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Document_remove_posting__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_19)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_Document_remove_posting__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_20)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2217,7 +2453,7 @@ func (p SwigcptrDocument) Remove_posting(a ...interface{}) {
 func (arg1 SwigcptrDocument) Remove_term(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Document_remove_term_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_20)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Document_remove_term_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_21)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2225,62 +2461,62 @@ func (arg1 SwigcptrDocument) Remove_term(arg2 string) {
 
 func (arg1 SwigcptrDocument) Clear_terms() {
 	_swig_i_0 := arg1
-	C._wrap_Document_clear_terms_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Document_clear_terms_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDocument) Termlist_count() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Document_termlist_count_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Document_termlist_count_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Termlist_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Document_termlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Document_termlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Termlist_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Document_termlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Document_termlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Values_count() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Document_values_count_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Document_values_count_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Values_begin() (_swig_ret ValueIterator) {
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Document_values_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Document_values_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Values_end() (_swig_ret ValueIterator) {
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Document_values_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Document_values_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Document_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Document_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDocument) Serialise() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Document_serialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Document_serialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2290,7 +2526,7 @@ func (arg1 SwigcptrDocument) Serialise() (_swig_ret string) {
 func DocumentUnserialise(arg1 string) (_swig_ret Document) {
 	var swig_r Document
 	_swig_i_0 := arg1
-	swig_r = (Document)(SwigcptrDocument(C._wrap_Document_unserialise_xapian_1797894d64db9bab(*(*C.swig_type_22)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_Document_unserialise_xapian_245a1afe1629f0b1(*(*C.swig_type_23)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2300,7 +2536,7 @@ func DocumentUnserialise(arg1 string) (_swig_ret Document) {
 func (arg1 SwigcptrDocument) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Document_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Document_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2344,26 +2580,26 @@ func (p SwigcptrRegistry) SwigIsRegistry() {
 
 func NewRegistry() (_swig_ret Registry) {
 	var swig_r Registry
-	swig_r = (Registry)(SwigcptrRegistry(C._wrap_new_Registry_xapian_1797894d64db9bab()))
+	swig_r = (Registry)(SwigcptrRegistry(C._wrap_new_Registry_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteRegistry(arg1 Registry) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Registry_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Registry_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrRegistry) Register_weighting_scheme(arg2 Weight) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Registry_register_weighting_scheme_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Registry_register_weighting_scheme_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrRegistry) Get_weighting_scheme(arg2 string) (_swig_ret Weight) {
 	var swig_r Weight
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Weight)(SwigcptrWeight(C._wrap_Registry_get_weighting_scheme_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_24)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Weight)(SwigcptrWeight(C._wrap_Registry_get_weighting_scheme_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_25)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2373,14 +2609,14 @@ func (arg1 SwigcptrRegistry) Get_weighting_scheme(arg2 string) (_swig_ret Weight
 func (arg1 SwigcptrRegistry) Register_posting_source(arg2 PostingSource) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Registry_register_posting_source_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Registry_register_posting_source_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrRegistry) Get_posting_source(arg2 string) (_swig_ret PostingSource) {
 	var swig_r PostingSource
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_Registry_get_posting_source_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_25)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_Registry_get_posting_source_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_26)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2390,14 +2626,14 @@ func (arg1 SwigcptrRegistry) Get_posting_source(arg2 string) (_swig_ret PostingS
 func (arg1 SwigcptrRegistry) Register_match_spy(arg2 MatchSpy) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Registry_register_match_spy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Registry_register_match_spy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrRegistry) Get_match_spy(arg2 string) (_swig_ret MatchSpy) {
 	var swig_r MatchSpy
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_Registry_get_match_spy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_26)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_Registry_get_match_spy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_27)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2407,14 +2643,14 @@ func (arg1 SwigcptrRegistry) Get_match_spy(arg2 string) (_swig_ret MatchSpy) {
 func (arg1 SwigcptrRegistry) Register_lat_long_metric(arg2 LatLongMetric) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Registry_register_lat_long_metric_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Registry_register_lat_long_metric_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrRegistry) Get_lat_long_metric(arg2 string) (_swig_ret LatLongMetric) {
 	var swig_r LatLongMetric
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (LatLongMetric)(SwigcptrLatLongMetric(C._wrap_Registry_get_lat_long_metric_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_27)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (LatLongMetric)(SwigcptrLatLongMetric(C._wrap_Registry_get_lat_long_metric_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_28)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2445,13 +2681,13 @@ func (p SwigcptrQuery) SwigIsQuery() {
 
 func GetQueryMatchNothing() (_swig_ret Query) {
 	var swig_r Query
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_MatchNothing_get_xapian_1797894d64db9bab()))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_MatchNothing_get_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func GetQueryMatchAll() (_swig_ret Query) {
 	var swig_r Query
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_MatchAll_get_xapian_1797894d64db9bab()))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_MatchAll_get_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -2459,7 +2695,7 @@ type XapianQueryOp int
 
 func _swig_getQuery_OP_AND_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_AND_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_AND_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2467,7 +2703,7 @@ var QueryOP_AND XapianQueryOp = _swig_getQuery_OP_AND_Query()
 
 func _swig_getQuery_OP_OR_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_OR_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_OR_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2475,7 +2711,7 @@ var QueryOP_OR XapianQueryOp = _swig_getQuery_OP_OR_Query()
 
 func _swig_getQuery_OP_AND_NOT_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_AND_NOT_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_AND_NOT_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2483,7 +2719,7 @@ var QueryOP_AND_NOT XapianQueryOp = _swig_getQuery_OP_AND_NOT_Query()
 
 func _swig_getQuery_OP_XOR_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_XOR_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_XOR_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2491,7 +2727,7 @@ var QueryOP_XOR XapianQueryOp = _swig_getQuery_OP_XOR_Query()
 
 func _swig_getQuery_OP_AND_MAYBE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_AND_MAYBE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_AND_MAYBE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2499,7 +2735,7 @@ var QueryOP_AND_MAYBE XapianQueryOp = _swig_getQuery_OP_AND_MAYBE_Query()
 
 func _swig_getQuery_OP_FILTER_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_FILTER_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_FILTER_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2507,7 +2743,7 @@ var QueryOP_FILTER XapianQueryOp = _swig_getQuery_OP_FILTER_Query()
 
 func _swig_getQuery_OP_NEAR_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_NEAR_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_NEAR_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2515,7 +2751,7 @@ var QueryOP_NEAR XapianQueryOp = _swig_getQuery_OP_NEAR_Query()
 
 func _swig_getQuery_OP_PHRASE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_PHRASE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_PHRASE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2523,7 +2759,7 @@ var QueryOP_PHRASE XapianQueryOp = _swig_getQuery_OP_PHRASE_Query()
 
 func _swig_getQuery_OP_VALUE_RANGE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_RANGE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_RANGE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2531,7 +2767,7 @@ var QueryOP_VALUE_RANGE XapianQueryOp = _swig_getQuery_OP_VALUE_RANGE_Query()
 
 func _swig_getQuery_OP_SCALE_WEIGHT_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_SCALE_WEIGHT_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_SCALE_WEIGHT_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2539,7 +2775,7 @@ var QueryOP_SCALE_WEIGHT XapianQueryOp = _swig_getQuery_OP_SCALE_WEIGHT_Query()
 
 func _swig_getQuery_OP_ELITE_SET_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_ELITE_SET_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_ELITE_SET_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2547,7 +2783,7 @@ var QueryOP_ELITE_SET XapianQueryOp = _swig_getQuery_OP_ELITE_SET_Query()
 
 func _swig_getQuery_OP_VALUE_GE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_GE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_GE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2555,7 +2791,7 @@ var QueryOP_VALUE_GE XapianQueryOp = _swig_getQuery_OP_VALUE_GE_Query()
 
 func _swig_getQuery_OP_VALUE_LE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_LE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_VALUE_LE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2563,7 +2799,7 @@ var QueryOP_VALUE_LE XapianQueryOp = _swig_getQuery_OP_VALUE_LE_Query()
 
 func _swig_getQuery_OP_SYNONYM_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_SYNONYM_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_SYNONYM_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2571,7 +2807,7 @@ var QueryOP_SYNONYM XapianQueryOp = _swig_getQuery_OP_SYNONYM_Query()
 
 func _swig_getQuery_OP_MAX_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_MAX_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_MAX_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2579,7 +2815,7 @@ var QueryOP_MAX XapianQueryOp = _swig_getQuery_OP_MAX_Query()
 
 func _swig_getQuery_OP_WILDCARD_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_WILDCARD_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_WILDCARD_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2587,7 +2823,7 @@ var QueryOP_WILDCARD XapianQueryOp = _swig_getQuery_OP_WILDCARD_Query()
 
 func _swig_getQuery_OP_INVALID_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_OP_INVALID_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_OP_INVALID_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2595,7 +2831,7 @@ var QueryOP_INVALID XapianQueryOp = _swig_getQuery_OP_INVALID_Query()
 
 func _swig_getQuery_LEAF_TERM_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_LEAF_TERM_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_LEAF_TERM_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2603,7 +2839,7 @@ var QueryLEAF_TERM XapianQueryOp = _swig_getQuery_LEAF_TERM_Query()
 
 func _swig_getQuery_LEAF_POSTING_SOURCE_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_LEAF_POSTING_SOURCE_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_LEAF_POSTING_SOURCE_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2611,7 +2847,7 @@ var QueryLEAF_POSTING_SOURCE XapianQueryOp = _swig_getQuery_LEAF_POSTING_SOURCE_
 
 func _swig_getQuery_LEAF_MATCH_ALL_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_LEAF_MATCH_ALL_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_LEAF_MATCH_ALL_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2619,7 +2855,7 @@ var QueryLEAF_MATCH_ALL XapianQueryOp = _swig_getQuery_LEAF_MATCH_ALL_Query()
 
 func _swig_getQuery_LEAF_MATCH_NOTHING_Query() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
-	swig_r = (XapianQueryOp)(C._wrap_LEAF_MATCH_NOTHING_Query_xapian_1797894d64db9bab())
+	swig_r = (XapianQueryOp)(C._wrap_LEAF_MATCH_NOTHING_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2627,7 +2863,7 @@ var QueryLEAF_MATCH_NOTHING XapianQueryOp = _swig_getQuery_LEAF_MATCH_NOTHING_Qu
 
 func _swig_getQuery_WILDCARD_LIMIT_ERROR_Query() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_WILDCARD_LIMIT_ERROR_Query_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_WILDCARD_LIMIT_ERROR_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2635,7 +2871,7 @@ var QueryWILDCARD_LIMIT_ERROR int = _swig_getQuery_WILDCARD_LIMIT_ERROR_Query()
 
 func _swig_getQuery_WILDCARD_LIMIT_FIRST_Query() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_WILDCARD_LIMIT_FIRST_Query_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_WILDCARD_LIMIT_FIRST_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2643,7 +2879,7 @@ var QueryWILDCARD_LIMIT_FIRST int = _swig_getQuery_WILDCARD_LIMIT_FIRST_Query()
 
 func _swig_getQuery_WILDCARD_LIMIT_MOST_FREQUENT_Query() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -2651,13 +2887,13 @@ var QueryWILDCARD_LIMIT_MOST_FREQUENT int = _swig_getQuery_WILDCARD_LIMIT_MOST_F
 
 func NewQuery__SWIG_0() (_swig_ret Query) {
 	var swig_r Query
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteQuery(arg1 Query) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Query_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Query_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func NewQuery__SWIG_1(arg1 string, arg2 uint, arg3 uint) (_swig_ret Query) {
@@ -2665,7 +2901,7 @@ func NewQuery__SWIG_1(arg1 string, arg2 uint, arg3 uint) (_swig_ret Query) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_28)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_29)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2676,7 +2912,7 @@ func NewQuery__SWIG_2(arg1 string, arg2 uint) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_29)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_30)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2686,7 +2922,7 @@ func NewQuery__SWIG_2(arg1 string, arg2 uint) (_swig_ret Query) {
 func NewQuery__SWIG_3(arg1 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_3_xapian_1797894d64db9bab(*(*C.swig_type_30)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_3_xapian_245a1afe1629f0b1(*(*C.swig_type_31)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2696,7 +2932,7 @@ func NewQuery__SWIG_3(arg1 string) (_swig_ret Query) {
 func NewQuery__SWIG_4(arg1 PostingSource) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1.Swigcptr()
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -2704,7 +2940,7 @@ func NewQuery__SWIG_5(arg1 float64, arg2 Query) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_5_xapian_1797894d64db9bab(C.double(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_5_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -2713,7 +2949,7 @@ func NewQuery__SWIG_6(arg1 XapianQueryOp, arg2 Query, arg3 float64) (_swig_ret Q
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_6_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_6_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))))
 	return swig_r
 }
 
@@ -2722,7 +2958,7 @@ func NewQuery__SWIG_7(arg1 XapianQueryOp, arg2 Query, arg3 Query) (_swig_ret Que
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_7_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_7_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
 	return swig_r
 }
 
@@ -2731,7 +2967,7 @@ func NewQuery__SWIG_8(arg1 XapianQueryOp, arg2 string, arg3 string) (_swig_ret Q
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_8_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_31)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_32)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_8_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_32)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_33)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2746,7 +2982,7 @@ func NewQuery__SWIG_9(arg1 XapianQueryOp, arg2 uint, arg3 string) (_swig_ret Que
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_9_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_33)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_9_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_34)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -2759,7 +2995,7 @@ func NewQuery__SWIG_10(arg1 XapianQueryOp, arg2 uint, arg3 string, arg4 string) 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_10_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_34)(unsafe.Pointer(&_swig_i_2)), *(*C.swig_type_35)(unsafe.Pointer(&_swig_i_3)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_10_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_35)(unsafe.Pointer(&_swig_i_2)), *(*C.swig_type_36)(unsafe.Pointer(&_swig_i_3)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -2776,7 +3012,7 @@ func NewQuery__SWIG_11(arg1 XapianQueryOp, arg2 string, arg3 uint, arg4 int, arg
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_11_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_36)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.swig_intgo(_swig_i_4))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_11_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_37)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.swig_intgo(_swig_i_4))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2789,7 +3025,7 @@ func NewQuery__SWIG_12(arg1 XapianQueryOp, arg2 string, arg3 uint, arg4 int) (_s
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_12_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_37)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_12_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_38)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2801,7 +3037,7 @@ func NewQuery__SWIG_13(arg1 XapianQueryOp, arg2 string, arg3 uint) (_swig_ret Qu
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_13_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_38)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_13_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_39)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2812,7 +3048,7 @@ func NewQuery__SWIG_14(arg1 XapianQueryOp, arg2 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_14_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_39)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_14_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_40)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -2822,42 +3058,42 @@ func NewQuery__SWIG_14(arg1 XapianQueryOp, arg2 string) (_swig_ret Query) {
 func (arg1 SwigcptrQuery) Get_terms_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_terms_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_terms_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Get_terms_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_terms_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_terms_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Get_unique_terms_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_unique_terms_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Query_get_unique_terms_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Get_length() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Query_get_length_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Query_get_length_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Empty() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Query_empty_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Query_empty_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Serialise() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Query_serialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Query_serialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2868,7 +3104,7 @@ func QueryUnserialise__SWIG_0(arg1 string, arg2 Registry) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_unserialise__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_41)(unsafe.Pointer(&_swig_i_0)), C.uintptr_t(_swig_i_1))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_unserialise__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_42)(unsafe.Pointer(&_swig_i_0)), C.uintptr_t(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2878,7 +3114,7 @@ func QueryUnserialise__SWIG_0(arg1 string, arg2 Registry) (_swig_ret Query) {
 func QueryUnserialise__SWIG_1(arg1 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_unserialise__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_42)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_unserialise__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_43)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -2899,14 +3135,14 @@ func QueryUnserialise(a ...interface{}) Query {
 func (arg1 SwigcptrQuery) Get_type() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
 	_swig_i_0 := arg1
-	swig_r = (XapianQueryOp)(C._wrap_Query_get_type_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (XapianQueryOp)(C._wrap_Query_get_type_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Get_num_subqueries() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_Query_get_num_subqueries_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_Query_get_num_subqueries_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -2914,14 +3150,14 @@ func (arg1 SwigcptrQuery) Get_subquery(arg2 int64) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_get_subquery_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_type_44(_swig_i_1))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Query_get_subquery_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_type_45(_swig_i_1))))
 	return swig_r
 }
 
 func (arg1 SwigcptrQuery) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Query_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Query_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -2931,7 +3167,7 @@ func (arg1 SwigcptrQuery) Get_description() (_swig_ret string) {
 func NewQuery__SWIG_17(arg1 XapianQueryOp) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
-	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_17_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_new_Query__SWIG_17_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -3100,17 +3336,17 @@ func (p *_swig_DirectorStemImplementation) DirectorInterface() interface{} {
 
 func NewDirectorStemImplementation(v interface{}) StemImplementation {
 	p := &_swig_DirectorStemImplementation{0, v}
-	p.SwigcptrStemImplementation = SwigcptrStemImplementation(C._wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrStemImplementation = SwigcptrStemImplementation(C._wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorStemImplementation(arg1 StemImplementation) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorStemImplementation_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorStemImplementation_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_StemImplementation_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_StemImplementation_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_StemImplementation_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_StemImplementation_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorStemImplementation).SwigcptrStemImplementation = 0
 	swigDirectorDelete(c)
 }
@@ -3126,8 +3362,8 @@ func (swig_p *_swig_DirectorStemImplementation) Apply(word string) string {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorStemImplementation_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorStemImplementation_callback_Apply_xapian_1797894d64db9bab(swig_c int, word string) (swig_result string) {
+//export Swig_DirectorStemImplementation_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorStemImplementation_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, word string) (swig_result string) {
 	var swig_r string
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorStemImplementation)
@@ -3147,8 +3383,8 @@ func (swig_p *_swig_DirectorStemImplementation) Get_description() string {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorStemImplementation_callback_get_description_xapian_1797894d64db9bab
-func Swig_DirectorStemImplementation_callback_get_description_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorStemImplementation_callback_get_description_xapian_245a1afe1629f0b1
+func Swig_DirectorStemImplementation_callback_get_description_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorStemImplementation)
 	swig_r = swig_p.Get_description()
@@ -3170,14 +3406,14 @@ func (p SwigcptrStemImplementation) DirectorInterface() interface{} {
 
 func DeleteStemImplementation(arg1 StemImplementation) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_StemImplementation_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_StemImplementation_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrStemImplementation) Apply(arg2 string) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_StemImplementation_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_47)(unsafe.Pointer(&_swig_i_1)))
+	swig_r_p := C._wrap_StemImplementation_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_48)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
@@ -3190,7 +3426,7 @@ func (arg1 SwigcptrStemImplementation) Apply(arg2 string) (_swig_ret string) {
 func (arg1 SwigcptrStemImplementation) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_StemImplementation_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_StemImplementation_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -3217,7 +3453,7 @@ func (p SwigcptrStem) SwigIsStem() {
 func NewStem__SWIG_0(arg1 string) (_swig_ret Stem) {
 	var swig_r Stem
 	_swig_i_0 := arg1
-	swig_r = (Stem)(SwigcptrStem(C._wrap_new_Stem__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_49)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Stem)(SwigcptrStem(C._wrap_new_Stem__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_50)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -3227,7 +3463,7 @@ func NewStem__SWIG_0(arg1 string) (_swig_ret Stem) {
 func NewStem__SWIG_1(arg1 StemImplementation) (_swig_ret Stem) {
 	var swig_r Stem
 	_swig_i_0 := arg1.Swigcptr()
-	swig_r = (Stem)(SwigcptrStem(C._wrap_new_Stem__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Stem)(SwigcptrStem(C._wrap_new_Stem__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -3248,14 +3484,14 @@ check_1:
 
 func DeleteStem(arg1 Stem) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Stem_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Stem_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrStem) Apply(arg2 string) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Stem_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_51)(unsafe.Pointer(&_swig_i_1)))
+	swig_r_p := C._wrap_Stem_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_52)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
@@ -3268,7 +3504,7 @@ func (arg1 SwigcptrStem) Apply(arg2 string) (_swig_ret string) {
 func (arg1 SwigcptrStem) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Stem_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Stem_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -3277,7 +3513,7 @@ func (arg1 SwigcptrStem) Get_description() (_swig_ret string) {
 
 func StemGet_available_languages() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_Stem_get_available_languages_xapian_1797894d64db9bab()
+	swig_r_p := C._wrap_Stem_get_available_languages_xapian_245a1afe1629f0b1()
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -3302,30 +3538,30 @@ func (p SwigcptrTermGenerator) SwigIsTermGenerator() {
 
 func NewTermGenerator() (_swig_ret TermGenerator) {
 	var swig_r TermGenerator
-	swig_r = (TermGenerator)(SwigcptrTermGenerator(C._wrap_new_TermGenerator_xapian_1797894d64db9bab()))
+	swig_r = (TermGenerator)(SwigcptrTermGenerator(C._wrap_new_TermGenerator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteTermGenerator(arg1 TermGenerator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_TermGenerator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_TermGenerator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrTermGenerator) Set_stemmer(arg2 Stem) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_TermGenerator_set_stemmer_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_TermGenerator_set_stemmer_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Set_stopper__SWIG_0(arg2 Stopper) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_TermGenerator_set_stopper__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_TermGenerator_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Set_stopper__SWIG_1() {
 	_swig_i_0 := arg1
-	C._wrap_TermGenerator_set_stopper__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_TermGenerator_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (p SwigcptrTermGenerator) Set_stopper(a ...interface{}) {
@@ -3344,25 +3580,25 @@ func (p SwigcptrTermGenerator) Set_stopper(a ...interface{}) {
 func (arg1 SwigcptrTermGenerator) Set_document(arg2 Document) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_TermGenerator_set_document_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_TermGenerator_set_document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Get_document() (_swig_ret Document) {
 	var swig_r Document
 	_swig_i_0 := arg1
-	swig_r = (Document)(SwigcptrDocument(C._wrap_TermGenerator_get_document_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_TermGenerator_get_document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermGenerator) Set_database(arg2 WritableDatabase) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_TermGenerator_set_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_TermGenerator_set_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func _swig_getTermGenerator_FLAG_SPELLING_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_SPELLING_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_SPELLING_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3370,7 +3606,7 @@ var TermGeneratorFLAG_SPELLING int = _swig_getTermGenerator_FLAG_SPELLING_TermGe
 
 func _swig_getTermGenerator_FLAG_CJK_NGRAM_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3380,7 +3616,7 @@ type XapianTermGeneratorStem_strategy int
 
 func _swig_getTermGenerator_STEM_NONE_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_NONE_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_NONE_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3388,7 +3624,7 @@ var TermGeneratorSTEM_NONE int = _swig_getTermGenerator_STEM_NONE_TermGenerator(
 
 func _swig_getTermGenerator_STEM_SOME_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_SOME_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_SOME_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3396,7 +3632,7 @@ var TermGeneratorSTEM_SOME int = _swig_getTermGenerator_STEM_SOME_TermGenerator(
 
 func _swig_getTermGenerator_STEM_ALL_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_ALL_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_ALL_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3404,7 +3640,7 @@ var TermGeneratorSTEM_ALL int = _swig_getTermGenerator_STEM_ALL_TermGenerator()
 
 func _swig_getTermGenerator_STEM_ALL_Z_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_ALL_Z_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_ALL_Z_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3414,7 +3650,7 @@ type XapianTermGeneratorStop_strategy int
 
 func _swig_getTermGenerator_STOP_NONE_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STOP_NONE_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STOP_NONE_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3422,7 +3658,7 @@ var TermGeneratorSTOP_NONE int = _swig_getTermGenerator_STOP_NONE_TermGenerator(
 
 func _swig_getTermGenerator_STOP_ALL_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STOP_ALL_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STOP_ALL_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3430,7 +3666,7 @@ var TermGeneratorSTOP_ALL int = _swig_getTermGenerator_STOP_ALL_TermGenerator()
 
 func _swig_getTermGenerator_STOP_STEMMED_TermGenerator() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STOP_STEMMED_TermGenerator_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STOP_STEMMED_TermGenerator_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -3441,7 +3677,7 @@ func (arg1 SwigcptrTermGenerator) Set_flags__SWIG_0(arg2 int, arg3 int) (_swig_r
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (int)(C._wrap_TermGenerator_set_flags__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (int)(C._wrap_TermGenerator_set_flags__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
@@ -3449,7 +3685,7 @@ func (arg1 SwigcptrTermGenerator) Set_flags__SWIG_1(arg2 int) (_swig_ret int) {
 	var swig_r int
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int)(C._wrap_TermGenerator_set_flags__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (int)(C._wrap_TermGenerator_set_flags__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
@@ -3467,19 +3703,19 @@ func (p SwigcptrTermGenerator) Set_flags(a ...interface{}) int {
 func (arg1 SwigcptrTermGenerator) Set_stemming_strategy(arg2 XapianTermGeneratorStem_strategy) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_set_stemming_strategy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_TermGenerator_set_stemming_strategy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Set_stopper_strategy(arg2 XapianTermGeneratorStop_strategy) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_set_stopper_strategy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_TermGenerator_set_stopper_strategy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Set_max_word_length(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_set_max_word_length_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_TermGenerator_set_max_word_length_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Index_text__SWIG_0(arg2 string, arg3 uint, arg4 string) {
@@ -3487,7 +3723,7 @@ func (arg1 SwigcptrTermGenerator) Index_text__SWIG_0(arg2 string, arg3 uint, arg
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_TermGenerator_index_text__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_54)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_55)(unsafe.Pointer(&_swig_i_3)))
+	C._wrap_TermGenerator_index_text__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_55)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_56)(unsafe.Pointer(&_swig_i_3)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3500,7 +3736,7 @@ func (arg1 SwigcptrTermGenerator) Index_text__SWIG_1(arg2 string, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_TermGenerator_index_text__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_56)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_TermGenerator_index_text__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_57)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3509,7 +3745,7 @@ func (arg1 SwigcptrTermGenerator) Index_text__SWIG_1(arg2 string, arg3 uint) {
 func (arg1 SwigcptrTermGenerator) Index_text__SWIG_2(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_index_text__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_57)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_TermGenerator_index_text__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_58)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3537,7 +3773,7 @@ func (arg1 SwigcptrTermGenerator) Index_text_without_positions__SWIG_0(arg2 stri
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_58)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_59)(unsafe.Pointer(&_swig_i_3)))
+	C._wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_59)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_60)(unsafe.Pointer(&_swig_i_3)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3550,7 +3786,7 @@ func (arg1 SwigcptrTermGenerator) Index_text_without_positions__SWIG_1(arg2 stri
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_60)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_61)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3559,7 +3795,7 @@ func (arg1 SwigcptrTermGenerator) Index_text_without_positions__SWIG_1(arg2 stri
 func (arg1 SwigcptrTermGenerator) Index_text_without_positions__SWIG_2(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_61)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_62)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3585,12 +3821,12 @@ func (p SwigcptrTermGenerator) Index_text_without_positions(a ...interface{}) {
 func (arg1 SwigcptrTermGenerator) Increase_termpos__SWIG_0(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_increase_termpos__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_TermGenerator_increase_termpos__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Increase_termpos__SWIG_1() {
 	_swig_i_0 := arg1
-	C._wrap_TermGenerator_increase_termpos__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_TermGenerator_increase_termpos__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (p SwigcptrTermGenerator) Increase_termpos(a ...interface{}) {
@@ -3609,20 +3845,20 @@ func (p SwigcptrTermGenerator) Increase_termpos(a ...interface{}) {
 func (arg1 SwigcptrTermGenerator) Get_termpos() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_TermGenerator_get_termpos_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_TermGenerator_get_termpos_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTermGenerator) Set_termpos(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_TermGenerator_set_termpos_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_TermGenerator_set_termpos_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrTermGenerator) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_TermGenerator_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_TermGenerator_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -3660,48 +3896,48 @@ func (p SwigcptrRSet) SwigIsRSet() {
 
 func NewRSet() (_swig_ret RSet) {
 	var swig_r RSet
-	swig_r = (RSet)(SwigcptrRSet(C._wrap_new_RSet_xapian_1797894d64db9bab()))
+	swig_r = (RSet)(SwigcptrRSet(C._wrap_new_RSet_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteRSet(arg1 RSet) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_RSet_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_RSet_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrRSet) Size() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_RSet_size_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_RSet_size_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrRSet) Empty() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_RSet_empty_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_RSet_empty_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrRSet) Add_document__SWIG_0(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_RSet_add_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_RSet_add_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
-func (arg1 SwigcptrRSet) Add_document__SWIG_1(arg2 Xapian_MSetIterator) {
+func (arg1 SwigcptrRSet) Add_document__SWIG_1(arg2 MSetIterator) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_RSet_add_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_RSet_add_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (p SwigcptrRSet) Add_document(a ...interface{}) {
 	argc := len(a)
 	if argc == 1 {
-		if _, ok := a[0].(SwigcptrXapian_MSetIterator); !ok {
+		if _, ok := a[0].(SwigcptrMSetIterator); !ok {
 			goto check_1
 		}
-		p.Add_document__SWIG_1(a[0].(Xapian_MSetIterator))
+		p.Add_document__SWIG_1(a[0].(MSetIterator))
 		return
 	}
 check_1:
@@ -3715,22 +3951,22 @@ check_1:
 func (arg1 SwigcptrRSet) Remove_document__SWIG_0(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_RSet_remove_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_RSet_remove_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
-func (arg1 SwigcptrRSet) Remove_document__SWIG_1(arg2 Xapian_MSetIterator) {
+func (arg1 SwigcptrRSet) Remove_document__SWIG_1(arg2 MSetIterator) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_RSet_remove_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_RSet_remove_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (p SwigcptrRSet) Remove_document(a ...interface{}) {
 	argc := len(a)
 	if argc == 1 {
-		if _, ok := a[0].(SwigcptrXapian_MSetIterator); !ok {
+		if _, ok := a[0].(SwigcptrMSetIterator); !ok {
 			goto check_1
 		}
-		p.Remove_document__SWIG_1(a[0].(Xapian_MSetIterator))
+		p.Remove_document__SWIG_1(a[0].(MSetIterator))
 		return
 	}
 check_1:
@@ -3745,25 +3981,25 @@ func (arg1 SwigcptrRSet) Contains__SWIG_0(arg2 uint) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_RSet_contains__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (bool)(C._wrap_RSet_contains__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
-func (arg1 SwigcptrRSet) Contains__SWIG_1(arg2 Xapian_MSetIterator) (_swig_ret bool) {
+func (arg1 SwigcptrRSet) Contains__SWIG_1(arg2 MSetIterator) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_RSet_contains__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_RSet_contains__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (p SwigcptrRSet) Contains(a ...interface{}) bool {
 	argc := len(a)
 	if argc == 1 {
-		if _, ok := a[0].(SwigcptrXapian_MSetIterator); !ok {
+		if _, ok := a[0].(SwigcptrMSetIterator); !ok {
 			goto check_1
 		}
-		return p.Contains__SWIG_1(a[0].(Xapian_MSetIterator))
+		return p.Contains__SWIG_1(a[0].(MSetIterator))
 	}
 check_1:
 	if argc == 1 {
@@ -3775,7 +4011,7 @@ check_1:
 func (arg1 SwigcptrRSet) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_RSet_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_RSet_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -3811,7 +4047,7 @@ func (p *_swig_DirectorMatchDecider) DirectorInterface() interface{} {
 
 func NewDirectorMatchDecider(v interface{}) MatchDecider {
 	p := &_swig_DirectorMatchDecider{0, v}
-	p.SwigcptrMatchDecider = SwigcptrMatchDecider(C._wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrMatchDecider = SwigcptrMatchDecider(C._wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
@@ -3826,8 +4062,8 @@ func (swig_p *_swig_DirectorMatchDecider) Apply(doc Document) bool {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorMatchDecider_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorMatchDecider_callback_Apply_xapian_1797894d64db9bab(swig_c int, doc uintptr) (swig_result bool) {
+//export Swig_DirectorMatchDecider_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorMatchDecider_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, doc uintptr) (swig_result bool) {
 	var swig_r bool
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorMatchDecider)
 	swig_r = swig_p.Apply(SwigcptrDocument(doc))
@@ -3836,11 +4072,11 @@ func Swig_DirectorMatchDecider_callback_Apply_xapian_1797894d64db9bab(swig_c int
 
 func DeleteDirectorMatchDecider(arg1 MatchDecider) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorMatchDecider_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorMatchDecider_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_MatchDecider_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_MatchDecider_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_MatchDecider_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_MatchDecider_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorMatchDecider).SwigcptrMatchDecider = 0
 	swigDirectorDelete(c)
 }
@@ -3862,13 +4098,13 @@ func (arg1 SwigcptrMatchDecider) Apply(arg2 Document) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_MatchDecider_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_MatchDecider_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func DeleteMatchDecider(arg1 MatchDecider) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_MatchDecider_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_MatchDecider_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type MatchDecider interface {
@@ -3890,26 +4126,26 @@ func (p SwigcptrEnquire) SwigIsEnquire() {
 func NewEnquire(arg1 Database) (_swig_ret Enquire) {
 	var swig_r Enquire
 	_swig_i_0 := arg1.Swigcptr()
-	swig_r = (Enquire)(SwigcptrEnquire(C._wrap_new_Enquire_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Enquire)(SwigcptrEnquire(C._wrap_new_Enquire_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func DeleteEnquire(arg1 Enquire) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Enquire_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Enquire_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrEnquire) Set_query__SWIG_0(arg2 Query, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_query__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_Enquire_set_query__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.swig_intgo(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_query__SWIG_1(arg2 Query) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Enquire_set_query__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Enquire_set_query__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (p SwigcptrEnquire) Set_query(a ...interface{}) {
@@ -3928,32 +4164,32 @@ func (p SwigcptrEnquire) Set_query(a ...interface{}) {
 func (arg1 SwigcptrEnquire) Get_query() (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
-	swig_r = (Query)(SwigcptrQuery(C._wrap_Enquire_get_query_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_Enquire_get_query_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrEnquire) Add_matchspy(arg2 MatchSpy) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Enquire_add_matchspy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Enquire_add_matchspy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrEnquire) Clear_matchspies() {
 	_swig_i_0 := arg1
-	C._wrap_Enquire_clear_matchspies_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Enquire_clear_matchspies_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrEnquire) Set_weighting_scheme(arg2 Weight) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Enquire_set_weighting_scheme_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Enquire_set_weighting_scheme_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrEnquire) Set_expansion_scheme__SWIG_0(arg2 string, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_64)(unsafe.Pointer(&_swig_i_1)), C.double(_swig_i_2))
+	C._wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_65)(unsafe.Pointer(&_swig_i_1)), C.double(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3962,7 +4198,7 @@ func (arg1 SwigcptrEnquire) Set_expansion_scheme__SWIG_0(arg2 string, arg3 float
 func (arg1 SwigcptrEnquire) Set_expansion_scheme__SWIG_1(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_65)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_66)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -3985,13 +4221,13 @@ func (arg1 SwigcptrEnquire) Set_collapse_key__SWIG_0(arg2 uint, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_collapse_key__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_Enquire_set_collapse_key__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_collapse_key__SWIG_1(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Enquire_set_collapse_key__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Enquire_set_collapse_key__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (p SwigcptrEnquire) Set_collapse_key(a ...interface{}) {
@@ -4011,7 +4247,7 @@ type XapianEnquireDocid_order int
 
 func _swig_getEnquire_ASCENDING_Enquire() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_ASCENDING_Enquire_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_ASCENDING_Enquire_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -4019,7 +4255,7 @@ var EnquireASCENDING int = _swig_getEnquire_ASCENDING_Enquire()
 
 func _swig_getEnquire_DESCENDING_Enquire() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DESCENDING_Enquire_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DESCENDING_Enquire_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -4027,7 +4263,7 @@ var EnquireDESCENDING int = _swig_getEnquire_DESCENDING_Enquire()
 
 func _swig_getEnquire_DONT_CARE_Enquire() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DONT_CARE_Enquire_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DONT_CARE_Enquire_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -4036,20 +4272,20 @@ var EnquireDONT_CARE int = _swig_getEnquire_DONT_CARE_Enquire()
 func (arg1 SwigcptrEnquire) Set_docid_order(arg2 XapianEnquireDocid_order) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Enquire_set_docid_order_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Enquire_set_docid_order_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrEnquire) Set_cutoff__SWIG_0(arg2 int, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_cutoff__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_Enquire_set_cutoff__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_cutoff__SWIG_1(arg2 int) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Enquire_set_cutoff__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Enquire_set_cutoff__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (p SwigcptrEnquire) Set_cutoff(a ...interface{}) {
@@ -4067,55 +4303,55 @@ func (p SwigcptrEnquire) Set_cutoff(a ...interface{}) {
 
 func (arg1 SwigcptrEnquire) Set_sort_by_relevance() {
 	_swig_i_0 := arg1
-	C._wrap_Enquire_set_sort_by_relevance_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Enquire_set_sort_by_relevance_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_value(arg2 uint, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_key(arg2 KeyMaker, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_key_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_key_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_value_then_relevance(arg2 uint, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_value_then_relevance_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_value_then_relevance_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_key_then_relevance(arg2 KeyMaker, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_key_then_relevance_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_key_then_relevance_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_relevance_then_value(arg2 uint, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_relevance_then_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_relevance_then_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_sort_by_relevance_then_key(arg2 KeyMaker, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_Enquire_set_sort_by_relevance_then_key_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_Enquire_set_sort_by_relevance_then_key_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrEnquire) Set_time_limit(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Enquire_set_time_limit_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_Enquire_set_time_limit_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrEnquire) Get_mset__SWIG_0(arg2 uint, arg3 uint, arg4 uint, arg5 RSet, arg6 MatchDecider) (_swig_ret MSet) {
@@ -4126,7 +4362,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_0(arg2 uint, arg3 uint, arg4 uint, ar
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
 	_swig_i_5 := arg6.Swigcptr()
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4), C.uintptr_t(_swig_i_5))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4), C.uintptr_t(_swig_i_5))))
 	return swig_r
 }
 
@@ -4137,7 +4373,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_1(arg2 uint, arg3 uint, arg4 uint, ar
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))))
 	return swig_r
 }
 
@@ -4147,7 +4383,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_2(arg2 uint, arg3 uint, arg4 uint) (_
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	return swig_r
 }
 
@@ -4156,7 +4392,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_3(arg2 uint, arg3 uint) (_swig_ret MS
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_3_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_3_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	return swig_r
 }
 
@@ -4167,7 +4403,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_4(arg2 uint, arg3 uint, arg4 RSet, ar
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4.Swigcptr()
 	_swig_i_4 := arg5.Swigcptr()
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3), C.uintptr_t(_swig_i_4))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3), C.uintptr_t(_swig_i_4))))
 	return swig_r
 }
 
@@ -4177,7 +4413,7 @@ func (arg1 SwigcptrEnquire) Get_mset__SWIG_5(arg2 uint, arg3 uint, arg4 RSet) (_
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4.Swigcptr()
-	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_5_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))))
+	swig_r = (MSet)(SwigcptrMSet(C._wrap_Enquire_get_mset__SWIG_5_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))))
 	return swig_r
 }
 
@@ -4217,7 +4453,7 @@ check_4:
 
 func _swig_getEnquire_Enquire_INCLUDE_QUERY_TERMS_Enquire() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -4225,7 +4461,7 @@ var EnquireINCLUDE_QUERY_TERMS int = _swig_getEnquire_Enquire_INCLUDE_QUERY_TERM
 
 func _swig_getEnquire_Enquire_USE_EXACT_TERMFREQ_Enquire() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -4239,7 +4475,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_0(arg2 uint, arg3 RSet, arg4 int, arg
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
 	_swig_i_5 := arg6
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4), C.double(_swig_i_5))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4), C.double(_swig_i_5))))
 	return swig_r
 }
 
@@ -4250,7 +4486,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_1(arg2 uint, arg3 RSet, arg4 int, arg
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))))
 	return swig_r
 }
 
@@ -4260,7 +4496,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_2(arg2 uint, arg3 RSet, arg4 int) (_s
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	return swig_r
 }
 
@@ -4269,7 +4505,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_3(arg2 uint, arg3 RSet) (_swig_ret ES
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_3_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_3_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2))))
 	return swig_r
 }
 
@@ -4279,7 +4515,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_4(arg2 uint, arg3 RSet, arg4 ExpandDe
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4.Swigcptr()
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.uintptr_t(_swig_i_3))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.uintptr_t(_swig_i_3))))
 	return swig_r
 }
 
@@ -4292,7 +4528,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_5(arg2 uint, arg3 RSet, arg4 int, arg
 	_swig_i_4 := arg5
 	_swig_i_5 := arg6.Swigcptr()
 	_swig_i_6 := arg7
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_5_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4), C.uintptr_t(_swig_i_5), C.double(_swig_i_6))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_5_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4), C.uintptr_t(_swig_i_5), C.double(_swig_i_6))))
 	return swig_r
 }
 
@@ -4304,7 +4540,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_6(arg2 uint, arg3 RSet, arg4 int, arg
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
 	_swig_i_5 := arg6.Swigcptr()
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_6_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4), C.uintptr_t(_swig_i_5))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_6_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4), C.uintptr_t(_swig_i_5))))
 	return swig_r
 }
 
@@ -4315,7 +4551,7 @@ func (arg1 SwigcptrEnquire) Get_eset__SWIG_7(arg2 uint, arg3 RSet, arg4 int, arg
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_7_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4))))
+	swig_r = (ESet)(SwigcptrESet(C._wrap_Enquire_get_eset__SWIG_7_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2), C.swig_intgo(_swig_i_3), C.double(_swig_i_4))))
 	return swig_r
 }
 
@@ -4367,7 +4603,7 @@ func (arg1 SwigcptrEnquire) Get_matching_terms_begin__SWIG_0(arg2 uint) (_swig_r
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -4375,7 +4611,7 @@ func (arg1 SwigcptrEnquire) Get_matching_terms_end__SWIG_0(arg2 uint) (_swig_ret
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -4383,7 +4619,7 @@ func (arg1 SwigcptrEnquire) Get_matching_terms_begin__SWIG_1(arg2 MSetIterator) 
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -4406,7 +4642,7 @@ func (arg1 SwigcptrEnquire) Get_matching_terms_end__SWIG_1(arg2 MSetIterator) (_
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -4428,7 +4664,7 @@ check_1:
 func (arg1 SwigcptrEnquire) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Enquire_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Enquire_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -4480,7 +4716,7 @@ func (p *_swig_DirectorExpandDecider) DirectorInterface() interface{} {
 
 func NewDirectorExpandDecider(v interface{}) ExpandDecider {
 	p := &_swig_DirectorExpandDecider{0, v}
-	p.SwigcptrExpandDecider = SwigcptrExpandDecider(C._wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrExpandDecider = SwigcptrExpandDecider(C._wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
@@ -4495,8 +4731,8 @@ func (swig_p *_swig_DirectorExpandDecider) Apply(term string) bool {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorExpandDecider_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorExpandDecider_callback_Apply_xapian_1797894d64db9bab(swig_c int, term string) (swig_result bool) {
+//export Swig_DirectorExpandDecider_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorExpandDecider_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, term string) (swig_result bool) {
 	var swig_r bool
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorExpandDecider)
@@ -4507,11 +4743,11 @@ func Swig_DirectorExpandDecider_callback_Apply_xapian_1797894d64db9bab(swig_c in
 
 func DeleteDirectorExpandDecider(arg1 ExpandDecider) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorExpandDecider_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorExpandDecider_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_ExpandDecider_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_ExpandDecider_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_ExpandDecider_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_ExpandDecider_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorExpandDecider).SwigcptrExpandDecider = 0
 	swigDirectorDelete(c)
 }
@@ -4533,7 +4769,7 @@ func (arg1 SwigcptrExpandDecider) Apply(arg2 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ExpandDecider_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_67)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_ExpandDecider_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_68)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -4542,20 +4778,20 @@ func (arg1 SwigcptrExpandDecider) Apply(arg2 string) (_swig_ret bool) {
 
 func DeleteExpandDecider(arg1 ExpandDecider) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ExpandDecider_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ExpandDecider_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrExpandDecider) Release__SWIG_0() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
 	_swig_i_0 := arg1
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDecider_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDecider_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrExpandDecider) Release__SWIG_1() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
 	_swig_i_0 := arg1
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDecider_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDecider_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -4591,7 +4827,7 @@ func NewExpandDeciderAnd(arg1 ExpandDecider, arg2 ExpandDecider) (_swig_ret Expa
 	var swig_r ExpandDeciderAnd
 	_swig_i_0 := arg1.Swigcptr()
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (ExpandDeciderAnd)(SwigcptrExpandDeciderAnd(C._wrap_new_ExpandDeciderAnd_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (ExpandDeciderAnd)(SwigcptrExpandDeciderAnd(C._wrap_new_ExpandDeciderAnd_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -4599,7 +4835,7 @@ func (arg1 SwigcptrExpandDeciderAnd) Apply(arg2 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ExpandDeciderAnd_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_68)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_ExpandDeciderAnd_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_69)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -4608,18 +4844,18 @@ func (arg1 SwigcptrExpandDeciderAnd) Apply(arg2 string) (_swig_ret bool) {
 
 func DeleteExpandDeciderAnd(arg1 ExpandDeciderAnd) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ExpandDeciderAnd_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ExpandDeciderAnd_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrExpandDeciderAnd) Release__SWIG_0() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderAnd_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderAnd_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrExpandDeciderAnd) Release__SWIG_1() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderAnd_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderAnd_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -4662,7 +4898,7 @@ func (p SwigcptrExpandDeciderFilterPrefix) SwigIsExpandDeciderFilterPrefix() {
 func NewExpandDeciderFilterPrefix(arg1 string) (_swig_ret ExpandDeciderFilterPrefix) {
 	var swig_r ExpandDeciderFilterPrefix
 	_swig_i_0 := arg1
-	swig_r = (ExpandDeciderFilterPrefix)(SwigcptrExpandDeciderFilterPrefix(C._wrap_new_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(*(*C.swig_type_69)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (ExpandDeciderFilterPrefix)(SwigcptrExpandDeciderFilterPrefix(C._wrap_new_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(*(*C.swig_type_70)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -4673,7 +4909,7 @@ func (arg1 SwigcptrExpandDeciderFilterPrefix) Apply(arg2 string) (_swig_ret bool
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ExpandDeciderFilterPrefix_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_70)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_ExpandDeciderFilterPrefix_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_71)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -4682,18 +4918,18 @@ func (arg1 SwigcptrExpandDeciderFilterPrefix) Apply(arg2 string) (_swig_ret bool
 
 func DeleteExpandDeciderFilterPrefix(arg1 ExpandDeciderFilterPrefix) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrExpandDeciderFilterPrefix) Release__SWIG_0() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrExpandDeciderFilterPrefix) Release__SWIG_1() (_swig_ret ExpandDecider) {
 	var swig_r ExpandDecider
-	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ExpandDecider)(SwigcptrExpandDecider(C._wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -4742,7 +4978,7 @@ func (p *_swig_DirectorKeyMaker) DirectorInterface() interface{} {
 
 func NewDirectorKeyMaker(v interface{}) KeyMaker {
 	p := &_swig_DirectorKeyMaker{0, v}
-	p.SwigcptrKeyMaker = SwigcptrKeyMaker(C._wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrKeyMaker = SwigcptrKeyMaker(C._wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
@@ -4757,8 +4993,8 @@ func (swig_p *_swig_DirectorKeyMaker) Apply(doc Document) string {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorKeyMaker_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorKeyMaker_callback_Apply_xapian_1797894d64db9bab(swig_c int, doc uintptr) (swig_result string) {
+//export Swig_DirectorKeyMaker_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorKeyMaker_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, doc uintptr) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorKeyMaker)
 	swig_r = swig_p.Apply(SwigcptrDocument(doc))
@@ -4767,11 +5003,11 @@ func Swig_DirectorKeyMaker_callback_Apply_xapian_1797894d64db9bab(swig_c int, do
 
 func DeleteDirectorKeyMaker(arg1 KeyMaker) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorKeyMaker_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorKeyMaker_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_KeyMaker_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_KeyMaker_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_KeyMaker_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_KeyMaker_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorKeyMaker).SwigcptrKeyMaker = 0
 	swigDirectorDelete(c)
 }
@@ -4793,7 +5029,7 @@ func (arg1 SwigcptrKeyMaker) Apply(arg2 Document) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r_p := C._wrap_KeyMaker_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	swig_r_p := C._wrap_KeyMaker_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -4802,20 +5038,20 @@ func (arg1 SwigcptrKeyMaker) Apply(arg2 Document) (_swig_ret string) {
 
 func DeleteKeyMaker(arg1 KeyMaker) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_KeyMaker_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_KeyMaker_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrKeyMaker) Release__SWIG_0() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
 	_swig_i_0 := arg1
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_KeyMaker_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_KeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrKeyMaker) Release__SWIG_1() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
 	_swig_i_0 := arg1
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_KeyMaker_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_KeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -4849,7 +5085,7 @@ func (p SwigcptrMultiValueKeyMaker) SwigIsMultiValueKeyMaker() {
 
 func NewMultiValueKeyMaker() (_swig_ret MultiValueKeyMaker) {
 	var swig_r MultiValueKeyMaker
-	swig_r = (MultiValueKeyMaker)(SwigcptrMultiValueKeyMaker(C._wrap_new_MultiValueKeyMaker_xapian_1797894d64db9bab()))
+	swig_r = (MultiValueKeyMaker)(SwigcptrMultiValueKeyMaker(C._wrap_new_MultiValueKeyMaker_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -4857,7 +5093,7 @@ func (arg1 SwigcptrMultiValueKeyMaker) Apply(arg2 Document) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r_p := C._wrap_MultiValueKeyMaker_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	swig_r_p := C._wrap_MultiValueKeyMaker_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -4869,7 +5105,7 @@ func (arg1 SwigcptrMultiValueKeyMaker) Add_value__SWIG_0(arg2 uint, arg3 bool, a
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2), *(*C.swig_type_73)(unsafe.Pointer(&_swig_i_3)))
+	C._wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2), *(*C.swig_type_74)(unsafe.Pointer(&_swig_i_3)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg4
 	}
@@ -4879,13 +5115,13 @@ func (arg1 SwigcptrMultiValueKeyMaker) Add_value__SWIG_1(arg2 uint, arg3 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
+	C._wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C._Bool(_swig_i_2))
 }
 
 func (arg1 SwigcptrMultiValueKeyMaker) Add_value__SWIG_2(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (p SwigcptrMultiValueKeyMaker) Add_value(a ...interface{}) {
@@ -4907,18 +5143,18 @@ func (p SwigcptrMultiValueKeyMaker) Add_value(a ...interface{}) {
 
 func DeleteMultiValueKeyMaker(arg1 MultiValueKeyMaker) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_MultiValueKeyMaker_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_MultiValueKeyMaker_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrMultiValueKeyMaker) Release__SWIG_0() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_MultiValueKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_MultiValueKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrMultiValueKeyMaker) Release__SWIG_1() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_MultiValueKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_MultiValueKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -4968,7 +5204,7 @@ func (p *_swig_DirectorStopper) DirectorInterface() interface{} {
 
 func NewDirectorStopper(v interface{}) Stopper {
 	p := &_swig_DirectorStopper{0, v}
-	p.SwigcptrStopper = SwigcptrStopper(C._wrap__swig_NewDirectorStopperStopper_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrStopper = SwigcptrStopper(C._wrap__swig_NewDirectorStopperStopper_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
@@ -4983,8 +5219,8 @@ func (swig_p *_swig_DirectorStopper) Apply(term string) bool {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorStopper_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorStopper_callback_Apply_xapian_1797894d64db9bab(swig_c int, term string) (swig_result bool) {
+//export Swig_DirectorStopper_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorStopper_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, term string) (swig_result bool) {
 	var swig_r bool
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorStopper)
@@ -4995,11 +5231,11 @@ func Swig_DirectorStopper_callback_Apply_xapian_1797894d64db9bab(swig_c int, ter
 
 func DeleteDirectorStopper(arg1 Stopper) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorStopper_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorStopper_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_Stopper_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_Stopper_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_Stopper_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_Stopper_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorStopper).SwigcptrStopper = 0
 	swigDirectorDelete(c)
 }
@@ -5013,7 +5249,7 @@ func (swig_p *_swig_DirectorStopper) Get_description() string {
 		return swig_g.Get_description()
 	}
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorStopper_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrStopper))
+	swig_r_p := C._wrap__swig_DirectorStopper_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrStopper))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -5022,15 +5258,15 @@ func (swig_p *_swig_DirectorStopper) Get_description() string {
 
 func DirectorStopperGet_description(p Stopper) string {
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorStopper_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorStopper).SwigcptrStopper))
+	swig_r_p := C._wrap__swig_DirectorStopper_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorStopper).SwigcptrStopper))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-//export Swig_DirectorStopper_callback_get_description_xapian_1797894d64db9bab
-func Swig_DirectorStopper_callback_get_description_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorStopper_callback_get_description_xapian_245a1afe1629f0b1
+func Swig_DirectorStopper_callback_get_description_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorStopper)
 	swig_r = swig_p.Get_description()
@@ -5054,7 +5290,7 @@ func (arg1 SwigcptrStopper) Apply(arg2 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_Stopper_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_75)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_Stopper_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_76)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5063,13 +5299,13 @@ func (arg1 SwigcptrStopper) Apply(arg2 string) (_swig_ret bool) {
 
 func DeleteStopper(arg1 Stopper) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Stopper_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Stopper_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrStopper) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Stopper_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Stopper_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -5079,14 +5315,14 @@ func (arg1 SwigcptrStopper) Get_description() (_swig_ret string) {
 func (arg1 SwigcptrStopper) Release__SWIG_0() (_swig_ret Stopper) {
 	var swig_r Stopper
 	_swig_i_0 := arg1
-	swig_r = (Stopper)(SwigcptrStopper(C._wrap_Stopper_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Stopper)(SwigcptrStopper(C._wrap_Stopper_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrStopper) Release__SWIG_1() (_swig_ret Stopper) {
 	var swig_r Stopper
 	_swig_i_0 := arg1
-	swig_r = (Stopper)(SwigcptrStopper(C._wrap_Stopper_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Stopper)(SwigcptrStopper(C._wrap_Stopper_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -5121,14 +5357,14 @@ func (p SwigcptrSimpleStopper) SwigIsSimpleStopper() {
 
 func NewSimpleStopper__SWIG_0() (_swig_ret SimpleStopper) {
 	var swig_r SimpleStopper
-	swig_r = (SimpleStopper)(SwigcptrSimpleStopper(C._wrap_new_SimpleStopper__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (SimpleStopper)(SwigcptrSimpleStopper(C._wrap_new_SimpleStopper__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func (arg1 SwigcptrSimpleStopper) Add(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_SimpleStopper_add_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_77)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_SimpleStopper_add_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_78)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5138,7 +5374,7 @@ func (arg1 SwigcptrSimpleStopper) Apply(arg2 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_SimpleStopper_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_78)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_SimpleStopper_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_79)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5148,7 +5384,7 @@ func (arg1 SwigcptrSimpleStopper) Apply(arg2 string) (_swig_ret bool) {
 func (arg1 SwigcptrSimpleStopper) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_SimpleStopper_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_SimpleStopper_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -5158,7 +5394,7 @@ func (arg1 SwigcptrSimpleStopper) Get_description() (_swig_ret string) {
 func NewSimpleStopper__SWIG_2(arg1 string) (_swig_ret SimpleStopper) {
 	var swig_r SimpleStopper
 	_swig_i_0 := arg1
-	swig_r = (SimpleStopper)(SwigcptrSimpleStopper(C._wrap_new_SimpleStopper__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_80)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (SimpleStopper)(SwigcptrSimpleStopper(C._wrap_new_SimpleStopper__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_81)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -5178,18 +5414,18 @@ func NewSimpleStopper(a ...interface{}) SimpleStopper {
 
 func DeleteSimpleStopper(arg1 SimpleStopper) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_SimpleStopper_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_SimpleStopper_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrSimpleStopper) Release__SWIG_0() (_swig_ret Stopper) {
 	var swig_r Stopper
-	swig_r = (Stopper)(SwigcptrStopper(C._wrap_SimpleStopper_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Stopper)(SwigcptrStopper(C._wrap_SimpleStopper_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrSimpleStopper) Release__SWIG_1() (_swig_ret Stopper) {
 	var swig_r Stopper
-	swig_r = (Stopper)(SwigcptrStopper(C._wrap_SimpleStopper_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Stopper)(SwigcptrStopper(C._wrap_SimpleStopper_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -5224,7 +5460,7 @@ type SimpleStopper interface {
 
 func _swig_getRP_SUFFIX() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_RP_SUFFIX_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_RP_SUFFIX_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -5232,7 +5468,7 @@ var RP_SUFFIX int = _swig_getRP_SUFFIX()
 
 func _swig_getRP_REPEATED() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_RP_REPEATED_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_RP_REPEATED_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -5240,7 +5476,7 @@ var RP_REPEATED int = _swig_getRP_REPEATED()
 
 func _swig_getRP_DATE_PREFER_MDY() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_RP_DATE_PREFER_MDY_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_RP_DATE_PREFER_MDY_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -5257,7 +5493,7 @@ func (p SwigcptrRangeProcessor) SwigIsRangeProcessor() {
 
 func NewRangeProcessor__SWIG_0() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -5266,7 +5502,7 @@ func NewRangeProcessor__SWIG_1(arg1 uint, arg2 string, arg3 uint) (_swig_ret Ran
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_81)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_82)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5277,7 +5513,7 @@ func NewRangeProcessor__SWIG_2(arg1 uint, arg2 string) (_swig_ret RangeProcessor
 	var swig_r RangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_82)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_83)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5287,7 +5523,7 @@ func NewRangeProcessor__SWIG_2(arg1 uint, arg2 string) (_swig_ret RangeProcessor
 func NewRangeProcessor__SWIG_3(arg1 uint) (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_new_RangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -5310,7 +5546,7 @@ func NewRangeProcessor(a ...interface{}) RangeProcessor {
 
 func DeleteRangeProcessor(arg1 RangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_RangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_RangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrRangeProcessor) Check_range(arg2 string, arg3 string) (_swig_ret Query) {
@@ -5318,7 +5554,7 @@ func (arg1 SwigcptrRangeProcessor) Check_range(arg2 string, arg3 string) (_swig_
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_RangeProcessor_check_range_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_83)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_84)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_RangeProcessor_check_range_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_84)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_85)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5333,7 +5569,7 @@ func (arg1 SwigcptrRangeProcessor) Apply(arg2 string, arg3 string) (_swig_ret Qu
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_RangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_85)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_86)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_RangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_86)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_87)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5346,14 +5582,14 @@ func (arg1 SwigcptrRangeProcessor) Apply(arg2 string, arg3 string) (_swig_ret Qu
 func (arg1 SwigcptrRangeProcessor) Release__SWIG_0() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_RangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_RangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrRangeProcessor) Release__SWIG_1() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_RangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_RangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -5390,7 +5626,7 @@ func NewDateRangeProcessor__SWIG_0(arg1 uint, arg2 uint, arg3 int) (_swig_ret Da
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	return swig_r
 }
 
@@ -5398,14 +5634,14 @@ func NewDateRangeProcessor__SWIG_1(arg1 uint, arg2 uint) (_swig_ret DateRangePro
 	var swig_r DateRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
 func NewDateRangeProcessor__SWIG_2(arg1 uint) (_swig_ret DateRangeProcessor) {
 	var swig_r DateRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -5415,7 +5651,7 @@ func NewDateRangeProcessor__SWIG_3(arg1 uint, arg2 string, arg3 uint, arg4 int) 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_87)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_88)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5427,7 +5663,7 @@ func NewDateRangeProcessor__SWIG_4(arg1 uint, arg2 string, arg3 uint) (_swig_ret
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_88)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_89)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5438,7 +5674,7 @@ func NewDateRangeProcessor__SWIG_5(arg1 uint, arg2 string) (_swig_ret DateRangeP
 	var swig_r DateRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_5_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_89)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (DateRangeProcessor)(SwigcptrDateRangeProcessor(C._wrap_new_DateRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_90)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5484,7 +5720,7 @@ func (arg1 SwigcptrDateRangeProcessor) Apply(arg2 string, arg3 string) (_swig_re
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_DateRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_90)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_91)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_DateRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_91)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_92)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5496,14 +5732,14 @@ func (arg1 SwigcptrDateRangeProcessor) Apply(arg2 string, arg3 string) (_swig_re
 
 func DeleteDateRangeProcessor(arg1 DateRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_DateRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_DateRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDateRangeProcessor) Check_range(arg1 string, arg2 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_DateRangeProcessor_check_range_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_92)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_93)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_DateRangeProcessor_check_range_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_93)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_94)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -5515,13 +5751,13 @@ func (_swig_base SwigcptrDateRangeProcessor) Check_range(arg1 string, arg2 strin
 
 func (_swig_base SwigcptrDateRangeProcessor) Release__SWIG_0() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_DateRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_DateRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDateRangeProcessor) Release__SWIG_1() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_DateRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_DateRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -5567,7 +5803,7 @@ func NewNumberRangeProcessor__SWIG_0(arg1 uint, arg2 string, arg3 uint) (_swig_r
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_94)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_95)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5578,7 +5814,7 @@ func NewNumberRangeProcessor__SWIG_1(arg1 uint, arg2 string) (_swig_ret NumberRa
 	var swig_r NumberRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_95)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_96)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5588,7 +5824,7 @@ func NewNumberRangeProcessor__SWIG_1(arg1 uint, arg2 string) (_swig_ret NumberRa
 func NewNumberRangeProcessor__SWIG_2(arg1 uint) (_swig_ret NumberRangeProcessor) {
 	var swig_r NumberRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (NumberRangeProcessor)(SwigcptrNumberRangeProcessor(C._wrap_new_NumberRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -5611,7 +5847,7 @@ func (arg1 SwigcptrNumberRangeProcessor) Apply(arg2 string, arg3 string) (_swig_
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_NumberRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_96)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_97)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_NumberRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_97)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_98)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5623,14 +5859,14 @@ func (arg1 SwigcptrNumberRangeProcessor) Apply(arg2 string, arg3 string) (_swig_
 
 func DeleteNumberRangeProcessor(arg1 NumberRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_NumberRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_NumberRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrNumberRangeProcessor) Check_range(arg1 string, arg2 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_NumberRangeProcessor_check_range_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_92)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_93)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_NumberRangeProcessor_check_range_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_93)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_94)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -5642,13 +5878,13 @@ func (_swig_base SwigcptrNumberRangeProcessor) Check_range(arg1 string, arg2 str
 
 func (_swig_base SwigcptrNumberRangeProcessor) Release__SWIG_0() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_NumberRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_NumberRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrNumberRangeProcessor) Release__SWIG_1() (_swig_ret RangeProcessor) {
 	var swig_r RangeProcessor
-	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_NumberRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (RangeProcessor)(SwigcptrRangeProcessor(C._wrap_NumberRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -5698,17 +5934,17 @@ func (p *_swig_DirectorValueRangeProcessor) DirectorInterface() interface{} {
 
 func NewDirectorValueRangeProcessor(v interface{}) ValueRangeProcessor {
 	p := &_swig_DirectorValueRangeProcessor{0, v}
-	p.SwigcptrValueRangeProcessor = SwigcptrValueRangeProcessor(C._wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrValueRangeProcessor = SwigcptrValueRangeProcessor(C._wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorValueRangeProcessor(arg1 ValueRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorValueRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorValueRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_ValueRangeProcessor_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_ValueRangeProcessor_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_ValueRangeProcessor_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_ValueRangeProcessor_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorValueRangeProcessor).SwigcptrValueRangeProcessor = 0
 	swigDirectorDelete(c)
 }
@@ -5724,8 +5960,8 @@ func (swig_p *_swig_DirectorValueRangeProcessor) Apply(begin *string, end *strin
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorValueRangeProcessor_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorValueRangeProcessor_callback_Apply_xapian_1797894d64db9bab(swig_c int, begin *string, end *string) (swig_result uint) {
+//export Swig_DirectorValueRangeProcessor_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorValueRangeProcessor_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, begin *string, end *string) (swig_result uint) {
 	var swig_r uint
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorValueRangeProcessor)
 	swig_r = swig_p.Apply(begin, end)
@@ -5747,7 +5983,7 @@ func (p SwigcptrValueRangeProcessor) DirectorInterface() interface{} {
 
 func DeleteValueRangeProcessor(arg1 ValueRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrValueRangeProcessor) Apply(arg2 *string, arg3 *string) (_swig_ret uint) {
@@ -5755,21 +5991,21 @@ func (arg1 SwigcptrValueRangeProcessor) Apply(arg2 *string, arg3 *string) (_swig
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (uint)(C._wrap_ValueRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
+	swig_r = (uint)(C._wrap_ValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueRangeProcessor) Release__SWIG_0() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_ValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_ValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueRangeProcessor) Release__SWIG_1() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_ValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_ValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -5804,7 +6040,7 @@ func (p SwigcptrStringValueRangeProcessor) SwigIsStringValueRangeProcessor() {
 func NewStringValueRangeProcessor__SWIG_0(arg1 uint) (_swig_ret StringValueRangeProcessor) {
 	var swig_r StringValueRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -5813,7 +6049,7 @@ func NewStringValueRangeProcessor__SWIG_1(arg1 uint, arg2 string, arg3 bool) (_s
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_98)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
+	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_99)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5824,7 +6060,7 @@ func NewStringValueRangeProcessor__SWIG_2(arg1 uint, arg2 string) (_swig_ret Str
 	var swig_r StringValueRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_99)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (StringValueRangeProcessor)(SwigcptrStringValueRangeProcessor(C._wrap_new_StringValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_100)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5850,24 +6086,24 @@ func (arg1 SwigcptrStringValueRangeProcessor) Apply(arg2 *string, arg3 *string) 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (uint)(C._wrap_StringValueRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
+	swig_r = (uint)(C._wrap_StringValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
 	return swig_r
 }
 
 func DeleteStringValueRangeProcessor(arg1 StringValueRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_StringValueRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_StringValueRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrStringValueRangeProcessor) Release__SWIG_0() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_StringValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_StringValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrStringValueRangeProcessor) Release__SWIG_1() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_StringValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_StringValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -5912,7 +6148,7 @@ func NewDateValueRangeProcessor__SWIG_0(arg1 uint, arg2 bool, arg3 int) (_swig_r
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	return swig_r
 }
 
@@ -5920,14 +6156,14 @@ func NewDateValueRangeProcessor__SWIG_1(arg1 uint, arg2 bool) (_swig_ret DateVal
 	var swig_r DateValueRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1))))
 	return swig_r
 }
 
 func NewDateValueRangeProcessor__SWIG_2(arg1 uint) (_swig_ret DateValueRangeProcessor) {
 	var swig_r DateValueRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -5938,7 +6174,7 @@ func NewDateValueRangeProcessor__SWIG_3(arg1 uint, arg2 string, arg3 bool, arg4 
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_100)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2), C._Bool(_swig_i_3), C.swig_intgo(_swig_i_4))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_101)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2), C._Bool(_swig_i_3), C.swig_intgo(_swig_i_4))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5951,7 +6187,7 @@ func NewDateValueRangeProcessor__SWIG_4(arg1 uint, arg2 string, arg3 bool, arg4 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_101)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2), C._Bool(_swig_i_3))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_102)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2), C._Bool(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5963,7 +6199,7 @@ func NewDateValueRangeProcessor__SWIG_5(arg1 uint, arg2 string, arg3 bool) (_swi
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_5_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_102)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_103)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -5974,7 +6210,7 @@ func NewDateValueRangeProcessor__SWIG_6(arg1 uint, arg2 string) (_swig_ret DateV
 	var swig_r DateValueRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_6_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_103)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (DateValueRangeProcessor)(SwigcptrDateValueRangeProcessor(C._wrap_new_DateValueRangeProcessor__SWIG_6_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_104)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6023,24 +6259,24 @@ func (arg1 SwigcptrDateValueRangeProcessor) Apply(arg2 *string, arg3 *string) (_
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (uint)(C._wrap_DateValueRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
+	swig_r = (uint)(C._wrap_DateValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
 	return swig_r
 }
 
 func DeleteDateValueRangeProcessor(arg1 DateValueRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_DateValueRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_DateValueRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDateValueRangeProcessor) Release__SWIG_0() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_DateValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_DateValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDateValueRangeProcessor) Release__SWIG_1() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_DateValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_DateValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -6092,7 +6328,7 @@ func (p SwigcptrNumberValueRangeProcessor) SwigIsNumberValueRangeProcessor() {
 func NewNumberValueRangeProcessor__SWIG_0(arg1 uint) (_swig_ret NumberValueRangeProcessor) {
 	var swig_r NumberValueRangeProcessor
 	_swig_i_0 := arg1
-	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -6101,7 +6337,7 @@ func NewNumberValueRangeProcessor__SWIG_1(arg1 uint, arg2 string, arg3 bool) (_s
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_104)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
+	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_105)(unsafe.Pointer(&_swig_i_1)), C._Bool(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6112,7 +6348,7 @@ func NewNumberValueRangeProcessor__SWIG_2(arg1 uint, arg2 string) (_swig_ret Num
 	var swig_r NumberValueRangeProcessor
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), *(*C.swig_type_105)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (NumberValueRangeProcessor)(SwigcptrNumberValueRangeProcessor(C._wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), *(*C.swig_type_106)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6138,24 +6374,24 @@ func (arg1 SwigcptrNumberValueRangeProcessor) Apply(arg2 *string, arg3 *string) 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (uint)(C._wrap_NumberValueRangeProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
+	swig_r = (uint)(C._wrap_NumberValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_voidp(_swig_i_1), C.swig_voidp(_swig_i_2)))
 	return swig_r
 }
 
 func DeleteNumberValueRangeProcessor(arg1 NumberValueRangeProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_NumberValueRangeProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_NumberValueRangeProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrNumberValueRangeProcessor) Release__SWIG_0() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrNumberValueRangeProcessor) Release__SWIG_1() (_swig_ret ValueRangeProcessor) {
 	var swig_r ValueRangeProcessor
-	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (ValueRangeProcessor)(SwigcptrValueRangeProcessor(C._wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -6213,17 +6449,17 @@ func (p *_swig_DirectorFieldProcessor) DirectorInterface() interface{} {
 
 func NewDirectorFieldProcessor(v interface{}) FieldProcessor {
 	p := &_swig_DirectorFieldProcessor{0, v}
-	p.SwigcptrFieldProcessor = SwigcptrFieldProcessor(C._wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrFieldProcessor = SwigcptrFieldProcessor(C._wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorFieldProcessor(arg1 FieldProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorFieldProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorFieldProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_FieldProcessor_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_FieldProcessor_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_FieldProcessor_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_FieldProcessor_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorFieldProcessor).SwigcptrFieldProcessor = 0
 	swigDirectorDelete(c)
 }
@@ -6239,8 +6475,8 @@ func (swig_p *_swig_DirectorFieldProcessor) Apply(str string) Query {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorFieldProcessor_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorFieldProcessor_callback_Apply_xapian_1797894d64db9bab(swig_c int, str string) (swig_result SwigcptrQuery) {
+//export Swig_DirectorFieldProcessor_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorFieldProcessor_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, str string) (swig_result SwigcptrQuery) {
 	var swig_r SwigcptrQuery
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorFieldProcessor)
@@ -6264,14 +6500,14 @@ func (p SwigcptrFieldProcessor) DirectorInterface() interface{} {
 
 func DeleteFieldProcessor(arg1 FieldProcessor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_FieldProcessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_FieldProcessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrFieldProcessor) Apply(arg2 string) (_swig_ret Query) {
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_FieldProcessor_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_106)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_FieldProcessor_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_107)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6281,14 +6517,14 @@ func (arg1 SwigcptrFieldProcessor) Apply(arg2 string) (_swig_ret Query) {
 func (arg1 SwigcptrFieldProcessor) Release__SWIG_0() (_swig_ret FieldProcessor) {
 	var swig_r FieldProcessor
 	_swig_i_0 := arg1
-	swig_r = (FieldProcessor)(SwigcptrFieldProcessor(C._wrap_FieldProcessor_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (FieldProcessor)(SwigcptrFieldProcessor(C._wrap_FieldProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrFieldProcessor) Release__SWIG_1() (_swig_ret FieldProcessor) {
 	var swig_r FieldProcessor
 	_swig_i_0 := arg1
-	swig_r = (FieldProcessor)(SwigcptrFieldProcessor(C._wrap_FieldProcessor_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (FieldProcessor)(SwigcptrFieldProcessor(C._wrap_FieldProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -6324,7 +6560,7 @@ type XapianQueryParserFeature_flag int
 
 func _swig_getQueryParser_FLAG_BOOLEAN_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_BOOLEAN_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_BOOLEAN_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6332,7 +6568,7 @@ var QueryParserFLAG_BOOLEAN int = _swig_getQueryParser_FLAG_BOOLEAN_QueryParser(
 
 func _swig_getQueryParser_FLAG_PHRASE_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_PHRASE_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_PHRASE_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6340,7 +6576,7 @@ var QueryParserFLAG_PHRASE int = _swig_getQueryParser_FLAG_PHRASE_QueryParser()
 
 func _swig_getQueryParser_FLAG_LOVEHATE_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_LOVEHATE_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_LOVEHATE_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6348,7 +6584,7 @@ var QueryParserFLAG_LOVEHATE int = _swig_getQueryParser_FLAG_LOVEHATE_QueryParse
 
 func _swig_getQueryParser_FLAG_BOOLEAN_ANY_CASE_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6356,7 +6592,7 @@ var QueryParserFLAG_BOOLEAN_ANY_CASE int = _swig_getQueryParser_FLAG_BOOLEAN_ANY
 
 func _swig_getQueryParser_FLAG_WILDCARD_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_WILDCARD_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_WILDCARD_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6364,7 +6600,7 @@ var QueryParserFLAG_WILDCARD int = _swig_getQueryParser_FLAG_WILDCARD_QueryParse
 
 func _swig_getQueryParser_FLAG_PURE_NOT_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_PURE_NOT_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_PURE_NOT_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6372,7 +6608,7 @@ var QueryParserFLAG_PURE_NOT int = _swig_getQueryParser_FLAG_PURE_NOT_QueryParse
 
 func _swig_getQueryParser_FLAG_PARTIAL_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_PARTIAL_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_PARTIAL_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6380,7 +6616,7 @@ var QueryParserFLAG_PARTIAL int = _swig_getQueryParser_FLAG_PARTIAL_QueryParser(
 
 func _swig_getQueryParser_FLAG_SPELLING_CORRECTION_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6388,7 +6624,7 @@ var QueryParserFLAG_SPELLING_CORRECTION int = _swig_getQueryParser_FLAG_SPELLING
 
 func _swig_getQueryParser_FLAG_SYNONYM_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_SYNONYM_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_SYNONYM_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6396,7 +6632,7 @@ var QueryParserFLAG_SYNONYM int = _swig_getQueryParser_FLAG_SYNONYM_QueryParser(
 
 func _swig_getQueryParser_FLAG_AUTO_SYNONYMS_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6404,7 +6640,7 @@ var QueryParserFLAG_AUTO_SYNONYMS int = _swig_getQueryParser_FLAG_AUTO_SYNONYMS_
 
 func _swig_getQueryParser_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6412,7 +6648,7 @@ var QueryParserFLAG_AUTO_MULTIWORD_SYNONYMS int = _swig_getQueryParser_FLAG_AUTO
 
 func _swig_getQueryParser_FLAG_CJK_NGRAM_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_CJK_NGRAM_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_CJK_NGRAM_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6420,7 +6656,7 @@ var QueryParserFLAG_CJK_NGRAM int = _swig_getQueryParser_FLAG_CJK_NGRAM_QueryPar
 
 func _swig_getQueryParser_FLAG_DEFAULT_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FLAG_DEFAULT_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FLAG_DEFAULT_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6430,7 +6666,7 @@ type XapianQueryParserStem_strategy int
 
 func _swig_getQueryParser_STEM_NONE_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_NONE_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_NONE_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6438,7 +6674,7 @@ var QueryParserSTEM_NONE int = _swig_getQueryParser_STEM_NONE_QueryParser()
 
 func _swig_getQueryParser_STEM_SOME_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_SOME_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_SOME_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6446,7 +6682,7 @@ var QueryParserSTEM_SOME int = _swig_getQueryParser_STEM_SOME_QueryParser()
 
 func _swig_getQueryParser_STEM_ALL_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_ALL_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_ALL_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6454,7 +6690,7 @@ var QueryParserSTEM_ALL int = _swig_getQueryParser_STEM_ALL_QueryParser()
 
 func _swig_getQueryParser_STEM_ALL_Z_QueryParser() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STEM_ALL_Z_QueryParser_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STEM_ALL_Z_QueryParser_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -6462,36 +6698,36 @@ var QueryParserSTEM_ALL_Z int = _swig_getQueryParser_STEM_ALL_Z_QueryParser()
 
 func NewQueryParser() (_swig_ret QueryParser) {
 	var swig_r QueryParser
-	swig_r = (QueryParser)(SwigcptrQueryParser(C._wrap_new_QueryParser_xapian_1797894d64db9bab()))
+	swig_r = (QueryParser)(SwigcptrQueryParser(C._wrap_new_QueryParser_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteQueryParser(arg1 QueryParser) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_QueryParser_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_QueryParser_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrQueryParser) Set_stemmer(arg2 Stem) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_QueryParser_set_stemmer_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_QueryParser_set_stemmer_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Set_stemming_strategy(arg2 XapianQueryParserStem_strategy) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_QueryParser_set_stemming_strategy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_QueryParser_set_stemming_strategy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Set_stopper__SWIG_0(arg2 Stopper) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_QueryParser_set_stopper__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_QueryParser_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Set_stopper__SWIG_1() {
 	_swig_i_0 := arg1
-	C._wrap_QueryParser_set_stopper__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_QueryParser_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (p SwigcptrQueryParser) Set_stopper(a ...interface{}) {
@@ -6510,20 +6746,20 @@ func (p SwigcptrQueryParser) Set_stopper(a ...interface{}) {
 func (arg1 SwigcptrQueryParser) Set_default_op(arg2 XapianQueryOp) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_QueryParser_set_default_op_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_QueryParser_set_default_op_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Get_default_op() (_swig_ret XapianQueryOp) {
 	var swig_r XapianQueryOp
 	_swig_i_0 := arg1
-	swig_r = (XapianQueryOp)(C._wrap_QueryParser_get_default_op_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (XapianQueryOp)(C._wrap_QueryParser_get_default_op_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrQueryParser) Set_database(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_QueryParser_set_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_QueryParser_set_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Set_max_expansion__SWIG_0(arg2 uint, arg3 int, arg4 uint) {
@@ -6531,20 +6767,20 @@ func (arg1 SwigcptrQueryParser) Set_max_expansion__SWIG_0(arg2 uint, arg3 int, a
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_QueryParser_set_max_expansion__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
+	C._wrap_QueryParser_set_max_expansion__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
 }
 
 func (arg1 SwigcptrQueryParser) Set_max_expansion__SWIG_1(arg2 uint, arg3 int) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_QueryParser_set_max_expansion__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_QueryParser_set_max_expansion__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
 }
 
 func (arg1 SwigcptrQueryParser) Set_max_expansion__SWIG_2(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_QueryParser_set_max_expansion__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_QueryParser_set_max_expansion__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (p SwigcptrQueryParser) Set_max_expansion(a ...interface{}) {
@@ -6567,7 +6803,7 @@ func (p SwigcptrQueryParser) Set_max_expansion(a ...interface{}) {
 func (arg1 SwigcptrQueryParser) Set_max_wildcard_expansion(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_QueryParser_set_max_wildcard_expansion_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_QueryParser_set_max_wildcard_expansion_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Parse_query__SWIG_0(arg2 string, arg3 uint, arg4 string) (_swig_ret Query) {
@@ -6576,7 +6812,7 @@ func (arg1 SwigcptrQueryParser) Parse_query__SWIG_0(arg2 string, arg3 uint, arg4
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_107)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_108)(unsafe.Pointer(&_swig_i_3)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_108)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), *(*C.swig_type_109)(unsafe.Pointer(&_swig_i_3)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6591,7 +6827,7 @@ func (arg1 SwigcptrQueryParser) Parse_query__SWIG_1(arg2 string, arg3 uint) (_sw
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_109)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_110)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6602,7 +6838,7 @@ func (arg1 SwigcptrQueryParser) Parse_query__SWIG_2(arg2 string) (_swig_ret Quer
 	var swig_r Query
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_110)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Query)(SwigcptrQuery(C._wrap_QueryParser_parse_query__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_111)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6627,7 +6863,7 @@ func (arg1 SwigcptrQueryParser) Add_prefix__SWIG_0(arg2 string, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_QueryParser_add_prefix__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_111)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_112)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_QueryParser_add_prefix__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_112)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_113)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6640,7 +6876,7 @@ func (arg1 SwigcptrQueryParser) Add_prefix__SWIG_1(arg2 string, arg3 FieldProces
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	C._wrap_QueryParser_add_prefix__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_113)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2))
+	C._wrap_QueryParser_add_prefix__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_114)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6668,7 +6904,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_0(arg2 string, arg3 str
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_114)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_115)(unsafe.Pointer(&_swig_i_2)), C.swig_voidp(_swig_i_3))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_115)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_116)(unsafe.Pointer(&_swig_i_2)), C.swig_voidp(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6681,7 +6917,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_1(arg2 string, arg3 str
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_116)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_117)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_117)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_118)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6695,7 +6931,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_2(arg2 string, arg3 str
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_118)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_119)(unsafe.Pointer(&_swig_i_2)), C._Bool(_swig_i_3))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_119)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_120)(unsafe.Pointer(&_swig_i_2)), C._Bool(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6709,7 +6945,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_3(arg2 string, arg3 Fie
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_120)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2), C.swig_voidp(_swig_i_3))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_121)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2), C.swig_voidp(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6719,7 +6955,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_4(arg2 string, arg3 Fie
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_121)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_122)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6730,7 +6966,7 @@ func (arg1 SwigcptrQueryParser) Add_boolean_prefix__SWIG_5(arg2 string, arg3 Fie
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	C._wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_122)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2), C._Bool(_swig_i_3))
+	C._wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_123)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2), C._Bool(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6790,14 +7026,14 @@ check_5:
 func (arg1 SwigcptrQueryParser) Stoplist_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_stoplist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_stoplist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrQueryParser) Stoplist_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_stoplist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_stoplist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -6805,7 +7041,7 @@ func (arg1 SwigcptrQueryParser) Unstem_begin(arg2 string) (_swig_ret TermIterato
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_unstem_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_123)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_unstem_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_124)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6816,7 +7052,7 @@ func (arg1 SwigcptrQueryParser) Unstem_end(arg2 string) (_swig_ret TermIterator)
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_unstem_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_124)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_QueryParser_unstem_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_125)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6827,13 +7063,13 @@ func (arg1 SwigcptrQueryParser) Add_rangeprocessor__SWIG_0(arg2 RangeProcessor, 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.swig_voidp(_swig_i_2))
+	C._wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.swig_voidp(_swig_i_2))
 }
 
 func (arg1 SwigcptrQueryParser) Add_rangeprocessor__SWIG_1(arg2 RangeProcessor) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (p SwigcptrQueryParser) Add_rangeprocessor(a ...interface{}) {
@@ -6852,13 +7088,13 @@ func (p SwigcptrQueryParser) Add_rangeprocessor(a ...interface{}) {
 func (arg1 SwigcptrQueryParser) Add_valuerangeprocessor(arg2 ValueRangeProcessor) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_QueryParser_add_valuerangeprocessor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_QueryParser_add_valuerangeprocessor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrQueryParser) Get_corrected_query_string() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_QueryParser_get_corrected_query_string_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_QueryParser_get_corrected_query_string_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -6868,7 +7104,7 @@ func (arg1 SwigcptrQueryParser) Get_corrected_query_string() (_swig_ret string) 
 func (arg1 SwigcptrQueryParser) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_QueryParser_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_QueryParser_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -6903,7 +7139,7 @@ func Sortable_serialise_(arg1 float64, arg2 string) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_sortable_serialise__xapian_1797894d64db9bab(C.double(_swig_i_0), *(*C.swig_type_128)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (int64)(C._wrap_sortable_serialise__xapian_245a1afe1629f0b1(C.double(_swig_i_0), *(*C.swig_type_129)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6913,7 +7149,7 @@ func Sortable_serialise_(arg1 float64, arg2 string) (_swig_ret int64) {
 func Sortable_serialise(arg1 float64) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_sortable_serialise_xapian_1797894d64db9bab(C.double(_swig_i_0))
+	swig_r_p := C._wrap_sortable_serialise_xapian_245a1afe1629f0b1(C.double(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -6923,7 +7159,7 @@ func Sortable_serialise(arg1 float64) (_swig_ret string) {
 func Sortable_unserialise(arg1 string) (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_sortable_unserialise_xapian_1797894d64db9bab(*(*C.swig_type_130)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (float64)(C._wrap_sortable_unserialise_xapian_245a1afe1629f0b1(*(*C.swig_type_131)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -6943,14 +7179,14 @@ func NewValueSetMatchDecider(arg1 uint, arg2 bool) (_swig_ret ValueSetMatchDecid
 	var swig_r ValueSetMatchDecider
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (ValueSetMatchDecider)(SwigcptrValueSetMatchDecider(C._wrap_new_ValueSetMatchDecider_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1))))
+	swig_r = (ValueSetMatchDecider)(SwigcptrValueSetMatchDecider(C._wrap_new_ValueSetMatchDecider_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C._Bool(_swig_i_1))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueSetMatchDecider) Add_value(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueSetMatchDecider_add_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_131)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_ValueSetMatchDecider_add_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_132)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6959,7 +7195,7 @@ func (arg1 SwigcptrValueSetMatchDecider) Add_value(arg2 string) {
 func (arg1 SwigcptrValueSetMatchDecider) Remove_value(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueSetMatchDecider_remove_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_132)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_ValueSetMatchDecider_remove_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_133)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -6969,13 +7205,13 @@ func (arg1 SwigcptrValueSetMatchDecider) Apply(arg2 Document) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_ValueSetMatchDecider_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_ValueSetMatchDecider_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func DeleteValueSetMatchDecider(arg1 ValueSetMatchDecider) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueSetMatchDecider_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueSetMatchDecider_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (p SwigcptrValueSetMatchDecider) SwigIsMatchDecider() {
@@ -7009,7 +7245,7 @@ type XapianWeightType_smoothing int
 
 func _swig_getWeight_TWO_STAGE_SMOOTHING_Weight() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_TWO_STAGE_SMOOTHING_Weight_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_TWO_STAGE_SMOOTHING_Weight_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -7017,7 +7253,7 @@ var WeightTWO_STAGE_SMOOTHING int = _swig_getWeight_TWO_STAGE_SMOOTHING_Weight()
 
 func _swig_getWeight_DIRICHLET_SMOOTHING_Weight() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DIRICHLET_SMOOTHING_Weight_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DIRICHLET_SMOOTHING_Weight_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -7025,7 +7261,7 @@ var WeightDIRICHLET_SMOOTHING int = _swig_getWeight_DIRICHLET_SMOOTHING_Weight()
 
 func _swig_getWeight_ABSOLUTE_DISCOUNT_SMOOTHING_Weight() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -7033,7 +7269,7 @@ var WeightABSOLUTE_DISCOUNT_SMOOTHING int = _swig_getWeight_ABSOLUTE_DISCOUNT_SM
 
 func _swig_getWeight_JELINEK_MERCER_SMOOTHING_Weight() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -7041,7 +7277,7 @@ var WeightJELINEK_MERCER_SMOOTHING int = _swig_getWeight_JELINEK_MERCER_SMOOTHIN
 
 func _swig_getWeight_DIRICHLET_PLUS_SMOOTHING_Weight() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -7049,13 +7285,13 @@ var WeightDIRICHLET_PLUS_SMOOTHING int = _swig_getWeight_DIRICHLET_PLUS_SMOOTHIN
 
 func DeleteWeight(arg1 Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7068,14 +7304,14 @@ func (arg1 SwigcptrWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swig_r
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7084,35 +7320,35 @@ func (arg1 SwigcptrWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret float64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7140,14 +7376,14 @@ func (p SwigcptrBoolWeight) SwigIsBoolWeight() {
 
 func NewBoolWeight() (_swig_ret BoolWeight) {
 	var swig_r BoolWeight
-	swig_r = (BoolWeight)(SwigcptrBoolWeight(C._wrap_new_BoolWeight_xapian_1797894d64db9bab()))
+	swig_r = (BoolWeight)(SwigcptrBoolWeight(C._wrap_new_BoolWeight_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func (arg1 SwigcptrBoolWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_BoolWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_BoolWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7160,14 +7396,14 @@ func (arg1 SwigcptrBoolWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_sw
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_BoolWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_BoolWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBoolWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BoolWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BoolWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7176,37 +7412,37 @@ func (arg1 SwigcptrBoolWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_BoolWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_BoolWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBoolWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BoolWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BoolWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteBoolWeight(arg1 BoolWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_BoolWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_BoolWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrBoolWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBoolWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBoolWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7244,7 +7480,7 @@ func (p SwigcptrTfIdfWeight) SwigIsTfIdfWeight() {
 func NewTfIdfWeight__SWIG_0(arg1 string) (_swig_ret TfIdfWeight) {
 	var swig_r TfIdfWeight
 	_swig_i_0 := arg1
-	swig_r = (TfIdfWeight)(SwigcptrTfIdfWeight(C._wrap_new_TfIdfWeight__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_135)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TfIdfWeight)(SwigcptrTfIdfWeight(C._wrap_new_TfIdfWeight__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_136)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -7253,7 +7489,7 @@ func NewTfIdfWeight__SWIG_0(arg1 string) (_swig_ret TfIdfWeight) {
 
 func NewTfIdfWeight__SWIG_1() (_swig_ret TfIdfWeight) {
 	var swig_r TfIdfWeight
-	swig_r = (TfIdfWeight)(SwigcptrTfIdfWeight(C._wrap_new_TfIdfWeight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (TfIdfWeight)(SwigcptrTfIdfWeight(C._wrap_new_TfIdfWeight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7271,7 +7507,7 @@ func NewTfIdfWeight(a ...interface{}) TfIdfWeight {
 func (arg1 SwigcptrTfIdfWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_TfIdfWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_TfIdfWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7284,14 +7520,14 @@ func (arg1 SwigcptrTfIdfWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_s
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_TfIdfWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_TfIdfWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTfIdfWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_TfIdfWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_TfIdfWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7300,37 +7536,37 @@ func (arg1 SwigcptrTfIdfWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret fl
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_TfIdfWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_TfIdfWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTfIdfWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_TfIdfWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_TfIdfWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteTfIdfWeight(arg1 TfIdfWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_TfIdfWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_TfIdfWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrTfIdfWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrTfIdfWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrTfIdfWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7372,13 +7608,13 @@ func NewBM25Weight__SWIG_0(arg1 float64, arg2 float64, arg3 float64, arg4 float6
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (BM25Weight)(SwigcptrBM25Weight(C._wrap_new_BM25Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0), C.double(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
+	swig_r = (BM25Weight)(SwigcptrBM25Weight(C._wrap_new_BM25Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.double(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
 	return swig_r
 }
 
 func NewBM25Weight__SWIG_1() (_swig_ret BM25Weight) {
 	var swig_r BM25Weight
-	swig_r = (BM25Weight)(SwigcptrBM25Weight(C._wrap_new_BM25Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (BM25Weight)(SwigcptrBM25Weight(C._wrap_new_BM25Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7396,7 +7632,7 @@ func NewBM25Weight(a ...interface{}) BM25Weight {
 func (arg1 SwigcptrBM25Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_BM25Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_BM25Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7409,14 +7645,14 @@ func (arg1 SwigcptrBM25Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_sw
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_BM25Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_BM25Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBM25Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BM25Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BM25Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7425,37 +7661,37 @@ func (arg1 SwigcptrBM25Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_BM25Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_BM25Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBM25Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BM25Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BM25Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteBM25Weight(arg1 BM25Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_BM25Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_BM25Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrBM25Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBM25Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBM25Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7498,13 +7734,13 @@ func NewBM25PlusWeight__SWIG_0(arg1 float64, arg2 float64, arg3 float64, arg4 fl
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
 	_swig_i_5 := arg6
-	swig_r = (BM25PlusWeight)(SwigcptrBM25PlusWeight(C._wrap_new_BM25PlusWeight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0), C.double(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4), C.double(_swig_i_5))))
+	swig_r = (BM25PlusWeight)(SwigcptrBM25PlusWeight(C._wrap_new_BM25PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.double(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4), C.double(_swig_i_5))))
 	return swig_r
 }
 
 func NewBM25PlusWeight__SWIG_1() (_swig_ret BM25PlusWeight) {
 	var swig_r BM25PlusWeight
-	swig_r = (BM25PlusWeight)(SwigcptrBM25PlusWeight(C._wrap_new_BM25PlusWeight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (BM25PlusWeight)(SwigcptrBM25PlusWeight(C._wrap_new_BM25PlusWeight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7522,7 +7758,7 @@ func NewBM25PlusWeight(a ...interface{}) BM25PlusWeight {
 func (arg1 SwigcptrBM25PlusWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_BM25PlusWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_BM25PlusWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7535,14 +7771,14 @@ func (arg1 SwigcptrBM25PlusWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_BM25PlusWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_BM25PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBM25PlusWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BM25PlusWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BM25PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7551,37 +7787,37 @@ func (arg1 SwigcptrBM25PlusWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_BM25PlusWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_BM25PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBM25PlusWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BM25PlusWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BM25PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteBM25PlusWeight(arg1 BM25PlusWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_BM25PlusWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_BM25PlusWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrBM25PlusWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBM25PlusWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBM25PlusWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7619,13 +7855,13 @@ func (p SwigcptrTradWeight) SwigIsTradWeight() {
 func NewTradWeight__SWIG_0(arg1 float64) (_swig_ret TradWeight) {
 	var swig_r TradWeight
 	_swig_i_0 := arg1
-	swig_r = (TradWeight)(SwigcptrTradWeight(C._wrap_new_TradWeight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (TradWeight)(SwigcptrTradWeight(C._wrap_new_TradWeight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewTradWeight__SWIG_1() (_swig_ret TradWeight) {
 	var swig_r TradWeight
-	swig_r = (TradWeight)(SwigcptrTradWeight(C._wrap_new_TradWeight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (TradWeight)(SwigcptrTradWeight(C._wrap_new_TradWeight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7643,7 +7879,7 @@ func NewTradWeight(a ...interface{}) TradWeight {
 func (arg1 SwigcptrTradWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_TradWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_TradWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7656,14 +7892,14 @@ func (arg1 SwigcptrTradWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_sw
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_TradWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_TradWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTradWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_TradWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_TradWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7672,37 +7908,37 @@ func (arg1 SwigcptrTradWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_TradWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_TradWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrTradWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_TradWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_TradWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteTradWeight(arg1 TradWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_TradWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_TradWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrTradWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrTradWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrTradWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7740,13 +7976,13 @@ func (p SwigcptrInL2Weight) SwigIsInL2Weight() {
 func NewInL2Weight__SWIG_0(arg1 float64) (_swig_ret InL2Weight) {
 	var swig_r InL2Weight
 	_swig_i_0 := arg1
-	swig_r = (InL2Weight)(SwigcptrInL2Weight(C._wrap_new_InL2Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (InL2Weight)(SwigcptrInL2Weight(C._wrap_new_InL2Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewInL2Weight__SWIG_1() (_swig_ret InL2Weight) {
 	var swig_r InL2Weight
-	swig_r = (InL2Weight)(SwigcptrInL2Weight(C._wrap_new_InL2Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (InL2Weight)(SwigcptrInL2Weight(C._wrap_new_InL2Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7764,7 +8000,7 @@ func NewInL2Weight(a ...interface{}) InL2Weight {
 func (arg1 SwigcptrInL2Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_InL2Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_InL2Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7777,14 +8013,14 @@ func (arg1 SwigcptrInL2Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_sw
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_InL2Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_InL2Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrInL2Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_InL2Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_InL2Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7793,37 +8029,37 @@ func (arg1 SwigcptrInL2Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_InL2Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_InL2Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrInL2Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_InL2Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_InL2Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteInL2Weight(arg1 InL2Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_InL2Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_InL2Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrInL2Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrInL2Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrInL2Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7861,13 +8097,13 @@ func (p SwigcptrIfB2Weight) SwigIsIfB2Weight() {
 func NewIfB2Weight__SWIG_0(arg1 float64) (_swig_ret IfB2Weight) {
 	var swig_r IfB2Weight
 	_swig_i_0 := arg1
-	swig_r = (IfB2Weight)(SwigcptrIfB2Weight(C._wrap_new_IfB2Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (IfB2Weight)(SwigcptrIfB2Weight(C._wrap_new_IfB2Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewIfB2Weight__SWIG_1() (_swig_ret IfB2Weight) {
 	var swig_r IfB2Weight
-	swig_r = (IfB2Weight)(SwigcptrIfB2Weight(C._wrap_new_IfB2Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (IfB2Weight)(SwigcptrIfB2Weight(C._wrap_new_IfB2Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -7885,7 +8121,7 @@ func NewIfB2Weight(a ...interface{}) IfB2Weight {
 func (arg1 SwigcptrIfB2Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_IfB2Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_IfB2Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -7898,14 +8134,14 @@ func (arg1 SwigcptrIfB2Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_sw
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_IfB2Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_IfB2Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrIfB2Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_IfB2Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_IfB2Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -7914,37 +8150,37 @@ func (arg1 SwigcptrIfB2Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_IfB2Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_IfB2Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrIfB2Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_IfB2Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_IfB2Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteIfB2Weight(arg1 IfB2Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_IfB2Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_IfB2Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrIfB2Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrIfB2Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrIfB2Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -7982,13 +8218,13 @@ func (p SwigcptrIneB2Weight) SwigIsIneB2Weight() {
 func NewIneB2Weight__SWIG_0(arg1 float64) (_swig_ret IneB2Weight) {
 	var swig_r IneB2Weight
 	_swig_i_0 := arg1
-	swig_r = (IneB2Weight)(SwigcptrIneB2Weight(C._wrap_new_IneB2Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (IneB2Weight)(SwigcptrIneB2Weight(C._wrap_new_IneB2Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewIneB2Weight__SWIG_1() (_swig_ret IneB2Weight) {
 	var swig_r IneB2Weight
-	swig_r = (IneB2Weight)(SwigcptrIneB2Weight(C._wrap_new_IneB2Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (IneB2Weight)(SwigcptrIneB2Weight(C._wrap_new_IneB2Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -8006,7 +8242,7 @@ func NewIneB2Weight(a ...interface{}) IneB2Weight {
 func (arg1 SwigcptrIneB2Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_IneB2Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_IneB2Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8019,14 +8255,14 @@ func (arg1 SwigcptrIneB2Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_s
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_IneB2Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_IneB2Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrIneB2Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_IneB2Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_IneB2Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8035,37 +8271,37 @@ func (arg1 SwigcptrIneB2Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret fl
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_IneB2Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_IneB2Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrIneB2Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_IneB2Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_IneB2Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteIneB2Weight(arg1 IneB2Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_IneB2Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_IneB2Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrIneB2Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrIneB2Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrIneB2Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8103,13 +8339,13 @@ func (p SwigcptrBB2Weight) SwigIsBB2Weight() {
 func NewBB2Weight__SWIG_0(arg1 float64) (_swig_ret BB2Weight) {
 	var swig_r BB2Weight
 	_swig_i_0 := arg1
-	swig_r = (BB2Weight)(SwigcptrBB2Weight(C._wrap_new_BB2Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (BB2Weight)(SwigcptrBB2Weight(C._wrap_new_BB2Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewBB2Weight__SWIG_1() (_swig_ret BB2Weight) {
 	var swig_r BB2Weight
-	swig_r = (BB2Weight)(SwigcptrBB2Weight(C._wrap_new_BB2Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (BB2Weight)(SwigcptrBB2Weight(C._wrap_new_BB2Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -8127,7 +8363,7 @@ func NewBB2Weight(a ...interface{}) BB2Weight {
 func (arg1 SwigcptrBB2Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_BB2Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_BB2Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8140,14 +8376,14 @@ func (arg1 SwigcptrBB2Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swi
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_BB2Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_BB2Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBB2Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BB2Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BB2Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8156,37 +8392,37 @@ func (arg1 SwigcptrBB2Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret floa
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_BB2Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_BB2Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrBB2Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_BB2Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_BB2Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteBB2Weight(arg1 BB2Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_BB2Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_BB2Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrBB2Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBB2Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrBB2Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8223,14 +8459,14 @@ func (p SwigcptrDLHWeight) SwigIsDLHWeight() {
 
 func NewDLHWeight() (_swig_ret DLHWeight) {
 	var swig_r DLHWeight
-	swig_r = (DLHWeight)(SwigcptrDLHWeight(C._wrap_new_DLHWeight_xapian_1797894d64db9bab()))
+	swig_r = (DLHWeight)(SwigcptrDLHWeight(C._wrap_new_DLHWeight_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func (arg1 SwigcptrDLHWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_DLHWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_DLHWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8243,14 +8479,14 @@ func (arg1 SwigcptrDLHWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swi
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_DLHWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_DLHWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDLHWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_DLHWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_DLHWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8259,37 +8495,37 @@ func (arg1 SwigcptrDLHWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret floa
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_DLHWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_DLHWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDLHWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_DLHWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_DLHWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteDLHWeight(arg1 DLHWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_DLHWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_DLHWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDLHWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDLHWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDLHWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8327,13 +8563,13 @@ func (p SwigcptrPL2Weight) SwigIsPL2Weight() {
 func NewPL2Weight__SWIG_0(arg1 float64) (_swig_ret PL2Weight) {
 	var swig_r PL2Weight
 	_swig_i_0 := arg1
-	swig_r = (PL2Weight)(SwigcptrPL2Weight(C._wrap_new_PL2Weight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (PL2Weight)(SwigcptrPL2Weight(C._wrap_new_PL2Weight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewPL2Weight__SWIG_1() (_swig_ret PL2Weight) {
 	var swig_r PL2Weight
-	swig_r = (PL2Weight)(SwigcptrPL2Weight(C._wrap_new_PL2Weight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (PL2Weight)(SwigcptrPL2Weight(C._wrap_new_PL2Weight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -8351,7 +8587,7 @@ func NewPL2Weight(a ...interface{}) PL2Weight {
 func (arg1 SwigcptrPL2Weight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PL2Weight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PL2Weight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8364,14 +8600,14 @@ func (arg1 SwigcptrPL2Weight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swi
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_PL2Weight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_PL2Weight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPL2Weight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PL2Weight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PL2Weight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8380,37 +8616,37 @@ func (arg1 SwigcptrPL2Weight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret floa
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_PL2Weight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_PL2Weight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPL2Weight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PL2Weight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PL2Weight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeletePL2Weight(arg1 PL2Weight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_PL2Weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_PL2Weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrPL2Weight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrPL2Weight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrPL2Weight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8449,13 +8685,13 @@ func NewPL2PlusWeight__SWIG_0(arg1 float64, arg2 float64) (_swig_ret PL2PlusWeig
 	var swig_r PL2PlusWeight
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PL2PlusWeight)(SwigcptrPL2PlusWeight(C._wrap_new_PL2PlusWeight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0), C.double(_swig_i_1))))
+	swig_r = (PL2PlusWeight)(SwigcptrPL2PlusWeight(C._wrap_new_PL2PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.double(_swig_i_1))))
 	return swig_r
 }
 
 func NewPL2PlusWeight__SWIG_1() (_swig_ret PL2PlusWeight) {
 	var swig_r PL2PlusWeight
-	swig_r = (PL2PlusWeight)(SwigcptrPL2PlusWeight(C._wrap_new_PL2PlusWeight__SWIG_1_xapian_1797894d64db9bab()))
+	swig_r = (PL2PlusWeight)(SwigcptrPL2PlusWeight(C._wrap_new_PL2PlusWeight__SWIG_1_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -8473,7 +8709,7 @@ func NewPL2PlusWeight(a ...interface{}) PL2PlusWeight {
 func (arg1 SwigcptrPL2PlusWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PL2PlusWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PL2PlusWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8486,14 +8722,14 @@ func (arg1 SwigcptrPL2PlusWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_PL2PlusWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_PL2PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPL2PlusWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PL2PlusWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PL2PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8502,37 +8738,37 @@ func (arg1 SwigcptrPL2PlusWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_PL2PlusWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_PL2PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPL2PlusWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PL2PlusWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PL2PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeletePL2PlusWeight(arg1 PL2PlusWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_PL2PlusWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_PL2PlusWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrPL2PlusWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrPL2PlusWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrPL2PlusWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8569,14 +8805,14 @@ func (p SwigcptrDPHWeight) SwigIsDPHWeight() {
 
 func NewDPHWeight() (_swig_ret DPHWeight) {
 	var swig_r DPHWeight
-	swig_r = (DPHWeight)(SwigcptrDPHWeight(C._wrap_new_DPHWeight_xapian_1797894d64db9bab()))
+	swig_r = (DPHWeight)(SwigcptrDPHWeight(C._wrap_new_DPHWeight_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func (arg1 SwigcptrDPHWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_DPHWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_DPHWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8589,14 +8825,14 @@ func (arg1 SwigcptrDPHWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swi
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_DPHWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_DPHWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDPHWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_DPHWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_DPHWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8605,37 +8841,37 @@ func (arg1 SwigcptrDPHWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret floa
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_DPHWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_DPHWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDPHWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_DPHWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_DPHWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteDPHWeight(arg1 DPHWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_DPHWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_DPHWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDPHWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDPHWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDPHWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8676,7 +8912,7 @@ func NewLMWeight__SWIG_0(arg1 float64, arg2 XapianWeightType_smoothing, arg3 flo
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_0_xapian_1797894d64db9bab(C.double(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3))))
+	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_0_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3))))
 	return swig_r
 }
 
@@ -8685,7 +8921,7 @@ func NewLMWeight__SWIG_1(arg1 float64, arg2 XapianWeightType_smoothing, arg3 flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_1_xapian_1797894d64db9bab(C.double(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))))
+	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_1_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))))
 	return swig_r
 }
 
@@ -8693,20 +8929,20 @@ func NewLMWeight__SWIG_2(arg1 float64, arg2 XapianWeightType_smoothing) (_swig_r
 	var swig_r LMWeight
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_2_xapian_1797894d64db9bab(C.double(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_2_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
 func NewLMWeight__SWIG_3(arg1 float64) (_swig_ret LMWeight) {
 	var swig_r LMWeight
 	_swig_i_0 := arg1
-	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_3_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_3_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func NewLMWeight__SWIG_4() (_swig_ret LMWeight) {
 	var swig_r LMWeight
-	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_4_xapian_1797894d64db9bab()))
+	swig_r = (LMWeight)(SwigcptrLMWeight(C._wrap_new_LMWeight__SWIG_4_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -8733,7 +8969,7 @@ func NewLMWeight(a ...interface{}) LMWeight {
 func (arg1 SwigcptrLMWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LMWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LMWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8746,14 +8982,14 @@ func (arg1 SwigcptrLMWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_swig
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_LMWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_LMWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLMWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_LMWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_LMWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8762,37 +8998,37 @@ func (arg1 SwigcptrLMWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret float
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_LMWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_LMWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLMWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_LMWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_LMWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteLMWeight(arg1 LMWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LMWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LMWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrLMWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLMWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLMWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8830,19 +9066,19 @@ func (p SwigcptrCoordWeight) SwigIsCoordWeight() {
 func (arg1 SwigcptrCoordWeight) Init(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_CoordWeight_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_CoordWeight_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func NewCoordWeight() (_swig_ret CoordWeight) {
 	var swig_r CoordWeight
-	swig_r = (CoordWeight)(SwigcptrCoordWeight(C._wrap_new_CoordWeight_xapian_1797894d64db9bab()))
+	swig_r = (CoordWeight)(SwigcptrCoordWeight(C._wrap_new_CoordWeight_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func (arg1 SwigcptrCoordWeight) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_CoordWeight_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_CoordWeight_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -8855,14 +9091,14 @@ func (arg1 SwigcptrCoordWeight) Get_sumpart(arg2 uint, arg3 uint, arg4 uint) (_s
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_CoordWeight_get_sumpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
+	swig_r = (float64)(C._wrap_CoordWeight_get_sumpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3)))
 	return swig_r
 }
 
 func (arg1 SwigcptrCoordWeight) Get_maxpart() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_CoordWeight_get_maxpart_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_CoordWeight_get_maxpart_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -8871,37 +9107,37 @@ func (arg1 SwigcptrCoordWeight) Get_sumextra(arg2 uint, arg3 uint) (_swig_ret fl
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_CoordWeight_get_sumextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
+	swig_r = (float64)(C._wrap_CoordWeight_get_sumextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrCoordWeight) Get_maxextra() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_CoordWeight_get_maxextra_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_CoordWeight_get_maxextra_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func DeleteCoordWeight(arg1 CoordWeight) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_CoordWeight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_CoordWeight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrCoordWeight) Get_sumpart_needs_doclength_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrCoordWeight) Get_sumpart_needs_wdf_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrCoordWeight) Get_sumpart_needs_uniqueterms_() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -8946,17 +9182,17 @@ func (p *_swig_DirectorCompactor) DirectorInterface() interface{} {
 
 func NewDirectorCompactor(v interface{}) Compactor {
 	p := &_swig_DirectorCompactor{0, v}
-	p.SwigcptrCompactor = SwigcptrCompactor(C._wrap__swig_NewDirectorCompactorCompactor_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrCompactor = SwigcptrCompactor(C._wrap__swig_NewDirectorCompactorCompactor_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorCompactor(arg1 Compactor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorCompactor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorCompactor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_Compactor_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_Compactor_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_Compactor_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_Compactor_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorCompactor).SwigcptrCompactor = 0
 	swigDirectorDelete(c)
 }
@@ -8972,7 +9208,7 @@ func (swig_p *_swig_DirectorCompactor) Set_status(table string, status string) {
 	}
 	_swig_i_0 := table
 	_swig_i_1 := status
-	C._wrap__swig_DirectorCompactor_upcall_Set_status_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrCompactor), *(*C.swig_type_150)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap__swig_DirectorCompactor_upcall_Set_status_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrCompactor), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_152)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
@@ -8984,7 +9220,7 @@ func (swig_p *_swig_DirectorCompactor) Set_status(table string, status string) {
 func DirectorCompactorSet_status(p Compactor, arg2 string, arg3 string) {
 	_swig_i_0 := arg2
 	_swig_i_1 := arg3
-	C._wrap__swig_DirectorCompactor_upcall_Set_status_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorCompactor).SwigcptrCompactor), *(*C.swig_type_150)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap__swig_DirectorCompactor_upcall_Set_status_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorCompactor).SwigcptrCompactor), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_152)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
@@ -8993,8 +9229,8 @@ func DirectorCompactorSet_status(p Compactor, arg2 string, arg3 string) {
 	}
 }
 
-//export Swig_DirectorCompactor_callback_set_status_xapian_1797894d64db9bab
-func Swig_DirectorCompactor_callback_set_status_xapian_1797894d64db9bab(swig_c int, arg2 string, arg3 string) {
+//export Swig_DirectorCompactor_callback_set_status_xapian_245a1afe1629f0b1
+func Swig_DirectorCompactor_callback_set_status_xapian_245a1afe1629f0b1(swig_c int, arg2 string, arg3 string) {
 	var _swig_i_0 string
 	var _swig_i_1 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorCompactor)
@@ -9020,7 +9256,7 @@ type XapianCompactorCompaction_level int
 
 func _swig_getCompactor_STANDARD_Compactor() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_STANDARD_Compactor_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_STANDARD_Compactor_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -9028,7 +9264,7 @@ var CompactorSTANDARD int = _swig_getCompactor_STANDARD_Compactor()
 
 func _swig_getCompactor_FULL_Compactor() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FULL_Compactor_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FULL_Compactor_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -9036,7 +9272,7 @@ var CompactorFULL int = _swig_getCompactor_FULL_Compactor()
 
 func _swig_getCompactor_FULLER_Compactor() (_swig_ret int) {
 	var swig_r int
-	swig_r = (int)(C._wrap_FULLER_Compactor_xapian_1797894d64db9bab())
+	swig_r = (int)(C._wrap_FULLER_Compactor_xapian_245a1afe1629f0b1())
 	return swig_r
 }
 
@@ -9044,43 +9280,43 @@ var CompactorFULLER int = _swig_getCompactor_FULLER_Compactor()
 
 func NewCompactor() (_swig_ret Compactor) {
 	var swig_r Compactor
-	swig_r = (Compactor)(SwigcptrCompactor(C._wrap_new_Compactor_xapian_1797894d64db9bab()))
+	swig_r = (Compactor)(SwigcptrCompactor(C._wrap_new_Compactor_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func DeleteCompactor(arg1 Compactor) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Compactor_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Compactor_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrCompactor) Set_block_size(arg2 int64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_set_block_size_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_type_152(_swig_i_1))
+	C._wrap_Compactor_set_block_size_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_type_153(_swig_i_1))
 }
 
 func (arg1 SwigcptrCompactor) Set_renumber(arg2 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_set_renumber_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
+	C._wrap_Compactor_set_renumber_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
 }
 
 func (arg1 SwigcptrCompactor) Set_multipass(arg2 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_set_multipass_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
+	C._wrap_Compactor_set_multipass_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
 }
 
 func (arg1 SwigcptrCompactor) Set_compaction_level(arg2 XapianCompactorCompaction_level) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_set_compaction_level_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Compactor_set_compaction_level_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrCompactor) Set_destdir(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_set_destdir_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_153)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Compactor_set_destdir_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_154)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -9089,7 +9325,7 @@ func (arg1 SwigcptrCompactor) Set_destdir(arg2 string) {
 func (arg1 SwigcptrCompactor) Add_source(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Compactor_add_source_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_154)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Compactor_add_source_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_155)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -9097,14 +9333,14 @@ func (arg1 SwigcptrCompactor) Add_source(arg2 string) {
 
 func (arg1 SwigcptrCompactor) Compact() {
 	_swig_i_0 := arg1
-	C._wrap_Compactor_compact_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Compactor_compact_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrCompactor) Set_status(arg2 string, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Compactor_set_status_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_150)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_Compactor_set_status_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_151)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_152)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -9145,17 +9381,17 @@ func (p *_swig_DirectorPostingSource) DirectorInterface() interface{} {
 
 func NewDirectorPostingSource(v interface{}) PostingSource {
 	p := &_swig_DirectorPostingSource{0, v}
-	p.SwigcptrPostingSource = SwigcptrPostingSource(C._wrap__swig_NewDirectorPostingSourcePostingSource_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrPostingSource = SwigcptrPostingSource(C._wrap__swig_NewDirectorPostingSourcePostingSource_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorPostingSource(arg1 PostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorPostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorPostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_PostingSource_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_PostingSource_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_PostingSource_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_PostingSource_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorPostingSource).SwigcptrPostingSource = 0
 	swigDirectorDelete(c)
 }
@@ -9171,8 +9407,8 @@ func (swig_p *_swig_DirectorPostingSource) Get_termfreq_min() uint {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_1797894d64db9bab(swig_c int) (swig_result uint) {
+//export Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_245a1afe1629f0b1(swig_c int) (swig_result uint) {
 	var swig_r uint
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_termfreq_min()
@@ -9190,8 +9426,8 @@ func (swig_p *_swig_DirectorPostingSource) Get_termfreq_est() uint {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_1797894d64db9bab(swig_c int) (swig_result uint) {
+//export Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_245a1afe1629f0b1(swig_c int) (swig_result uint) {
 	var swig_r uint
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_termfreq_est()
@@ -9209,8 +9445,8 @@ func (swig_p *_swig_DirectorPostingSource) Get_termfreq_max() uint {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_1797894d64db9bab(swig_c int) (swig_result uint) {
+//export Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_245a1afe1629f0b1(swig_c int) (swig_result uint) {
 	var swig_r uint
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_termfreq_max()
@@ -9226,18 +9462,18 @@ func (swig_p *_swig_DirectorPostingSource) Get_weight() float64 {
 		return swig_g.Get_weight()
 	}
 	var swig_r float64
-	swig_r = (float64)(C._wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrPostingSource)))
+	swig_r = (float64)(C._wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrPostingSource)))
 	return swig_r
 }
 
 func DirectorPostingSourceGet_weight(p PostingSource) float64 {
 	var swig_r float64
-	swig_r = (float64)(C._wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource)))
+	swig_r = (float64)(C._wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource)))
 	return swig_r
 }
 
-//export Swig_DirectorPostingSource_callback_get_weight_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_weight_xapian_1797894d64db9bab(swig_c int) (swig_result float64) {
+//export Swig_DirectorPostingSource_callback_get_weight_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_weight_xapian_245a1afe1629f0b1(swig_c int) (swig_result float64) {
 	var swig_r float64
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_weight()
@@ -9255,8 +9491,8 @@ func (swig_p *_swig_DirectorPostingSource) Get_docid() uint {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_get_docid_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_docid_xapian_1797894d64db9bab(swig_c int) (swig_result uint) {
+//export Swig_DirectorPostingSource_callback_get_docid_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_docid_xapian_245a1afe1629f0b1(swig_c int) (swig_result uint) {
 	var swig_r uint
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_docid()
@@ -9275,8 +9511,8 @@ func (swig_p *_swig_DirectorPostingSource) Next(min_wt float64) {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_next_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_next_xapian_1797894d64db9bab(swig_c int, min_wt float64) {
+//export Swig_DirectorPostingSource_callback_next_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_next_xapian_245a1afe1629f0b1(swig_c int, min_wt float64) {
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_p.Next(min_wt)
 }
@@ -9292,17 +9528,17 @@ func (swig_p *_swig_DirectorPostingSource) Skip_to(did uint, min_wt float64) {
 	}
 	_swig_i_0 := did
 	_swig_i_1 := min_wt
-	C._wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
+	C._wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
 }
 
 func DirectorPostingSourceSkip_to(p PostingSource, arg2 uint, arg3 float64) {
 	_swig_i_0 := arg2
 	_swig_i_1 := arg3
-	C._wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
+	C._wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
 }
 
-//export Swig_DirectorPostingSource_callback_skip_to_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_skip_to_xapian_1797894d64db9bab(swig_c int, arg2 uint, arg3 float64) {
+//export Swig_DirectorPostingSource_callback_skip_to_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_skip_to_xapian_245a1afe1629f0b1(swig_c int, arg2 uint, arg3 float64) {
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_p.Skip_to(arg2, arg3)
 }
@@ -9318,7 +9554,7 @@ func (swig_p *_swig_DirectorPostingSource) Check(did uint, min_wt float64) bool 
 	var swig_r bool
 	_swig_i_0 := did
 	_swig_i_1 := min_wt
-	swig_r = (bool)(C._wrap__swig_DirectorPostingSource_upcall_Check_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
+	swig_r = (bool)(C._wrap__swig_DirectorPostingSource_upcall_Check_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
 	return swig_r
 }
 
@@ -9326,12 +9562,12 @@ func DirectorPostingSourceCheck(p PostingSource, arg2 uint, arg3 float64) bool {
 	var swig_r bool
 	_swig_i_0 := arg2
 	_swig_i_1 := arg3
-	swig_r = (bool)(C._wrap__swig_DirectorPostingSource_upcall_Check_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
+	swig_r = (bool)(C._wrap__swig_DirectorPostingSource_upcall_Check_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
 	return swig_r
 }
 
-//export Swig_DirectorPostingSource_callback_check_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_check_xapian_1797894d64db9bab(swig_c int, arg2 uint, arg3 float64) (swig_result bool) {
+//export Swig_DirectorPostingSource_callback_check_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_check_xapian_245a1afe1629f0b1(swig_c int, arg2 uint, arg3 float64) (swig_result bool) {
 	var swig_r bool
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Check(arg2, arg3)
@@ -9349,8 +9585,8 @@ func (swig_p *_swig_DirectorPostingSource) At_end() bool {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_at_end_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_at_end_xapian_1797894d64db9bab(swig_c int) (swig_result bool) {
+//export Swig_DirectorPostingSource_callback_at_end_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_at_end_xapian_245a1afe1629f0b1(swig_c int) (swig_result bool) {
 	var swig_r bool
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.At_end()
@@ -9366,7 +9602,7 @@ func (swig_p *_swig_DirectorPostingSource) Name() string {
 		return swig_g.Name()
 	}
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Name_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrPostingSource))
+	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Name_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrPostingSource))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9375,15 +9611,15 @@ func (swig_p *_swig_DirectorPostingSource) Name() string {
 
 func DirectorPostingSourceName(p PostingSource) string {
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Name_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource))
+	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Name_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-//export Swig_DirectorPostingSource_callback_name_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_name_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorPostingSource_callback_name_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_name_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Name()
@@ -9402,8 +9638,8 @@ func (swig_p *_swig_DirectorPostingSource) Init(db Database) {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorPostingSource_callback_init_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_init_xapian_1797894d64db9bab(swig_c int, db uintptr) {
+//export Swig_DirectorPostingSource_callback_init_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_init_xapian_245a1afe1629f0b1(swig_c int, db uintptr) {
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_p.Init(SwigcptrDatabase(db))
 }
@@ -9417,7 +9653,7 @@ func (swig_p *_swig_DirectorPostingSource) Get_description() string {
 		return swig_g.Get_description()
 	}
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrPostingSource))
+	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrPostingSource))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9426,15 +9662,15 @@ func (swig_p *_swig_DirectorPostingSource) Get_description() string {
 
 func DirectorPostingSourceGet_description(p PostingSource) string {
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource))
+	swig_r_p := C._wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorPostingSource).SwigcptrPostingSource))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-//export Swig_DirectorPostingSource_callback_get_description_xapian_1797894d64db9bab
-func Swig_DirectorPostingSource_callback_get_description_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorPostingSource_callback_get_description_xapian_245a1afe1629f0b1
+func Swig_DirectorPostingSource_callback_get_description_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorPostingSource)
 	swig_r = swig_p.Get_description()
@@ -9456,68 +9692,68 @@ func (p SwigcptrPostingSource) DirectorInterface() interface{} {
 
 func DeletePostingSource(arg1 PostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_PostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_PostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrPostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Set_maxweight(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_PostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_PostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrPostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_PostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_PostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_PostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_PostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Next(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_PostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_PostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrPostingSource) Skip_to(arg2 uint, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_PostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_PostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrPostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool) {
@@ -9525,21 +9761,21 @@ func (arg1 SwigcptrPostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (bool)(C._wrap_PostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
+	swig_r = (bool)(C._wrap_PostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_PostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_PostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9549,13 +9785,13 @@ func (arg1 SwigcptrPostingSource) Name() (_swig_ret string) {
 func (arg1 SwigcptrPostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_PostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_PostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrPostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_PostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_PostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9565,14 +9801,14 @@ func (arg1 SwigcptrPostingSource) Get_description() (_swig_ret string) {
 func (arg1 SwigcptrPostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
 	_swig_i_0 := arg1
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_PostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_PostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrPostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
 	_swig_i_0 := arg1
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_PostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_PostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -9620,42 +9856,42 @@ func (p SwigcptrValuePostingSource) SwigIsValuePostingSource() {
 func NewValuePostingSource(arg1 uint) (_swig_ret ValuePostingSource) {
 	var swig_r ValuePostingSource
 	_swig_i_0 := arg1
-	swig_r = (ValuePostingSource)(SwigcptrValuePostingSource(C._wrap_new_ValuePostingSource_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (ValuePostingSource)(SwigcptrValuePostingSource(C._wrap_new_ValuePostingSource_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValuePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Next(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValuePostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_ValuePostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrValuePostingSource) Skip_to(arg2 uint, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_ValuePostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_ValuePostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrValuePostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool) {
@@ -9663,48 +9899,48 @@ func (arg1 SwigcptrValuePostingSource) Check(arg2 uint, arg3 float64) (_swig_ret
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (bool)(C._wrap_ValuePostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
+	swig_r = (bool)(C._wrap_ValuePostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_ValuePostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_ValuePostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValuePostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValuePostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_ValuePostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_ValuePostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_database() (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValuePostingSource_get_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValuePostingSource_get_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_slot() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_ValuePostingSource_get_slot_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_ValuePostingSource_get_slot_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_value() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValuePostingSource_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValuePostingSource_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9713,59 +9949,59 @@ func (arg1 SwigcptrValuePostingSource) Get_value() (_swig_ret string) {
 
 func (arg1 SwigcptrValuePostingSource) Done() {
 	_swig_i_0 := arg1
-	C._wrap_ValuePostingSource_done_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_ValuePostingSource_done_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrValuePostingSource) Get_started() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_ValuePostingSource_get_started_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_ValuePostingSource_get_started_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValuePostingSource) Set_termfreq_min(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValuePostingSource_set_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_ValuePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrValuePostingSource) Set_termfreq_est(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValuePostingSource_set_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_ValuePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrValuePostingSource) Set_termfreq_max(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValuePostingSource_set_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_ValuePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func DeleteValuePostingSource(arg1 ValuePostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValuePostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValuePostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValuePostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_ValuePostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_ValuePostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValuePostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_ValuePostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_ValuePostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValuePostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_ValuePostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_ValuePostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValuePostingSource) Name() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_ValuePostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_ValuePostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9774,7 +10010,7 @@ func (_swig_base SwigcptrValuePostingSource) Name() (_swig_ret string) {
 
 func (_swig_base SwigcptrValuePostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_ValuePostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_ValuePostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9783,13 +10019,13 @@ func (_swig_base SwigcptrValuePostingSource) Get_description() (_swig_ret string
 
 func (_swig_base SwigcptrValuePostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValuePostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValuePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValuePostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValuePostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValuePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -9853,21 +10089,21 @@ func (p SwigcptrValueWeightPostingSource) SwigIsValueWeightPostingSource() {
 func NewValueWeightPostingSource(arg1 uint) (_swig_ret ValueWeightPostingSource) {
 	var swig_r ValueWeightPostingSource
 	_swig_i_0 := arg1
-	swig_r = (ValueWeightPostingSource)(SwigcptrValueWeightPostingSource(C._wrap_new_ValueWeightPostingSource_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (ValueWeightPostingSource)(SwigcptrValueWeightPostingSource(C._wrap_new_ValueWeightPostingSource_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueWeightPostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_ValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_ValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueWeightPostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueWeightPostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueWeightPostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9877,13 +10113,13 @@ func (arg1 SwigcptrValueWeightPostingSource) Name() (_swig_ret string) {
 func (arg1 SwigcptrValueWeightPostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_ValueWeightPostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_ValueWeightPostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrValueWeightPostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueWeightPostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9892,73 +10128,73 @@ func (arg1 SwigcptrValueWeightPostingSource) Get_description() (_swig_ret string
 
 func DeleteValueWeightPostingSource(arg1 ValueWeightPostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueWeightPostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueWeightPostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Next(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_ValueWeightPostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_ValueWeightPostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Skip_to(arg1 uint, arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_ValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Check(arg1 uint, arg2 float64) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ValueWeightPostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
+	swig_r = (bool)(C._wrap_ValueWeightPostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_ValueWeightPostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_ValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_database() (_swig_ret Database) {
 	var swig_r Database
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValueWeightPostingSource_get_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_slot() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_value() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_ValueWeightPostingSource_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_ValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -9966,50 +10202,50 @@ func (_swig_base SwigcptrValueWeightPostingSource) Get_value() (_swig_ret string
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Done() {
-	C._wrap_ValueWeightPostingSource_done_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_ValueWeightPostingSource_done_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_started() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_ValueWeightPostingSource_get_started_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_ValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Set_termfreq_min(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Set_termfreq_est(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Set_termfreq_max(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_ValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_ValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_ValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_ValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueWeightPostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -10084,7 +10320,7 @@ func NewDecreasingValueWeightPostingSource__SWIG_0(arg1 uint, arg2 uint, arg3 ui
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	return swig_r
 }
 
@@ -10092,14 +10328,14 @@ func NewDecreasingValueWeightPostingSource__SWIG_1(arg1 uint, arg2 uint) (_swig_
 	var swig_r DecreasingValueWeightPostingSource
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
 func NewDecreasingValueWeightPostingSource__SWIG_2(arg1 uint) (_swig_ret DecreasingValueWeightPostingSource) {
 	var swig_r DecreasingValueWeightPostingSource
 	_swig_i_0 := arg1
-	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (DecreasingValueWeightPostingSource)(SwigcptrDecreasingValueWeightPostingSource(C._wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -10120,14 +10356,14 @@ func NewDecreasingValueWeightPostingSource(a ...interface{}) DecreasingValueWeig
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_DecreasingValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_DecreasingValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10137,20 +10373,20 @@ func (arg1 SwigcptrDecreasingValueWeightPostingSource) Name() (_swig_ret string)
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_DecreasingValueWeightPostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_DecreasingValueWeightPostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Next(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_DecreasingValueWeightPostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_DecreasingValueWeightPostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Skip_to(arg2 uint, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_DecreasingValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_DecreasingValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool) {
@@ -10158,14 +10394,14 @@ func (arg1 SwigcptrDecreasingValueWeightPostingSource) Check(arg2 uint, arg3 flo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
+	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDecreasingValueWeightPostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10174,54 +10410,54 @@ func (arg1 SwigcptrDecreasingValueWeightPostingSource) Get_description() (_swig_
 
 func DeleteDecreasingValueWeightPostingSource(arg1 DecreasingValueWeightPostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_DecreasingValueWeightPostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_DecreasingValueWeightPostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_database() (_swig_ret Database) {
 	var swig_r Database
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_DecreasingValueWeightPostingSource_get_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_DecreasingValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_slot() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_DecreasingValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_value() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_DecreasingValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10229,50 +10465,50 @@ func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_value() (_swig_
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Done() {
-	C._wrap_DecreasingValueWeightPostingSource_done_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_DecreasingValueWeightPostingSource_done_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_started() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_get_started_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_DecreasingValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Set_termfreq_min(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Set_termfreq_est(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Set_termfreq_max(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrDecreasingValueWeightPostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -10354,7 +10590,7 @@ func (p SwigcptrValueMapPostingSource) SwigIsValueMapPostingSource() {
 func NewValueMapPostingSource(arg1 uint) (_swig_ret ValueMapPostingSource) {
 	var swig_r ValueMapPostingSource
 	_swig_i_0 := arg1
-	swig_r = (ValueMapPostingSource)(SwigcptrValueMapPostingSource(C._wrap_new_ValueMapPostingSource_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (ValueMapPostingSource)(SwigcptrValueMapPostingSource(C._wrap_new_ValueMapPostingSource_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -10362,7 +10598,7 @@ func (arg1 SwigcptrValueMapPostingSource) Add_mapping(arg2 string, arg3 float64)
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_ValueMapPostingSource_add_mapping_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_168)(unsafe.Pointer(&_swig_i_1)), C.double(_swig_i_2))
+	C._wrap_ValueMapPostingSource_add_mapping_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_169)(unsafe.Pointer(&_swig_i_1)), C.double(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -10370,26 +10606,26 @@ func (arg1 SwigcptrValueMapPostingSource) Add_mapping(arg2 string, arg3 float64)
 
 func (arg1 SwigcptrValueMapPostingSource) Clear_mappings() {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_clear_mappings_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_ValueMapPostingSource_clear_mappings_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrValueMapPostingSource) Set_default_weight(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueMapPostingSource_set_default_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_ValueMapPostingSource_set_default_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrValueMapPostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_ValueMapPostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_ValueMapPostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueMapPostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueMapPostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueMapPostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10399,13 +10635,13 @@ func (arg1 SwigcptrValueMapPostingSource) Name() (_swig_ret string) {
 func (arg1 SwigcptrValueMapPostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_ValueMapPostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_ValueMapPostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrValueMapPostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueMapPostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueMapPostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10414,73 +10650,73 @@ func (arg1 SwigcptrValueMapPostingSource) Get_description() (_swig_ret string) {
 
 func DeleteValueMapPostingSource(arg1 ValueMapPostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueMapPostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueMapPostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Next(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_ValueMapPostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Skip_to(arg1 uint, arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueMapPostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_ValueMapPostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Check(arg1 uint, arg2 float64) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_ValueMapPostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
+	swig_r = (bool)(C._wrap_ValueMapPostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.double(_swig_i_1)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_ValueMapPostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_ValueMapPostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_database() (_swig_ret Database) {
 	var swig_r Database
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValueMapPostingSource_get_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_ValueMapPostingSource_get_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_slot() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_slot_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_ValueMapPostingSource_get_slot_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_value() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_ValueMapPostingSource_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_ValueMapPostingSource_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10488,50 +10724,50 @@ func (_swig_base SwigcptrValueMapPostingSource) Get_value() (_swig_ret string) {
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Done() {
-	C._wrap_ValueMapPostingSource_done_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_ValueMapPostingSource_done_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_started() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_ValueMapPostingSource_get_started_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_ValueMapPostingSource_get_started_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Set_termfreq_min(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_set_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueMapPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Set_termfreq_est(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_set_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueMapPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Set_termfreq_max(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_set_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_ValueMapPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_ValueMapPostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_ValueMapPostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_ValueMapPostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_ValueMapPostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueMapPostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueMapPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueMapPostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueMapPostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_ValueMapPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -10607,49 +10843,49 @@ func (p SwigcptrFixedWeightPostingSource) SwigIsFixedWeightPostingSource() {
 func NewFixedWeightPostingSource(arg1 float64) (_swig_ret FixedWeightPostingSource) {
 	var swig_r FixedWeightPostingSource
 	_swig_i_0 := arg1
-	swig_r = (FixedWeightPostingSource)(SwigcptrFixedWeightPostingSource(C._wrap_new_FixedWeightPostingSource_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (FixedWeightPostingSource)(SwigcptrFixedWeightPostingSource(C._wrap_new_FixedWeightPostingSource_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_FixedWeightPostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_FixedWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Next(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_FixedWeightPostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_FixedWeightPostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Skip_to(arg2 uint, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_FixedWeightPostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_FixedWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool) {
@@ -10657,28 +10893,28 @@ func (arg1 SwigcptrFixedWeightPostingSource) Check(arg2 uint, arg3 float64) (_sw
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (bool)(C._wrap_FixedWeightPostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
+	swig_r = (bool)(C._wrap_FixedWeightPostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_FixedWeightPostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_FixedWeightPostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_FixedWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_FixedWeightPostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_FixedWeightPostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10688,13 +10924,13 @@ func (arg1 SwigcptrFixedWeightPostingSource) Name() (_swig_ret string) {
 func (arg1 SwigcptrFixedWeightPostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_FixedWeightPostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_FixedWeightPostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrFixedWeightPostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_FixedWeightPostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_FixedWeightPostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10703,29 +10939,29 @@ func (arg1 SwigcptrFixedWeightPostingSource) Get_description() (_swig_ret string
 
 func DeleteFixedWeightPostingSource(arg1 FixedWeightPostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_FixedWeightPostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_FixedWeightPostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrFixedWeightPostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_FixedWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_FixedWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrFixedWeightPostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_FixedWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_FixedWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrFixedWeightPostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_FixedWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_FixedWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrFixedWeightPostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_FixedWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_FixedWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -10787,17 +11023,17 @@ func (p *_swig_DirectorMatchSpy) DirectorInterface() interface{} {
 
 func NewDirectorMatchSpy(v interface{}) MatchSpy {
 	p := &_swig_DirectorMatchSpy{0, v}
-	p.SwigcptrMatchSpy = SwigcptrMatchSpy(C._wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrMatchSpy = SwigcptrMatchSpy(C._wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorMatchSpy(arg1 MatchSpy) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorMatchSpy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorMatchSpy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_MatchSpy_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_MatchSpy_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_MatchSpy_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_MatchSpy_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorMatchSpy).SwigcptrMatchSpy = 0
 	swigDirectorDelete(c)
 }
@@ -10814,8 +11050,8 @@ func (swig_p *_swig_DirectorMatchSpy) Apply(doc Document, wt float64) {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorMatchSpy_callback_Apply_xapian_1797894d64db9bab
-func Swig_DirectorMatchSpy_callback_Apply_xapian_1797894d64db9bab(swig_c int, doc uintptr, wt float64) {
+//export Swig_DirectorMatchSpy_callback_Apply_xapian_245a1afe1629f0b1
+func Swig_DirectorMatchSpy_callback_Apply_xapian_245a1afe1629f0b1(swig_c int, doc uintptr, wt float64) {
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorMatchSpy)
 	swig_p.Apply(SwigcptrDocument(doc), wt)
 }
@@ -10829,7 +11065,7 @@ func (swig_p *_swig_DirectorMatchSpy) Name() string {
 		return swig_g.Name()
 	}
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Name_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrMatchSpy))
+	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Name_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrMatchSpy))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10838,15 +11074,15 @@ func (swig_p *_swig_DirectorMatchSpy) Name() string {
 
 func DirectorMatchSpyName(p MatchSpy) string {
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Name_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy))
+	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Name_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-//export Swig_DirectorMatchSpy_callback_name_xapian_1797894d64db9bab
-func Swig_DirectorMatchSpy_callback_name_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorMatchSpy_callback_name_xapian_245a1afe1629f0b1
+func Swig_DirectorMatchSpy_callback_name_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorMatchSpy)
 	swig_r = swig_p.Name()
@@ -10863,7 +11099,7 @@ func (swig_p *_swig_DirectorMatchSpy) Merge_results(serialised string) {
 		return
 	}
 	_swig_i_0 := serialised
-	C._wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrMatchSpy), *(*C.swig_type_175)(unsafe.Pointer(&_swig_i_0)))
+	C._wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrMatchSpy), *(*C.swig_type_176)(unsafe.Pointer(&_swig_i_0)))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
@@ -10871,14 +11107,14 @@ func (swig_p *_swig_DirectorMatchSpy) Merge_results(serialised string) {
 
 func DirectorMatchSpyMerge_results(p MatchSpy, arg2 string) {
 	_swig_i_0 := arg2
-	C._wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy), *(*C.swig_type_175)(unsafe.Pointer(&_swig_i_0)))
+	C._wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy), *(*C.swig_type_176)(unsafe.Pointer(&_swig_i_0)))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
 }
 
-//export Swig_DirectorMatchSpy_callback_merge_results_xapian_1797894d64db9bab
-func Swig_DirectorMatchSpy_callback_merge_results_xapian_1797894d64db9bab(swig_c int, arg2 string) {
+//export Swig_DirectorMatchSpy_callback_merge_results_xapian_245a1afe1629f0b1
+func Swig_DirectorMatchSpy_callback_merge_results_xapian_245a1afe1629f0b1(swig_c int, arg2 string) {
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorMatchSpy)
 	_swig_i_0 = swigCopyString(arg2)
@@ -10894,7 +11130,7 @@ func (swig_p *_swig_DirectorMatchSpy) Get_description() string {
 		return swig_g.Get_description()
 	}
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(swig_p.SwigcptrMatchSpy))
+	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(swig_p.SwigcptrMatchSpy))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10903,15 +11139,15 @@ func (swig_p *_swig_DirectorMatchSpy) Get_description() string {
 
 func DirectorMatchSpyGet_description(p MatchSpy) string {
 	var swig_r string
-	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_1797894d64db9bab(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy))
+	swig_r_p := C._wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_245a1afe1629f0b1(C.uintptr_t(p.(*_swig_DirectorMatchSpy).SwigcptrMatchSpy))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-//export Swig_DirectorMatchSpy_callback_get_description_xapian_1797894d64db9bab
-func Swig_DirectorMatchSpy_callback_get_description_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorMatchSpy_callback_get_description_xapian_245a1afe1629f0b1
+func Swig_DirectorMatchSpy_callback_get_description_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorMatchSpy)
 	swig_r = swig_p.Get_description()
@@ -10933,20 +11169,20 @@ func (p SwigcptrMatchSpy) DirectorInterface() interface{} {
 
 func DeleteMatchSpy(arg1 MatchSpy) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_MatchSpy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_MatchSpy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrMatchSpy) Apply(arg2 Document, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_MatchSpy_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_MatchSpy_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrMatchSpy) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_MatchSpy_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_MatchSpy_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10956,7 +11192,7 @@ func (arg1 SwigcptrMatchSpy) Name() (_swig_ret string) {
 func (arg1 SwigcptrMatchSpy) Merge_results(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_MatchSpy_merge_results_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_175)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_MatchSpy_merge_results_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_176)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -10965,7 +11201,7 @@ func (arg1 SwigcptrMatchSpy) Merge_results(arg2 string) {
 func (arg1 SwigcptrMatchSpy) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_MatchSpy_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_MatchSpy_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -10975,14 +11211,14 @@ func (arg1 SwigcptrMatchSpy) Get_description() (_swig_ret string) {
 func (arg1 SwigcptrMatchSpy) Release__SWIG_0() (_swig_ret MatchSpy) {
 	var swig_r MatchSpy
 	_swig_i_0 := arg1
-	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_MatchSpy_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_MatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrMatchSpy) Release__SWIG_1() (_swig_ret MatchSpy) {
 	var swig_r MatchSpy
 	_swig_i_0 := arg1
-	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_MatchSpy_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_MatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -11019,14 +11255,14 @@ func (p SwigcptrValueCountMatchSpy) SwigIsValueCountMatchSpy() {
 
 func NewValueCountMatchSpy__SWIG_0() (_swig_ret ValueCountMatchSpy) {
 	var swig_r ValueCountMatchSpy
-	swig_r = (ValueCountMatchSpy)(SwigcptrValueCountMatchSpy(C._wrap_new_ValueCountMatchSpy__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (ValueCountMatchSpy)(SwigcptrValueCountMatchSpy(C._wrap_new_ValueCountMatchSpy__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func NewValueCountMatchSpy__SWIG_1(arg1 uint) (_swig_ret ValueCountMatchSpy) {
 	var swig_r ValueCountMatchSpy
 	_swig_i_0 := arg1
-	swig_r = (ValueCountMatchSpy)(SwigcptrValueCountMatchSpy(C._wrap_new_ValueCountMatchSpy__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (ValueCountMatchSpy)(SwigcptrValueCountMatchSpy(C._wrap_new_ValueCountMatchSpy__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -11044,21 +11280,21 @@ func NewValueCountMatchSpy(a ...interface{}) ValueCountMatchSpy {
 func (arg1 SwigcptrValueCountMatchSpy) Get_total() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_ValueCountMatchSpy_get_total_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_ValueCountMatchSpy_get_total_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueCountMatchSpy) Values_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_values_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_values_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrValueCountMatchSpy) Values_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_values_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_values_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -11066,7 +11302,7 @@ func (arg1 SwigcptrValueCountMatchSpy) Top_values_begin(arg2 int64) (_swig_ret T
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_top_values_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_type_180(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_top_values_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_type_181(_swig_i_1))))
 	return swig_r
 }
 
@@ -11074,7 +11310,7 @@ func (arg1 SwigcptrValueCountMatchSpy) Top_values_end(arg2 int64) (_swig_ret Ter
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_top_values_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_type_181(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_ValueCountMatchSpy_top_values_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_type_182(_swig_i_1))))
 	return swig_r
 }
 
@@ -11082,13 +11318,13 @@ func (arg1 SwigcptrValueCountMatchSpy) Apply(arg2 Document, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	C._wrap_ValueCountMatchSpy_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_ValueCountMatchSpy_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrValueCountMatchSpy) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueCountMatchSpy_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueCountMatchSpy_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11098,7 +11334,7 @@ func (arg1 SwigcptrValueCountMatchSpy) Name() (_swig_ret string) {
 func (arg1 SwigcptrValueCountMatchSpy) Merge_results(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_ValueCountMatchSpy_merge_results_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_183)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_ValueCountMatchSpy_merge_results_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_184)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -11107,7 +11343,7 @@ func (arg1 SwigcptrValueCountMatchSpy) Merge_results(arg2 string) {
 func (arg1 SwigcptrValueCountMatchSpy) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_ValueCountMatchSpy_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_ValueCountMatchSpy_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11116,18 +11352,18 @@ func (arg1 SwigcptrValueCountMatchSpy) Get_description() (_swig_ret string) {
 
 func DeleteValueCountMatchSpy(arg1 ValueCountMatchSpy) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_ValueCountMatchSpy_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_ValueCountMatchSpy_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrValueCountMatchSpy) Release__SWIG_0() (_swig_ret MatchSpy) {
 	var swig_r MatchSpy
-	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_ValueCountMatchSpy_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_ValueCountMatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrValueCountMatchSpy) Release__SWIG_1() (_swig_ret MatchSpy) {
 	var swig_r MatchSpy
-	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_ValueCountMatchSpy_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (MatchSpy)(SwigcptrMatchSpy(C._wrap_ValueCountMatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -11169,14 +11405,14 @@ type ValueCountMatchSpy interface {
 func Miles_to_metres(arg1 float64) (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_miles_to_metres_xapian_1797894d64db9bab(C.double(_swig_i_0)))
+	swig_r = (float64)(C._wrap_miles_to_metres_xapian_245a1afe1629f0b1(C.double(_swig_i_0)))
 	return swig_r
 }
 
 func Metres_to_miles(arg1 float64) (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_metres_to_miles_xapian_1797894d64db9bab(C.double(_swig_i_0)))
+	swig_r = (float64)(C._wrap_metres_to_miles_xapian_245a1afe1629f0b1(C.double(_swig_i_0)))
 	return swig_r
 }
 
@@ -11192,32 +11428,32 @@ func (p SwigcptrLatLongCoord) SwigIsLatLongCoord() {
 func (arg1 SwigcptrLatLongCoord) SetLatitude(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LatLongCoord_latitude_set_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_LatLongCoord_latitude_set_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrLatLongCoord) GetLatitude() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_LatLongCoord_latitude_get_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_LatLongCoord_latitude_get_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoord) SetLongitude(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LatLongCoord_longitude_set_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_LatLongCoord_longitude_set_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrLatLongCoord) GetLongitude() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_LatLongCoord_longitude_get_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_LatLongCoord_longitude_get_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func NewLatLongCoord__SWIG_0() (_swig_ret LatLongCoord) {
 	var swig_r LatLongCoord
-	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_new_LatLongCoord__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_new_LatLongCoord__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -11225,7 +11461,7 @@ func NewLatLongCoord__SWIG_1(arg1 float64, arg2 float64) (_swig_ret LatLongCoord
 	var swig_r LatLongCoord
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_new_LatLongCoord__SWIG_1_xapian_1797894d64db9bab(C.double(_swig_i_0), C.double(_swig_i_1))))
+	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_new_LatLongCoord__SWIG_1_xapian_245a1afe1629f0b1(C.double(_swig_i_0), C.double(_swig_i_1))))
 	return swig_r
 }
 
@@ -11243,7 +11479,7 @@ func NewLatLongCoord(a ...interface{}) LatLongCoord {
 func (arg1 SwigcptrLatLongCoord) Unserialise(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LatLongCoord_unserialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_185)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_LatLongCoord_unserialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_186)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -11252,7 +11488,7 @@ func (arg1 SwigcptrLatLongCoord) Unserialise(arg2 string) {
 func (arg1 SwigcptrLatLongCoord) Serialise() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongCoord_serialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongCoord_serialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11262,7 +11498,7 @@ func (arg1 SwigcptrLatLongCoord) Serialise() (_swig_ret string) {
 func (arg1 SwigcptrLatLongCoord) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongCoord_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongCoord_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11271,7 +11507,7 @@ func (arg1 SwigcptrLatLongCoord) Get_description() (_swig_ret string) {
 
 func DeleteLatLongCoord(arg1 LatLongCoord) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongCoord_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongCoord_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type LatLongCoord interface {
@@ -11297,7 +11533,7 @@ func (p SwigcptrLatLongCoordsIterator) SwigIsLatLongCoordsIterator() {
 
 func NewLatLongCoordsIterator() (_swig_ret LatLongCoordsIterator) {
 	var swig_r LatLongCoordsIterator
-	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_new_LatLongCoordsIterator_xapian_1797894d64db9bab()))
+	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_new_LatLongCoordsIterator_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -11305,25 +11541,25 @@ func (arg1 SwigcptrLatLongCoordsIterator) Equals(arg2 LatLongCoordsIterator) (_s
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (bool)(C._wrap_LatLongCoordsIterator_equals_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (bool)(C._wrap_LatLongCoordsIterator_equals_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoordsIterator) Get_coord() (_swig_ret LatLongCoord) {
 	var swig_r LatLongCoord
 	_swig_i_0 := arg1
-	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_LatLongCoordsIterator_get_coord_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (LatLongCoord)(SwigcptrLatLongCoord(C._wrap_LatLongCoordsIterator_get_coord_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoordsIterator) Next() {
 	_swig_i_0 := arg1
-	C._wrap_LatLongCoordsIterator_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_LatLongCoordsIterator_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func DeleteLatLongCoordsIterator(arg1 LatLongCoordsIterator) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongCoordsIterator_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongCoordsIterator_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type LatLongCoordsIterator interface {
@@ -11346,47 +11582,47 @@ func (p SwigcptrLatLongCoords) SwigIsLatLongCoords() {
 func (arg1 SwigcptrLatLongCoords) Begin() (_swig_ret LatLongCoordsIterator) {
 	var swig_r LatLongCoordsIterator
 	_swig_i_0 := arg1
-	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_LatLongCoords_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_LatLongCoords_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoords) End() (_swig_ret LatLongCoordsIterator) {
 	var swig_r LatLongCoordsIterator
 	_swig_i_0 := arg1
-	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_LatLongCoords_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (LatLongCoordsIterator)(SwigcptrLatLongCoordsIterator(C._wrap_LatLongCoords_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoords) Size() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_LatLongCoords_size_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_LatLongCoords_size_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoords) Empty() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_LatLongCoords_empty_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_LatLongCoords_empty_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongCoords) Append(arg2 LatLongCoord) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_LatLongCoords_append_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_LatLongCoords_append_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func NewLatLongCoords__SWIG_0() (_swig_ret LatLongCoords) {
 	var swig_r LatLongCoords
-	swig_r = (LatLongCoords)(SwigcptrLatLongCoords(C._wrap_new_LatLongCoords__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (LatLongCoords)(SwigcptrLatLongCoords(C._wrap_new_LatLongCoords__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func NewLatLongCoords__SWIG_1(arg1 LatLongCoord) (_swig_ret LatLongCoords) {
 	var swig_r LatLongCoords
 	_swig_i_0 := arg1.Swigcptr()
-	swig_r = (LatLongCoords)(SwigcptrLatLongCoords(C._wrap_new_LatLongCoords__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (LatLongCoords)(SwigcptrLatLongCoords(C._wrap_new_LatLongCoords__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -11404,7 +11640,7 @@ func NewLatLongCoords(a ...interface{}) LatLongCoords {
 func (arg1 SwigcptrLatLongCoords) Unserialise(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LatLongCoords_unserialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_189)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_LatLongCoords_unserialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_190)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -11413,7 +11649,7 @@ func (arg1 SwigcptrLatLongCoords) Unserialise(arg2 string) {
 func (arg1 SwigcptrLatLongCoords) Serialise() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongCoords_serialise_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongCoords_serialise_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11423,7 +11659,7 @@ func (arg1 SwigcptrLatLongCoords) Serialise() (_swig_ret string) {
 func (arg1 SwigcptrLatLongCoords) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongCoords_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongCoords_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11432,7 +11668,7 @@ func (arg1 SwigcptrLatLongCoords) Get_description() (_swig_ret string) {
 
 func DeleteLatLongCoords(arg1 LatLongCoords) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongCoords_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongCoords_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 type LatLongCoords interface {
@@ -11466,17 +11702,17 @@ func (p *_swig_DirectorLatLongMetric) DirectorInterface() interface{} {
 
 func NewDirectorLatLongMetric(v interface{}) LatLongMetric {
 	p := &_swig_DirectorLatLongMetric{0, v}
-	p.SwigcptrLatLongMetric = SwigcptrLatLongMetric(C._wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_1797894d64db9bab(C.int(swigDirectorAdd(p))))
+	p.SwigcptrLatLongMetric = SwigcptrLatLongMetric(C._wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_245a1afe1629f0b1(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorLatLongMetric(arg1 LatLongMetric) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorLatLongMetric_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorLatLongMetric_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_LatLongMetric_xapian_1797894d64db9bab
-func Swiggo_DeleteDirector_LatLongMetric_xapian_1797894d64db9bab(c int) {
+//export Swiggo_DeleteDirector_LatLongMetric_xapian_245a1afe1629f0b1
+func Swiggo_DeleteDirector_LatLongMetric_xapian_245a1afe1629f0b1(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorLatLongMetric).SwigcptrLatLongMetric = 0
 	swigDirectorDelete(c)
 }
@@ -11492,8 +11728,8 @@ func (swig_p *_swig_DirectorLatLongMetric) Pointwise_distance(a LatLongCoord, b 
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_1797894d64db9bab
-func Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_1797894d64db9bab(swig_c int, a uintptr, b uintptr) (swig_result float64) {
+//export Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_245a1afe1629f0b1
+func Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_245a1afe1629f0b1(swig_c int, a uintptr, b uintptr) (swig_result float64) {
 	var swig_r float64
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorLatLongMetric)
 	swig_r = swig_p.Pointwise_distance(SwigcptrLatLongCoord(a), SwigcptrLatLongCoord(b))
@@ -11511,8 +11747,8 @@ func (swig_p *_swig_DirectorLatLongMetric) Name() string {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorLatLongMetric_callback_name_xapian_1797894d64db9bab
-func Swig_DirectorLatLongMetric_callback_name_xapian_1797894d64db9bab(swig_c int) (swig_result string) {
+//export Swig_DirectorLatLongMetric_callback_name_xapian_245a1afe1629f0b1
+func Swig_DirectorLatLongMetric_callback_name_xapian_245a1afe1629f0b1(swig_c int) (swig_result string) {
 	var swig_r string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorLatLongMetric)
 	swig_r = swig_p.Name()
@@ -11534,7 +11770,7 @@ func (p SwigcptrLatLongMetric) DirectorInterface() interface{} {
 
 func DeleteLatLongMetric(arg1 LatLongMetric) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongMetric_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongMetric_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrLatLongMetric) Pointwise_distance(arg2 LatLongCoord, arg3 LatLongCoord) (_swig_ret float64) {
@@ -11542,7 +11778,7 @@ func (arg1 SwigcptrLatLongMetric) Pointwise_distance(arg2 LatLongCoord, arg3 Lat
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (float64)(C._wrap_LatLongMetric_pointwise_distance_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
+	swig_r = (float64)(C._wrap_LatLongMetric_pointwise_distance_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
 	return swig_r
 }
 
@@ -11551,7 +11787,7 @@ func (arg1 SwigcptrLatLongMetric) Apply__SWIG_0(arg2 LatLongCoords, arg3 LatLong
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
+	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
 	return swig_r
 }
 
@@ -11560,7 +11796,7 @@ func (arg1 SwigcptrLatLongMetric) Apply__SWIG_1(arg2 LatLongCoords, arg3 string)
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), *(*C.swig_type_192)(unsafe.Pointer(&_swig_i_2))))
+	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), *(*C.swig_type_193)(unsafe.Pointer(&_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -11573,7 +11809,7 @@ func (arg1 SwigcptrLatLongMetric) Apply__SWIG_2(arg2 LatLongCoords, arg3 string,
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), *(*C.swig_type_193)(unsafe.Pointer(&_swig_i_2)), C.swig_type_194(_swig_i_3)))
+	swig_r = (float64)(C._wrap_LatLongMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), *(*C.swig_type_194)(unsafe.Pointer(&_swig_i_2)), C.swig_type_195(_swig_i_3)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -11601,7 +11837,7 @@ check_1:
 func (arg1 SwigcptrLatLongMetric) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongMetric_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongMetric_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11628,14 +11864,14 @@ func (p SwigcptrGreatCircleMetric) SwigIsGreatCircleMetric() {
 
 func NewGreatCircleMetric__SWIG_0() (_swig_ret GreatCircleMetric) {
 	var swig_r GreatCircleMetric
-	swig_r = (GreatCircleMetric)(SwigcptrGreatCircleMetric(C._wrap_new_GreatCircleMetric__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (GreatCircleMetric)(SwigcptrGreatCircleMetric(C._wrap_new_GreatCircleMetric__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func NewGreatCircleMetric__SWIG_1(arg1 float64) (_swig_ret GreatCircleMetric) {
 	var swig_r GreatCircleMetric
 	_swig_i_0 := arg1
-	swig_r = (GreatCircleMetric)(SwigcptrGreatCircleMetric(C._wrap_new_GreatCircleMetric__SWIG_1_xapian_1797894d64db9bab(C.double(_swig_i_0))))
+	swig_r = (GreatCircleMetric)(SwigcptrGreatCircleMetric(C._wrap_new_GreatCircleMetric__SWIG_1_xapian_245a1afe1629f0b1(C.double(_swig_i_0))))
 	return swig_r
 }
 
@@ -11655,14 +11891,14 @@ func (arg1 SwigcptrGreatCircleMetric) Pointwise_distance(arg2 LatLongCoord, arg3
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (float64)(C._wrap_GreatCircleMetric_pointwise_distance_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
+	swig_r = (float64)(C._wrap_GreatCircleMetric_pointwise_distance_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrGreatCircleMetric) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_GreatCircleMetric_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_GreatCircleMetric_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11671,14 +11907,14 @@ func (arg1 SwigcptrGreatCircleMetric) Name() (_swig_ret string) {
 
 func DeleteGreatCircleMetric(arg1 GreatCircleMetric) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_GreatCircleMetric_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_GreatCircleMetric_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrGreatCircleMetric) Apply__SWIG_0(arg1 LatLongCoords, arg2 LatLongCoords) (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1.Swigcptr()
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
@@ -11686,7 +11922,7 @@ func (_swig_base SwigcptrGreatCircleMetric) Apply__SWIG_1(arg1 LatLongCoords, ar
 	var swig_r float64
 	_swig_i_0 := arg1.Swigcptr()
 	_swig_i_1 := arg2
-	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), *(*C.swig_type_197)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), *(*C.swig_type_198)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -11698,7 +11934,7 @@ func (_swig_base SwigcptrGreatCircleMetric) Apply__SWIG_2(arg1 LatLongCoords, ar
 	_swig_i_0 := arg1.Swigcptr()
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), *(*C.swig_type_198)(unsafe.Pointer(&_swig_i_1)), C.swig_type_199(_swig_i_2)))
+	swig_r = (float64)(C._wrap_GreatCircleMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0), *(*C.swig_type_199)(unsafe.Pointer(&_swig_i_1)), C.swig_type_200(_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -11757,7 +11993,7 @@ func NewLatLongDistancePostingSource__SWIG_0(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
 	_swig_i_5 := arg6
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4), C.double(_swig_i_5))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4), C.double(_swig_i_5))))
 	return swig_r
 }
 
@@ -11768,7 +12004,7 @@ func NewLatLongDistancePostingSource__SWIG_1(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
 	return swig_r
 }
 
@@ -11778,7 +12014,7 @@ func NewLatLongDistancePostingSource__SWIG_2(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
 	return swig_r
 }
 
@@ -11787,7 +12023,7 @@ func NewLatLongDistancePostingSource__SWIG_3(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
 	return swig_r
 }
 
@@ -11798,7 +12034,7 @@ func NewLatLongDistancePostingSource__SWIG_4(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3), C.double(_swig_i_4))))
 	return swig_r
 }
 
@@ -11808,7 +12044,7 @@ func NewLatLongDistancePostingSource__SWIG_5(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2), C.double(_swig_i_3))))
 	return swig_r
 }
 
@@ -11817,7 +12053,7 @@ func NewLatLongDistancePostingSource__SWIG_6(arg1 uint, arg2 LatLongCoords, arg3
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.double(_swig_i_2))))
 	return swig_r
 }
 
@@ -11825,7 +12061,7 @@ func NewLatLongDistancePostingSource__SWIG_7(arg1 uint, arg2 LatLongCoords) (_sw
 	var swig_r LatLongDistancePostingSource
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (LatLongDistancePostingSource)(SwigcptrLatLongDistancePostingSource(C._wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -11872,20 +12108,20 @@ check_6:
 
 func DeleteLatLongDistancePostingSource(arg1 LatLongDistancePostingSource) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongDistancePostingSource_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongDistancePostingSource_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Next(arg2 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LatLongDistancePostingSource_next_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
+	C._wrap_LatLongDistancePostingSource_next_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.double(_swig_i_1))
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Skip_to(arg2 uint, arg3 float64) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_LatLongDistancePostingSource_skip_to_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
+	C._wrap_LatLongDistancePostingSource_skip_to_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2))
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Check(arg2 uint, arg3 float64) (_swig_ret bool) {
@@ -11893,21 +12129,21 @@ func (arg1 SwigcptrLatLongDistancePostingSource) Check(arg2 uint, arg3 float64) 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_check_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
+	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_check_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.double(_swig_i_2)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Get_weight() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_LatLongDistancePostingSource_get_weight_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_LatLongDistancePostingSource_get_weight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Name() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongDistancePostingSource_name_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongDistancePostingSource_name_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11917,13 +12153,13 @@ func (arg1 SwigcptrLatLongDistancePostingSource) Name() (_swig_ret string) {
 func (arg1 SwigcptrLatLongDistancePostingSource) Init(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_LatLongDistancePostingSource_init_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_LatLongDistancePostingSource_init_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrLatLongDistancePostingSource) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_LatLongDistancePostingSource_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_LatLongDistancePostingSource_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11932,49 +12168,49 @@ func (arg1 SwigcptrLatLongDistancePostingSource) Get_description() (_swig_ret st
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_termfreq_min() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_termfreq_est() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_termfreq_max() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) At_end() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_at_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_at_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_docid() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_docid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_docid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_database() (_swig_ret Database) {
 	var swig_r Database
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_LatLongDistancePostingSource_get_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_LatLongDistancePostingSource_get_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_slot() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_slot_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_LatLongDistancePostingSource_get_slot_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_value() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_LatLongDistancePostingSource_get_value_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_LatLongDistancePostingSource_get_value_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -11982,50 +12218,50 @@ func (_swig_base SwigcptrLatLongDistancePostingSource) Get_value() (_swig_ret st
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Done() {
-	C._wrap_LatLongDistancePostingSource_done_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_LatLongDistancePostingSource_done_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_started() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_get_started_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_LatLongDistancePostingSource_get_started_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Set_termfreq_min(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Set_termfreq_est(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Set_termfreq_max(arg1 uint) {
 	_swig_i_0 := arg1
-	C._wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Set_maxweight(arg1 float64) {
 	_swig_i_0 := arg1
-	C._wrap_LatLongDistancePostingSource_set_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.double(_swig_i_0))
+	C._wrap_LatLongDistancePostingSource_set_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.double(_swig_i_0))
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Get_maxweight() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_LatLongDistancePostingSource_get_maxweight_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_LatLongDistancePostingSource_get_maxweight_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Release__SWIG_0() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistancePostingSource) Release__SWIG_1() (_swig_ret PostingSource) {
 	var swig_r PostingSource
-	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (PostingSource)(SwigcptrPostingSource(C._wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -12101,7 +12337,7 @@ func NewLatLongDistanceKeyMaker__SWIG_0(arg1 uint, arg2 LatLongCoords, arg3 LatL
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
 	return swig_r
 }
 
@@ -12110,7 +12346,7 @@ func NewLatLongDistanceKeyMaker__SWIG_1(arg1 uint, arg2 LatLongCoords, arg3 LatL
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
 	return swig_r
 }
 
@@ -12118,7 +12354,7 @@ func NewLatLongDistanceKeyMaker__SWIG_2(arg1 uint, arg2 LatLongCoords) (_swig_re
 	var swig_r LatLongDistanceKeyMaker
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -12128,7 +12364,7 @@ func NewLatLongDistanceKeyMaker__SWIG_3(arg1 uint, arg2 LatLongCoord, arg3 LatLo
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
 	_swig_i_3 := arg4
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2), C.double(_swig_i_3))))
 	return swig_r
 }
 
@@ -12137,7 +12373,7 @@ func NewLatLongDistanceKeyMaker__SWIG_4(arg1 uint, arg2 LatLongCoord, arg3 LatLo
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1), C.uintptr_t(_swig_i_2))))
 	return swig_r
 }
 
@@ -12145,7 +12381,7 @@ func NewLatLongDistanceKeyMaker__SWIG_5(arg1 uint, arg2 LatLongCoord) (_swig_ret
 	var swig_r LatLongDistanceKeyMaker
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
+	swig_r = (LatLongDistanceKeyMaker)(SwigcptrLatLongDistanceKeyMaker(C._wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.uintptr_t(_swig_i_1))))
 	return swig_r
 }
 
@@ -12186,14 +12422,14 @@ check_5:
 
 func DeleteLatLongDistanceKeyMaker(arg1 LatLongDistanceKeyMaker) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LatLongDistanceKeyMaker_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LatLongDistanceKeyMaker_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrLatLongDistanceKeyMaker) Apply(arg2 Document) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r_p := C._wrap_LatLongDistanceKeyMaker_Apply_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	swig_r_p := C._wrap_LatLongDistanceKeyMaker_Apply_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -12202,13 +12438,13 @@ func (arg1 SwigcptrLatLongDistanceKeyMaker) Apply(arg2 Document) (_swig_ret stri
 
 func (_swig_base SwigcptrLatLongDistanceKeyMaker) Release__SWIG_0() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrLatLongDistanceKeyMaker) Release__SWIG_1() (_swig_ret KeyMaker) {
 	var swig_r KeyMaker
-	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (KeyMaker)(SwigcptrKeyMaker(C._wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -12251,12 +12487,12 @@ func (p SwigcptrDatabase) SwigIsDatabase() {
 func (arg1 SwigcptrDatabase) Add_database(arg2 Database) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_Database_add_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_Database_add_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func NewDatabase__SWIG_0() (_swig_ret Database) {
 	var swig_r Database
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -12264,7 +12500,7 @@ func NewDatabase__SWIG_1(arg1 string, arg2 int) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_204)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_205)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -12274,7 +12510,7 @@ func NewDatabase__SWIG_1(arg1 string, arg2 int) (_swig_ret Database) {
 func NewDatabase__SWIG_2(arg1 string) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_205)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_206)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -12285,14 +12521,14 @@ func NewDatabase__SWIG_3(arg1 int, arg2 int) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
 func NewDatabase__SWIG_4(arg1 int) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_new_Database__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -12326,25 +12562,25 @@ check_4:
 
 func DeleteDatabase(arg1 Database) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_Database_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_Database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDatabase) Reopen() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Database_reopen_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Database_reopen_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Close() {
 	_swig_i_0 := arg1
-	C._wrap_Database_close_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Database_close_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDatabase) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Database_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Database_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -12355,7 +12591,7 @@ func (arg1 SwigcptrDatabase) Postlist_begin(arg2 string) (_swig_ret PostingItera
 	var swig_r PostingIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_Database_postlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_207)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_Database_postlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_208)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12366,7 +12602,7 @@ func (arg1 SwigcptrDatabase) Postlist_end(arg2 string) (_swig_ret PostingIterato
 	var swig_r PostingIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_Database_postlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_208)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_Database_postlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_209)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12377,7 +12613,7 @@ func (arg1 SwigcptrDatabase) Termlist_begin(arg2 uint) (_swig_ret TermIterator) 
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_termlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_termlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -12385,14 +12621,14 @@ func (arg1 SwigcptrDatabase) Termlist_end(arg2 uint) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_termlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_termlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Has_positions() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Database_has_positions_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Database_has_positions_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -12401,7 +12637,7 @@ func (arg1 SwigcptrDatabase) Positionlist_begin(arg2 uint, arg3 string) (_swig_r
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_Database_positionlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_209)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_Database_positionlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_210)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -12413,7 +12649,7 @@ func (arg1 SwigcptrDatabase) Positionlist_end(arg2 uint, arg3 string) (_swig_ret
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_Database_positionlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_210)(unsafe.Pointer(&_swig_i_2)))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_Database_positionlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), *(*C.swig_type_211)(unsafe.Pointer(&_swig_i_2)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg3
 	}
@@ -12424,7 +12660,7 @@ func (arg1 SwigcptrDatabase) Allterms_begin__SWIG_0(arg2 string) (_swig_ret Term
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_211)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_212)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12434,7 +12670,7 @@ func (arg1 SwigcptrDatabase) Allterms_begin__SWIG_0(arg2 string) (_swig_ret Term
 func (arg1 SwigcptrDatabase) Allterms_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12453,7 +12689,7 @@ func (arg1 SwigcptrDatabase) Allterms_end__SWIG_0(arg2 string) (_swig_ret TermIt
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_212)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_213)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12463,7 +12699,7 @@ func (arg1 SwigcptrDatabase) Allterms_end__SWIG_0(arg2 string) (_swig_ret TermIt
 func (arg1 SwigcptrDatabase) Allterms_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12481,28 +12717,28 @@ func (p SwigcptrDatabase) Allterms_end(a ...interface{}) TermIterator {
 func (arg1 SwigcptrDatabase) Get_doccount() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Database_get_doccount_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Database_get_doccount_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Get_lastdocid() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Database_get_lastdocid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Database_get_lastdocid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Get_avlength() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_Database_get_avlength_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_Database_get_avlength_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Get_total_length() (_swig_ret XAPIAN_TOTALLENGTH_TYPE) {
 	var swig_r XAPIAN_TOTALLENGTH_TYPE
 	_swig_i_0 := arg1
-	swig_r = (XAPIAN_TOTALLENGTH_TYPE)(SwigcptrXAPIAN_TOTALLENGTH_TYPE(C._wrap_Database_get_total_length_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (XAPIAN_TOTALLENGTH_TYPE)(SwigcptrXAPIAN_TOTALLENGTH_TYPE(C._wrap_Database_get_total_length_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12510,7 +12746,7 @@ func (arg1 SwigcptrDatabase) Get_termfreq(arg2 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_termfreq_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_213)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (uint)(C._wrap_Database_get_termfreq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_214)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12521,7 +12757,7 @@ func (arg1 SwigcptrDatabase) Term_exists(arg2 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_Database_term_exists_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_214)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (bool)(C._wrap_Database_term_exists_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_215)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12532,7 +12768,7 @@ func (arg1 SwigcptrDatabase) Get_collection_freq(arg2 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_collection_freq_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_215)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (uint)(C._wrap_Database_get_collection_freq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_216)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12543,7 +12779,7 @@ func (arg1 SwigcptrDatabase) Get_value_freq(arg2 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_value_freq_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (uint)(C._wrap_Database_get_value_freq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
@@ -12551,7 +12787,7 @@ func (arg1 SwigcptrDatabase) Get_value_lower_bound(arg2 uint) (_swig_ret string)
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Database_get_value_lower_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	swig_r_p := C._wrap_Database_get_value_lower_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -12562,7 +12798,7 @@ func (arg1 SwigcptrDatabase) Get_value_upper_bound(arg2 uint) (_swig_ret string)
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Database_get_value_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	swig_r_p := C._wrap_Database_get_value_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -12572,14 +12808,14 @@ func (arg1 SwigcptrDatabase) Get_value_upper_bound(arg2 uint) (_swig_ret string)
 func (arg1 SwigcptrDatabase) Get_doclength_lower_bound() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Database_get_doclength_lower_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Database_get_doclength_lower_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Get_doclength_upper_bound() (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_Database_get_doclength_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (uint)(C._wrap_Database_get_doclength_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -12587,7 +12823,7 @@ func (arg1 SwigcptrDatabase) Get_wdf_upper_bound(arg2 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_wdf_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_218)(unsafe.Pointer(&_swig_i_1))))
+	swig_r = (uint)(C._wrap_Database_get_wdf_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_219)(unsafe.Pointer(&_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12598,7 +12834,7 @@ func (arg1 SwigcptrDatabase) Valuestream_begin(arg2 uint) (_swig_ret ValueIterat
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Database_valuestream_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Database_valuestream_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -12606,7 +12842,7 @@ func (arg1 SwigcptrDatabase) Valuestream_end(arg2 uint) (_swig_ret ValueIterator
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Database_valuestream_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_Database_valuestream_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -12614,7 +12850,7 @@ func (arg1 SwigcptrDatabase) Get_doclength(arg2 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_doclength_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (uint)(C._wrap_Database_get_doclength_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
@@ -12622,20 +12858,20 @@ func (arg1 SwigcptrDatabase) Get_unique_terms(arg2 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (uint)(C._wrap_Database_get_unique_terms_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (uint)(C._wrap_Database_get_unique_terms_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Keep_alive() {
 	_swig_i_0 := arg1
-	C._wrap_Database_keep_alive_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_Database_keep_alive_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrDatabase) Get_document__SWIG_0(arg2 uint) (_swig_ret Document) {
 	var swig_r Document
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Document)(SwigcptrDocument(C._wrap_Database_get_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_Database_get_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -12644,7 +12880,7 @@ func (arg1 SwigcptrDatabase) Get_document__SWIG_1(arg2 uint, arg3 uint) (_swig_r
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Document)(SwigcptrDocument(C._wrap_Database_get_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_Database_get_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	return swig_r
 }
 
@@ -12664,7 +12900,7 @@ func (arg1 SwigcptrDatabase) Get_spelling_suggestion__SWIG_0(arg2 string, arg3 u
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r_p := C._wrap_Database_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_220)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	swig_r_p := C._wrap_Database_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_221)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
@@ -12678,7 +12914,7 @@ func (arg1 SwigcptrDatabase) Get_spelling_suggestion__SWIG_1(arg2 string) (_swig
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Database_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_222)(unsafe.Pointer(&_swig_i_1)))
+	swig_r_p := C._wrap_Database_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_223)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
@@ -12702,14 +12938,14 @@ func (p SwigcptrDatabase) Get_spelling_suggestion(a ...interface{}) string {
 func (arg1 SwigcptrDatabase) Spellings_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_spellings_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_spellings_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Spellings_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_spellings_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_spellings_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12717,7 +12953,7 @@ func (arg1 SwigcptrDatabase) Synonyms_begin(arg2 string) (_swig_ret TermIterator
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonyms_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_223)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonyms_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_224)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12728,7 +12964,7 @@ func (arg1 SwigcptrDatabase) Synonyms_end(arg2 string) (_swig_ret TermIterator) 
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonyms_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_224)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonyms_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_225)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12739,7 +12975,7 @@ func (arg1 SwigcptrDatabase) Synonym_keys_begin__SWIG_0(arg2 string) (_swig_ret 
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_225)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_226)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12749,7 +12985,7 @@ func (arg1 SwigcptrDatabase) Synonym_keys_begin__SWIG_0(arg2 string) (_swig_ret 
 func (arg1 SwigcptrDatabase) Synonym_keys_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12768,7 +13004,7 @@ func (arg1 SwigcptrDatabase) Synonym_keys_end__SWIG_0(arg2 string) (_swig_ret Te
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_226)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_227)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12778,7 +13014,7 @@ func (arg1 SwigcptrDatabase) Synonym_keys_end__SWIG_0(arg2 string) (_swig_ret Te
 func (arg1 SwigcptrDatabase) Synonym_keys_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12797,7 +13033,7 @@ func (arg1 SwigcptrDatabase) Get_metadata(arg2 string) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_Database_get_metadata_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_228)(unsafe.Pointer(&_swig_i_1)))
+	swig_r_p := C._wrap_Database_get_metadata_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_229)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
@@ -12811,7 +13047,7 @@ func (arg1 SwigcptrDatabase) Metadata_keys_begin__SWIG_0(arg2 string) (_swig_ret
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_229)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_230)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12821,7 +13057,7 @@ func (arg1 SwigcptrDatabase) Metadata_keys_begin__SWIG_0(arg2 string) (_swig_ret
 func (arg1 SwigcptrDatabase) Metadata_keys_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12840,7 +13076,7 @@ func (arg1 SwigcptrDatabase) Metadata_keys_end__SWIG_0(arg2 string) (_swig_ret T
 	var swig_r TermIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_230)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_231)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12850,7 +13086,7 @@ func (arg1 SwigcptrDatabase) Metadata_keys_end__SWIG_0(arg2 string) (_swig_ret T
 func (arg1 SwigcptrDatabase) Metadata_keys_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_Database_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12868,7 +13104,7 @@ func (p SwigcptrDatabase) Metadata_keys_end(a ...interface{}) TermIterator {
 func (arg1 SwigcptrDatabase) Get_uuid() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_Database_get_uuid_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_Database_get_uuid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -12878,14 +13114,14 @@ func (arg1 SwigcptrDatabase) Get_uuid() (_swig_ret string) {
 func (arg1 SwigcptrDatabase) Locked() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_Database_locked_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_Database_locked_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrDatabase) Get_revision() (_swig_ret XAPIAN_REVISION_TYPE) {
 	var swig_r XAPIAN_REVISION_TYPE
 	_swig_i_0 := arg1
-	swig_r = (XAPIAN_REVISION_TYPE)(SwigcptrXAPIAN_REVISION_TYPE(C._wrap_Database_get_revision_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))))
+	swig_r = (XAPIAN_REVISION_TYPE)(SwigcptrXAPIAN_REVISION_TYPE(C._wrap_Database_get_revision_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))))
 	return swig_r
 }
 
@@ -12893,7 +13129,7 @@ func DatabaseCheck__SWIG_0(arg1 string, arg2 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_Database_check__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_233)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1)))
+	swig_r = (int64)(C._wrap_Database_check__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_234)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -12903,7 +13139,7 @@ func DatabaseCheck__SWIG_0(arg1 string, arg2 int) (_swig_ret int64) {
 func DatabaseCheck__SWIG_1(arg1 string) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_Database_check__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_235)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (int64)(C._wrap_Database_check__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_236)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -12915,7 +13151,7 @@ func DatabaseCheck__SWIG_2(arg1 int, arg2 int, arg3 Std_ostream) (_swig_ret int6
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (int64)(C._wrap_Database_check__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2)))
+	swig_r = (int64)(C._wrap_Database_check__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2)))
 	return swig_r
 }
 
@@ -12923,14 +13159,14 @@ func DatabaseCheck__SWIG_3(arg1 int, arg2 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_Database_check__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (int64)(C._wrap_Database_check__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
 func DatabaseCheck__SWIG_4(arg1 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_Database_check__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0)))
+	swig_r = (int64)(C._wrap_Database_check__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
@@ -12967,7 +13203,7 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_0(arg2 string, arg3 uint, arg4 int) {
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_Database_compact__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_239)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
+	C._wrap_Database_compact__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_240)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12977,7 +13213,7 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_1(arg2 string, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Database_compact__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_240)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_Database_compact__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_241)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12986,7 +13222,7 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_1(arg2 string, arg3 uint) {
 func (arg1 SwigcptrDatabase) Compact__SWIG_2(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Database_compact__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_241)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_Database_compact__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_242)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -12997,20 +13233,20 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_3(arg2 int, arg3 uint, arg4 int) {
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	C._wrap_Database_compact__SWIG_3_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
+	C._wrap_Database_compact__SWIG_3_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))
 }
 
 func (arg1 SwigcptrDatabase) Compact__SWIG_4(arg2 int, arg3 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_Database_compact__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_Database_compact__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
 }
 
 func (arg1 SwigcptrDatabase) Compact__SWIG_5(arg2 int) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_Database_compact__SWIG_5_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_Database_compact__SWIG_5_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrDatabase) Compact__SWIG_6(arg2 string, arg3 uint, arg4 int, arg5 Compactor) {
@@ -13019,7 +13255,7 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_6(arg2 string, arg3 uint, arg4 int, a
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
-	C._wrap_Database_compact__SWIG_6_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_242)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))
+	C._wrap_Database_compact__SWIG_6_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_243)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13031,7 +13267,7 @@ func (arg1 SwigcptrDatabase) Compact__SWIG_7(arg2 int, arg3 uint, arg4 int, arg5
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5.Swigcptr()
-	C._wrap_Database_compact__SWIG_7_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))
+	C._wrap_Database_compact__SWIG_7_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.uintptr_t(_swig_i_4))
 }
 
 func (p SwigcptrDatabase) Compact(a ...interface{}) {
@@ -13149,12 +13385,12 @@ func (p SwigcptrWritableDatabase) SwigIsWritableDatabase() {
 
 func DeleteWritableDatabase(arg1 WritableDatabase) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_WritableDatabase_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_WritableDatabase_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func NewWritableDatabase__SWIG_0() (_swig_ret WritableDatabase) {
 	var swig_r WritableDatabase
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_0_xapian_1797894d64db9bab()))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_0_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
@@ -13163,7 +13399,7 @@ func NewWritableDatabase__SWIG_1(arg1 string, arg2 int, arg3 int) (_swig_ret Wri
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_243)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_244)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13174,7 +13410,7 @@ func NewWritableDatabase__SWIG_2(arg1 string, arg2 int) (_swig_ret WritableDatab
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_244)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_245)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13184,7 +13420,7 @@ func NewWritableDatabase__SWIG_2(arg1 string, arg2 int) (_swig_ret WritableDatab
 func NewWritableDatabase__SWIG_3(arg1 string) (_swig_ret WritableDatabase) {
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_3_xapian_1797894d64db9bab(*(*C.swig_type_245)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_new_WritableDatabase__SWIG_3_xapian_245a1afe1629f0b1(*(*C.swig_type_246)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13210,23 +13446,23 @@ func NewWritableDatabase(a ...interface{}) WritableDatabase {
 
 func (arg1 SwigcptrWritableDatabase) Commit() {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_commit_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_commit_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrWritableDatabase) Flush() {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_flush_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_flush_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrWritableDatabase) Begin_transaction__SWIG_0(arg2 bool) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
+	C._wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
 }
 
 func (arg1 SwigcptrWritableDatabase) Begin_transaction__SWIG_1() {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (p SwigcptrWritableDatabase) Begin_transaction(a ...interface{}) {
@@ -13244,32 +13480,32 @@ func (p SwigcptrWritableDatabase) Begin_transaction(a ...interface{}) {
 
 func (arg1 SwigcptrWritableDatabase) Commit_transaction() {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_commit_transaction_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_commit_transaction_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrWritableDatabase) Cancel_transaction() {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_cancel_transaction_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_cancel_transaction_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrWritableDatabase) Add_document(arg2 Document) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	swig_r = (uint)(C._wrap_WritableDatabase_add_document_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
+	swig_r = (uint)(C._wrap_WritableDatabase_add_document_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrWritableDatabase) Delete_document__SWIG_0(arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_delete_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_WritableDatabase_delete_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (arg1 SwigcptrWritableDatabase) Delete_document__SWIG_1(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_delete_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_246)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_WritableDatabase_delete_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_247)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13296,7 +13532,7 @@ func (arg1 SwigcptrWritableDatabase) Replace_document__SWIG_0(arg2 uint, arg3 Do
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	C._wrap_WritableDatabase_replace_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2))
+	C._wrap_WritableDatabase_replace_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2))
 }
 
 func (arg1 SwigcptrWritableDatabase) Replace_document__SWIG_1(arg2 string, arg3 Document) (_swig_ret uint) {
@@ -13304,7 +13540,7 @@ func (arg1 SwigcptrWritableDatabase) Replace_document__SWIG_1(arg2 string, arg3 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (uint)(C._wrap_WritableDatabase_replace_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_247)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2)))
+	swig_r = (uint)(C._wrap_WritableDatabase_replace_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_248)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13331,7 +13567,7 @@ func (arg1 SwigcptrWritableDatabase) Add_spelling__SWIG_0(arg2 string, arg3 uint
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_add_spelling__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_248)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_WritableDatabase_add_spelling__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_249)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13340,7 +13576,7 @@ func (arg1 SwigcptrWritableDatabase) Add_spelling__SWIG_0(arg2 string, arg3 uint
 func (arg1 SwigcptrWritableDatabase) Add_spelling__SWIG_1(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_add_spelling__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_249)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_WritableDatabase_add_spelling__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_250)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13363,7 +13599,7 @@ func (arg1 SwigcptrWritableDatabase) Remove_spelling__SWIG_0(arg2 string, arg3 u
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_250)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
+	C._wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_251)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13372,7 +13608,7 @@ func (arg1 SwigcptrWritableDatabase) Remove_spelling__SWIG_0(arg2 string, arg3 u
 func (arg1 SwigcptrWritableDatabase) Remove_spelling__SWIG_1(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_251)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_252)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13395,7 +13631,7 @@ func (arg1 SwigcptrWritableDatabase) Add_synonym(arg2 string, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_add_synonym_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_252)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_253)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_WritableDatabase_add_synonym_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_253)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_254)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13408,7 +13644,7 @@ func (arg1 SwigcptrWritableDatabase) Remove_synonym(arg2 string, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_remove_synonym_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_254)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_255)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_WritableDatabase_remove_synonym_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_255)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_256)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13420,7 +13656,7 @@ func (arg1 SwigcptrWritableDatabase) Remove_synonym(arg2 string, arg3 string) {
 func (arg1 SwigcptrWritableDatabase) Clear_synonyms(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_clear_synonyms_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_256)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_WritableDatabase_clear_synonyms_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_257)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13430,7 +13666,7 @@ func (arg1 SwigcptrWritableDatabase) Set_metadata(arg2 string, arg3 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_set_metadata_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0), *(*C.swig_type_257)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_258)(unsafe.Pointer(&_swig_i_2)))
+	C._wrap_WritableDatabase_set_metadata_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0), *(*C.swig_type_258)(unsafe.Pointer(&_swig_i_1)), *(*C.swig_type_259)(unsafe.Pointer(&_swig_i_2)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13442,7 +13678,7 @@ func (arg1 SwigcptrWritableDatabase) Set_metadata(arg2 string, arg3 string) {
 func (arg1 SwigcptrWritableDatabase) Get_description() (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_WritableDatabase_get_description_xapian_1797894d64db9bab(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_WritableDatabase_get_description_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -13451,23 +13687,23 @@ func (arg1 SwigcptrWritableDatabase) Get_description() (_swig_ret string) {
 
 func (_swig_base SwigcptrWritableDatabase) Add_database(arg1 Database) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_WritableDatabase_add_database_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0))
+	C._wrap_WritableDatabase_add_database_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.uintptr_t(_swig_i_0))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Reopen() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_WritableDatabase_reopen_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_WritableDatabase_reopen_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Close() {
-	C._wrap_WritableDatabase_close_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_WritableDatabase_close_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Postlist_begin(arg1 string) (_swig_ret PostingIterator) {
 	var swig_r PostingIterator
 	_swig_i_0 := arg1
-	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_WritableDatabase_postlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_260)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_WritableDatabase_postlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_261)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13477,7 +13713,7 @@ func (_swig_base SwigcptrWritableDatabase) Postlist_begin(arg1 string) (_swig_re
 func (_swig_base SwigcptrWritableDatabase) Postlist_end(arg1 string) (_swig_ret PostingIterator) {
 	var swig_r PostingIterator
 	_swig_i_0 := arg1
-	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_WritableDatabase_postlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_261)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (PostingIterator)(SwigcptrPostingIterator(C._wrap_WritableDatabase_postlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_262)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13487,20 +13723,20 @@ func (_swig_base SwigcptrWritableDatabase) Postlist_end(arg1 string) (_swig_ret 
 func (_swig_base SwigcptrWritableDatabase) Termlist_begin(arg1 uint) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_termlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_termlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Termlist_end(arg1 uint) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_termlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_termlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Has_positions() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_WritableDatabase_has_positions_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_WritableDatabase_has_positions_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
@@ -13508,7 +13744,7 @@ func (_swig_base SwigcptrWritableDatabase) Positionlist_begin(arg1 uint, arg2 st
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_WritableDatabase_positionlist_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), *(*C.swig_type_262)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_WritableDatabase_positionlist_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), *(*C.swig_type_263)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13519,7 +13755,7 @@ func (_swig_base SwigcptrWritableDatabase) Positionlist_end(arg1 uint, arg2 stri
 	var swig_r PositionIterator
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_WritableDatabase_positionlist_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), *(*C.swig_type_263)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (PositionIterator)(SwigcptrPositionIterator(C._wrap_WritableDatabase_positionlist_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), *(*C.swig_type_264)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -13529,7 +13765,7 @@ func (_swig_base SwigcptrWritableDatabase) Positionlist_end(arg1 uint, arg2 stri
 func (_swig_base SwigcptrWritableDatabase) Allterms_begin__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_264)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_265)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13538,7 +13774,7 @@ func (_swig_base SwigcptrWritableDatabase) Allterms_begin__SWIG_0(arg1 string) (
 
 func (_swig_base SwigcptrWritableDatabase) Allterms_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13556,7 +13792,7 @@ func (p SwigcptrWritableDatabase) Allterms_begin(a ...interface{}) TermIterator 
 func (_swig_base SwigcptrWritableDatabase) Allterms_end__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_265)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_266)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13565,7 +13801,7 @@ func (_swig_base SwigcptrWritableDatabase) Allterms_end__SWIG_0(arg1 string) (_s
 
 func (_swig_base SwigcptrWritableDatabase) Allterms_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13582,32 +13818,32 @@ func (p SwigcptrWritableDatabase) Allterms_end(a ...interface{}) TermIterator {
 
 func (_swig_base SwigcptrWritableDatabase) Get_doccount() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_WritableDatabase_get_doccount_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_doccount_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_lastdocid() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_WritableDatabase_get_lastdocid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_lastdocid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_avlength() (_swig_ret float64) {
 	var swig_r float64
-	swig_r = (float64)(C._wrap_WritableDatabase_get_avlength_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (float64)(C._wrap_WritableDatabase_get_avlength_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_total_length() (_swig_ret XAPIAN_TOTALLENGTH_TYPE) {
 	var swig_r XAPIAN_TOTALLENGTH_TYPE
-	swig_r = (XAPIAN_TOTALLENGTH_TYPE)(SwigcptrXAPIAN_TOTALLENGTH_TYPE(C._wrap_WritableDatabase_get_total_length_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (XAPIAN_TOTALLENGTH_TYPE)(SwigcptrXAPIAN_TOTALLENGTH_TYPE(C._wrap_WritableDatabase_get_total_length_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_termfreq(arg1 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_termfreq_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_266)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_termfreq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_267)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13617,7 +13853,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_termfreq(arg1 string) (_swig_ret 
 func (_swig_base SwigcptrWritableDatabase) Term_exists(arg1 string) (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_WritableDatabase_term_exists_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_267)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (bool)(C._wrap_WritableDatabase_term_exists_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_268)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13627,7 +13863,7 @@ func (_swig_base SwigcptrWritableDatabase) Term_exists(arg1 string) (_swig_ret b
 func (_swig_base SwigcptrWritableDatabase) Get_collection_freq(arg1 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_collection_freq_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_268)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_collection_freq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_269)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13637,14 +13873,14 @@ func (_swig_base SwigcptrWritableDatabase) Get_collection_freq(arg1 string) (_sw
 func (_swig_base SwigcptrWritableDatabase) Get_value_freq(arg1 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_value_freq_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_value_freq_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_value_lower_bound(arg1 uint) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_WritableDatabase_get_value_lower_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	swig_r_p := C._wrap_WritableDatabase_get_value_lower_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -13654,7 +13890,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_value_lower_bound(arg1 uint) (_sw
 func (_swig_base SwigcptrWritableDatabase) Get_value_upper_bound(arg1 uint) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_WritableDatabase_get_value_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	swig_r_p := C._wrap_WritableDatabase_get_value_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -13663,20 +13899,20 @@ func (_swig_base SwigcptrWritableDatabase) Get_value_upper_bound(arg1 uint) (_sw
 
 func (_swig_base SwigcptrWritableDatabase) Get_doclength_lower_bound() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_lower_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_lower_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_doclength_upper_bound() (_swig_ret uint) {
 	var swig_r uint
-	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_wdf_upper_bound(arg1 string) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_wdf_upper_bound_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_271)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_wdf_upper_bound_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_272)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13686,39 +13922,39 @@ func (_swig_base SwigcptrWritableDatabase) Get_wdf_upper_bound(arg1 string) (_sw
 func (_swig_base SwigcptrWritableDatabase) Valuestream_begin(arg1 uint) (_swig_ret ValueIterator) {
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_WritableDatabase_valuestream_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_WritableDatabase_valuestream_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Valuestream_end(arg1 uint) (_swig_ret ValueIterator) {
 	var swig_r ValueIterator
 	_swig_i_0 := arg1
-	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_WritableDatabase_valuestream_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
+	swig_r = (ValueIterator)(SwigcptrValueIterator(C._wrap_WritableDatabase_valuestream_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_doclength(arg1 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_doclength_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_unique_terms(arg1 uint) (_swig_ret uint) {
 	var swig_r uint
 	_swig_i_0 := arg1
-	swig_r = (uint)(C._wrap_WritableDatabase_get_unique_terms_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
+	swig_r = (uint)(C._wrap_WritableDatabase_get_unique_terms_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Keep_alive() {
-	C._wrap_WritableDatabase_keep_alive_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	C._wrap_WritableDatabase_keep_alive_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_document__SWIG_0(arg1 uint) (_swig_ret Document) {
 	var swig_r Document
 	_swig_i_0 := arg1
-	swig_r = (Document)(SwigcptrDocument(C._wrap_WritableDatabase_get_document__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_WritableDatabase_get_document__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))))
 	return swig_r
 }
 
@@ -13726,7 +13962,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_document__SWIG_1(arg1 uint, arg2 
 	var swig_r Document
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Document)(SwigcptrDocument(C._wrap_WritableDatabase_get_document__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
+	swig_r = (Document)(SwigcptrDocument(C._wrap_WritableDatabase_get_document__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))))
 	return swig_r
 }
 
@@ -13745,7 +13981,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_spelling_suggestion__SWIG_0(arg1 
 	var swig_r string
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r_p := C._wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_273)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))
+	swig_r_p := C._wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_274)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
@@ -13758,7 +13994,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_spelling_suggestion__SWIG_0(arg1 
 func (_swig_base SwigcptrWritableDatabase) Get_spelling_suggestion__SWIG_1(arg1 string) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_275)(unsafe.Pointer(&_swig_i_0)))
+	swig_r_p := C._wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_276)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
@@ -13781,20 +14017,20 @@ func (p SwigcptrWritableDatabase) Get_spelling_suggestion(a ...interface{}) stri
 
 func (_swig_base SwigcptrWritableDatabase) Spellings_begin() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_spellings_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_spellings_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Spellings_end() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_spellings_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_spellings_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Synonyms_begin(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonyms_begin_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_276)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonyms_begin_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_277)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13804,7 +14040,7 @@ func (_swig_base SwigcptrWritableDatabase) Synonyms_begin(arg1 string) (_swig_re
 func (_swig_base SwigcptrWritableDatabase) Synonyms_end(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonyms_end_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_277)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonyms_end_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_278)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13814,7 +14050,7 @@ func (_swig_base SwigcptrWritableDatabase) Synonyms_end(arg1 string) (_swig_ret 
 func (_swig_base SwigcptrWritableDatabase) Synonym_keys_begin__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_278)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_279)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13823,7 +14059,7 @@ func (_swig_base SwigcptrWritableDatabase) Synonym_keys_begin__SWIG_0(arg1 strin
 
 func (_swig_base SwigcptrWritableDatabase) Synonym_keys_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13841,7 +14077,7 @@ func (p SwigcptrWritableDatabase) Synonym_keys_begin(a ...interface{}) TermItera
 func (_swig_base SwigcptrWritableDatabase) Synonym_keys_end__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_279)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_280)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13850,7 +14086,7 @@ func (_swig_base SwigcptrWritableDatabase) Synonym_keys_end__SWIG_0(arg1 string)
 
 func (_swig_base SwigcptrWritableDatabase) Synonym_keys_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13868,7 +14104,7 @@ func (p SwigcptrWritableDatabase) Synonym_keys_end(a ...interface{}) TermIterato
 func (_swig_base SwigcptrWritableDatabase) Get_metadata(arg1 string) (_swig_ret string) {
 	var swig_r string
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_WritableDatabase_get_metadata_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_281)(unsafe.Pointer(&_swig_i_0)))
+	swig_r_p := C._wrap_WritableDatabase_get_metadata_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_282)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
@@ -13881,7 +14117,7 @@ func (_swig_base SwigcptrWritableDatabase) Get_metadata(arg1 string) (_swig_ret 
 func (_swig_base SwigcptrWritableDatabase) Metadata_keys_begin__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_282)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_283)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13890,7 +14126,7 @@ func (_swig_base SwigcptrWritableDatabase) Metadata_keys_begin__SWIG_0(arg1 stri
 
 func (_swig_base SwigcptrWritableDatabase) Metadata_keys_begin__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13908,7 +14144,7 @@ func (p SwigcptrWritableDatabase) Metadata_keys_begin(a ...interface{}) TermIter
 func (_swig_base SwigcptrWritableDatabase) Metadata_keys_end__SWIG_0(arg1 string) (_swig_ret TermIterator) {
 	var swig_r TermIterator
 	_swig_i_0 := arg1
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_283)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_284)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13917,7 +14153,7 @@ func (_swig_base SwigcptrWritableDatabase) Metadata_keys_end__SWIG_0(arg1 string
 
 func (_swig_base SwigcptrWritableDatabase) Metadata_keys_end__SWIG_1() (_swig_ret TermIterator) {
 	var swig_r TermIterator
-	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (TermIterator)(SwigcptrTermIterator(C._wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13934,7 +14170,7 @@ func (p SwigcptrWritableDatabase) Metadata_keys_end(a ...interface{}) TermIterat
 
 func (_swig_base SwigcptrWritableDatabase) Get_uuid() (_swig_ret string) {
 	var swig_r string
-	swig_r_p := C._wrap_WritableDatabase_get_uuid_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))
+	swig_r_p := C._wrap_WritableDatabase_get_uuid_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
 	swig_r_1 = swigCopyString(swig_r)
@@ -13943,13 +14179,13 @@ func (_swig_base SwigcptrWritableDatabase) Get_uuid() (_swig_ret string) {
 
 func (_swig_base SwigcptrWritableDatabase) Locked() (_swig_ret bool) {
 	var swig_r bool
-	swig_r = (bool)(C._wrap_WritableDatabase_locked_xapian_1797894d64db9bab(C.uintptr_t(_swig_base)))
+	swig_r = (bool)(C._wrap_WritableDatabase_locked_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base)))
 	return swig_r
 }
 
 func (_swig_base SwigcptrWritableDatabase) Get_revision() (_swig_ret XAPIAN_REVISION_TYPE) {
 	var swig_r XAPIAN_REVISION_TYPE
-	swig_r = (XAPIAN_REVISION_TYPE)(SwigcptrXAPIAN_REVISION_TYPE(C._wrap_WritableDatabase_get_revision_xapian_1797894d64db9bab(C.uintptr_t(_swig_base))))
+	swig_r = (XAPIAN_REVISION_TYPE)(SwigcptrXAPIAN_REVISION_TYPE(C._wrap_WritableDatabase_get_revision_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base))))
 	return swig_r
 }
 
@@ -13957,7 +14193,7 @@ func WritableDatabaseCheck__SWIG_0(arg1 string, arg2 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_233)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1)))
+	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_234)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13967,7 +14203,7 @@ func WritableDatabaseCheck__SWIG_0(arg1 string, arg2 int) (_swig_ret int64) {
 func WritableDatabaseCheck__SWIG_1(arg1 string) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_235)(unsafe.Pointer(&_swig_i_0))))
+	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_236)(unsafe.Pointer(&_swig_i_0))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -13979,7 +14215,7 @@ func WritableDatabaseCheck__SWIG_2(arg1 int, arg2 int, arg3 Std_ostream) (_swig_
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3.Swigcptr()
-	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_2_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2)))
+	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_2_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.uintptr_t(_swig_i_2)))
 	return swig_r
 }
 
@@ -13987,14 +14223,14 @@ func WritableDatabaseCheck__SWIG_3(arg1 int, arg2 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_3_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_3_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
 func WritableDatabaseCheck__SWIG_4(arg1 int) (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_4_xapian_1797894d64db9bab(C.swig_intgo(_swig_i_0)))
+	swig_r = (int64)(C._wrap_WritableDatabase_check__SWIG_4_xapian_245a1afe1629f0b1(C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
@@ -14030,7 +14266,7 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_0(arg1 string, arg2 uin
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_compact__SWIG_0_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_290)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_WritableDatabase_compact__SWIG_0_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_291)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14039,7 +14275,7 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_0(arg1 string, arg2 uin
 func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_1(arg1 string, arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_compact__SWIG_1_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_291)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))
+	C._wrap_WritableDatabase_compact__SWIG_1_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_292)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14047,7 +14283,7 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_1(arg1 string, arg2 uin
 
 func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_2(arg1 string) {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_compact__SWIG_2_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_292)(unsafe.Pointer(&_swig_i_0)))
+	C._wrap_WritableDatabase_compact__SWIG_2_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_293)(unsafe.Pointer(&_swig_i_0)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14057,18 +14293,18 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_3(arg1 int, arg2 uint, 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	C._wrap_WritableDatabase_compact__SWIG_3_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
+	C._wrap_WritableDatabase_compact__SWIG_3_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_4(arg1 int, arg2 uint) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_WritableDatabase_compact__SWIG_4_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))
+	C._wrap_WritableDatabase_compact__SWIG_4_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_5(arg1 int) {
 	_swig_i_0 := arg1
-	C._wrap_WritableDatabase_compact__SWIG_5_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
+	C._wrap_WritableDatabase_compact__SWIG_5_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0))
 }
 
 func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_6(arg1 string, arg2 uint, arg3 int, arg4 Compactor) {
@@ -14076,7 +14312,7 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_6(arg1 string, arg2 uin
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4.Swigcptr()
-	C._wrap_WritableDatabase_compact__SWIG_6_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), *(*C.swig_type_293)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))
+	C._wrap_WritableDatabase_compact__SWIG_6_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), *(*C.swig_type_294)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14087,7 +14323,7 @@ func (_swig_base SwigcptrWritableDatabase) Compact__SWIG_7(arg1 int, arg2 uint, 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4.Swigcptr()
-	C._wrap_WritableDatabase_compact__SWIG_7_xapian_1797894d64db9bab(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))
+	C._wrap_WritableDatabase_compact__SWIG_7_xapian_245a1afe1629f0b1(C.uintptr_t(_swig_base), C.swig_intgo(_swig_i_0), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.uintptr_t(_swig_i_3))
 }
 
 func (p SwigcptrWritableDatabase) Compact(a ...interface{}) {
@@ -14220,7 +14456,7 @@ type WritableDatabase interface {
 func Open_stub__SWIG_0(arg1 string) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_open_stub__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_294)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_open_stub__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_295)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14231,7 +14467,7 @@ func Open_stub__SWIG_1(arg1 string, arg2 int) (_swig_ret WritableDatabase) {
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_open_stub__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_295)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_open_stub__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_296)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14251,14 +14487,14 @@ func Open_stub(a ...interface{}) interface{} {
 
 func Inmemory_open() (_swig_ret WritableDatabase) {
 	var swig_r WritableDatabase
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_inmemory_open_xapian_1797894d64db9bab()))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_inmemory_open_xapian_245a1afe1629f0b1()))
 	return swig_r
 }
 
 func Chert_open__SWIG_0(arg1 string) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_chert_open__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_296)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_chert_open__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_297)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14270,7 +14506,7 @@ func Chert_open__SWIG_1(arg1 string, arg2 int, arg3 int) (_swig_ret WritableData
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_chert_open__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_297)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_chert_open__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_298)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14281,7 +14517,7 @@ func Chert_open__SWIG_2(arg1 string, arg2 int) (_swig_ret WritableDatabase) {
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_chert_open__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_298)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_chert_open__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_299)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14308,7 +14544,7 @@ func Remote_open__SWIG_0(arg1 string, arg2 uint, arg3 uint, arg4 uint) (_swig_re
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_299)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_300)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14320,7 +14556,7 @@ func Remote_open__SWIG_1(arg1 string, arg2 uint, arg3 uint) (_swig_ret Database)
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_300)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_301)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14331,7 +14567,7 @@ func Remote_open__SWIG_2(arg1 string, arg2 uint) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_301)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_302)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14345,7 +14581,7 @@ func Remote_open_writable__SWIG_0(arg1 string, arg2 uint, arg3 uint, arg4 uint, 
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
 	_swig_i_4 := arg5
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_0_xapian_1797894d64db9bab(*(*C.swig_type_302)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.swig_intgo(_swig_i_4))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_0_xapian_245a1afe1629f0b1(*(*C.swig_type_303)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3), C.swig_intgo(_swig_i_4))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14358,7 +14594,7 @@ func Remote_open_writable__SWIG_1(arg1 string, arg2 uint, arg3 uint, arg4 uint) 
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_1_xapian_1797894d64db9bab(*(*C.swig_type_303)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_1_xapian_245a1afe1629f0b1(*(*C.swig_type_304)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14370,7 +14606,7 @@ func Remote_open_writable__SWIG_2(arg1 string, arg2 uint, arg3 uint) (_swig_ret 
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_2_xapian_1797894d64db9bab(*(*C.swig_type_304)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_2_xapian_245a1afe1629f0b1(*(*C.swig_type_305)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14381,7 +14617,7 @@ func Remote_open_writable__SWIG_3(arg1 string, arg2 uint) (_swig_ret WritableDat
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_3_xapian_1797894d64db9bab(*(*C.swig_type_305)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_3_xapian_245a1afe1629f0b1(*(*C.swig_type_306)(unsafe.Pointer(&_swig_i_0)), C.swig_intgo(_swig_i_1))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14393,7 +14629,7 @@ func Remote_open__SWIG_3(arg1 string, arg2 string, arg3 uint) (_swig_ret Databas
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_3_xapian_1797894d64db9bab(*(*C.swig_type_306)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_307)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_3_xapian_245a1afe1629f0b1(*(*C.swig_type_307)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_308)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14407,7 +14643,7 @@ func Remote_open__SWIG_4(arg1 string, arg2 string) (_swig_ret Database) {
 	var swig_r Database
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_4_xapian_1797894d64db9bab(*(*C.swig_type_308)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_309)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (Database)(SwigcptrDatabase(C._wrap_remote_open__SWIG_4_xapian_245a1afe1629f0b1(*(*C.swig_type_309)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_310)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14451,7 +14687,7 @@ func Remote_open_writable__SWIG_4(arg1 string, arg2 string, arg3 uint, arg4 int)
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
 	_swig_i_3 := arg4
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_4_xapian_1797894d64db9bab(*(*C.swig_type_310)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_311)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_4_xapian_245a1afe1629f0b1(*(*C.swig_type_311)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_312)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2), C.swig_intgo(_swig_i_3))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14466,7 +14702,7 @@ func Remote_open_writable__SWIG_5(arg1 string, arg2 string, arg3 uint) (_swig_re
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
 	_swig_i_2 := arg3
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_5_xapian_1797894d64db9bab(*(*C.swig_type_312)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_313)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_5_xapian_245a1afe1629f0b1(*(*C.swig_type_313)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_314)(unsafe.Pointer(&_swig_i_1)), C.swig_intgo(_swig_i_2))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14480,7 +14716,7 @@ func Remote_open_writable__SWIG_6(arg1 string, arg2 string) (_swig_ret WritableD
 	var swig_r WritableDatabase
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_6_xapian_1797894d64db9bab(*(*C.swig_type_314)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_315)(unsafe.Pointer(&_swig_i_1)))))
+	swig_r = (WritableDatabase)(SwigcptrWritableDatabase(C._wrap_remote_open_writable__SWIG_6_xapian_245a1afe1629f0b1(*(*C.swig_type_315)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_316)(unsafe.Pointer(&_swig_i_1)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg1
 	}
@@ -14531,24 +14767,6 @@ check_5:
 	panic("No match for overloaded function call")
 }
 
-type SwigcptrXapian_MSetIterator uintptr
-type Xapian_MSetIterator interface {
-	Swigcptr() uintptr
-}
-
-func (p SwigcptrXapian_MSetIterator) Swigcptr() uintptr {
-	return uintptr(p)
-}
-
-type SwigcptrMSetIterator uintptr
-type MSetIterator interface {
-	Swigcptr() uintptr
-}
-
-func (p SwigcptrMSetIterator) Swigcptr() uintptr {
-	return uintptr(p)
-}
-
 type SwigcptrSwigDirector_Compactor uintptr
 type SwigDirector_Compactor interface {
 	Swigcptr() uintptr
@@ -14564,15 +14782,6 @@ type XAPIAN_REVISION_TYPE interface {
 }
 
 func (p SwigcptrXAPIAN_REVISION_TYPE) Swigcptr() uintptr {
-	return uintptr(p)
-}
-
-type SwigcptrESet uintptr
-type ESet interface {
-	Swigcptr() uintptr
-}
-
-func (p SwigcptrESet) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
@@ -14600,15 +14809,6 @@ type SwigDirector_Stopper interface {
 }
 
 func (p SwigcptrSwigDirector_Stopper) Swigcptr() uintptr {
-	return uintptr(p)
-}
-
-type SwigcptrMSet uintptr
-type MSet interface {
-	Swigcptr() uintptr
-}
-
-func (p SwigcptrMSet) Swigcptr() uintptr {
 	return uintptr(p)
 }
 

@@ -1,5 +1,3 @@
-
-
 /** White space escape **/
 !whitespace : '\t' | '\n' | '\r' | ' ' ;
 
@@ -37,7 +35,7 @@ _letter :  'a'-'z' | 'A'-'Z';
 int64 : ['-']'1'-'9' {_digit} ;
 
 /** float number **/
-float64 : ['-'][[{_digit}] '.'] {_digit}  [_exponent] ;
+float64 : ['-'][[{_digit}] '.'] {_digit}  /*[_exponent]*/ ; // TODO clash with id rule.
 
 /** String **/
 string :  '"' {_esc_seq | _esc_string | _letter | _symbol | _digit | _group | _separator | _ponctuation | _accent | ' '} '"';

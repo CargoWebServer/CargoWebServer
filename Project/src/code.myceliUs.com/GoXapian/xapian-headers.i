@@ -267,6 +267,7 @@ STANDARD_IGNORES(Xapian, MSet)
 	return self->convert_to_percent((*self)[i]);
     }
 }
+
 STANDARD_IGNORES(Xapian, ESet)
 %ignore Xapian::ESet::operator[];
 STANDARD_IGNORES(Xapian, RSet)

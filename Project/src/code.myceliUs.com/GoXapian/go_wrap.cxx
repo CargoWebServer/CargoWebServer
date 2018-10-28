@@ -166,6 +166,7 @@ template <typename T> T SwigValueInit() {
 #include <sys/types.h>
 
 
+
 typedef long long intgo;
 typedef unsigned long long uintgo;
 
@@ -237,6 +238,27 @@ static _gostring_ Swig_AllocateString(const char *p, size_t l) {
 static void Swig_free(void* p) {
   free(p);
 }
+
+
+/* go.i: SWIG interface file for the Go bindings
+ *
+ * Copyright (c) 2005,2006,2008,2009,2011,2012,2018 Olly Betts
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
+ * USA
+ */
 
 
 /** @file xapian-head.i
@@ -338,6 +360,32 @@ namespace Xapian {
 
 #include <utility>
 
+SWIGINTERN Xapian::docid Xapian_MSet_get_docid(Xapian::MSet const *self,Xapian::doccount i){
+	return *(*self)[i];
+    }
+SWIGINTERN Xapian::Document Xapian_MSet_get_document(Xapian::MSet const *self,Xapian::doccount i){
+	return (*self)[i].get_document();
+    }
+SWIGINTERN Xapian::MSetIterator Xapian_MSet_get_hit(Xapian::MSet const *self,Xapian::doccount i){
+	return (*self)[i];
+    }
+SWIGINTERN Xapian::percent Xapian_MSet_get_document_percentage(Xapian::MSet const *self,Xapian::doccount i){
+	return self->convert_to_percent((*self)[i]);
+    }
+SWIGINTERN int Xapian_MSet_size(Xapian::MSet const *self){
+		return self->size();
+	}
+SWIGINTERN bool Xapian_MSetIterator_equals(Xapian::MSetIterator const *self,Xapian::MSetIterator const &o){ return *self == o; }
+SWIGINTERN Xapian::docid Xapian_MSetIterator_get_docid(Xapian::MSetIterator const *self){ return **self; }
+SWIGINTERN void Xapian_MSetIterator_next(Xapian::MSetIterator *self){ ++(*self); }
+SWIGINTERN void Xapian_MSetIterator_prev(Xapian::MSetIterator *self){ --(*self); }
+SWIGINTERN Xapian::Document Xapian_MSetIterator_get_document(Xapian::MSetIterator const *self){
+		return self->get_document();
+	}
+SWIGINTERN bool Xapian_ESetIterator_equals(Xapian::ESetIterator const *self,Xapian::ESetIterator const &o){ return *self == o; }
+SWIGINTERN std::string Xapian_ESetIterator_get_term(Xapian::ESetIterator const *self){ return **self; }
+SWIGINTERN void Xapian_ESetIterator_next(Xapian::ESetIterator *self){ ++(*self); }
+SWIGINTERN void Xapian_ESetIterator_prev(Xapian::ESetIterator *self){ --(*self); }
 
 /* xapian-headers.i: Getting SWIG to parse Xapian's C++ headers.
  *
@@ -458,31 +506,31 @@ SwigDirector_StemImplementation::SwigDirector_StemImplementation(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_StemImplementation_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_StemImplementation_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_StemImplementation::~SwigDirector_StemImplementation()
 {
-  Swiggo_DeleteDirector_StemImplementation_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_StemImplementation_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" _gostring_ Swig_DirectorStemImplementation_callback_Apply_xapian_1797894d64db9bab(int, _gostring_ word);
+extern "C" _gostring_ Swig_DirectorStemImplementation_callback_Apply_xapian_245a1afe1629f0b1(int, _gostring_ word);
 std::string SwigDirector_StemImplementation::operator ()(std::string const &word) {
   std::string c_result;
   _gostring_ result;
   _gostring_ swig_word;
   
   swig_word = Swig_AllocateString((&word)->data(), (&word)->length()); 
-  result = Swig_DirectorStemImplementation_callback_Apply_xapian_1797894d64db9bab(go_val, swig_word);
+  result = Swig_DirectorStemImplementation_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_word);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
 
-extern "C" _gostring_ Swig_DirectorStemImplementation_callback_get_description_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorStemImplementation_callback_get_description_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_StemImplementation::get_description() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorStemImplementation_callback_get_description_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorStemImplementation_callback_get_description_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
@@ -492,22 +540,22 @@ SwigDirector_MatchDecider::SwigDirector_MatchDecider(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" bool Swig_DirectorMatchDecider_callback_Apply_xapian_1797894d64db9bab(int, Xapian::Document *doc);
+extern "C" bool Swig_DirectorMatchDecider_callback_Apply_xapian_245a1afe1629f0b1(int, Xapian::Document *doc);
 bool SwigDirector_MatchDecider::operator ()(Xapian::Document const &doc) const {
   bool c_result;
   bool result;
   Xapian::Document *swig_doc;
   
   swig_doc = (Xapian::Document *)&doc; 
-  result = Swig_DirectorMatchDecider_callback_Apply_xapian_1797894d64db9bab(go_val, swig_doc);
+  result = Swig_DirectorMatchDecider_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_doc);
   c_result = (bool)result; 
   return c_result;
 }
 
-extern "C" void Swiggo_DeleteDirector_MatchDecider_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_MatchDecider_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_MatchDecider::~SwigDirector_MatchDecider()
 {
-  Swiggo_DeleteDirector_MatchDecider_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_MatchDecider_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
@@ -516,22 +564,22 @@ SwigDirector_ExpandDecider::SwigDirector_ExpandDecider(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" bool Swig_DirectorExpandDecider_callback_Apply_xapian_1797894d64db9bab(int, _gostring_ term);
+extern "C" bool Swig_DirectorExpandDecider_callback_Apply_xapian_245a1afe1629f0b1(int, _gostring_ term);
 bool SwigDirector_ExpandDecider::operator ()(std::string const &term) const {
   bool c_result;
   bool result;
   _gostring_ swig_term;
   
   swig_term = Swig_AllocateString((&term)->data(), (&term)->length()); 
-  result = Swig_DirectorExpandDecider_callback_Apply_xapian_1797894d64db9bab(go_val, swig_term);
+  result = Swig_DirectorExpandDecider_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_term);
   c_result = (bool)result; 
   return c_result;
 }
 
-extern "C" void Swiggo_DeleteDirector_ExpandDecider_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_ExpandDecider_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_ExpandDecider::~SwigDirector_ExpandDecider()
 {
-  Swiggo_DeleteDirector_ExpandDecider_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_ExpandDecider_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
@@ -540,22 +588,22 @@ SwigDirector_KeyMaker::SwigDirector_KeyMaker(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" _gostring_ Swig_DirectorKeyMaker_callback_Apply_xapian_1797894d64db9bab(int, Xapian::Document *doc);
+extern "C" _gostring_ Swig_DirectorKeyMaker_callback_Apply_xapian_245a1afe1629f0b1(int, Xapian::Document *doc);
 std::string SwigDirector_KeyMaker::operator ()(Xapian::Document const &doc) const {
   std::string c_result;
   _gostring_ result;
   Xapian::Document *swig_doc;
   
   swig_doc = (Xapian::Document *)&doc; 
-  result = Swig_DirectorKeyMaker_callback_Apply_xapian_1797894d64db9bab(go_val, swig_doc);
+  result = Swig_DirectorKeyMaker_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_doc);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
 
-extern "C" void Swiggo_DeleteDirector_KeyMaker_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_KeyMaker_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_KeyMaker::~SwigDirector_KeyMaker()
 {
-  Swiggo_DeleteDirector_KeyMaker_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_KeyMaker_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
@@ -564,31 +612,31 @@ SwigDirector_Stopper::SwigDirector_Stopper(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" bool Swig_DirectorStopper_callback_Apply_xapian_1797894d64db9bab(int, _gostring_ term);
+extern "C" bool Swig_DirectorStopper_callback_Apply_xapian_245a1afe1629f0b1(int, _gostring_ term);
 bool SwigDirector_Stopper::operator ()(std::string const &term) const {
   bool c_result;
   bool result;
   _gostring_ swig_term;
   
   swig_term = Swig_AllocateString((&term)->data(), (&term)->length()); 
-  result = Swig_DirectorStopper_callback_Apply_xapian_1797894d64db9bab(go_val, swig_term);
+  result = Swig_DirectorStopper_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_term);
   c_result = (bool)result; 
   return c_result;
 }
 
-extern "C" void Swiggo_DeleteDirector_Stopper_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_Stopper_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_Stopper::~SwigDirector_Stopper()
 {
-  Swiggo_DeleteDirector_Stopper_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_Stopper_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" _gostring_ Swig_DirectorStopper_callback_get_description_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorStopper_callback_get_description_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_Stopper::get_description() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorStopper_callback_get_description_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorStopper_callback_get_description_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
@@ -598,14 +646,14 @@ SwigDirector_ValueRangeProcessor::SwigDirector_ValueRangeProcessor(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_ValueRangeProcessor_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_ValueRangeProcessor_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_ValueRangeProcessor::~SwigDirector_ValueRangeProcessor()
 {
-  Swiggo_DeleteDirector_ValueRangeProcessor_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_ValueRangeProcessor_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" intgo Swig_DirectorValueRangeProcessor_callback_Apply_xapian_1797894d64db9bab(int, std::string *begin, std::string *end);
+extern "C" intgo Swig_DirectorValueRangeProcessor_callback_Apply_xapian_245a1afe1629f0b1(int, std::string *begin, std::string *end);
 Xapian::valueno SwigDirector_ValueRangeProcessor::operator ()(std::string &begin, std::string &end) {
   Xapian::valueno c_result;
   intgo result;
@@ -614,7 +662,7 @@ Xapian::valueno SwigDirector_ValueRangeProcessor::operator ()(std::string &begin
   
   swig_begin = (std::string *)&begin; 
   swig_end = (std::string *)&end; 
-  result = Swig_DirectorValueRangeProcessor_callback_Apply_xapian_1797894d64db9bab(go_val, swig_begin, swig_end);
+  result = Swig_DirectorValueRangeProcessor_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_begin, swig_end);
   c_result = (Xapian::valueno)result; 
   return c_result;
 }
@@ -624,21 +672,21 @@ SwigDirector_FieldProcessor::SwigDirector_FieldProcessor(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_FieldProcessor_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_FieldProcessor_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_FieldProcessor::~SwigDirector_FieldProcessor()
 {
-  Swiggo_DeleteDirector_FieldProcessor_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_FieldProcessor_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" Xapian::Query *Swig_DirectorFieldProcessor_callback_Apply_xapian_1797894d64db9bab(int, _gostring_ str);
+extern "C" Xapian::Query *Swig_DirectorFieldProcessor_callback_Apply_xapian_245a1afe1629f0b1(int, _gostring_ str);
 Xapian::Query SwigDirector_FieldProcessor::operator ()(std::string const &str) {
   Xapian::Query c_result;
   Xapian::Query *result;
   _gostring_ swig_str;
   
   swig_str = Swig_AllocateString((&str)->data(), (&str)->length()); 
-  result = Swig_DirectorFieldProcessor_callback_Apply_xapian_1797894d64db9bab(go_val, swig_str);
+  result = Swig_DirectorFieldProcessor_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_str);
   c_result = *(Xapian::Query *)result; 
   return c_result;
 }
@@ -648,21 +696,21 @@ SwigDirector_Compactor::SwigDirector_Compactor(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_Compactor_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_Compactor_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_Compactor::~SwigDirector_Compactor()
 {
-  Swiggo_DeleteDirector_Compactor_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_Compactor_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" void Swig_DirectorCompactor_callback_set_status_xapian_1797894d64db9bab(int, _gostring_ arg2, _gostring_ arg3);
+extern "C" void Swig_DirectorCompactor_callback_set_status_xapian_245a1afe1629f0b1(int, _gostring_ arg2, _gostring_ arg3);
 void SwigDirector_Compactor::set_status(std::string const &table, std::string const &status) {
   _gostring_ swig_arg2;
   _gostring_ swig_arg3;
   
   swig_arg2 = Swig_AllocateString((&table)->data(), (&table)->length()); 
   swig_arg3 = Swig_AllocateString((&status)->data(), (&status)->length()); 
-  Swig_DirectorCompactor_callback_set_status_xapian_1797894d64db9bab(go_val, swig_arg2, swig_arg3);
+  Swig_DirectorCompactor_callback_set_status_xapian_245a1afe1629f0b1(go_val, swig_arg2, swig_arg3);
 }
 
 SwigDirector_PostingSource::SwigDirector_PostingSource(int swig_p)
@@ -670,82 +718,82 @@ SwigDirector_PostingSource::SwigDirector_PostingSource(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_PostingSource_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_PostingSource_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_PostingSource::~SwigDirector_PostingSource()
 {
-  Swiggo_DeleteDirector_PostingSource_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_PostingSource_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_1797894d64db9bab(int);
+extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_245a1afe1629f0b1(int);
 Xapian::doccount SwigDirector_PostingSource::get_termfreq_min() const {
   Xapian::doccount c_result;
   intgo result;
   
-  result = Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_termfreq_min_xapian_245a1afe1629f0b1(go_val);
   c_result = (Xapian::doccount)result; 
   return c_result;
 }
 
-extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_1797894d64db9bab(int);
+extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_245a1afe1629f0b1(int);
 Xapian::doccount SwigDirector_PostingSource::get_termfreq_est() const {
   Xapian::doccount c_result;
   intgo result;
   
-  result = Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_termfreq_est_xapian_245a1afe1629f0b1(go_val);
   c_result = (Xapian::doccount)result; 
   return c_result;
 }
 
-extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_1797894d64db9bab(int);
+extern "C" intgo Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_245a1afe1629f0b1(int);
 Xapian::doccount SwigDirector_PostingSource::get_termfreq_max() const {
   Xapian::doccount c_result;
   intgo result;
   
-  result = Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_termfreq_max_xapian_245a1afe1629f0b1(go_val);
   c_result = (Xapian::doccount)result; 
   return c_result;
 }
 
-extern "C" double Swig_DirectorPostingSource_callback_get_weight_xapian_1797894d64db9bab(int);
+extern "C" double Swig_DirectorPostingSource_callback_get_weight_xapian_245a1afe1629f0b1(int);
 double SwigDirector_PostingSource::get_weight() const {
   double c_result;
   double result;
   
-  result = Swig_DirectorPostingSource_callback_get_weight_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_weight_xapian_245a1afe1629f0b1(go_val);
   c_result = (double)result; 
   return c_result;
 }
 
-extern "C" intgo Swig_DirectorPostingSource_callback_get_docid_xapian_1797894d64db9bab(int);
+extern "C" intgo Swig_DirectorPostingSource_callback_get_docid_xapian_245a1afe1629f0b1(int);
 Xapian::docid SwigDirector_PostingSource::get_docid() const {
   Xapian::docid c_result;
   intgo result;
   
-  result = Swig_DirectorPostingSource_callback_get_docid_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_docid_xapian_245a1afe1629f0b1(go_val);
   c_result = (Xapian::docid)result; 
   return c_result;
 }
 
-extern "C" void Swig_DirectorPostingSource_callback_next_xapian_1797894d64db9bab(int, double min_wt);
+extern "C" void Swig_DirectorPostingSource_callback_next_xapian_245a1afe1629f0b1(int, double min_wt);
 void SwigDirector_PostingSource::next(double min_wt) {
   double swig_min_wt;
   
   swig_min_wt = (double)min_wt; 
-  Swig_DirectorPostingSource_callback_next_xapian_1797894d64db9bab(go_val, swig_min_wt);
+  Swig_DirectorPostingSource_callback_next_xapian_245a1afe1629f0b1(go_val, swig_min_wt);
 }
 
-extern "C" void Swig_DirectorPostingSource_callback_skip_to_xapian_1797894d64db9bab(int, intgo arg2, double arg3);
+extern "C" void Swig_DirectorPostingSource_callback_skip_to_xapian_245a1afe1629f0b1(int, intgo arg2, double arg3);
 void SwigDirector_PostingSource::skip_to(Xapian::docid did, double min_wt) {
   intgo swig_arg2;
   double swig_arg3;
   
   swig_arg2 = (Xapian::docid)did; 
   swig_arg3 = (double)min_wt; 
-  Swig_DirectorPostingSource_callback_skip_to_xapian_1797894d64db9bab(go_val, swig_arg2, swig_arg3);
+  Swig_DirectorPostingSource_callback_skip_to_xapian_245a1afe1629f0b1(go_val, swig_arg2, swig_arg3);
 }
 
-extern "C" bool Swig_DirectorPostingSource_callback_check_xapian_1797894d64db9bab(int, intgo arg2, double arg3);
+extern "C" bool Swig_DirectorPostingSource_callback_check_xapian_245a1afe1629f0b1(int, intgo arg2, double arg3);
 bool SwigDirector_PostingSource::check(Xapian::docid did, double min_wt) {
   bool c_result;
   bool result;
@@ -754,45 +802,45 @@ bool SwigDirector_PostingSource::check(Xapian::docid did, double min_wt) {
   
   swig_arg2 = (Xapian::docid)did; 
   swig_arg3 = (double)min_wt; 
-  result = Swig_DirectorPostingSource_callback_check_xapian_1797894d64db9bab(go_val, swig_arg2, swig_arg3);
+  result = Swig_DirectorPostingSource_callback_check_xapian_245a1afe1629f0b1(go_val, swig_arg2, swig_arg3);
   c_result = (bool)result; 
   return c_result;
 }
 
-extern "C" bool Swig_DirectorPostingSource_callback_at_end_xapian_1797894d64db9bab(int);
+extern "C" bool Swig_DirectorPostingSource_callback_at_end_xapian_245a1afe1629f0b1(int);
 bool SwigDirector_PostingSource::at_end() const {
   bool c_result;
   bool result;
   
-  result = Swig_DirectorPostingSource_callback_at_end_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_at_end_xapian_245a1afe1629f0b1(go_val);
   c_result = (bool)result; 
   return c_result;
 }
 
-extern "C" _gostring_ Swig_DirectorPostingSource_callback_name_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorPostingSource_callback_name_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_PostingSource::name() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorPostingSource_callback_name_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_name_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
 
-extern "C" void Swig_DirectorPostingSource_callback_init_xapian_1797894d64db9bab(int, Xapian::Database *db);
+extern "C" void Swig_DirectorPostingSource_callback_init_xapian_245a1afe1629f0b1(int, Xapian::Database *db);
 void SwigDirector_PostingSource::init(Xapian::Database const &db) {
   Xapian::Database *swig_db;
   
   swig_db = (Xapian::Database *)&db; 
-  Swig_DirectorPostingSource_callback_init_xapian_1797894d64db9bab(go_val, swig_db);
+  Swig_DirectorPostingSource_callback_init_xapian_245a1afe1629f0b1(go_val, swig_db);
 }
 
-extern "C" _gostring_ Swig_DirectorPostingSource_callback_get_description_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorPostingSource_callback_get_description_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_PostingSource::get_description() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorPostingSource_callback_get_description_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorPostingSource_callback_get_description_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
@@ -802,47 +850,47 @@ SwigDirector_MatchSpy::SwigDirector_MatchSpy(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_MatchSpy_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_MatchSpy_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_MatchSpy::~SwigDirector_MatchSpy()
 {
-  Swiggo_DeleteDirector_MatchSpy_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_MatchSpy_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" void Swig_DirectorMatchSpy_callback_Apply_xapian_1797894d64db9bab(int, Xapian::Document *doc, double wt);
+extern "C" void Swig_DirectorMatchSpy_callback_Apply_xapian_245a1afe1629f0b1(int, Xapian::Document *doc, double wt);
 void SwigDirector_MatchSpy::operator ()(Xapian::Document const &doc, double wt) {
   Xapian::Document *swig_doc;
   double swig_wt;
   
   swig_doc = (Xapian::Document *)&doc; 
   swig_wt = (double)wt; 
-  Swig_DirectorMatchSpy_callback_Apply_xapian_1797894d64db9bab(go_val, swig_doc, swig_wt);
+  Swig_DirectorMatchSpy_callback_Apply_xapian_245a1afe1629f0b1(go_val, swig_doc, swig_wt);
 }
 
-extern "C" _gostring_ Swig_DirectorMatchSpy_callback_name_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorMatchSpy_callback_name_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_MatchSpy::name() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorMatchSpy_callback_name_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorMatchSpy_callback_name_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
 
-extern "C" void Swig_DirectorMatchSpy_callback_merge_results_xapian_1797894d64db9bab(int, _gostring_ arg2);
+extern "C" void Swig_DirectorMatchSpy_callback_merge_results_xapian_245a1afe1629f0b1(int, _gostring_ arg2);
 void SwigDirector_MatchSpy::merge_results(std::string const &serialised) {
   _gostring_ swig_arg2;
   
   swig_arg2 = Swig_AllocateString((&serialised)->data(), (&serialised)->length()); 
-  Swig_DirectorMatchSpy_callback_merge_results_xapian_1797894d64db9bab(go_val, swig_arg2);
+  Swig_DirectorMatchSpy_callback_merge_results_xapian_245a1afe1629f0b1(go_val, swig_arg2);
 }
 
-extern "C" _gostring_ Swig_DirectorMatchSpy_callback_get_description_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorMatchSpy_callback_get_description_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_MatchSpy::get_description() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorMatchSpy_callback_get_description_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorMatchSpy_callback_get_description_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
@@ -852,14 +900,14 @@ SwigDirector_LatLongMetric::SwigDirector_LatLongMetric(int swig_p)
       go_val(swig_p), swig_mem(0)
 { }
 
-extern "C" void Swiggo_DeleteDirector_LatLongMetric_xapian_1797894d64db9bab(intgo);
+extern "C" void Swiggo_DeleteDirector_LatLongMetric_xapian_245a1afe1629f0b1(intgo);
 SwigDirector_LatLongMetric::~SwigDirector_LatLongMetric()
 {
-  Swiggo_DeleteDirector_LatLongMetric_xapian_1797894d64db9bab(go_val);
+  Swiggo_DeleteDirector_LatLongMetric_xapian_245a1afe1629f0b1(go_val);
   delete swig_mem;
 }
 
-extern "C" double Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_1797894d64db9bab(int, Xapian::LatLongCoord *a, Xapian::LatLongCoord *b);
+extern "C" double Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_245a1afe1629f0b1(int, Xapian::LatLongCoord *a, Xapian::LatLongCoord *b);
 double SwigDirector_LatLongMetric::pointwise_distance(Xapian::LatLongCoord const &a, Xapian::LatLongCoord const &b) const {
   double c_result;
   double result;
@@ -868,7 +916,7 @@ double SwigDirector_LatLongMetric::pointwise_distance(Xapian::LatLongCoord const
   
   swig_a = (Xapian::LatLongCoord *)&a; 
   swig_b = (Xapian::LatLongCoord *)&b; 
-  result = Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_1797894d64db9bab(go_val, swig_a, swig_b);
+  result = Swig_DirectorLatLongMetric_callback_pointwise_distance_xapian_245a1afe1629f0b1(go_val, swig_a, swig_b);
   c_result = (double)result; 
   return c_result;
 }
@@ -880,12 +928,12 @@ Xapian::LatLongMetric *SwigDirector_LatLongMetric::clone() const {
   return c_result;
 }
 
-extern "C" _gostring_ Swig_DirectorLatLongMetric_callback_name_xapian_1797894d64db9bab(int);
+extern "C" _gostring_ Swig_DirectorLatLongMetric_callback_name_xapian_245a1afe1629f0b1(int);
 std::string SwigDirector_LatLongMetric::name() const {
   std::string c_result;
   _gostring_ result;
   
-  result = Swig_DirectorLatLongMetric_callback_name_xapian_1797894d64db9bab(go_val);
+  result = Swig_DirectorLatLongMetric_callback_name_xapian_245a1afe1629f0b1(go_val);
   c_result.assign(result.p, result.n); 
   return c_result;
 }
@@ -908,7 +956,7 @@ Xapian::LatLongMetric *SwigDirector_LatLongMetric::unserialise(std::string const
 extern "C" {
 #endif
 
-void _wrap_Swig_free_xapian_1797894d64db9bab(void *_swig_go_0) {
+void _wrap_Swig_free_xapian_245a1afe1629f0b1(void *_swig_go_0) {
   void *arg1 = (void *) 0 ;
   
   arg1 = *(void **)&_swig_go_0; 
@@ -918,7 +966,273 @@ void _wrap_Swig_free_xapian_1797894d64db9bab(void *_swig_go_0) {
 }
 
 
-_gostring_ _wrap_version_string_xapian_1797894d64db9bab() {
+intgo _wrap_MSet_get_docid_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0, intgo _swig_go_1) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  Xapian::doccount arg2 ;
+  Xapian::docid result;
+  intgo _swig_go_result;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  arg2 = (Xapian::doccount)_swig_go_1; 
+  
+  result = (Xapian::docid)Xapian_MSet_get_docid((Xapian::MSet const *)arg1,arg2);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+Xapian::Document *_wrap_MSet_get_document_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0, intgo _swig_go_1) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  Xapian::doccount arg2 ;
+  Xapian::Document result;
+  Xapian::Document *_swig_go_result;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  arg2 = (Xapian::doccount)_swig_go_1; 
+  
+  result = Xapian_MSet_get_document((Xapian::MSet const *)arg1,arg2);
+  *(Xapian::Document **)&_swig_go_result = new Xapian::Document(result); 
+  return _swig_go_result;
+}
+
+
+Xapian::MSetIterator *_wrap_MSet_get_hit_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0, intgo _swig_go_1) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  Xapian::doccount arg2 ;
+  Xapian::MSetIterator result;
+  Xapian::MSetIterator *_swig_go_result;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  arg2 = (Xapian::doccount)_swig_go_1; 
+  
+  result = Xapian_MSet_get_hit((Xapian::MSet const *)arg1,arg2);
+  *(Xapian::MSetIterator **)&_swig_go_result = new Xapian::MSetIterator(result); 
+  return _swig_go_result;
+}
+
+
+intgo _wrap_MSet_get_document_percentage_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0, intgo _swig_go_1) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  Xapian::doccount arg2 ;
+  Xapian::percent result;
+  intgo _swig_go_result;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  arg2 = (Xapian::doccount)_swig_go_1; 
+  
+  result = (Xapian::percent)Xapian_MSet_get_document_percentage((Xapian::MSet const *)arg1,arg2);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+intgo _wrap_MSet_size_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  int result;
+  intgo _swig_go_result;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  
+  result = (int)Xapian_MSet_size((Xapian::MSet const *)arg1);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+Xapian::MSet *_wrap_new_MSet_xapian_245a1afe1629f0b1() {
+  Xapian::MSet *result = 0 ;
+  Xapian::MSet *_swig_go_result;
+  
+  
+  result = (Xapian::MSet *)new Xapian::MSet();
+  *(Xapian::MSet **)&_swig_go_result = (Xapian::MSet *)result; 
+  return _swig_go_result;
+}
+
+
+void _wrap_delete_MSet_xapian_245a1afe1629f0b1(Xapian::MSet *_swig_go_0) {
+  Xapian::MSet *arg1 = (Xapian::MSet *) 0 ;
+  
+  arg1 = *(Xapian::MSet **)&_swig_go_0; 
+  
+  delete arg1;
+  
+}
+
+
+Xapian::ESet *_wrap_new_ESet_xapian_245a1afe1629f0b1() {
+  Xapian::ESet *result = 0 ;
+  Xapian::ESet *_swig_go_result;
+  
+  
+  result = (Xapian::ESet *)new Xapian::ESet();
+  *(Xapian::ESet **)&_swig_go_result = (Xapian::ESet *)result; 
+  return _swig_go_result;
+}
+
+
+void _wrap_delete_ESet_xapian_245a1afe1629f0b1(Xapian::ESet *_swig_go_0) {
+  Xapian::ESet *arg1 = (Xapian::ESet *) 0 ;
+  
+  arg1 = *(Xapian::ESet **)&_swig_go_0; 
+  
+  delete arg1;
+  
+}
+
+
+bool _wrap_MSetIterator_equals_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  Xapian::MSetIterator *arg2 = 0 ;
+  bool result;
+  bool _swig_go_result;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  arg2 = *(Xapian::MSetIterator **)&_swig_go_1; 
+  
+  result = (bool)Xapian_MSetIterator_equals((Xapian::MSetIterator const *)arg1,(Xapian::MSetIterator const &)*arg2);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+intgo _wrap_MSetIterator_get_docid_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  Xapian::docid result;
+  intgo _swig_go_result;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  
+  result = (Xapian::docid)Xapian_MSetIterator_get_docid((Xapian::MSetIterator const *)arg1);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+void _wrap_MSetIterator_next_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  
+  Xapian_MSetIterator_next(arg1);
+  
+}
+
+
+void _wrap_MSetIterator_prev_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  
+  Xapian_MSetIterator_prev(arg1);
+  
+}
+
+
+Xapian::Document *_wrap_MSetIterator_get_document_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  Xapian::Document result;
+  Xapian::Document *_swig_go_result;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  
+  result = Xapian_MSetIterator_get_document((Xapian::MSetIterator const *)arg1);
+  *(Xapian::Document **)&_swig_go_result = new Xapian::Document(result); 
+  return _swig_go_result;
+}
+
+
+Xapian::MSetIterator *_wrap_new_MSetIterator_xapian_245a1afe1629f0b1() {
+  Xapian::MSetIterator *result = 0 ;
+  Xapian::MSetIterator *_swig_go_result;
+  
+  
+  result = (Xapian::MSetIterator *)new Xapian::MSetIterator();
+  *(Xapian::MSetIterator **)&_swig_go_result = (Xapian::MSetIterator *)result; 
+  return _swig_go_result;
+}
+
+
+void _wrap_delete_MSetIterator_xapian_245a1afe1629f0b1(Xapian::MSetIterator *_swig_go_0) {
+  Xapian::MSetIterator *arg1 = (Xapian::MSetIterator *) 0 ;
+  
+  arg1 = *(Xapian::MSetIterator **)&_swig_go_0; 
+  
+  delete arg1;
+  
+}
+
+
+bool _wrap_ESetIterator_equals_xapian_245a1afe1629f0b1(Xapian::ESetIterator *_swig_go_0, Xapian::ESetIterator *_swig_go_1) {
+  Xapian::ESetIterator *arg1 = (Xapian::ESetIterator *) 0 ;
+  Xapian::ESetIterator *arg2 = 0 ;
+  bool result;
+  bool _swig_go_result;
+  
+  arg1 = *(Xapian::ESetIterator **)&_swig_go_0; 
+  arg2 = *(Xapian::ESetIterator **)&_swig_go_1; 
+  
+  result = (bool)Xapian_ESetIterator_equals((Xapian::ESetIterator const *)arg1,(Xapian::ESetIterator const &)*arg2);
+  _swig_go_result = result; 
+  return _swig_go_result;
+}
+
+
+_gostring_ _wrap_ESetIterator_get_term_xapian_245a1afe1629f0b1(Xapian::ESetIterator *_swig_go_0) {
+  Xapian::ESetIterator *arg1 = (Xapian::ESetIterator *) 0 ;
+  std::string result;
+  _gostring_ _swig_go_result;
+  
+  arg1 = *(Xapian::ESetIterator **)&_swig_go_0; 
+  
+  result = Xapian_ESetIterator_get_term((Xapian::ESetIterator const *)arg1);
+  _swig_go_result = Swig_AllocateString((&result)->data(), (&result)->length()); 
+  return _swig_go_result;
+}
+
+
+void _wrap_ESetIterator_next_xapian_245a1afe1629f0b1(Xapian::ESetIterator *_swig_go_0) {
+  Xapian::ESetIterator *arg1 = (Xapian::ESetIterator *) 0 ;
+  
+  arg1 = *(Xapian::ESetIterator **)&_swig_go_0; 
+  
+  Xapian_ESetIterator_next(arg1);
+  
+}
+
+
+void _wrap_ESetIterator_prev_xapian_245a1afe1629f0b1(Xapian::ESetIterator *_swig_go_0) {
+  Xapian::ESetIterator *arg1 = (Xapian::ESetIterator *) 0 ;
+  
+  arg1 = *(Xapian::ESetIterator **)&_swig_go_0; 
+  
+  Xapian_ESetIterator_prev(arg1);
+  
+}
+
+
+Xapian::ESetIterator *_wrap_new_ESetIterator_xapian_245a1afe1629f0b1() {
+  Xapian::ESetIterator *result = 0 ;
+  Xapian::ESetIterator *_swig_go_result;
+  
+  
+  result = (Xapian::ESetIterator *)new Xapian::ESetIterator();
+  *(Xapian::ESetIterator **)&_swig_go_result = (Xapian::ESetIterator *)result; 
+  return _swig_go_result;
+}
+
+
+void _wrap_delete_ESetIterator_xapian_245a1afe1629f0b1(Xapian::ESetIterator *_swig_go_0) {
+  Xapian::ESetIterator *arg1 = (Xapian::ESetIterator *) 0 ;
+  
+  arg1 = *(Xapian::ESetIterator **)&_swig_go_0; 
+  
+  delete arg1;
+  
+}
+
+
+_gostring_ _wrap_version_string_xapian_245a1afe1629f0b1() {
   char *result = 0 ;
   _gostring_ _swig_go_result;
   
@@ -929,7 +1243,7 @@ _gostring_ _wrap_version_string_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_major_version_xapian_1797894d64db9bab() {
+intgo _wrap_major_version_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -940,7 +1254,7 @@ intgo _wrap_major_version_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_minor_version_xapian_1797894d64db9bab() {
+intgo _wrap_minor_version_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -951,7 +1265,7 @@ intgo _wrap_minor_version_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_revision_xapian_1797894d64db9bab() {
+intgo _wrap_revision_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -962,7 +1276,7 @@ intgo _wrap_revision_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_BAD_VALUENO_get_xapian_1797894d64db9bab() {
+intgo _wrap_BAD_VALUENO_get_xapian_245a1afe1629f0b1() {
   Xapian::valueno result;
   intgo _swig_go_result;
   
@@ -973,7 +1287,7 @@ intgo _wrap_BAD_VALUENO_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_CREATE_xapian_1797894d64db9bab() {
+intgo _wrap_DB_CREATE_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -985,7 +1299,7 @@ intgo _wrap_DB_CREATE_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_CREATE_OR_OPEN_xapian_1797894d64db9bab() {
+intgo _wrap_DB_CREATE_OR_OPEN_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -997,7 +1311,7 @@ intgo _wrap_DB_CREATE_OR_OPEN_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_CREATE_OR_OVERWRITE_xapian_1797894d64db9bab() {
+intgo _wrap_DB_CREATE_OR_OVERWRITE_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1009,7 +1323,7 @@ intgo _wrap_DB_CREATE_OR_OVERWRITE_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_OPEN_xapian_1797894d64db9bab() {
+intgo _wrap_DB_OPEN_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1021,7 +1335,7 @@ intgo _wrap_DB_OPEN_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_NO_SYNC_xapian_1797894d64db9bab() {
+intgo _wrap_DB_NO_SYNC_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1033,7 +1347,7 @@ intgo _wrap_DB_NO_SYNC_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_FULL_SYNC_xapian_1797894d64db9bab() {
+intgo _wrap_DB_FULL_SYNC_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1045,7 +1359,7 @@ intgo _wrap_DB_FULL_SYNC_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_DANGEROUS_xapian_1797894d64db9bab() {
+intgo _wrap_DB_DANGEROUS_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1057,7 +1371,7 @@ intgo _wrap_DB_DANGEROUS_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_NO_TERMLIST_xapian_1797894d64db9bab() {
+intgo _wrap_DB_NO_TERMLIST_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1069,7 +1383,7 @@ intgo _wrap_DB_NO_TERMLIST_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_BACKEND_CHERT_xapian_1797894d64db9bab() {
+intgo _wrap_DB_BACKEND_CHERT_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1081,7 +1395,7 @@ intgo _wrap_DB_BACKEND_CHERT_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_BACKEND_GLASS_xapian_1797894d64db9bab() {
+intgo _wrap_DB_BACKEND_GLASS_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1093,7 +1407,7 @@ intgo _wrap_DB_BACKEND_GLASS_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_BACKEND_STUB_xapian_1797894d64db9bab() {
+intgo _wrap_DB_BACKEND_STUB_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1105,7 +1419,7 @@ intgo _wrap_DB_BACKEND_STUB_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_RETRY_LOCK_xapian_1797894d64db9bab() {
+intgo _wrap_DB_RETRY_LOCK_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1117,7 +1431,7 @@ intgo _wrap_DB_RETRY_LOCK_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCHECK_SHORT_TREE_xapian_1797894d64db9bab() {
+intgo _wrap_DBCHECK_SHORT_TREE_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1129,7 +1443,7 @@ intgo _wrap_DBCHECK_SHORT_TREE_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCHECK_FULL_TREE_xapian_1797894d64db9bab() {
+intgo _wrap_DBCHECK_FULL_TREE_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1141,7 +1455,7 @@ intgo _wrap_DBCHECK_FULL_TREE_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCHECK_SHOW_FREELIST_xapian_1797894d64db9bab() {
+intgo _wrap_DBCHECK_SHOW_FREELIST_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1153,7 +1467,7 @@ intgo _wrap_DBCHECK_SHOW_FREELIST_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCHECK_SHOW_STATS_xapian_1797894d64db9bab() {
+intgo _wrap_DBCHECK_SHOW_STATS_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1165,7 +1479,7 @@ intgo _wrap_DBCHECK_SHOW_STATS_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCHECK_FIX_xapian_1797894d64db9bab() {
+intgo _wrap_DBCHECK_FIX_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1177,7 +1491,7 @@ intgo _wrap_DBCHECK_FIX_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DB_BACKEND_INMEMORY_get_xapian_1797894d64db9bab() {
+intgo _wrap_DB_BACKEND_INMEMORY_get_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1188,7 +1502,7 @@ intgo _wrap_DB_BACKEND_INMEMORY_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCOMPACT_NO_RENUMBER_get_xapian_1797894d64db9bab() {
+intgo _wrap_DBCOMPACT_NO_RENUMBER_get_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1199,7 +1513,7 @@ intgo _wrap_DBCOMPACT_NO_RENUMBER_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCOMPACT_MULTIPASS_get_xapian_1797894d64db9bab() {
+intgo _wrap_DBCOMPACT_MULTIPASS_get_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1210,7 +1524,7 @@ intgo _wrap_DBCOMPACT_MULTIPASS_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DBCOMPACT_SINGLE_FILE_get_xapian_1797894d64db9bab() {
+intgo _wrap_DBCOMPACT_SINGLE_FILE_get_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1221,7 +1535,7 @@ intgo _wrap_DBCOMPACT_SINGLE_FILE_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DOC_ASSUME_VALID_get_xapian_1797894d64db9bab() {
+intgo _wrap_DOC_ASSUME_VALID_get_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -1232,7 +1546,7 @@ intgo _wrap_DOC_ASSUME_VALID_get_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::PositionIterator *_wrap_new_PositionIterator_xapian_1797894d64db9bab() {
+Xapian::PositionIterator *_wrap_new_PositionIterator_xapian_245a1afe1629f0b1() {
   Xapian::PositionIterator *result = 0 ;
   Xapian::PositionIterator *_swig_go_result;
   
@@ -1243,7 +1557,7 @@ Xapian::PositionIterator *_wrap_new_PositionIterator_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_PositionIterator_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0) {
+void _wrap_delete_PositionIterator_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   
   arg1 = *(Xapian::PositionIterator **)&_swig_go_0; 
@@ -1253,7 +1567,7 @@ void _wrap_delete_PositionIterator_xapian_1797894d64db9bab(Xapian::PositionItera
 }
 
 
-void _wrap_PositionIterator_skip_to_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_PositionIterator_skip_to_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0, intgo _swig_go_1) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   Xapian::termpos arg2 ;
   
@@ -1265,7 +1579,7 @@ void _wrap_PositionIterator_skip_to_xapian_1797894d64db9bab(Xapian::PositionIter
 }
 
 
-_gostring_ _wrap_PositionIterator_get_description_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0) {
+_gostring_ _wrap_PositionIterator_get_description_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1278,7 +1592,7 @@ _gostring_ _wrap_PositionIterator_get_description_xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_PositionIterator_equals_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0, Xapian::PositionIterator *_swig_go_1) {
+bool _wrap_PositionIterator_equals_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0, Xapian::PositionIterator *_swig_go_1) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   Xapian::PositionIterator *arg2 = 0 ;
   bool result;
@@ -1293,7 +1607,7 @@ bool _wrap_PositionIterator_equals_xapian_1797894d64db9bab(Xapian::PositionItera
 }
 
 
-intgo _wrap_PositionIterator_get_termpos_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0) {
+intgo _wrap_PositionIterator_get_termpos_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   Xapian::termpos result;
   intgo _swig_go_result;
@@ -1306,7 +1620,7 @@ intgo _wrap_PositionIterator_get_termpos_xapian_1797894d64db9bab(Xapian::Positio
 }
 
 
-void _wrap_PositionIterator_next_xapian_1797894d64db9bab(Xapian::PositionIterator *_swig_go_0) {
+void _wrap_PositionIterator_next_xapian_245a1afe1629f0b1(Xapian::PositionIterator *_swig_go_0) {
   Xapian::PositionIterator *arg1 = (Xapian::PositionIterator *) 0 ;
   
   arg1 = *(Xapian::PositionIterator **)&_swig_go_0; 
@@ -1316,7 +1630,7 @@ void _wrap_PositionIterator_next_xapian_1797894d64db9bab(Xapian::PositionIterato
 }
 
 
-Xapian::PostingIterator *_wrap_new_PostingIterator_xapian_1797894d64db9bab() {
+Xapian::PostingIterator *_wrap_new_PostingIterator_xapian_245a1afe1629f0b1() {
   Xapian::PostingIterator *result = 0 ;
   Xapian::PostingIterator *_swig_go_result;
   
@@ -1327,7 +1641,7 @@ Xapian::PostingIterator *_wrap_new_PostingIterator_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_PostingIterator_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+void _wrap_delete_PostingIterator_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   
   arg1 = *(Xapian::PostingIterator **)&_swig_go_0; 
@@ -1337,7 +1651,7 @@ void _wrap_delete_PostingIterator_xapian_1797894d64db9bab(Xapian::PostingIterato
 }
 
 
-intgo _wrap_PostingIterator_get_wdf_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+intgo _wrap_PostingIterator_get_wdf_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -1350,7 +1664,7 @@ intgo _wrap_PostingIterator_get_wdf_xapian_1797894d64db9bab(Xapian::PostingItera
 }
 
 
-intgo _wrap_PostingIterator_get_doclength_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+intgo _wrap_PostingIterator_get_doclength_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -1363,7 +1677,7 @@ intgo _wrap_PostingIterator_get_doclength_xapian_1797894d64db9bab(Xapian::Postin
 }
 
 
-intgo _wrap_PostingIterator_get_unique_terms_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+intgo _wrap_PostingIterator_get_unique_terms_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -1376,7 +1690,7 @@ intgo _wrap_PostingIterator_get_unique_terms_xapian_1797894d64db9bab(Xapian::Pos
 }
 
 
-Xapian::PositionIterator *_wrap_PostingIterator_positionlist_begin_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+Xapian::PositionIterator *_wrap_PostingIterator_positionlist_begin_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::PositionIterator result;
   Xapian::PositionIterator *_swig_go_result;
@@ -1389,7 +1703,7 @@ Xapian::PositionIterator *_wrap_PostingIterator_positionlist_begin_xapian_179789
 }
 
 
-Xapian::PositionIterator *_wrap_PostingIterator_positionlist_end_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+Xapian::PositionIterator *_wrap_PostingIterator_positionlist_end_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::PositionIterator result;
   Xapian::PositionIterator *_swig_go_result;
@@ -1402,7 +1716,7 @@ Xapian::PositionIterator *_wrap_PostingIterator_positionlist_end_xapian_1797894d
 }
 
 
-void _wrap_PostingIterator_skip_to_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_PostingIterator_skip_to_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0, intgo _swig_go_1) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::docid arg2 ;
   
@@ -1414,7 +1728,7 @@ void _wrap_PostingIterator_skip_to_xapian_1797894d64db9bab(Xapian::PostingIterat
 }
 
 
-_gostring_ _wrap_PostingIterator_get_description_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+_gostring_ _wrap_PostingIterator_get_description_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1427,7 +1741,7 @@ _gostring_ _wrap_PostingIterator_get_description_xapian_1797894d64db9bab(Xapian:
 }
 
 
-bool _wrap_PostingIterator_equals_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0, Xapian::PostingIterator *_swig_go_1) {
+bool _wrap_PostingIterator_equals_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0, Xapian::PostingIterator *_swig_go_1) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::PostingIterator *arg2 = 0 ;
   bool result;
@@ -1442,7 +1756,7 @@ bool _wrap_PostingIterator_equals_xapian_1797894d64db9bab(Xapian::PostingIterato
 }
 
 
-intgo _wrap_PostingIterator_get_docid_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+intgo _wrap_PostingIterator_get_docid_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -1455,7 +1769,7 @@ intgo _wrap_PostingIterator_get_docid_xapian_1797894d64db9bab(Xapian::PostingIte
 }
 
 
-void _wrap_PostingIterator_next_xapian_1797894d64db9bab(Xapian::PostingIterator *_swig_go_0) {
+void _wrap_PostingIterator_next_xapian_245a1afe1629f0b1(Xapian::PostingIterator *_swig_go_0) {
   Xapian::PostingIterator *arg1 = (Xapian::PostingIterator *) 0 ;
   
   arg1 = *(Xapian::PostingIterator **)&_swig_go_0; 
@@ -1465,7 +1779,7 @@ void _wrap_PostingIterator_next_xapian_1797894d64db9bab(Xapian::PostingIterator 
 }
 
 
-Xapian::TermIterator *_wrap_new_TermIterator_xapian_1797894d64db9bab() {
+Xapian::TermIterator *_wrap_new_TermIterator_xapian_245a1afe1629f0b1() {
   Xapian::TermIterator *result = 0 ;
   Xapian::TermIterator *_swig_go_result;
   
@@ -1476,7 +1790,7 @@ Xapian::TermIterator *_wrap_new_TermIterator_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_TermIterator_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+void _wrap_delete_TermIterator_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   
   arg1 = *(Xapian::TermIterator **)&_swig_go_0; 
@@ -1486,7 +1800,7 @@ void _wrap_delete_TermIterator_xapian_1797894d64db9bab(Xapian::TermIterator *_sw
 }
 
 
-intgo _wrap_TermIterator_get_wdf_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+intgo _wrap_TermIterator_get_wdf_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -1499,7 +1813,7 @@ intgo _wrap_TermIterator_get_wdf_xapian_1797894d64db9bab(Xapian::TermIterator *_
 }
 
 
-intgo _wrap_TermIterator_get_termfreq_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+intgo _wrap_TermIterator_get_termfreq_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -1512,7 +1826,7 @@ intgo _wrap_TermIterator_get_termfreq_xapian_1797894d64db9bab(Xapian::TermIterat
 }
 
 
-intgo _wrap_TermIterator_positionlist_count_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+intgo _wrap_TermIterator_positionlist_count_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -1525,7 +1839,7 @@ intgo _wrap_TermIterator_positionlist_count_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-Xapian::PositionIterator *_wrap_TermIterator_positionlist_begin_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+Xapian::PositionIterator *_wrap_TermIterator_positionlist_begin_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::PositionIterator result;
   Xapian::PositionIterator *_swig_go_result;
@@ -1538,7 +1852,7 @@ Xapian::PositionIterator *_wrap_TermIterator_positionlist_begin_xapian_1797894d6
 }
 
 
-Xapian::PositionIterator *_wrap_TermIterator_positionlist_end_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+Xapian::PositionIterator *_wrap_TermIterator_positionlist_end_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::PositionIterator result;
   Xapian::PositionIterator *_swig_go_result;
@@ -1551,7 +1865,7 @@ Xapian::PositionIterator *_wrap_TermIterator_positionlist_end_xapian_1797894d64d
 }
 
 
-void _wrap_TermIterator_skip_to_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_TermIterator_skip_to_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1566,7 +1880,7 @@ void _wrap_TermIterator_skip_to_xapian_1797894d64db9bab(Xapian::TermIterator *_s
 }
 
 
-_gostring_ _wrap_TermIterator_get_description_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+_gostring_ _wrap_TermIterator_get_description_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1579,7 +1893,7 @@ _gostring_ _wrap_TermIterator_get_description_xapian_1797894d64db9bab(Xapian::Te
 }
 
 
-bool _wrap_TermIterator_equals_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0, Xapian::TermIterator *_swig_go_1) {
+bool _wrap_TermIterator_equals_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0, Xapian::TermIterator *_swig_go_1) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   Xapian::TermIterator *arg2 = 0 ;
   bool result;
@@ -1594,7 +1908,7 @@ bool _wrap_TermIterator_equals_xapian_1797894d64db9bab(Xapian::TermIterator *_sw
 }
 
 
-_gostring_ _wrap_TermIterator_get_term_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+_gostring_ _wrap_TermIterator_get_term_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1607,7 +1921,7 @@ _gostring_ _wrap_TermIterator_get_term_xapian_1797894d64db9bab(Xapian::TermItera
 }
 
 
-void _wrap_TermIterator_next_xapian_1797894d64db9bab(Xapian::TermIterator *_swig_go_0) {
+void _wrap_TermIterator_next_xapian_245a1afe1629f0b1(Xapian::TermIterator *_swig_go_0) {
   Xapian::TermIterator *arg1 = (Xapian::TermIterator *) 0 ;
   
   arg1 = *(Xapian::TermIterator **)&_swig_go_0; 
@@ -1617,7 +1931,7 @@ void _wrap_TermIterator_next_xapian_1797894d64db9bab(Xapian::TermIterator *_swig
 }
 
 
-Xapian::ValueIterator *_wrap_new_ValueIterator_xapian_1797894d64db9bab() {
+Xapian::ValueIterator *_wrap_new_ValueIterator_xapian_245a1afe1629f0b1() {
   Xapian::ValueIterator *result = 0 ;
   Xapian::ValueIterator *_swig_go_result;
   
@@ -1628,7 +1942,7 @@ Xapian::ValueIterator *_wrap_new_ValueIterator_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_ValueIterator_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+void _wrap_delete_ValueIterator_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   
   arg1 = *(Xapian::ValueIterator **)&_swig_go_0; 
@@ -1638,7 +1952,7 @@ void _wrap_delete_ValueIterator_xapian_1797894d64db9bab(Xapian::ValueIterator *_
 }
 
 
-intgo _wrap_ValueIterator_get_docid_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+intgo _wrap_ValueIterator_get_docid_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -1651,7 +1965,7 @@ intgo _wrap_ValueIterator_get_docid_xapian_1797894d64db9bab(Xapian::ValueIterato
 }
 
 
-intgo _wrap_ValueIterator_get_valueno_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+intgo _wrap_ValueIterator_get_valueno_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -1664,7 +1978,7 @@ intgo _wrap_ValueIterator_get_valueno_xapian_1797894d64db9bab(Xapian::ValueItera
 }
 
 
-void _wrap_ValueIterator_skip_to_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueIterator_skip_to_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   Xapian::docid arg2 ;
   
@@ -1676,7 +1990,7 @@ void _wrap_ValueIterator_skip_to_xapian_1797894d64db9bab(Xapian::ValueIterator *
 }
 
 
-bool _wrap_ValueIterator_check_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0, intgo _swig_go_1) {
+bool _wrap_ValueIterator_check_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   Xapian::docid arg2 ;
   bool result;
@@ -1691,7 +2005,7 @@ bool _wrap_ValueIterator_check_xapian_1797894d64db9bab(Xapian::ValueIterator *_s
 }
 
 
-_gostring_ _wrap_ValueIterator_get_description_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+_gostring_ _wrap_ValueIterator_get_description_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1704,7 +2018,7 @@ _gostring_ _wrap_ValueIterator_get_description_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-bool _wrap_ValueIterator_equals_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0, Xapian::ValueIterator *_swig_go_1) {
+bool _wrap_ValueIterator_equals_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0, Xapian::ValueIterator *_swig_go_1) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   Xapian::ValueIterator *arg2 = 0 ;
   bool result;
@@ -1719,7 +2033,7 @@ bool _wrap_ValueIterator_equals_xapian_1797894d64db9bab(Xapian::ValueIterator *_
 }
 
 
-_gostring_ _wrap_ValueIterator_get_value_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+_gostring_ _wrap_ValueIterator_get_value_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1732,7 +2046,7 @@ _gostring_ _wrap_ValueIterator_get_value_xapian_1797894d64db9bab(Xapian::ValueIt
 }
 
 
-void _wrap_ValueIterator_next_xapian_1797894d64db9bab(Xapian::ValueIterator *_swig_go_0) {
+void _wrap_ValueIterator_next_xapian_245a1afe1629f0b1(Xapian::ValueIterator *_swig_go_0) {
   Xapian::ValueIterator *arg1 = (Xapian::ValueIterator *) 0 ;
   
   arg1 = *(Xapian::ValueIterator **)&_swig_go_0; 
@@ -1742,7 +2056,7 @@ void _wrap_ValueIterator_next_xapian_1797894d64db9bab(Xapian::ValueIterator *_sw
 }
 
 
-Xapian::Document *_wrap_new_Document_xapian_1797894d64db9bab() {
+Xapian::Document *_wrap_new_Document_xapian_245a1afe1629f0b1() {
   Xapian::Document *result = 0 ;
   Xapian::Document *_swig_go_result;
   
@@ -1753,7 +2067,7 @@ Xapian::Document *_wrap_new_Document_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_Document_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+void _wrap_delete_Document_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   
   arg1 = *(Xapian::Document **)&_swig_go_0; 
@@ -1763,7 +2077,7 @@ void _wrap_delete_Document_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0)
 }
 
 
-_gostring_ _wrap_Document_get_value_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, intgo _swig_go_1) {
+_gostring_ _wrap_Document_get_value_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, intgo _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::valueno arg2 ;
   std::string result;
@@ -1778,7 +2092,7 @@ _gostring_ _wrap_Document_get_value_xapian_1797894d64db9bab(Xapian::Document *_s
 }
 
 
-void _wrap_Document_add_value_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_Document_add_value_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::valueno arg2 ;
   std::string *arg3 = 0 ;
@@ -1795,7 +2109,7 @@ void _wrap_Document_add_value_xapian_1797894d64db9bab(Xapian::Document *_swig_go
 }
 
 
-void _wrap_Document_remove_value_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Document_remove_value_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, intgo _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::valueno arg2 ;
   
@@ -1807,7 +2121,7 @@ void _wrap_Document_remove_value_xapian_1797894d64db9bab(Xapian::Document *_swig
 }
 
 
-void _wrap_Document_clear_values_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+void _wrap_Document_clear_values_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   
   arg1 = *(Xapian::Document **)&_swig_go_0; 
@@ -1817,7 +2131,7 @@ void _wrap_Document_clear_values_xapian_1797894d64db9bab(Xapian::Document *_swig
 }
 
 
-_gostring_ _wrap_Document_get_data_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+_gostring_ _wrap_Document_get_data_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -1830,7 +2144,7 @@ _gostring_ _wrap_Document_get_data_xapian_1797894d64db9bab(Xapian::Document *_sw
 }
 
 
-void _wrap_Document_set_data_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Document_set_data_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1845,7 +2159,7 @@ void _wrap_Document_set_data_xapian_1797894d64db9bab(Xapian::Document *_swig_go_
 }
 
 
-void _wrap_Document_add_posting__SWIG_0_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_Document_add_posting__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termpos arg3 ;
@@ -1864,7 +2178,7 @@ void _wrap_Document_add_posting__SWIG_0_xapian_1797894d64db9bab(Xapian::Document
 }
 
 
-void _wrap_Document_add_posting__SWIG_1_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_Document_add_posting__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termpos arg3 ;
@@ -1881,7 +2195,7 @@ void _wrap_Document_add_posting__SWIG_1_xapian_1797894d64db9bab(Xapian::Document
 }
 
 
-void _wrap_Document_add_term__SWIG_0_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_Document_add_term__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -1898,7 +2212,7 @@ void _wrap_Document_add_term__SWIG_0_xapian_1797894d64db9bab(Xapian::Document *_
 }
 
 
-void _wrap_Document_add_term__SWIG_1_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Document_add_term__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1913,7 +2227,7 @@ void _wrap_Document_add_term__SWIG_1_xapian_1797894d64db9bab(Xapian::Document *_
 }
 
 
-void _wrap_Document_add_boolean_term_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Document_add_boolean_term_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1928,7 +2242,7 @@ void _wrap_Document_add_boolean_term_xapian_1797894d64db9bab(Xapian::Document *_
 }
 
 
-void _wrap_Document_remove_posting__SWIG_0_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_Document_remove_posting__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termpos arg3 ;
@@ -1947,7 +2261,7 @@ void _wrap_Document_remove_posting__SWIG_0_xapian_1797894d64db9bab(Xapian::Docum
 }
 
 
-void _wrap_Document_remove_posting__SWIG_1_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_Document_remove_posting__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termpos arg3 ;
@@ -1964,7 +2278,7 @@ void _wrap_Document_remove_posting__SWIG_1_xapian_1797894d64db9bab(Xapian::Docum
 }
 
 
-void _wrap_Document_remove_term_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Document_remove_term_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1979,7 +2293,7 @@ void _wrap_Document_remove_term_xapian_1797894d64db9bab(Xapian::Document *_swig_
 }
 
 
-void _wrap_Document_clear_terms_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+void _wrap_Document_clear_terms_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   
   arg1 = *(Xapian::Document **)&_swig_go_0; 
@@ -1989,7 +2303,7 @@ void _wrap_Document_clear_terms_xapian_1797894d64db9bab(Xapian::Document *_swig_
 }
 
 
-intgo _wrap_Document_termlist_count_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+intgo _wrap_Document_termlist_count_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -2002,7 +2316,7 @@ intgo _wrap_Document_termlist_count_xapian_1797894d64db9bab(Xapian::Document *_s
 }
 
 
-Xapian::TermIterator *_wrap_Document_termlist_begin_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+Xapian::TermIterator *_wrap_Document_termlist_begin_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -2015,7 +2329,7 @@ Xapian::TermIterator *_wrap_Document_termlist_begin_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::TermIterator *_wrap_Document_termlist_end_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+Xapian::TermIterator *_wrap_Document_termlist_end_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -2028,7 +2342,7 @@ Xapian::TermIterator *_wrap_Document_termlist_end_xapian_1797894d64db9bab(Xapian
 }
 
 
-intgo _wrap_Document_values_count_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+intgo _wrap_Document_values_count_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -2041,7 +2355,7 @@ intgo _wrap_Document_values_count_xapian_1797894d64db9bab(Xapian::Document *_swi
 }
 
 
-Xapian::ValueIterator *_wrap_Document_values_begin_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+Xapian::ValueIterator *_wrap_Document_values_begin_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::ValueIterator result;
   Xapian::ValueIterator *_swig_go_result;
@@ -2054,7 +2368,7 @@ Xapian::ValueIterator *_wrap_Document_values_begin_xapian_1797894d64db9bab(Xapia
 }
 
 
-Xapian::ValueIterator *_wrap_Document_values_end_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+Xapian::ValueIterator *_wrap_Document_values_end_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::ValueIterator result;
   Xapian::ValueIterator *_swig_go_result;
@@ -2067,7 +2381,7 @@ Xapian::ValueIterator *_wrap_Document_values_end_xapian_1797894d64db9bab(Xapian:
 }
 
 
-intgo _wrap_Document_get_docid_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+intgo _wrap_Document_get_docid_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -2080,7 +2394,7 @@ intgo _wrap_Document_get_docid_xapian_1797894d64db9bab(Xapian::Document *_swig_g
 }
 
 
-_gostring_ _wrap_Document_serialise_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+_gostring_ _wrap_Document_serialise_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -2093,7 +2407,7 @@ _gostring_ _wrap_Document_serialise_xapian_1797894d64db9bab(Xapian::Document *_s
 }
 
 
-Xapian::Document *_wrap_Document_unserialise_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Document *_wrap_Document_unserialise_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Document result;
   Xapian::Document *_swig_go_result;
@@ -2109,7 +2423,7 @@ Xapian::Document *_wrap_Document_unserialise_xapian_1797894d64db9bab(_gostring_ 
 }
 
 
-_gostring_ _wrap_Document_get_description_xapian_1797894d64db9bab(Xapian::Document *_swig_go_0) {
+_gostring_ _wrap_Document_get_description_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -2122,7 +2436,7 @@ _gostring_ _wrap_Document_get_description_xapian_1797894d64db9bab(Xapian::Docume
 }
 
 
-Xapian::Registry *_wrap_new_Registry_xapian_1797894d64db9bab() {
+Xapian::Registry *_wrap_new_Registry_xapian_245a1afe1629f0b1() {
   Xapian::Registry *result = 0 ;
   Xapian::Registry *_swig_go_result;
   
@@ -2133,7 +2447,7 @@ Xapian::Registry *_wrap_new_Registry_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_Registry_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0) {
+void _wrap_delete_Registry_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   
   arg1 = *(Xapian::Registry **)&_swig_go_0; 
@@ -2143,7 +2457,7 @@ void _wrap_delete_Registry_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0)
 }
 
 
-void _wrap_Registry_register_weighting_scheme_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, Xapian::Weight *_swig_go_1) {
+void _wrap_Registry_register_weighting_scheme_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, Xapian::Weight *_swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   Xapian::Weight *arg2 = 0 ;
   
@@ -2155,7 +2469,7 @@ void _wrap_Registry_register_weighting_scheme_xapian_1797894d64db9bab(Xapian::Re
 }
 
 
-Xapian::Weight *_wrap_Registry_get_weighting_scheme_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::Weight *_wrap_Registry_get_weighting_scheme_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::Weight *result = 0 ;
@@ -2173,7 +2487,7 @@ Xapian::Weight *_wrap_Registry_get_weighting_scheme_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_Registry_register_posting_source_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, Xapian::PostingSource *_swig_go_1) {
+void _wrap_Registry_register_posting_source_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, Xapian::PostingSource *_swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   Xapian::PostingSource *arg2 = 0 ;
   
@@ -2185,7 +2499,7 @@ void _wrap_Registry_register_posting_source_xapian_1797894d64db9bab(Xapian::Regi
 }
 
 
-Xapian::PostingSource *_wrap_Registry_get_posting_source_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::PostingSource *_wrap_Registry_get_posting_source_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::PostingSource *result = 0 ;
@@ -2203,7 +2517,7 @@ Xapian::PostingSource *_wrap_Registry_get_posting_source_xapian_1797894d64db9bab
 }
 
 
-void _wrap_Registry_register_match_spy_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, Xapian::MatchSpy *_swig_go_1) {
+void _wrap_Registry_register_match_spy_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, Xapian::MatchSpy *_swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   Xapian::MatchSpy *arg2 = 0 ;
   
@@ -2215,7 +2529,7 @@ void _wrap_Registry_register_match_spy_xapian_1797894d64db9bab(Xapian::Registry 
 }
 
 
-Xapian::MatchSpy *_wrap_Registry_get_match_spy_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::MatchSpy *_wrap_Registry_get_match_spy_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::MatchSpy *result = 0 ;
@@ -2233,7 +2547,7 @@ Xapian::MatchSpy *_wrap_Registry_get_match_spy_xapian_1797894d64db9bab(Xapian::R
 }
 
 
-void _wrap_Registry_register_lat_long_metric_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, Xapian::LatLongMetric *_swig_go_1) {
+void _wrap_Registry_register_lat_long_metric_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, Xapian::LatLongMetric *_swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   Xapian::LatLongMetric *arg2 = 0 ;
   
@@ -2245,7 +2559,7 @@ void _wrap_Registry_register_lat_long_metric_xapian_1797894d64db9bab(Xapian::Reg
 }
 
 
-Xapian::LatLongMetric *_wrap_Registry_get_lat_long_metric_xapian_1797894d64db9bab(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::LatLongMetric *_wrap_Registry_get_lat_long_metric_xapian_245a1afe1629f0b1(Xapian::Registry *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Registry *arg1 = (Xapian::Registry *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::LatLongMetric *result = 0 ;
@@ -2263,7 +2577,7 @@ Xapian::LatLongMetric *_wrap_Registry_get_lat_long_metric_xapian_1797894d64db9ba
 }
 
 
-Xapian::Query *_wrap_Query_MatchNothing_get_xapian_1797894d64db9bab() {
+Xapian::Query *_wrap_Query_MatchNothing_get_xapian_245a1afe1629f0b1() {
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
   
@@ -2274,7 +2588,7 @@ Xapian::Query *_wrap_Query_MatchNothing_get_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::Query *_wrap_Query_MatchAll_get_xapian_1797894d64db9bab() {
+Xapian::Query *_wrap_Query_MatchAll_get_xapian_245a1afe1629f0b1() {
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
   
@@ -2285,7 +2599,7 @@ Xapian::Query *_wrap_Query_MatchAll_get_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_AND_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_AND_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2297,7 +2611,7 @@ intgo _wrap_OP_AND_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_OR_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_OR_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2309,7 +2623,7 @@ intgo _wrap_OP_OR_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_AND_NOT_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_AND_NOT_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2321,7 +2635,7 @@ intgo _wrap_OP_AND_NOT_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_XOR_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_XOR_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2333,7 +2647,7 @@ intgo _wrap_OP_XOR_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_AND_MAYBE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_AND_MAYBE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2345,7 +2659,7 @@ intgo _wrap_OP_AND_MAYBE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_FILTER_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_FILTER_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2357,7 +2671,7 @@ intgo _wrap_OP_FILTER_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_NEAR_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_NEAR_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2369,7 +2683,7 @@ intgo _wrap_OP_NEAR_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_PHRASE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_PHRASE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2381,7 +2695,7 @@ intgo _wrap_OP_PHRASE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_VALUE_RANGE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_VALUE_RANGE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2393,7 +2707,7 @@ intgo _wrap_OP_VALUE_RANGE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_SCALE_WEIGHT_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_SCALE_WEIGHT_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2405,7 +2719,7 @@ intgo _wrap_OP_SCALE_WEIGHT_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_ELITE_SET_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_ELITE_SET_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2417,7 +2731,7 @@ intgo _wrap_OP_ELITE_SET_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_VALUE_GE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_VALUE_GE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2429,7 +2743,7 @@ intgo _wrap_OP_VALUE_GE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_VALUE_LE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_VALUE_LE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2441,7 +2755,7 @@ intgo _wrap_OP_VALUE_LE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_SYNONYM_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_SYNONYM_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2453,7 +2767,7 @@ intgo _wrap_OP_SYNONYM_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_MAX_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_MAX_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2465,7 +2779,7 @@ intgo _wrap_OP_MAX_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_WILDCARD_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_WILDCARD_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2477,7 +2791,7 @@ intgo _wrap_OP_WILDCARD_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_OP_INVALID_Query_xapian_1797894d64db9bab() {
+intgo _wrap_OP_INVALID_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2489,7 +2803,7 @@ intgo _wrap_OP_INVALID_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_LEAF_TERM_Query_xapian_1797894d64db9bab() {
+intgo _wrap_LEAF_TERM_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2501,7 +2815,7 @@ intgo _wrap_LEAF_TERM_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_LEAF_POSTING_SOURCE_Query_xapian_1797894d64db9bab() {
+intgo _wrap_LEAF_POSTING_SOURCE_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2513,7 +2827,7 @@ intgo _wrap_LEAF_POSTING_SOURCE_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_LEAF_MATCH_ALL_Query_xapian_1797894d64db9bab() {
+intgo _wrap_LEAF_MATCH_ALL_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2525,7 +2839,7 @@ intgo _wrap_LEAF_MATCH_ALL_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_LEAF_MATCH_NOTHING_Query_xapian_1797894d64db9bab() {
+intgo _wrap_LEAF_MATCH_NOTHING_Query_xapian_245a1afe1629f0b1() {
   Xapian::Query::op result;
   intgo _swig_go_result;
   
@@ -2537,7 +2851,7 @@ intgo _wrap_LEAF_MATCH_NOTHING_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_WILDCARD_LIMIT_ERROR_Query_xapian_1797894d64db9bab() {
+intgo _wrap_WILDCARD_LIMIT_ERROR_Query_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -2549,7 +2863,7 @@ intgo _wrap_WILDCARD_LIMIT_ERROR_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_WILDCARD_LIMIT_FIRST_Query_xapian_1797894d64db9bab() {
+intgo _wrap_WILDCARD_LIMIT_FIRST_Query_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -2561,7 +2875,7 @@ intgo _wrap_WILDCARD_LIMIT_FIRST_Query_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_1797894d64db9bab() {
+intgo _wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -2573,7 +2887,7 @@ intgo _wrap_WILDCARD_LIMIT_MOST_FREQUENT_Query_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::Query *_wrap_new_Query__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
   
@@ -2584,7 +2898,7 @@ Xapian::Query *_wrap_new_Query__SWIG_0_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_Query_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+void _wrap_delete_Query_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   
   arg1 = *(Xapian::Query **)&_swig_go_0; 
@@ -2594,7 +2908,7 @@ void _wrap_delete_Query_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   Xapian::termcount arg2 ;
   Xapian::termpos arg3 ;
@@ -2614,7 +2928,7 @@ Xapian::Query *_wrap_new_Query__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::Query *_wrap_new_Query__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   Xapian::termcount arg2 ;
   Xapian::Query *result = 0 ;
@@ -2632,7 +2946,7 @@ Xapian::Query *_wrap_new_Query__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_3_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Query *_wrap_new_Query__SWIG_3_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
@@ -2648,7 +2962,7 @@ Xapian::Query *_wrap_new_Query__SWIG_3_xapian_1797894d64db9bab(_gostring_ _swig_
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_4_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+Xapian::Query *_wrap_new_Query__SWIG_4_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
@@ -2661,7 +2975,7 @@ Xapian::Query *_wrap_new_Query__SWIG_4_xapian_1797894d64db9bab(Xapian::PostingSo
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_5_xapian_1797894d64db9bab(double _swig_go_0, Xapian::Query *_swig_go_1) {
+Xapian::Query *_wrap_new_Query__SWIG_5_xapian_245a1afe1629f0b1(double _swig_go_0, Xapian::Query *_swig_go_1) {
   double arg1 ;
   Xapian::Query *arg2 = 0 ;
   Xapian::Query *result = 0 ;
@@ -2676,7 +2990,7 @@ Xapian::Query *_wrap_new_Query__SWIG_5_xapian_1797894d64db9bab(double _swig_go_0
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_6_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::Query *_swig_go_1, double _swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_6_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::Query *_swig_go_1, double _swig_go_2) {
   Xapian::Query::op arg1 ;
   Xapian::Query *arg2 = 0 ;
   double arg3 ;
@@ -2693,7 +3007,7 @@ Xapian::Query *_wrap_new_Query__SWIG_6_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_7_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::Query *_swig_go_1, Xapian::Query *_swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_7_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::Query *_swig_go_1, Xapian::Query *_swig_go_2) {
   Xapian::Query::op arg1 ;
   Xapian::Query *arg2 = 0 ;
   Xapian::Query *arg3 = 0 ;
@@ -2710,7 +3024,7 @@ Xapian::Query *_wrap_new_Query__SWIG_7_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_8_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_8_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Query::op arg1 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -2733,7 +3047,7 @@ Xapian::Query *_wrap_new_Query__SWIG_8_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_9_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_9_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Query::op arg1 ;
   Xapian::valueno arg2 ;
   std::string *arg3 = 0 ;
@@ -2753,7 +3067,7 @@ Xapian::Query *_wrap_new_Query__SWIG_9_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_10_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2, _gostring_ _swig_go_3) {
+Xapian::Query *_wrap_new_Query__SWIG_10_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2, _gostring_ _swig_go_3) {
   Xapian::Query::op arg1 ;
   Xapian::valueno arg2 ;
   std::string *arg3 = 0 ;
@@ -2778,7 +3092,7 @@ Xapian::Query *_wrap_new_Query__SWIG_10_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_11_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, intgo _swig_go_4) {
+Xapian::Query *_wrap_new_Query__SWIG_11_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, intgo _swig_go_4) {
   Xapian::Query::op arg1 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -2802,7 +3116,7 @@ Xapian::Query *_wrap_new_Query__SWIG_11_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_12_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::Query *_wrap_new_Query__SWIG_12_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Query::op arg1 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -2824,7 +3138,7 @@ Xapian::Query *_wrap_new_Query__SWIG_12_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_13_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::Query *_wrap_new_Query__SWIG_13_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Query::op arg1 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -2844,7 +3158,7 @@ Xapian::Query *_wrap_new_Query__SWIG_13_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_14_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::Query *_wrap_new_Query__SWIG_14_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Query::op arg1 ;
   std::string *arg2 = 0 ;
   Xapian::Query *result = 0 ;
@@ -2862,7 +3176,7 @@ Xapian::Query *_wrap_new_Query__SWIG_14_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::TermIterator *_wrap_Query_get_terms_begin_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+Xapian::TermIterator *_wrap_Query_get_terms_begin_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -2875,7 +3189,7 @@ Xapian::TermIterator *_wrap_Query_get_terms_begin_xapian_1797894d64db9bab(Xapian
 }
 
 
-Xapian::TermIterator *_wrap_Query_get_terms_end_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+Xapian::TermIterator *_wrap_Query_get_terms_end_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -2888,7 +3202,7 @@ Xapian::TermIterator *_wrap_Query_get_terms_end_xapian_1797894d64db9bab(Xapian::
 }
 
 
-Xapian::TermIterator *_wrap_Query_get_unique_terms_begin_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+Xapian::TermIterator *_wrap_Query_get_unique_terms_begin_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -2901,7 +3215,7 @@ Xapian::TermIterator *_wrap_Query_get_unique_terms_begin_xapian_1797894d64db9bab
 }
 
 
-intgo _wrap_Query_get_length_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+intgo _wrap_Query_get_length_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -2914,7 +3228,7 @@ intgo _wrap_Query_get_length_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) 
 }
 
 
-bool _wrap_Query_empty_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+bool _wrap_Query_empty_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -2927,7 +3241,7 @@ bool _wrap_Query_empty_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
 }
 
 
-_gostring_ _wrap_Query_serialise_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+_gostring_ _wrap_Query_serialise_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -2940,7 +3254,7 @@ _gostring_ _wrap_Query_serialise_xapian_1797894d64db9bab(Xapian::Query *_swig_go
 }
 
 
-Xapian::Query *_wrap_Query_unserialise__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0, Xapian::Registry *_swig_go_1) {
+Xapian::Query *_wrap_Query_unserialise__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, Xapian::Registry *_swig_go_1) {
   std::string *arg1 = 0 ;
   Xapian::Registry *arg2 = 0 ;
   Xapian::Query result;
@@ -2958,7 +3272,7 @@ Xapian::Query *_wrap_Query_unserialise__SWIG_0_xapian_1797894d64db9bab(_gostring
 }
 
 
-Xapian::Query *_wrap_Query_unserialise__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Query *_wrap_Query_unserialise__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Query result;
   Xapian::Query *_swig_go_result;
@@ -2974,7 +3288,7 @@ Xapian::Query *_wrap_Query_unserialise__SWIG_1_xapian_1797894d64db9bab(_gostring
 }
 
 
-intgo _wrap_Query_get_type_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+intgo _wrap_Query_get_type_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   Xapian::Query::op result;
   intgo _swig_go_result;
@@ -2987,7 +3301,7 @@ intgo _wrap_Query_get_type_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
 }
 
 
-long long _wrap_Query_get_num_subqueries_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+long long _wrap_Query_get_num_subqueries_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   size_t result;
   long long _swig_go_result;
@@ -3000,7 +3314,7 @@ long long _wrap_Query_get_num_subqueries_xapian_1797894d64db9bab(Xapian::Query *
 }
 
 
-Xapian::Query *_wrap_Query_get_subquery_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0, long long _swig_go_1) {
+Xapian::Query *_wrap_Query_get_subquery_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0, long long _swig_go_1) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   size_t arg2 ;
   Xapian::Query result;
@@ -3015,7 +3329,7 @@ Xapian::Query *_wrap_Query_get_subquery_xapian_1797894d64db9bab(Xapian::Query *_
 }
 
 
-_gostring_ _wrap_Query_get_description_xapian_1797894d64db9bab(Xapian::Query *_swig_go_0) {
+_gostring_ _wrap_Query_get_description_xapian_245a1afe1629f0b1(Xapian::Query *_swig_go_0) {
   Xapian::Query *arg1 = (Xapian::Query *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -3028,7 +3342,7 @@ _gostring_ _wrap_Query_get_description_xapian_1797894d64db9bab(Xapian::Query *_s
 }
 
 
-Xapian::Query *_wrap_new_Query__SWIG_17_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::Query *_wrap_new_Query__SWIG_17_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::Query::op arg1 ;
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
@@ -3041,7 +3355,7 @@ Xapian::Query *_wrap_new_Query__SWIG_17_xapian_1797894d64db9bab(intgo _swig_go_0
 }
 
 
-Xapian::StemImplementation *_wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::StemImplementation *_wrap__swig_NewDirectorStemImplementationStemImplementation_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::StemImplementation *result = 0 ;
   Xapian::StemImplementation *_swig_go_result;
@@ -3054,7 +3368,7 @@ Xapian::StemImplementation *_wrap__swig_NewDirectorStemImplementationStemImpleme
 }
 
 
-void _wrap_DeleteDirectorStemImplementation_xapian_1797894d64db9bab(Xapian::StemImplementation *_swig_go_0) {
+void _wrap_DeleteDirectorStemImplementation_xapian_245a1afe1629f0b1(Xapian::StemImplementation *_swig_go_0) {
   Xapian::StemImplementation *arg1 = (Xapian::StemImplementation *) 0 ;
   
   arg1 = *(Xapian::StemImplementation **)&_swig_go_0; 
@@ -3064,7 +3378,7 @@ void _wrap_DeleteDirectorStemImplementation_xapian_1797894d64db9bab(Xapian::Stem
 }
 
 
-void _wrap_delete_StemImplementation_xapian_1797894d64db9bab(Xapian::StemImplementation *_swig_go_0) {
+void _wrap_delete_StemImplementation_xapian_245a1afe1629f0b1(Xapian::StemImplementation *_swig_go_0) {
   Xapian::StemImplementation *arg1 = (Xapian::StemImplementation *) 0 ;
   
   arg1 = *(Xapian::StemImplementation **)&_swig_go_0; 
@@ -3074,7 +3388,7 @@ void _wrap_delete_StemImplementation_xapian_1797894d64db9bab(Xapian::StemImpleme
 }
 
 
-_gostring_ _wrap_StemImplementation_Apply_xapian_1797894d64db9bab(Xapian::StemImplementation *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_StemImplementation_Apply_xapian_245a1afe1629f0b1(Xapian::StemImplementation *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::StemImplementation *arg1 = (Xapian::StemImplementation *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -3092,7 +3406,7 @@ _gostring_ _wrap_StemImplementation_Apply_xapian_1797894d64db9bab(Xapian::StemIm
 }
 
 
-_gostring_ _wrap_StemImplementation_get_description_xapian_1797894d64db9bab(Xapian::StemImplementation *_swig_go_0) {
+_gostring_ _wrap_StemImplementation_get_description_xapian_245a1afe1629f0b1(Xapian::StemImplementation *_swig_go_0) {
   Xapian::StemImplementation *arg1 = (Xapian::StemImplementation *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -3105,7 +3419,7 @@ _gostring_ _wrap_StemImplementation_get_description_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::Stem *_wrap_new_Stem__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Stem *_wrap_new_Stem__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Stem *result = 0 ;
   Xapian::Stem *_swig_go_result;
@@ -3121,7 +3435,7 @@ Xapian::Stem *_wrap_new_Stem__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go
 }
 
 
-Xapian::Stem *_wrap_new_Stem__SWIG_1_xapian_1797894d64db9bab(Xapian::StemImplementation *_swig_go_0) {
+Xapian::Stem *_wrap_new_Stem__SWIG_1_xapian_245a1afe1629f0b1(Xapian::StemImplementation *_swig_go_0) {
   Xapian::StemImplementation *arg1 = (Xapian::StemImplementation *) 0 ;
   Xapian::Stem *result = 0 ;
   Xapian::Stem *_swig_go_result;
@@ -3134,7 +3448,7 @@ Xapian::Stem *_wrap_new_Stem__SWIG_1_xapian_1797894d64db9bab(Xapian::StemImpleme
 }
 
 
-void _wrap_delete_Stem_xapian_1797894d64db9bab(Xapian::Stem *_swig_go_0) {
+void _wrap_delete_Stem_xapian_245a1afe1629f0b1(Xapian::Stem *_swig_go_0) {
   Xapian::Stem *arg1 = (Xapian::Stem *) 0 ;
   
   arg1 = *(Xapian::Stem **)&_swig_go_0; 
@@ -3144,7 +3458,7 @@ void _wrap_delete_Stem_xapian_1797894d64db9bab(Xapian::Stem *_swig_go_0) {
 }
 
 
-_gostring_ _wrap_Stem_Apply_xapian_1797894d64db9bab(Xapian::Stem *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_Stem_Apply_xapian_245a1afe1629f0b1(Xapian::Stem *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Stem *arg1 = (Xapian::Stem *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -3162,7 +3476,7 @@ _gostring_ _wrap_Stem_Apply_xapian_1797894d64db9bab(Xapian::Stem *_swig_go_0, _g
 }
 
 
-_gostring_ _wrap_Stem_get_description_xapian_1797894d64db9bab(Xapian::Stem *_swig_go_0) {
+_gostring_ _wrap_Stem_get_description_xapian_245a1afe1629f0b1(Xapian::Stem *_swig_go_0) {
   Xapian::Stem *arg1 = (Xapian::Stem *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -3175,7 +3489,7 @@ _gostring_ _wrap_Stem_get_description_xapian_1797894d64db9bab(Xapian::Stem *_swi
 }
 
 
-_gostring_ _wrap_Stem_get_available_languages_xapian_1797894d64db9bab() {
+_gostring_ _wrap_Stem_get_available_languages_xapian_245a1afe1629f0b1() {
   std::string result;
   _gostring_ _swig_go_result;
   
@@ -3186,7 +3500,7 @@ _gostring_ _wrap_Stem_get_available_languages_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::TermGenerator *_wrap_new_TermGenerator_xapian_1797894d64db9bab() {
+Xapian::TermGenerator *_wrap_new_TermGenerator_xapian_245a1afe1629f0b1() {
   Xapian::TermGenerator *result = 0 ;
   Xapian::TermGenerator *_swig_go_result;
   
@@ -3197,7 +3511,7 @@ Xapian::TermGenerator *_wrap_new_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_TermGenerator_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+void _wrap_delete_TermGenerator_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   
   arg1 = *(Xapian::TermGenerator **)&_swig_go_0; 
@@ -3207,7 +3521,7 @@ void _wrap_delete_TermGenerator_xapian_1797894d64db9bab(Xapian::TermGenerator *_
 }
 
 
-void _wrap_TermGenerator_set_stemmer_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, Xapian::Stem *_swig_go_1) {
+void _wrap_TermGenerator_set_stemmer_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, Xapian::Stem *_swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::Stem *arg2 = 0 ;
   
@@ -3219,7 +3533,7 @@ void _wrap_TermGenerator_set_stemmer_xapian_1797894d64db9bab(Xapian::TermGenerat
 }
 
 
-void _wrap_TermGenerator_set_stopper__SWIG_0_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, Xapian::Stopper *_swig_go_1) {
+void _wrap_TermGenerator_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, Xapian::Stopper *_swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::Stopper *arg2 = (Xapian::Stopper *) 0 ;
   
@@ -3231,7 +3545,7 @@ void _wrap_TermGenerator_set_stopper__SWIG_0_xapian_1797894d64db9bab(Xapian::Ter
 }
 
 
-void _wrap_TermGenerator_set_stopper__SWIG_1_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+void _wrap_TermGenerator_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   
   arg1 = *(Xapian::TermGenerator **)&_swig_go_0; 
@@ -3241,7 +3555,7 @@ void _wrap_TermGenerator_set_stopper__SWIG_1_xapian_1797894d64db9bab(Xapian::Ter
 }
 
 
-void _wrap_TermGenerator_set_document_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, Xapian::Document *_swig_go_1) {
+void _wrap_TermGenerator_set_document_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::Document *arg2 = 0 ;
   
@@ -3253,7 +3567,7 @@ void _wrap_TermGenerator_set_document_xapian_1797894d64db9bab(Xapian::TermGenera
 }
 
 
-Xapian::Document *_wrap_TermGenerator_get_document_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+Xapian::Document *_wrap_TermGenerator_get_document_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::Document *result = 0 ;
   Xapian::Document *_swig_go_result;
@@ -3266,7 +3580,7 @@ Xapian::Document *_wrap_TermGenerator_get_document_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_TermGenerator_set_database_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, Xapian::WritableDatabase *_swig_go_1) {
+void _wrap_TermGenerator_set_database_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, Xapian::WritableDatabase *_swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::WritableDatabase *arg2 = 0 ;
   
@@ -3278,7 +3592,7 @@ void _wrap_TermGenerator_set_database_xapian_1797894d64db9bab(Xapian::TermGenera
 }
 
 
-intgo _wrap_FLAG_SPELLING_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_SPELLING_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3290,7 +3604,7 @@ intgo _wrap_FLAG_SPELLING_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3302,7 +3616,7 @@ intgo _wrap_FLAG_CJK_NGRAM_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_NONE_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_NONE_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3314,7 +3628,7 @@ intgo _wrap_STEM_NONE_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_SOME_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_SOME_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3326,7 +3640,7 @@ intgo _wrap_STEM_SOME_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_ALL_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_ALL_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3338,7 +3652,7 @@ intgo _wrap_STEM_ALL_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_ALL_Z_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_ALL_Z_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3350,7 +3664,7 @@ intgo _wrap_STEM_ALL_Z_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STOP_NONE_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STOP_NONE_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3362,7 +3676,7 @@ intgo _wrap_STOP_NONE_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STOP_ALL_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STOP_ALL_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3374,7 +3688,7 @@ intgo _wrap_STOP_ALL_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STOP_STEMMED_TermGenerator_xapian_1797894d64db9bab() {
+intgo _wrap_STOP_STEMMED_TermGenerator_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3386,7 +3700,7 @@ intgo _wrap_STOP_STEMMED_TermGenerator_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_TermGenerator_set_flags__SWIG_0_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+intgo _wrap_TermGenerator_set_flags__SWIG_0_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::TermGenerator::flags arg2 ;
   Xapian::TermGenerator::flags arg3 ;
@@ -3403,7 +3717,7 @@ intgo _wrap_TermGenerator_set_flags__SWIG_0_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-intgo _wrap_TermGenerator_set_flags__SWIG_1_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_TermGenerator_set_flags__SWIG_1_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::TermGenerator::flags arg2 ;
   Xapian::TermGenerator::flags result;
@@ -3418,7 +3732,7 @@ intgo _wrap_TermGenerator_set_flags__SWIG_1_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-void _wrap_TermGenerator_set_stemming_strategy_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_TermGenerator_set_stemming_strategy_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::TermGenerator::stem_strategy arg2 ;
   
@@ -3430,7 +3744,7 @@ void _wrap_TermGenerator_set_stemming_strategy_xapian_1797894d64db9bab(Xapian::T
 }
 
 
-void _wrap_TermGenerator_set_stopper_strategy_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_TermGenerator_set_stopper_strategy_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::TermGenerator::stop_strategy arg2 ;
   
@@ -3442,7 +3756,7 @@ void _wrap_TermGenerator_set_stopper_strategy_xapian_1797894d64db9bab(Xapian::Te
 }
 
 
-void _wrap_TermGenerator_set_max_word_length_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_TermGenerator_set_max_word_length_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   unsigned int arg2 ;
   
@@ -3454,7 +3768,7 @@ void _wrap_TermGenerator_set_max_word_length_xapian_1797894d64db9bab(Xapian::Ter
 }
 
 
-void _wrap_TermGenerator_index_text__SWIG_0_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
+void _wrap_TermGenerator_index_text__SWIG_0_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -3476,7 +3790,7 @@ void _wrap_TermGenerator_index_text__SWIG_0_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-void _wrap_TermGenerator_index_text__SWIG_1_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_TermGenerator_index_text__SWIG_1_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -3493,7 +3807,7 @@ void _wrap_TermGenerator_index_text__SWIG_1_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-void _wrap_TermGenerator_index_text__SWIG_2_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_TermGenerator_index_text__SWIG_2_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -3508,7 +3822,7 @@ void _wrap_TermGenerator_index_text__SWIG_2_xapian_1797894d64db9bab(Xapian::Term
 }
 
 
-void _wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
+void _wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -3530,7 +3844,7 @@ void _wrap_TermGenerator_index_text_without_positions__SWIG_0_xapian_1797894d64d
 }
 
 
-void _wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -3547,7 +3861,7 @@ void _wrap_TermGenerator_index_text_without_positions__SWIG_1_xapian_1797894d64d
 }
 
 
-void _wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -3562,7 +3876,7 @@ void _wrap_TermGenerator_index_text_without_positions__SWIG_2_xapian_1797894d64d
 }
 
 
-void _wrap_TermGenerator_increase_termpos__SWIG_0_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_TermGenerator_increase_termpos__SWIG_0_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::termcount arg2 ;
   
@@ -3574,7 +3888,7 @@ void _wrap_TermGenerator_increase_termpos__SWIG_0_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_TermGenerator_increase_termpos__SWIG_1_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+void _wrap_TermGenerator_increase_termpos__SWIG_1_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   
   arg1 = *(Xapian::TermGenerator **)&_swig_go_0; 
@@ -3584,7 +3898,7 @@ void _wrap_TermGenerator_increase_termpos__SWIG_1_xapian_1797894d64db9bab(Xapian
 }
 
 
-intgo _wrap_TermGenerator_get_termpos_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+intgo _wrap_TermGenerator_get_termpos_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -3597,7 +3911,7 @@ intgo _wrap_TermGenerator_get_termpos_xapian_1797894d64db9bab(Xapian::TermGenera
 }
 
 
-void _wrap_TermGenerator_set_termpos_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
+void _wrap_TermGenerator_set_termpos_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0, intgo _swig_go_1) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   Xapian::termcount arg2 ;
   
@@ -3609,7 +3923,7 @@ void _wrap_TermGenerator_set_termpos_xapian_1797894d64db9bab(Xapian::TermGenerat
 }
 
 
-_gostring_ _wrap_TermGenerator_get_description_xapian_1797894d64db9bab(Xapian::TermGenerator *_swig_go_0) {
+_gostring_ _wrap_TermGenerator_get_description_xapian_245a1afe1629f0b1(Xapian::TermGenerator *_swig_go_0) {
   Xapian::TermGenerator *arg1 = (Xapian::TermGenerator *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -3622,7 +3936,7 @@ _gostring_ _wrap_TermGenerator_get_description_xapian_1797894d64db9bab(Xapian::T
 }
 
 
-Xapian::RSet *_wrap_new_RSet_xapian_1797894d64db9bab() {
+Xapian::RSet *_wrap_new_RSet_xapian_245a1afe1629f0b1() {
   Xapian::RSet *result = 0 ;
   Xapian::RSet *_swig_go_result;
   
@@ -3633,7 +3947,7 @@ Xapian::RSet *_wrap_new_RSet_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_RSet_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
+void _wrap_delete_RSet_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   
   arg1 = *(Xapian::RSet **)&_swig_go_0; 
@@ -3643,7 +3957,7 @@ void _wrap_delete_RSet_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
 }
 
 
-intgo _wrap_RSet_size_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
+intgo _wrap_RSet_size_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -3656,7 +3970,7 @@ intgo _wrap_RSet_size_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
 }
 
 
-bool _wrap_RSet_empty_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
+bool _wrap_RSet_empty_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -3669,7 +3983,7 @@ bool _wrap_RSet_empty_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
 }
 
 
-void _wrap_RSet_add_document__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
+void _wrap_RSet_add_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::docid arg2 ;
   
@@ -3681,7 +3995,7 @@ void _wrap_RSet_add_document__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_swig
 }
 
 
-void _wrap_RSet_add_document__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+void _wrap_RSet_add_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::MSetIterator *arg2 = 0 ;
   
@@ -3693,7 +4007,7 @@ void _wrap_RSet_add_document__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_swig
 }
 
 
-void _wrap_RSet_remove_document__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
+void _wrap_RSet_remove_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::docid arg2 ;
   
@@ -3705,7 +4019,7 @@ void _wrap_RSet_remove_document__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_s
 }
 
 
-void _wrap_RSet_remove_document__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+void _wrap_RSet_remove_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::MSetIterator *arg2 = 0 ;
   
@@ -3717,7 +4031,7 @@ void _wrap_RSet_remove_document__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_s
 }
 
 
-bool _wrap_RSet_contains__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
+bool _wrap_RSet_contains__SWIG_0_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, intgo _swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::docid arg2 ;
   bool result;
@@ -3732,7 +4046,7 @@ bool _wrap_RSet_contains__SWIG_0_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_
 }
 
 
-bool _wrap_RSet_contains__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+bool _wrap_RSet_contains__SWIG_1_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   Xapian::MSetIterator *arg2 = 0 ;
   bool result;
@@ -3747,7 +4061,7 @@ bool _wrap_RSet_contains__SWIG_1_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_
 }
 
 
-_gostring_ _wrap_RSet_get_description_xapian_1797894d64db9bab(Xapian::RSet *_swig_go_0) {
+_gostring_ _wrap_RSet_get_description_xapian_245a1afe1629f0b1(Xapian::RSet *_swig_go_0) {
   Xapian::RSet *arg1 = (Xapian::RSet *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -3760,7 +4074,7 @@ _gostring_ _wrap_RSet_get_description_xapian_1797894d64db9bab(Xapian::RSet *_swi
 }
 
 
-Xapian::MatchDecider *_wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::MatchDecider *_wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::MatchDecider *result = 0 ;
   Xapian::MatchDecider *_swig_go_result;
@@ -3773,7 +4087,7 @@ Xapian::MatchDecider *_wrap__swig_NewDirectorMatchDeciderMatchDecider_xapian_179
 }
 
 
-void _wrap_DeleteDirectorMatchDecider_xapian_1797894d64db9bab(Xapian::MatchDecider *_swig_go_0) {
+void _wrap_DeleteDirectorMatchDecider_xapian_245a1afe1629f0b1(Xapian::MatchDecider *_swig_go_0) {
   Xapian::MatchDecider *arg1 = (Xapian::MatchDecider *) 0 ;
   
   arg1 = *(Xapian::MatchDecider **)&_swig_go_0; 
@@ -3783,7 +4097,7 @@ void _wrap_DeleteDirectorMatchDecider_xapian_1797894d64db9bab(Xapian::MatchDecid
 }
 
 
-bool _wrap_MatchDecider_Apply_xapian_1797894d64db9bab(Xapian::MatchDecider *_swig_go_0, Xapian::Document *_swig_go_1) {
+bool _wrap_MatchDecider_Apply_xapian_245a1afe1629f0b1(Xapian::MatchDecider *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::MatchDecider *arg1 = (Xapian::MatchDecider *) 0 ;
   Xapian::Document *arg2 = 0 ;
   bool result;
@@ -3798,7 +4112,7 @@ bool _wrap_MatchDecider_Apply_xapian_1797894d64db9bab(Xapian::MatchDecider *_swi
 }
 
 
-void _wrap_delete_MatchDecider_xapian_1797894d64db9bab(Xapian::MatchDecider *_swig_go_0) {
+void _wrap_delete_MatchDecider_xapian_245a1afe1629f0b1(Xapian::MatchDecider *_swig_go_0) {
   Xapian::MatchDecider *arg1 = (Xapian::MatchDecider *) 0 ;
   
   arg1 = *(Xapian::MatchDecider **)&_swig_go_0; 
@@ -3808,7 +4122,7 @@ void _wrap_delete_MatchDecider_xapian_1797894d64db9bab(Xapian::MatchDecider *_sw
 }
 
 
-Xapian::Enquire *_wrap_new_Enquire_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::Enquire *_wrap_new_Enquire_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = 0 ;
   Xapian::Enquire *result = 0 ;
   Xapian::Enquire *_swig_go_result;
@@ -3821,7 +4135,7 @@ Xapian::Enquire *_wrap_new_Enquire_xapian_1797894d64db9bab(Xapian::Database *_sw
 }
 
 
-void _wrap_delete_Enquire_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
+void _wrap_delete_Enquire_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   
   arg1 = *(Xapian::Enquire **)&_swig_go_0; 
@@ -3831,7 +4145,7 @@ void _wrap_delete_Enquire_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
 }
 
 
-void _wrap_Enquire_set_query__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::Query *_swig_go_1, intgo _swig_go_2) {
+void _wrap_Enquire_set_query__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::Query *_swig_go_1, intgo _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::Query *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -3845,7 +4159,7 @@ void _wrap_Enquire_set_query__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_s
 }
 
 
-void _wrap_Enquire_set_query__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::Query *_swig_go_1) {
+void _wrap_Enquire_set_query__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::Query *_swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::Query *arg2 = 0 ;
   
@@ -3857,7 +4171,7 @@ void _wrap_Enquire_set_query__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_s
 }
 
 
-Xapian::Query *_wrap_Enquire_get_query_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
+Xapian::Query *_wrap_Enquire_get_query_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::Query *result = 0 ;
   Xapian::Query *_swig_go_result;
@@ -3870,7 +4184,7 @@ Xapian::Query *_wrap_Enquire_get_query_xapian_1797894d64db9bab(Xapian::Enquire *
 }
 
 
-void _wrap_Enquire_add_matchspy_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::MatchSpy *_swig_go_1) {
+void _wrap_Enquire_add_matchspy_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::MatchSpy *_swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::MatchSpy *arg2 = (Xapian::MatchSpy *) 0 ;
   
@@ -3882,7 +4196,7 @@ void _wrap_Enquire_add_matchspy_xapian_1797894d64db9bab(Xapian::Enquire *_swig_g
 }
 
 
-void _wrap_Enquire_clear_matchspies_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
+void _wrap_Enquire_clear_matchspies_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   
   arg1 = *(Xapian::Enquire **)&_swig_go_0; 
@@ -3892,7 +4206,7 @@ void _wrap_Enquire_clear_matchspies_xapian_1797894d64db9bab(Xapian::Enquire *_sw
 }
 
 
-void _wrap_Enquire_set_weighting_scheme_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::Weight *_swig_go_1) {
+void _wrap_Enquire_set_weighting_scheme_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::Weight *_swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::Weight *arg2 = 0 ;
   
@@ -3904,7 +4218,7 @@ void _wrap_Enquire_set_weighting_scheme_xapian_1797894d64db9bab(Xapian::Enquire 
 }
 
 
-void _wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, _gostring_ _swig_go_1, double _swig_go_2) {
+void _wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, _gostring_ _swig_go_1, double _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   std::string *arg2 = 0 ;
   double arg3 ;
@@ -3921,7 +4235,7 @@ void _wrap_Enquire_set_expansion_scheme__SWIG_0_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -3936,7 +4250,7 @@ void _wrap_Enquire_set_expansion_scheme__SWIG_1_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_Enquire_set_collapse_key__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+void _wrap_Enquire_set_collapse_key__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::doccount arg3 ;
@@ -3950,7 +4264,7 @@ void _wrap_Enquire_set_collapse_key__SWIG_0_xapian_1797894d64db9bab(Xapian::Enqu
 }
 
 
-void _wrap_Enquire_set_collapse_key__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Enquire_set_collapse_key__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::valueno arg2 ;
   
@@ -3962,7 +4276,7 @@ void _wrap_Enquire_set_collapse_key__SWIG_1_xapian_1797894d64db9bab(Xapian::Enqu
 }
 
 
-intgo _wrap_ASCENDING_Enquire_xapian_1797894d64db9bab() {
+intgo _wrap_ASCENDING_Enquire_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3974,7 +4288,7 @@ intgo _wrap_ASCENDING_Enquire_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DESCENDING_Enquire_xapian_1797894d64db9bab() {
+intgo _wrap_DESCENDING_Enquire_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3986,7 +4300,7 @@ intgo _wrap_DESCENDING_Enquire_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DONT_CARE_Enquire_xapian_1797894d64db9bab() {
+intgo _wrap_DONT_CARE_Enquire_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -3998,7 +4312,7 @@ intgo _wrap_DONT_CARE_Enquire_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_Enquire_set_docid_order_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Enquire_set_docid_order_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::Enquire::docid_order arg2 ;
   
@@ -4010,7 +4324,7 @@ void _wrap_Enquire_set_docid_order_xapian_1797894d64db9bab(Xapian::Enquire *_swi
 }
 
 
-void _wrap_Enquire_set_cutoff__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_Enquire_set_cutoff__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   int arg2 ;
   double arg3 ;
@@ -4024,7 +4338,7 @@ void _wrap_Enquire_set_cutoff__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_
 }
 
 
-void _wrap_Enquire_set_cutoff__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Enquire_set_cutoff__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   int arg2 ;
   
@@ -4036,7 +4350,7 @@ void _wrap_Enquire_set_cutoff__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_
 }
 
 
-void _wrap_Enquire_set_sort_by_relevance_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
+void _wrap_Enquire_set_sort_by_relevance_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   
   arg1 = *(Xapian::Enquire **)&_swig_go_0; 
@@ -4046,7 +4360,7 @@ void _wrap_Enquire_set_sort_by_relevance_xapian_1797894d64db9bab(Xapian::Enquire
 }
 
 
-void _wrap_Enquire_set_sort_by_value_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_value_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::valueno arg2 ;
   bool arg3 ;
@@ -4060,7 +4374,7 @@ void _wrap_Enquire_set_sort_by_value_xapian_1797894d64db9bab(Xapian::Enquire *_s
 }
 
 
-void _wrap_Enquire_set_sort_by_key_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_key_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::KeyMaker *arg2 = (Xapian::KeyMaker *) 0 ;
   bool arg3 ;
@@ -4074,7 +4388,7 @@ void _wrap_Enquire_set_sort_by_key_xapian_1797894d64db9bab(Xapian::Enquire *_swi
 }
 
 
-void _wrap_Enquire_set_sort_by_value_then_relevance_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_value_then_relevance_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::valueno arg2 ;
   bool arg3 ;
@@ -4088,7 +4402,7 @@ void _wrap_Enquire_set_sort_by_value_then_relevance_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_Enquire_set_sort_by_key_then_relevance_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_key_then_relevance_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::KeyMaker *arg2 = (Xapian::KeyMaker *) 0 ;
   bool arg3 ;
@@ -4102,7 +4416,7 @@ void _wrap_Enquire_set_sort_by_key_then_relevance_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_Enquire_set_sort_by_relevance_then_value_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_relevance_then_value_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::valueno arg2 ;
   bool arg3 ;
@@ -4116,7 +4430,7 @@ void _wrap_Enquire_set_sort_by_relevance_then_value_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_Enquire_set_sort_by_relevance_then_key_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
+void _wrap_Enquire_set_sort_by_relevance_then_key_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::KeyMaker *_swig_go_1, bool _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::KeyMaker *arg2 = (Xapian::KeyMaker *) 0 ;
   bool arg3 ;
@@ -4130,7 +4444,7 @@ void _wrap_Enquire_set_sort_by_relevance_then_key_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_Enquire_set_time_limit_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, double _swig_go_1) {
+void _wrap_Enquire_set_time_limit_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, double _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   double arg2 ;
   
@@ -4142,7 +4456,7 @@ void _wrap_Enquire_set_time_limit_xapian_1797894d64db9bab(Xapian::Enquire *_swig
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::RSet *_swig_go_4, Xapian::MatchDecider *_swig_go_5) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::RSet *_swig_go_4, Xapian::MatchDecider *_swig_go_5) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4165,7 +4479,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_0_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::RSet *_swig_go_4) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::RSet *_swig_go_4) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4186,7 +4500,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_1_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_2_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_2_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4205,7 +4519,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_2_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_3_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_3_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4222,7 +4536,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_3_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_4_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, Xapian::RSet *_swig_go_3, Xapian::MatchDecider *_swig_go_4) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_4_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, Xapian::RSet *_swig_go_3, Xapian::MatchDecider *_swig_go_4) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4243,7 +4557,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_4_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::MSet *_wrap_Enquire_get_mset__SWIG_5_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, Xapian::RSet *_swig_go_3) {
+Xapian::MSet *_wrap_Enquire_get_mset__SWIG_5_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, Xapian::RSet *_swig_go_3) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::doccount arg2 ;
   Xapian::doccount arg3 ;
@@ -4262,7 +4576,7 @@ Xapian::MSet *_wrap_Enquire_get_mset__SWIG_5_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-intgo _wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_1797894d64db9bab() {
+intgo _wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -4274,7 +4588,7 @@ intgo _wrap_Enquire_INCLUDE_QUERY_TERMS_Enquire_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_1797894d64db9bab() {
+intgo _wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -4286,7 +4600,7 @@ intgo _wrap_Enquire_USE_EXACT_TERMFREQ_Enquire_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, Xapian::ExpandDecider *_swig_go_4, double _swig_go_5) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, Xapian::ExpandDecider *_swig_go_4, double _swig_go_5) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4309,7 +4623,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_0_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, Xapian::ExpandDecider *_swig_go_4) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, Xapian::ExpandDecider *_swig_go_4) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4330,7 +4644,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_1_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_2_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_2_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4349,7 +4663,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_2_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_3_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_3_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4366,7 +4680,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_3_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_4_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, Xapian::ExpandDecider *_swig_go_3) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_4_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, Xapian::ExpandDecider *_swig_go_3) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4385,7 +4699,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_4_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_5_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4, Xapian::ExpandDecider *_swig_go_5, double _swig_go_6) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_5_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4, Xapian::ExpandDecider *_swig_go_5, double _swig_go_6) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4410,7 +4724,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_5_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_6_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4, Xapian::ExpandDecider *_swig_go_5) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_6_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4, Xapian::ExpandDecider *_swig_go_5) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4433,7 +4747,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_6_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::ESet *_wrap_Enquire_get_eset__SWIG_7_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4) {
+Xapian::ESet *_wrap_Enquire_get_eset__SWIG_7_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1, Xapian::RSet *_swig_go_2, intgo _swig_go_3, double _swig_go_4) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::RSet *arg3 = 0 ;
@@ -4454,7 +4768,7 @@ Xapian::ESet *_wrap_Enquire_get_eset__SWIG_7_xapian_1797894d64db9bab(Xapian::Enq
 }
 
 
-Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -4469,7 +4783,7 @@ Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_0_xapian_1797
 }
 
 
-Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, intgo _swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -4484,7 +4798,7 @@ Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_0_xapian_179789
 }
 
 
-Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::MSetIterator *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -4499,7 +4813,7 @@ Xapian::TermIterator *_wrap_Enquire_get_matching_terms_begin__SWIG_1_xapian_1797
 }
 
 
-Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
+Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0, Xapian::MSetIterator *_swig_go_1) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   Xapian::MSetIterator *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -4514,7 +4828,7 @@ Xapian::TermIterator *_wrap_Enquire_get_matching_terms_end__SWIG_1_xapian_179789
 }
 
 
-_gostring_ _wrap_Enquire_get_description_xapian_1797894d64db9bab(Xapian::Enquire *_swig_go_0) {
+_gostring_ _wrap_Enquire_get_description_xapian_245a1afe1629f0b1(Xapian::Enquire *_swig_go_0) {
   Xapian::Enquire *arg1 = (Xapian::Enquire *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -4527,7 +4841,7 @@ _gostring_ _wrap_Enquire_get_description_xapian_1797894d64db9bab(Xapian::Enquire
 }
 
 
-Xapian::ExpandDecider *_wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ExpandDecider *_wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4540,7 +4854,7 @@ Xapian::ExpandDecider *_wrap__swig_NewDirectorExpandDeciderExpandDecider_xapian_
 }
 
 
-void _wrap_DeleteDirectorExpandDecider_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0) {
+void _wrap_DeleteDirectorExpandDecider_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0) {
   Xapian::ExpandDecider *arg1 = (Xapian::ExpandDecider *) 0 ;
   
   arg1 = *(Xapian::ExpandDecider **)&_swig_go_0; 
@@ -4550,7 +4864,7 @@ void _wrap_DeleteDirectorExpandDecider_xapian_1797894d64db9bab(Xapian::ExpandDec
 }
 
 
-bool _wrap_ExpandDecider_Apply_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_ExpandDecider_Apply_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ExpandDecider *arg1 = (Xapian::ExpandDecider *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -4568,7 +4882,7 @@ bool _wrap_ExpandDecider_Apply_xapian_1797894d64db9bab(Xapian::ExpandDecider *_s
 }
 
 
-void _wrap_delete_ExpandDecider_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0) {
+void _wrap_delete_ExpandDecider_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0) {
   Xapian::ExpandDecider *arg1 = (Xapian::ExpandDecider *) 0 ;
   
   arg1 = *(Xapian::ExpandDecider **)&_swig_go_0; 
@@ -4578,7 +4892,7 @@ void _wrap_delete_ExpandDecider_xapian_1797894d64db9bab(Xapian::ExpandDecider *_
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0) {
   Xapian::ExpandDecider *arg1 = (Xapian::ExpandDecider *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4591,7 +4905,7 @@ Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_0_xapian_1797894d64db9b
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0) {
   Xapian::ExpandDecider *arg1 = (Xapian::ExpandDecider *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4604,7 +4918,7 @@ Xapian::ExpandDecider *_wrap_ExpandDecider_release__SWIG_1_xapian_1797894d64db9b
 }
 
 
-Xapian::ExpandDeciderAnd *_wrap_new_ExpandDeciderAnd_xapian_1797894d64db9bab(Xapian::ExpandDecider *_swig_go_0, Xapian::ExpandDecider *_swig_go_1) {
+Xapian::ExpandDeciderAnd *_wrap_new_ExpandDeciderAnd_xapian_245a1afe1629f0b1(Xapian::ExpandDecider *_swig_go_0, Xapian::ExpandDecider *_swig_go_1) {
   Xapian::ExpandDecider *arg1 = 0 ;
   Xapian::ExpandDecider *arg2 = 0 ;
   Xapian::ExpandDeciderAnd *result = 0 ;
@@ -4619,7 +4933,7 @@ Xapian::ExpandDeciderAnd *_wrap_new_ExpandDeciderAnd_xapian_1797894d64db9bab(Xap
 }
 
 
-bool _wrap_ExpandDeciderAnd_Apply_xapian_1797894d64db9bab(Xapian::ExpandDeciderAnd *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_ExpandDeciderAnd_Apply_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderAnd *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ExpandDeciderAnd *arg1 = (Xapian::ExpandDeciderAnd *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -4637,7 +4951,7 @@ bool _wrap_ExpandDeciderAnd_Apply_xapian_1797894d64db9bab(Xapian::ExpandDeciderA
 }
 
 
-void _wrap_delete_ExpandDeciderAnd_xapian_1797894d64db9bab(Xapian::ExpandDeciderAnd *_swig_go_0) {
+void _wrap_delete_ExpandDeciderAnd_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderAnd *_swig_go_0) {
   Xapian::ExpandDeciderAnd *arg1 = (Xapian::ExpandDeciderAnd *) 0 ;
   
   arg1 = *(Xapian::ExpandDeciderAnd **)&_swig_go_0; 
@@ -4647,7 +4961,7 @@ void _wrap_delete_ExpandDeciderAnd_xapian_1797894d64db9bab(Xapian::ExpandDecider
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ExpandDeciderAnd *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderAnd *_swig_go_0) {
   Xapian::ExpandDeciderAnd *arg1 = (Xapian::ExpandDeciderAnd *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4661,7 +4975,7 @@ Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_0_xapian_1797894d64d
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ExpandDeciderAnd *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderAnd *_swig_go_0) {
   Xapian::ExpandDeciderAnd *arg1 = (Xapian::ExpandDeciderAnd *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4675,7 +4989,7 @@ Xapian::ExpandDecider *_wrap_ExpandDeciderAnd_release__SWIG_1_xapian_1797894d64d
 }
 
 
-Xapian::ExpandDeciderFilterPrefix *_wrap_new_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::ExpandDeciderFilterPrefix *_wrap_new_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::ExpandDeciderFilterPrefix *result = 0 ;
   Xapian::ExpandDeciderFilterPrefix *_swig_go_result;
@@ -4691,7 +5005,7 @@ Xapian::ExpandDeciderFilterPrefix *_wrap_new_ExpandDeciderFilterPrefix_xapian_17
 }
 
 
-bool _wrap_ExpandDeciderFilterPrefix_Apply_xapian_1797894d64db9bab(Xapian::ExpandDeciderFilterPrefix *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_ExpandDeciderFilterPrefix_Apply_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderFilterPrefix *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ExpandDeciderFilterPrefix *arg1 = (Xapian::ExpandDeciderFilterPrefix *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -4709,7 +5023,7 @@ bool _wrap_ExpandDeciderFilterPrefix_Apply_xapian_1797894d64db9bab(Xapian::Expan
 }
 
 
-void _wrap_delete_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
+void _wrap_delete_ExpandDeciderFilterPrefix_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
   Xapian::ExpandDeciderFilterPrefix *arg1 = (Xapian::ExpandDeciderFilterPrefix *) 0 ;
   
   arg1 = *(Xapian::ExpandDeciderFilterPrefix **)&_swig_go_0; 
@@ -4719,7 +5033,7 @@ void _wrap_delete_ExpandDeciderFilterPrefix_xapian_1797894d64db9bab(Xapian::Expa
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
   Xapian::ExpandDeciderFilterPrefix *arg1 = (Xapian::ExpandDeciderFilterPrefix *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4733,7 +5047,7 @@ Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_0_xapian_17
 }
 
 
-Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
+Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ExpandDeciderFilterPrefix *_swig_go_0) {
   Xapian::ExpandDeciderFilterPrefix *arg1 = (Xapian::ExpandDeciderFilterPrefix *) 0 ;
   Xapian::ExpandDecider *result = 0 ;
   Xapian::ExpandDecider *_swig_go_result;
@@ -4747,7 +5061,7 @@ Xapian::ExpandDecider *_wrap_ExpandDeciderFilterPrefix_release__SWIG_1_xapian_17
 }
 
 
-Xapian::KeyMaker *_wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::KeyMaker *_wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -4760,7 +5074,7 @@ Xapian::KeyMaker *_wrap__swig_NewDirectorKeyMakerKeyMaker_xapian_1797894d64db9ba
 }
 
 
-void _wrap_DeleteDirectorKeyMaker_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0) {
+void _wrap_DeleteDirectorKeyMaker_xapian_245a1afe1629f0b1(Xapian::KeyMaker *_swig_go_0) {
   Xapian::KeyMaker *arg1 = (Xapian::KeyMaker *) 0 ;
   
   arg1 = *(Xapian::KeyMaker **)&_swig_go_0; 
@@ -4770,7 +5084,7 @@ void _wrap_DeleteDirectorKeyMaker_xapian_1797894d64db9bab(Xapian::KeyMaker *_swi
 }
 
 
-_gostring_ _wrap_KeyMaker_Apply_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
+_gostring_ _wrap_KeyMaker_Apply_xapian_245a1afe1629f0b1(Xapian::KeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::KeyMaker *arg1 = (Xapian::KeyMaker *) 0 ;
   Xapian::Document *arg2 = 0 ;
   std::string result;
@@ -4785,7 +5099,7 @@ _gostring_ _wrap_KeyMaker_Apply_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_
 }
 
 
-void _wrap_delete_KeyMaker_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0) {
+void _wrap_delete_KeyMaker_xapian_245a1afe1629f0b1(Xapian::KeyMaker *_swig_go_0) {
   Xapian::KeyMaker *arg1 = (Xapian::KeyMaker *) 0 ;
   
   arg1 = *(Xapian::KeyMaker **)&_swig_go_0; 
@@ -4795,7 +5109,7 @@ void _wrap_delete_KeyMaker_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0)
 }
 
 
-Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_0_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::KeyMaker *_swig_go_0) {
   Xapian::KeyMaker *arg1 = (Xapian::KeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -4808,7 +5122,7 @@ Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_0_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_1_xapian_1797894d64db9bab(Xapian::KeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::KeyMaker *_swig_go_0) {
   Xapian::KeyMaker *arg1 = (Xapian::KeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -4821,7 +5135,7 @@ Xapian::KeyMaker *_wrap_KeyMaker_release__SWIG_1_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::MultiValueKeyMaker *_wrap_new_MultiValueKeyMaker_xapian_1797894d64db9bab() {
+Xapian::MultiValueKeyMaker *_wrap_new_MultiValueKeyMaker_xapian_245a1afe1629f0b1() {
   Xapian::MultiValueKeyMaker *result = 0 ;
   Xapian::MultiValueKeyMaker *_swig_go_result;
   
@@ -4832,7 +5146,7 @@ Xapian::MultiValueKeyMaker *_wrap_new_MultiValueKeyMaker_xapian_1797894d64db9bab
 }
 
 
-_gostring_ _wrap_MultiValueKeyMaker_Apply_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
+_gostring_ _wrap_MultiValueKeyMaker_Apply_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::Document *arg2 = 0 ;
   std::string result;
@@ -4847,7 +5161,7 @@ _gostring_ _wrap_MultiValueKeyMaker_Apply_xapian_1797894d64db9bab(Xapian::MultiV
 }
 
 
-void _wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1, bool _swig_go_2, _gostring_ _swig_go_3) {
+void _wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1, bool _swig_go_2, _gostring_ _swig_go_3) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::valueno arg2 ;
   bool arg3 ;
@@ -4866,7 +5180,7 @@ void _wrap_MultiValueKeyMaker_add_value__SWIG_0_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
+void _wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1, bool _swig_go_2) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::valueno arg2 ;
   bool arg3 ;
@@ -4880,7 +5194,7 @@ void _wrap_MultiValueKeyMaker_add_value__SWIG_1_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1) {
+void _wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0, intgo _swig_go_1) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::valueno arg2 ;
   
@@ -4892,7 +5206,7 @@ void _wrap_MultiValueKeyMaker_add_value__SWIG_2_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_delete_MultiValueKeyMaker_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0) {
+void _wrap_delete_MultiValueKeyMaker_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   
   arg1 = *(Xapian::MultiValueKeyMaker **)&_swig_go_0; 
@@ -4902,7 +5216,7 @@ void _wrap_delete_MultiValueKeyMaker_xapian_1797894d64db9bab(Xapian::MultiValueK
 }
 
 
-Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -4916,7 +5230,7 @@ Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_0_xapian_1797894d64db9b
 }
 
 
-Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(Xapian::MultiValueKeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::MultiValueKeyMaker *_swig_go_0) {
   Xapian::MultiValueKeyMaker *arg1 = (Xapian::MultiValueKeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -4930,7 +5244,7 @@ Xapian::KeyMaker *_wrap_MultiValueKeyMaker_release__SWIG_1_xapian_1797894d64db9b
 }
 
 
-Xapian::Stopper *_wrap__swig_NewDirectorStopperStopper_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::Stopper *_wrap__swig_NewDirectorStopperStopper_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::Stopper *result = 0 ;
   Xapian::Stopper *_swig_go_result;
@@ -4943,7 +5257,7 @@ Xapian::Stopper *_wrap__swig_NewDirectorStopperStopper_xapian_1797894d64db9bab(i
 }
 
 
-void _wrap_DeleteDirectorStopper_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
+void _wrap_DeleteDirectorStopper_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   
   arg1 = *(Xapian::Stopper **)&_swig_go_0; 
@@ -4953,7 +5267,7 @@ void _wrap_DeleteDirectorStopper_xapian_1797894d64db9bab(Xapian::Stopper *_swig_
 }
 
 
-_gostring_ _wrap__swig_DirectorStopper_upcall_Get_description_xapian_1797894d64db9bab(SwigDirector_Stopper *_swig_go_0) {
+_gostring_ _wrap__swig_DirectorStopper_upcall_Get_description_xapian_245a1afe1629f0b1(SwigDirector_Stopper *_swig_go_0) {
   SwigDirector_Stopper *arg1 = (SwigDirector_Stopper *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -4966,7 +5280,7 @@ _gostring_ _wrap__swig_DirectorStopper_upcall_Get_description_xapian_1797894d64d
 }
 
 
-bool _wrap_Stopper_Apply_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_Stopper_Apply_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -4984,7 +5298,7 @@ bool _wrap_Stopper_Apply_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0, _g
 }
 
 
-void _wrap_delete_Stopper_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
+void _wrap_delete_Stopper_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   
   arg1 = *(Xapian::Stopper **)&_swig_go_0; 
@@ -4994,7 +5308,7 @@ void _wrap_delete_Stopper_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
 }
 
 
-_gostring_ _wrap_Stopper_get_description_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
+_gostring_ _wrap_Stopper_get_description_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -5007,7 +5321,7 @@ _gostring_ _wrap_Stopper_get_description_xapian_1797894d64db9bab(Xapian::Stopper
 }
 
 
-Xapian::Stopper *_wrap_Stopper_release__SWIG_0_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
+Xapian::Stopper *_wrap_Stopper_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   Xapian::Stopper *result = 0 ;
   Xapian::Stopper *_swig_go_result;
@@ -5020,7 +5334,7 @@ Xapian::Stopper *_wrap_Stopper_release__SWIG_0_xapian_1797894d64db9bab(Xapian::S
 }
 
 
-Xapian::Stopper *_wrap_Stopper_release__SWIG_1_xapian_1797894d64db9bab(Xapian::Stopper *_swig_go_0) {
+Xapian::Stopper *_wrap_Stopper_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Stopper *_swig_go_0) {
   Xapian::Stopper *arg1 = (Xapian::Stopper *) 0 ;
   Xapian::Stopper *result = 0 ;
   Xapian::Stopper *_swig_go_result;
@@ -5033,7 +5347,7 @@ Xapian::Stopper *_wrap_Stopper_release__SWIG_1_xapian_1797894d64db9bab(Xapian::S
 }
 
 
-Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::SimpleStopper *result = 0 ;
   Xapian::SimpleStopper *_swig_go_result;
   
@@ -5044,7 +5358,7 @@ Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_0_xapian_1797894d64db9bab()
 }
 
 
-void _wrap_SimpleStopper_add_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_SimpleStopper_add_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -5059,7 +5373,7 @@ void _wrap_SimpleStopper_add_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swi
 }
 
 
-bool _wrap_SimpleStopper_Apply_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_SimpleStopper_Apply_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -5077,7 +5391,7 @@ bool _wrap_SimpleStopper_Apply_xapian_1797894d64db9bab(Xapian::SimpleStopper *_s
 }
 
 
-_gostring_ _wrap_SimpleStopper_get_description_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0) {
+_gostring_ _wrap_SimpleStopper_get_description_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -5090,7 +5404,7 @@ _gostring_ _wrap_SimpleStopper_get_description_xapian_1797894d64db9bab(Xapian::S
 }
 
 
-Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::SimpleStopper *result = 0 ;
   Xapian::SimpleStopper *_swig_go_result;
@@ -5106,7 +5420,7 @@ Xapian::SimpleStopper *_wrap_new_SimpleStopper__SWIG_2_xapian_1797894d64db9bab(_
 }
 
 
-void _wrap_delete_SimpleStopper_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0) {
+void _wrap_delete_SimpleStopper_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   
   arg1 = *(Xapian::SimpleStopper **)&_swig_go_0; 
@@ -5116,7 +5430,7 @@ void _wrap_delete_SimpleStopper_xapian_1797894d64db9bab(Xapian::SimpleStopper *_
 }
 
 
-Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_0_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0) {
+Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   Xapian::Stopper *result = 0 ;
   Xapian::Stopper *_swig_go_result;
@@ -5130,7 +5444,7 @@ Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_0_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_1_xapian_1797894d64db9bab(Xapian::SimpleStopper *_swig_go_0) {
+Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::SimpleStopper *_swig_go_0) {
   Xapian::SimpleStopper *arg1 = (Xapian::SimpleStopper *) 0 ;
   Xapian::Stopper *result = 0 ;
   Xapian::Stopper *_swig_go_result;
@@ -5144,7 +5458,7 @@ Xapian::Stopper *_wrap_SimpleStopper_release__SWIG_1_xapian_1797894d64db9bab(Xap
 }
 
 
-intgo _wrap_RP_SUFFIX_xapian_1797894d64db9bab() {
+intgo _wrap_RP_SUFFIX_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -5156,7 +5470,7 @@ intgo _wrap_RP_SUFFIX_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_RP_REPEATED_xapian_1797894d64db9bab() {
+intgo _wrap_RP_REPEATED_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -5168,7 +5482,7 @@ intgo _wrap_RP_REPEATED_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_RP_DATE_PREFER_MDY_xapian_1797894d64db9bab() {
+intgo _wrap_RP_DATE_PREFER_MDY_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -5180,7 +5494,7 @@ intgo _wrap_RP_DATE_PREFER_MDY_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
   
@@ -5191,7 +5505,7 @@ Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_0_xapian_1797894d64db9bab
 }
 
 
-Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -5211,7 +5525,7 @@ Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_1_xapian_1797894d64db9bab
 }
 
 
-Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::RangeProcessor *result = 0 ;
@@ -5229,7 +5543,7 @@ Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_2_xapian_1797894d64db9bab
 }
 
 
-Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5242,7 +5556,7 @@ Xapian::RangeProcessor *_wrap_new_RangeProcessor__SWIG_3_xapian_1797894d64db9bab
 }
 
 
-void _wrap_delete_RangeProcessor_xapian_1797894d64db9bab(Xapian::RangeProcessor *_swig_go_0) {
+void _wrap_delete_RangeProcessor_xapian_245a1afe1629f0b1(Xapian::RangeProcessor *_swig_go_0) {
   Xapian::RangeProcessor *arg1 = (Xapian::RangeProcessor *) 0 ;
   
   arg1 = *(Xapian::RangeProcessor **)&_swig_go_0; 
@@ -5252,7 +5566,7 @@ void _wrap_delete_RangeProcessor_xapian_1797894d64db9bab(Xapian::RangeProcessor 
 }
 
 
-Xapian::Query *_wrap_RangeProcessor_check_range_xapian_1797894d64db9bab(Xapian::RangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_RangeProcessor_check_range_xapian_245a1afe1629f0b1(Xapian::RangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::RangeProcessor *arg1 = (Xapian::RangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5275,7 +5589,7 @@ Xapian::Query *_wrap_RangeProcessor_check_range_xapian_1797894d64db9bab(Xapian::
 }
 
 
-Xapian::Query *_wrap_RangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::RangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_RangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::RangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::RangeProcessor *arg1 = (Xapian::RangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5298,7 +5612,7 @@ Xapian::Query *_wrap_RangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::RangeP
 }
 
 
-Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::RangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::RangeProcessor *_swig_go_0) {
   Xapian::RangeProcessor *arg1 = (Xapian::RangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5311,7 +5625,7 @@ Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_0_xapian_1797894d64db
 }
 
 
-Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::RangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::RangeProcessor *_swig_go_0) {
   Xapian::RangeProcessor *arg1 = (Xapian::RangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5324,7 +5638,7 @@ Xapian::RangeProcessor *_wrap_RangeProcessor_release__SWIG_1_xapian_1797894d64db
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   unsigned int arg2 ;
   int arg3 ;
@@ -5341,7 +5655,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_0_xapian_1797894d
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1) {
   Xapian::valueno arg1 ;
   unsigned int arg2 ;
   Xapian::DateRangeProcessor *result = 0 ;
@@ -5356,7 +5670,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_1_xapian_1797894d
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::DateRangeProcessor *result = 0 ;
   Xapian::DateRangeProcessor *_swig_go_result;
@@ -5369,7 +5683,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_2_xapian_1797894d
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -5391,7 +5705,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_3_xapian_1797894d
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -5411,7 +5725,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_4_xapian_1797894d
 }
 
 
-Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_5_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::DateRangeProcessor *result = 0 ;
@@ -5429,7 +5743,7 @@ Xapian::DateRangeProcessor *_wrap_new_DateRangeProcessor__SWIG_5_xapian_1797894d
 }
 
 
-Xapian::Query *_wrap_DateRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::DateRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_DateRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::DateRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::DateRangeProcessor *arg1 = (Xapian::DateRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5452,7 +5766,7 @@ Xapian::Query *_wrap_DateRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::Da
 }
 
 
-void _wrap_delete_DateRangeProcessor_xapian_1797894d64db9bab(Xapian::DateRangeProcessor *_swig_go_0) {
+void _wrap_delete_DateRangeProcessor_xapian_245a1afe1629f0b1(Xapian::DateRangeProcessor *_swig_go_0) {
   Xapian::DateRangeProcessor *arg1 = (Xapian::DateRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::DateRangeProcessor **)&_swig_go_0; 
@@ -5462,7 +5776,7 @@ void _wrap_delete_DateRangeProcessor_xapian_1797894d64db9bab(Xapian::DateRangePr
 }
 
 
-Xapian::Query *_wrap_DateRangeProcessor_check_range_xapian_1797894d64db9bab(Xapian::DateRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_DateRangeProcessor_check_range_xapian_245a1afe1629f0b1(Xapian::DateRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::DateRangeProcessor *arg1 = (Xapian::DateRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5486,7 +5800,7 @@ Xapian::Query *_wrap_DateRangeProcessor_check_range_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::DateRangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::DateRangeProcessor *_swig_go_0) {
   Xapian::DateRangeProcessor *arg1 = (Xapian::DateRangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5500,7 +5814,7 @@ Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_0_xapian_1797894d
 }
 
 
-Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::DateRangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::DateRangeProcessor *_swig_go_0) {
   Xapian::DateRangeProcessor *arg1 = (Xapian::DateRangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5514,7 +5828,7 @@ Xapian::RangeProcessor *_wrap_DateRangeProcessor_release__SWIG_1_xapian_1797894d
 }
 
 
-Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -5534,7 +5848,7 @@ Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_0_xapian_1797
 }
 
 
-Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::NumberRangeProcessor *result = 0 ;
@@ -5552,7 +5866,7 @@ Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_1_xapian_1797
 }
 
 
-Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::NumberRangeProcessor *result = 0 ;
   Xapian::NumberRangeProcessor *_swig_go_result;
@@ -5565,7 +5879,7 @@ Xapian::NumberRangeProcessor *_wrap_new_NumberRangeProcessor__SWIG_2_xapian_1797
 }
 
 
-Xapian::Query *_wrap_NumberRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::NumberRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_NumberRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::NumberRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::NumberRangeProcessor *arg1 = (Xapian::NumberRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5588,7 +5902,7 @@ Xapian::Query *_wrap_NumberRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_delete_NumberRangeProcessor_xapian_1797894d64db9bab(Xapian::NumberRangeProcessor *_swig_go_0) {
+void _wrap_delete_NumberRangeProcessor_xapian_245a1afe1629f0b1(Xapian::NumberRangeProcessor *_swig_go_0) {
   Xapian::NumberRangeProcessor *arg1 = (Xapian::NumberRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::NumberRangeProcessor **)&_swig_go_0; 
@@ -5598,7 +5912,7 @@ void _wrap_delete_NumberRangeProcessor_xapian_1797894d64db9bab(Xapian::NumberRan
 }
 
 
-Xapian::Query *_wrap_NumberRangeProcessor_check_range_xapian_1797894d64db9bab(Xapian::NumberRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::Query *_wrap_NumberRangeProcessor_check_range_xapian_245a1afe1629f0b1(Xapian::NumberRangeProcessor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::NumberRangeProcessor *arg1 = (Xapian::NumberRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5622,7 +5936,7 @@ Xapian::Query *_wrap_NumberRangeProcessor_check_range_xapian_1797894d64db9bab(Xa
 }
 
 
-Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::NumberRangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::NumberRangeProcessor *_swig_go_0) {
   Xapian::NumberRangeProcessor *arg1 = (Xapian::NumberRangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5636,7 +5950,7 @@ Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_0_xapian_179789
 }
 
 
-Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::NumberRangeProcessor *_swig_go_0) {
+Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::NumberRangeProcessor *_swig_go_0) {
   Xapian::NumberRangeProcessor *arg1 = (Xapian::NumberRangeProcessor *) 0 ;
   Xapian::RangeProcessor *result = 0 ;
   Xapian::RangeProcessor *_swig_go_result;
@@ -5650,7 +5964,7 @@ Xapian::RangeProcessor *_wrap_NumberRangeProcessor_release__SWIG_1_xapian_179789
 }
 
 
-Xapian::ValueRangeProcessor *_wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap__swig_NewDirectorValueRangeProcessorValueRangeProcessor_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -5663,7 +5977,7 @@ Xapian::ValueRangeProcessor *_wrap__swig_NewDirectorValueRangeProcessorValueRang
 }
 
 
-void _wrap_DeleteDirectorValueRangeProcessor_xapian_1797894d64db9bab(Xapian::ValueRangeProcessor *_swig_go_0) {
+void _wrap_DeleteDirectorValueRangeProcessor_xapian_245a1afe1629f0b1(Xapian::ValueRangeProcessor *_swig_go_0) {
   Xapian::ValueRangeProcessor *arg1 = (Xapian::ValueRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::ValueRangeProcessor **)&_swig_go_0; 
@@ -5673,7 +5987,7 @@ void _wrap_DeleteDirectorValueRangeProcessor_xapian_1797894d64db9bab(Xapian::Val
 }
 
 
-void _wrap_delete_ValueRangeProcessor_xapian_1797894d64db9bab(Xapian::ValueRangeProcessor *_swig_go_0) {
+void _wrap_delete_ValueRangeProcessor_xapian_245a1afe1629f0b1(Xapian::ValueRangeProcessor *_swig_go_0) {
   Xapian::ValueRangeProcessor *arg1 = (Xapian::ValueRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::ValueRangeProcessor **)&_swig_go_0; 
@@ -5683,7 +5997,7 @@ void _wrap_delete_ValueRangeProcessor_xapian_1797894d64db9bab(Xapian::ValueRange
 }
 
 
-intgo _wrap_ValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::ValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
+intgo _wrap_ValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::ValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
   Xapian::ValueRangeProcessor *arg1 = (Xapian::ValueRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5700,7 +6014,7 @@ intgo _wrap_ValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::ValueRange
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ValueRangeProcessor *_swig_go_0) {
   Xapian::ValueRangeProcessor *arg1 = (Xapian::ValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -5713,7 +6027,7 @@ Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_0_xapian_17
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ValueRangeProcessor *_swig_go_0) {
   Xapian::ValueRangeProcessor *arg1 = (Xapian::ValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -5726,7 +6040,7 @@ Xapian::ValueRangeProcessor *_wrap_ValueRangeProcessor_release__SWIG_1_xapian_17
 }
 
 
-Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::StringValueRangeProcessor *result = 0 ;
   Xapian::StringValueRangeProcessor *_swig_go_result;
@@ -5739,7 +6053,7 @@ Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_0_x
 }
 
 
-Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
+Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5759,7 +6073,7 @@ Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_1_x
 }
 
 
-Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::StringValueRangeProcessor *result = 0 ;
@@ -5777,7 +6091,7 @@ Xapian::StringValueRangeProcessor *_wrap_new_StringValueRangeProcessor__SWIG_2_x
 }
 
 
-intgo _wrap_StringValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::StringValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
+intgo _wrap_StringValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::StringValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
   Xapian::StringValueRangeProcessor *arg1 = (Xapian::StringValueRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5794,7 +6108,7 @@ intgo _wrap_StringValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::Stri
 }
 
 
-void _wrap_delete_StringValueRangeProcessor_xapian_1797894d64db9bab(Xapian::StringValueRangeProcessor *_swig_go_0) {
+void _wrap_delete_StringValueRangeProcessor_xapian_245a1afe1629f0b1(Xapian::StringValueRangeProcessor *_swig_go_0) {
   Xapian::StringValueRangeProcessor *arg1 = (Xapian::StringValueRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::StringValueRangeProcessor **)&_swig_go_0; 
@@ -5804,7 +6118,7 @@ void _wrap_delete_StringValueRangeProcessor_xapian_1797894d64db9bab(Xapian::Stri
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::StringValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::StringValueRangeProcessor *_swig_go_0) {
   Xapian::StringValueRangeProcessor *arg1 = (Xapian::StringValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -5818,7 +6132,7 @@ Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_0_xap
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::StringValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::StringValueRangeProcessor *_swig_go_0) {
   Xapian::StringValueRangeProcessor *arg1 = (Xapian::StringValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -5832,7 +6146,7 @@ Xapian::ValueRangeProcessor *_wrap_StringValueRangeProcessor_release__SWIG_1_xap
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, bool _swig_go_1, intgo _swig_go_2) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, bool _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   bool arg2 ;
   int arg3 ;
@@ -5849,7 +6163,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_0_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, bool _swig_go_1) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, bool _swig_go_1) {
   Xapian::valueno arg1 ;
   bool arg2 ;
   Xapian::DateValueRangeProcessor *result = 0 ;
@@ -5864,7 +6178,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_1_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::DateValueRangeProcessor *result = 0 ;
   Xapian::DateValueRangeProcessor *_swig_go_result;
@@ -5877,7 +6191,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_2_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2, bool _swig_go_3, intgo _swig_go_4) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2, bool _swig_go_3, intgo _swig_go_4) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5901,7 +6215,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_3_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2, bool _swig_go_3) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2, bool _swig_go_3) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5923,7 +6237,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_4_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_5_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_5_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5943,7 +6257,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_5_xapia
 }
 
 
-Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_6_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_6_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::DateValueRangeProcessor *result = 0 ;
@@ -5961,7 +6275,7 @@ Xapian::DateValueRangeProcessor *_wrap_new_DateValueRangeProcessor__SWIG_6_xapia
 }
 
 
-intgo _wrap_DateValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::DateValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
+intgo _wrap_DateValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::DateValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
   Xapian::DateValueRangeProcessor *arg1 = (Xapian::DateValueRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5978,7 +6292,7 @@ intgo _wrap_DateValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::DateVa
 }
 
 
-void _wrap_delete_DateValueRangeProcessor_xapian_1797894d64db9bab(Xapian::DateValueRangeProcessor *_swig_go_0) {
+void _wrap_delete_DateValueRangeProcessor_xapian_245a1afe1629f0b1(Xapian::DateValueRangeProcessor *_swig_go_0) {
   Xapian::DateValueRangeProcessor *arg1 = (Xapian::DateValueRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::DateValueRangeProcessor **)&_swig_go_0; 
@@ -5988,7 +6302,7 @@ void _wrap_delete_DateValueRangeProcessor_xapian_1797894d64db9bab(Xapian::DateVa
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::DateValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::DateValueRangeProcessor *_swig_go_0) {
   Xapian::DateValueRangeProcessor *arg1 = (Xapian::DateValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -6003,7 +6317,7 @@ Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_0_xapia
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::DateValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::DateValueRangeProcessor *_swig_go_0) {
   Xapian::DateValueRangeProcessor *arg1 = (Xapian::DateValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -6018,7 +6332,7 @@ Xapian::ValueRangeProcessor *_wrap_DateValueRangeProcessor_release__SWIG_1_xapia
 }
 
 
-Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::NumberValueRangeProcessor *result = 0 ;
   Xapian::NumberValueRangeProcessor *_swig_go_result;
@@ -6031,7 +6345,7 @@ Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_0_x
 }
 
 
-Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
+Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1, bool _swig_go_2) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -6051,7 +6365,7 @@ Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_1_x
 }
 
 
-Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, _gostring_ _swig_go_1) {
   Xapian::valueno arg1 ;
   std::string *arg2 = 0 ;
   Xapian::NumberValueRangeProcessor *result = 0 ;
@@ -6069,7 +6383,7 @@ Xapian::NumberValueRangeProcessor *_wrap_new_NumberValueRangeProcessor__SWIG_2_x
 }
 
 
-intgo _wrap_NumberValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::NumberValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
+intgo _wrap_NumberValueRangeProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::NumberValueRangeProcessor *_swig_go_0, std::string *_swig_go_1, std::string *_swig_go_2) {
   Xapian::NumberValueRangeProcessor *arg1 = (Xapian::NumberValueRangeProcessor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -6086,7 +6400,7 @@ intgo _wrap_NumberValueRangeProcessor_Apply_xapian_1797894d64db9bab(Xapian::Numb
 }
 
 
-void _wrap_delete_NumberValueRangeProcessor_xapian_1797894d64db9bab(Xapian::NumberValueRangeProcessor *_swig_go_0) {
+void _wrap_delete_NumberValueRangeProcessor_xapian_245a1afe1629f0b1(Xapian::NumberValueRangeProcessor *_swig_go_0) {
   Xapian::NumberValueRangeProcessor *arg1 = (Xapian::NumberValueRangeProcessor *) 0 ;
   
   arg1 = *(Xapian::NumberValueRangeProcessor **)&_swig_go_0; 
@@ -6096,7 +6410,7 @@ void _wrap_delete_NumberValueRangeProcessor_xapian_1797894d64db9bab(Xapian::Numb
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::NumberValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::NumberValueRangeProcessor *_swig_go_0) {
   Xapian::NumberValueRangeProcessor *arg1 = (Xapian::NumberValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -6111,7 +6425,7 @@ Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_0_xap
 }
 
 
-Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::NumberValueRangeProcessor *_swig_go_0) {
+Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::NumberValueRangeProcessor *_swig_go_0) {
   Xapian::NumberValueRangeProcessor *arg1 = (Xapian::NumberValueRangeProcessor *) 0 ;
   Xapian::ValueRangeProcessor *result = 0 ;
   Xapian::ValueRangeProcessor *_swig_go_result;
@@ -6126,7 +6440,7 @@ Xapian::ValueRangeProcessor *_wrap_NumberValueRangeProcessor_release__SWIG_1_xap
 }
 
 
-Xapian::FieldProcessor *_wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::FieldProcessor *_wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::FieldProcessor *result = 0 ;
   Xapian::FieldProcessor *_swig_go_result;
@@ -6139,7 +6453,7 @@ Xapian::FieldProcessor *_wrap__swig_NewDirectorFieldProcessorFieldProcessor_xapi
 }
 
 
-void _wrap_DeleteDirectorFieldProcessor_xapian_1797894d64db9bab(Xapian::FieldProcessor *_swig_go_0) {
+void _wrap_DeleteDirectorFieldProcessor_xapian_245a1afe1629f0b1(Xapian::FieldProcessor *_swig_go_0) {
   Xapian::FieldProcessor *arg1 = (Xapian::FieldProcessor *) 0 ;
   
   arg1 = *(Xapian::FieldProcessor **)&_swig_go_0; 
@@ -6149,7 +6463,7 @@ void _wrap_DeleteDirectorFieldProcessor_xapian_1797894d64db9bab(Xapian::FieldPro
 }
 
 
-void _wrap_delete_FieldProcessor_xapian_1797894d64db9bab(Xapian::FieldProcessor *_swig_go_0) {
+void _wrap_delete_FieldProcessor_xapian_245a1afe1629f0b1(Xapian::FieldProcessor *_swig_go_0) {
   Xapian::FieldProcessor *arg1 = (Xapian::FieldProcessor *) 0 ;
   
   arg1 = *(Xapian::FieldProcessor **)&_swig_go_0; 
@@ -6159,7 +6473,7 @@ void _wrap_delete_FieldProcessor_xapian_1797894d64db9bab(Xapian::FieldProcessor 
 }
 
 
-Xapian::Query *_wrap_FieldProcessor_Apply_xapian_1797894d64db9bab(Xapian::FieldProcessor *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::Query *_wrap_FieldProcessor_Apply_xapian_245a1afe1629f0b1(Xapian::FieldProcessor *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::FieldProcessor *arg1 = (Xapian::FieldProcessor *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::Query result;
@@ -6177,7 +6491,7 @@ Xapian::Query *_wrap_FieldProcessor_Apply_xapian_1797894d64db9bab(Xapian::FieldP
 }
 
 
-Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_0_xapian_1797894d64db9bab(Xapian::FieldProcessor *_swig_go_0) {
+Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::FieldProcessor *_swig_go_0) {
   Xapian::FieldProcessor *arg1 = (Xapian::FieldProcessor *) 0 ;
   Xapian::FieldProcessor *result = 0 ;
   Xapian::FieldProcessor *_swig_go_result;
@@ -6190,7 +6504,7 @@ Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_0_xapian_1797894d64db
 }
 
 
-Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_1_xapian_1797894d64db9bab(Xapian::FieldProcessor *_swig_go_0) {
+Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::FieldProcessor *_swig_go_0) {
   Xapian::FieldProcessor *arg1 = (Xapian::FieldProcessor *) 0 ;
   Xapian::FieldProcessor *result = 0 ;
   Xapian::FieldProcessor *_swig_go_result;
@@ -6203,7 +6517,7 @@ Xapian::FieldProcessor *_wrap_FieldProcessor_release__SWIG_1_xapian_1797894d64db
 }
 
 
-intgo _wrap_FLAG_BOOLEAN_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_BOOLEAN_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6215,7 +6529,7 @@ intgo _wrap_FLAG_BOOLEAN_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_PHRASE_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_PHRASE_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6227,7 +6541,7 @@ intgo _wrap_FLAG_PHRASE_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_LOVEHATE_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_LOVEHATE_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6239,7 +6553,7 @@ intgo _wrap_FLAG_LOVEHATE_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6251,7 +6565,7 @@ intgo _wrap_FLAG_BOOLEAN_ANY_CASE_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_WILDCARD_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_WILDCARD_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6263,7 +6577,7 @@ intgo _wrap_FLAG_WILDCARD_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_PURE_NOT_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_PURE_NOT_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6275,7 +6589,7 @@ intgo _wrap_FLAG_PURE_NOT_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_PARTIAL_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_PARTIAL_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6287,7 +6601,7 @@ intgo _wrap_FLAG_PARTIAL_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6299,7 +6613,7 @@ intgo _wrap_FLAG_SPELLING_CORRECTION_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_SYNONYM_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_SYNONYM_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6311,7 +6625,7 @@ intgo _wrap_FLAG_SYNONYM_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6323,7 +6637,7 @@ intgo _wrap_FLAG_AUTO_SYNONYMS_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6335,7 +6649,7 @@ intgo _wrap_FLAG_AUTO_MULTIWORD_SYNONYMS_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_CJK_NGRAM_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_CJK_NGRAM_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6347,7 +6661,7 @@ intgo _wrap_FLAG_CJK_NGRAM_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FLAG_DEFAULT_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_FLAG_DEFAULT_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6359,7 +6673,7 @@ intgo _wrap_FLAG_DEFAULT_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_NONE_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_NONE_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6371,7 +6685,7 @@ intgo _wrap_STEM_NONE_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_SOME_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_SOME_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6383,7 +6697,7 @@ intgo _wrap_STEM_SOME_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_ALL_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_ALL_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6395,7 +6709,7 @@ intgo _wrap_STEM_ALL_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_STEM_ALL_Z_QueryParser_xapian_1797894d64db9bab() {
+intgo _wrap_STEM_ALL_Z_QueryParser_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -6407,7 +6721,7 @@ intgo _wrap_STEM_ALL_Z_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::QueryParser *_wrap_new_QueryParser_xapian_1797894d64db9bab() {
+Xapian::QueryParser *_wrap_new_QueryParser_xapian_245a1afe1629f0b1() {
   Xapian::QueryParser *result = 0 ;
   Xapian::QueryParser *_swig_go_result;
   
@@ -6418,7 +6732,7 @@ Xapian::QueryParser *_wrap_new_QueryParser_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_QueryParser_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+void _wrap_delete_QueryParser_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   
   arg1 = *(Xapian::QueryParser **)&_swig_go_0; 
@@ -6428,7 +6742,7 @@ void _wrap_delete_QueryParser_xapian_1797894d64db9bab(Xapian::QueryParser *_swig
 }
 
 
-void _wrap_QueryParser_set_stemmer_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::Stem *_swig_go_1) {
+void _wrap_QueryParser_set_stemmer_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::Stem *_swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::Stem *arg2 = 0 ;
   
@@ -6440,7 +6754,7 @@ void _wrap_QueryParser_set_stemmer_xapian_1797894d64db9bab(Xapian::QueryParser *
 }
 
 
-void _wrap_QueryParser_set_stemming_strategy_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
+void _wrap_QueryParser_set_stemming_strategy_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::QueryParser::stem_strategy arg2 ;
   
@@ -6452,7 +6766,7 @@ void _wrap_QueryParser_set_stemming_strategy_xapian_1797894d64db9bab(Xapian::Que
 }
 
 
-void _wrap_QueryParser_set_stopper__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::Stopper *_swig_go_1) {
+void _wrap_QueryParser_set_stopper__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::Stopper *_swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::Stopper *arg2 = (Xapian::Stopper *) 0 ;
   
@@ -6464,7 +6778,7 @@ void _wrap_QueryParser_set_stopper__SWIG_0_xapian_1797894d64db9bab(Xapian::Query
 }
 
 
-void _wrap_QueryParser_set_stopper__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+void _wrap_QueryParser_set_stopper__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   
   arg1 = *(Xapian::QueryParser **)&_swig_go_0; 
@@ -6474,7 +6788,7 @@ void _wrap_QueryParser_set_stopper__SWIG_1_xapian_1797894d64db9bab(Xapian::Query
 }
 
 
-void _wrap_QueryParser_set_default_op_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
+void _wrap_QueryParser_set_default_op_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::Query::op arg2 ;
   
@@ -6486,7 +6800,7 @@ void _wrap_QueryParser_set_default_op_xapian_1797894d64db9bab(Xapian::QueryParse
 }
 
 
-intgo _wrap_QueryParser_get_default_op_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+intgo _wrap_QueryParser_get_default_op_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::Query::op result;
   intgo _swig_go_result;
@@ -6499,7 +6813,7 @@ intgo _wrap_QueryParser_get_default_op_xapian_1797894d64db9bab(Xapian::QueryPars
 }
 
 
-void _wrap_QueryParser_set_database_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_QueryParser_set_database_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -6511,7 +6825,7 @@ void _wrap_QueryParser_set_database_xapian_1797894d64db9bab(Xapian::QueryParser 
 }
 
 
-void _wrap_QueryParser_set_max_expansion__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_QueryParser_set_max_expansion__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::termcount arg2 ;
   int arg3 ;
@@ -6527,7 +6841,7 @@ void _wrap_QueryParser_set_max_expansion__SWIG_0_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_QueryParser_set_max_expansion__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+void _wrap_QueryParser_set_max_expansion__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::termcount arg2 ;
   int arg3 ;
@@ -6541,7 +6855,7 @@ void _wrap_QueryParser_set_max_expansion__SWIG_1_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_QueryParser_set_max_expansion__SWIG_2_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
+void _wrap_QueryParser_set_max_expansion__SWIG_2_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::termcount arg2 ;
   
@@ -6553,7 +6867,7 @@ void _wrap_QueryParser_set_max_expansion__SWIG_2_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_QueryParser_set_max_wildcard_expansion_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
+void _wrap_QueryParser_set_max_wildcard_expansion_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, intgo _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::termcount arg2 ;
   
@@ -6565,7 +6879,7 @@ void _wrap_QueryParser_set_max_wildcard_expansion_xapian_1797894d64db9bab(Xapian
 }
 
 
-Xapian::Query *_wrap_QueryParser_parse_query__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
+Xapian::Query *_wrap_QueryParser_parse_query__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, _gostring_ _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -6590,7 +6904,7 @@ Xapian::Query *_wrap_QueryParser_parse_query__SWIG_0_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::Query *_wrap_QueryParser_parse_query__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::Query *_wrap_QueryParser_parse_query__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -6610,7 +6924,7 @@ Xapian::Query *_wrap_QueryParser_parse_query__SWIG_1_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::Query *_wrap_QueryParser_parse_query__SWIG_2_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::Query *_wrap_QueryParser_parse_query__SWIG_2_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::Query result;
@@ -6628,7 +6942,7 @@ Xapian::Query *_wrap_QueryParser_parse_query__SWIG_2_xapian_1797894d64db9bab(Xap
 }
 
 
-void _wrap_QueryParser_add_prefix__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_QueryParser_add_prefix__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -6648,7 +6962,7 @@ void _wrap_QueryParser_add_prefix__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryP
 }
 
 
-void _wrap_QueryParser_add_prefix__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2) {
+void _wrap_QueryParser_add_prefix__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::FieldProcessor *arg3 = (Xapian::FieldProcessor *) 0 ;
@@ -6665,7 +6979,7 @@ void _wrap_QueryParser_add_prefix__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryP
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2, _gostring_* _swig_go_3) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2, _gostring_* _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -6687,7 +7001,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_0_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -6707,7 +7021,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_1_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2, bool _swig_go_3) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2, bool _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -6729,7 +7043,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_2_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2, _gostring_* _swig_go_3) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2, _gostring_* _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::FieldProcessor *arg3 = (Xapian::FieldProcessor *) 0 ;
@@ -6748,7 +7062,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_3_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::FieldProcessor *arg3 = (Xapian::FieldProcessor *) 0 ;
@@ -6765,7 +7079,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_4_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2, bool _swig_go_3) {
+void _wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1, Xapian::FieldProcessor *_swig_go_2, bool _swig_go_3) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::FieldProcessor *arg3 = (Xapian::FieldProcessor *) 0 ;
@@ -6784,7 +7098,7 @@ void _wrap_QueryParser_add_boolean_prefix__SWIG_5_xapian_1797894d64db9bab(Xapian
 }
 
 
-Xapian::TermIterator *_wrap_QueryParser_stoplist_begin_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+Xapian::TermIterator *_wrap_QueryParser_stoplist_begin_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -6797,7 +7111,7 @@ Xapian::TermIterator *_wrap_QueryParser_stoplist_begin_xapian_1797894d64db9bab(X
 }
 
 
-Xapian::TermIterator *_wrap_QueryParser_stoplist_end_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+Xapian::TermIterator *_wrap_QueryParser_stoplist_end_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -6810,7 +7124,7 @@ Xapian::TermIterator *_wrap_QueryParser_stoplist_end_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::TermIterator *_wrap_QueryParser_unstem_begin_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_QueryParser_unstem_begin_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -6828,7 +7142,7 @@ Xapian::TermIterator *_wrap_QueryParser_unstem_begin_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::TermIterator *_wrap_QueryParser_unstem_end_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_QueryParser_unstem_end_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -6846,7 +7160,7 @@ Xapian::TermIterator *_wrap_QueryParser_unstem_end_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::RangeProcessor *_swig_go_1, _gostring_* _swig_go_2) {
+void _wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::RangeProcessor *_swig_go_1, _gostring_* _swig_go_2) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::RangeProcessor *arg2 = (Xapian::RangeProcessor *) 0 ;
   std::string *arg3 = (std::string *) 0 ;
@@ -6860,7 +7174,7 @@ void _wrap_QueryParser_add_rangeprocessor__SWIG_0_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::RangeProcessor *_swig_go_1) {
+void _wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::RangeProcessor *_swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::RangeProcessor *arg2 = (Xapian::RangeProcessor *) 0 ;
   
@@ -6872,7 +7186,7 @@ void _wrap_QueryParser_add_rangeprocessor__SWIG_1_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_QueryParser_add_valuerangeprocessor_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0, Xapian::ValueRangeProcessor *_swig_go_1) {
+void _wrap_QueryParser_add_valuerangeprocessor_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0, Xapian::ValueRangeProcessor *_swig_go_1) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   Xapian::ValueRangeProcessor *arg2 = (Xapian::ValueRangeProcessor *) 0 ;
   
@@ -6884,7 +7198,7 @@ void _wrap_QueryParser_add_valuerangeprocessor_xapian_1797894d64db9bab(Xapian::Q
 }
 
 
-_gostring_ _wrap_QueryParser_get_corrected_query_string_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+_gostring_ _wrap_QueryParser_get_corrected_query_string_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -6897,7 +7211,7 @@ _gostring_ _wrap_QueryParser_get_corrected_query_string_xapian_1797894d64db9bab(
 }
 
 
-_gostring_ _wrap_QueryParser_get_description_xapian_1797894d64db9bab(Xapian::QueryParser *_swig_go_0) {
+_gostring_ _wrap_QueryParser_get_description_xapian_245a1afe1629f0b1(Xapian::QueryParser *_swig_go_0) {
   Xapian::QueryParser *arg1 = (Xapian::QueryParser *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -6910,7 +7224,7 @@ _gostring_ _wrap_QueryParser_get_description_xapian_1797894d64db9bab(Xapian::Que
 }
 
 
-long long _wrap_sortable_serialise__xapian_1797894d64db9bab(double _swig_go_0, _gostring_ _swig_go_1) {
+long long _wrap_sortable_serialise__xapian_245a1afe1629f0b1(double _swig_go_0, _gostring_ _swig_go_1) {
   double arg1 ;
   char *arg2 = (char *) 0 ;
   size_t result;
@@ -6925,7 +7239,7 @@ long long _wrap_sortable_serialise__xapian_1797894d64db9bab(double _swig_go_0, _
 }
 
 
-_gostring_ _wrap_sortable_serialise_xapian_1797894d64db9bab(double _swig_go_0) {
+_gostring_ _wrap_sortable_serialise_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -6938,7 +7252,7 @@ _gostring_ _wrap_sortable_serialise_xapian_1797894d64db9bab(double _swig_go_0) {
 }
 
 
-double _wrap_sortable_unserialise_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+double _wrap_sortable_unserialise_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   double result;
   double _swig_go_result;
@@ -6954,7 +7268,7 @@ double _wrap_sortable_unserialise_xapian_1797894d64db9bab(_gostring_ _swig_go_0)
 }
 
 
-Xapian::ValueSetMatchDecider *_wrap_new_ValueSetMatchDecider_xapian_1797894d64db9bab(intgo _swig_go_0, bool _swig_go_1) {
+Xapian::ValueSetMatchDecider *_wrap_new_ValueSetMatchDecider_xapian_245a1afe1629f0b1(intgo _swig_go_0, bool _swig_go_1) {
   Xapian::valueno arg1 ;
   bool arg2 ;
   Xapian::ValueSetMatchDecider *result = 0 ;
@@ -6969,7 +7283,7 @@ Xapian::ValueSetMatchDecider *_wrap_new_ValueSetMatchDecider_xapian_1797894d64db
 }
 
 
-void _wrap_ValueSetMatchDecider_add_value_xapian_1797894d64db9bab(Xapian::ValueSetMatchDecider *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_ValueSetMatchDecider_add_value_xapian_245a1afe1629f0b1(Xapian::ValueSetMatchDecider *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ValueSetMatchDecider *arg1 = (Xapian::ValueSetMatchDecider *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -6984,7 +7298,7 @@ void _wrap_ValueSetMatchDecider_add_value_xapian_1797894d64db9bab(Xapian::ValueS
 }
 
 
-void _wrap_ValueSetMatchDecider_remove_value_xapian_1797894d64db9bab(Xapian::ValueSetMatchDecider *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_ValueSetMatchDecider_remove_value_xapian_245a1afe1629f0b1(Xapian::ValueSetMatchDecider *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ValueSetMatchDecider *arg1 = (Xapian::ValueSetMatchDecider *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -6999,7 +7313,7 @@ void _wrap_ValueSetMatchDecider_remove_value_xapian_1797894d64db9bab(Xapian::Val
 }
 
 
-bool _wrap_ValueSetMatchDecider_Apply_xapian_1797894d64db9bab(Xapian::ValueSetMatchDecider *_swig_go_0, Xapian::Document *_swig_go_1) {
+bool _wrap_ValueSetMatchDecider_Apply_xapian_245a1afe1629f0b1(Xapian::ValueSetMatchDecider *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::ValueSetMatchDecider *arg1 = (Xapian::ValueSetMatchDecider *) 0 ;
   Xapian::Document *arg2 = 0 ;
   bool result;
@@ -7014,7 +7328,7 @@ bool _wrap_ValueSetMatchDecider_Apply_xapian_1797894d64db9bab(Xapian::ValueSetMa
 }
 
 
-void _wrap_delete_ValueSetMatchDecider_xapian_1797894d64db9bab(Xapian::ValueSetMatchDecider *_swig_go_0) {
+void _wrap_delete_ValueSetMatchDecider_xapian_245a1afe1629f0b1(Xapian::ValueSetMatchDecider *_swig_go_0) {
   Xapian::ValueSetMatchDecider *arg1 = (Xapian::ValueSetMatchDecider *) 0 ;
   
   arg1 = *(Xapian::ValueSetMatchDecider **)&_swig_go_0; 
@@ -7024,7 +7338,7 @@ void _wrap_delete_ValueSetMatchDecider_xapian_1797894d64db9bab(Xapian::ValueSetM
 }
 
 
-intgo _wrap_TWO_STAGE_SMOOTHING_Weight_xapian_1797894d64db9bab() {
+intgo _wrap_TWO_STAGE_SMOOTHING_Weight_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -7036,7 +7350,7 @@ intgo _wrap_TWO_STAGE_SMOOTHING_Weight_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DIRICHLET_SMOOTHING_Weight_xapian_1797894d64db9bab() {
+intgo _wrap_DIRICHLET_SMOOTHING_Weight_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -7048,7 +7362,7 @@ intgo _wrap_DIRICHLET_SMOOTHING_Weight_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_1797894d64db9bab() {
+intgo _wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -7060,7 +7374,7 @@ intgo _wrap_ABSOLUTE_DISCOUNT_SMOOTHING_Weight_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_1797894d64db9bab() {
+intgo _wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -7072,7 +7386,7 @@ intgo _wrap_JELINEK_MERCER_SMOOTHING_Weight_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_1797894d64db9bab() {
+intgo _wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -7084,7 +7398,7 @@ intgo _wrap_DIRICHLET_PLUS_SMOOTHING_Weight_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_Weight_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+void _wrap_delete_Weight_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   
   arg1 = *(Xapian::Weight **)&_swig_go_0; 
@@ -7094,7 +7408,7 @@ void _wrap_delete_Weight_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
 }
 
 
-_gostring_ _wrap_Weight_name_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+_gostring_ _wrap_Weight_name_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7107,7 +7421,7 @@ _gostring_ _wrap_Weight_name_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0)
 }
 
 
-double _wrap_Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7126,7 +7440,7 @@ double _wrap_Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::Weight *_swig_go
 }
 
 
-double _wrap_Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+double _wrap_Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7139,7 +7453,7 @@ double _wrap_Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::Weight *_swig_go
 }
 
 
-double _wrap_Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7156,7 +7470,7 @@ double _wrap_Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::Weight *_swig_g
 }
 
 
-double _wrap_Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+double _wrap_Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7169,7 +7483,7 @@ double _wrap_Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::Weight *_swig_g
 }
 
 
-bool _wrap_Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+bool _wrap_Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7182,7 +7496,7 @@ bool _wrap_Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::W
 }
 
 
-bool _wrap_Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+bool _wrap_Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7195,7 +7509,7 @@ bool _wrap_Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Weight 
 }
 
 
-bool _wrap_Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::Weight *_swig_go_0) {
+bool _wrap_Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::Weight *_swig_go_0) {
   Xapian::Weight *arg1 = (Xapian::Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7208,7 +7522,7 @@ bool _wrap_Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::BoolWeight *_wrap_new_BoolWeight_xapian_1797894d64db9bab() {
+Xapian::BoolWeight *_wrap_new_BoolWeight_xapian_245a1afe1629f0b1() {
   Xapian::BoolWeight *result = 0 ;
   Xapian::BoolWeight *_swig_go_result;
   
@@ -7219,7 +7533,7 @@ Xapian::BoolWeight *_wrap_new_BoolWeight_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_BoolWeight_name_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+_gostring_ _wrap_BoolWeight_name_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7232,7 +7546,7 @@ _gostring_ _wrap_BoolWeight_name_xapian_1797894d64db9bab(Xapian::BoolWeight *_sw
 }
 
 
-double _wrap_BoolWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_BoolWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7251,7 +7565,7 @@ double _wrap_BoolWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::BoolWeight *
 }
 
 
-double _wrap_BoolWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+double _wrap_BoolWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7264,7 +7578,7 @@ double _wrap_BoolWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::BoolWeight *
 }
 
 
-double _wrap_BoolWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_BoolWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7281,7 +7595,7 @@ double _wrap_BoolWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::BoolWeight 
 }
 
 
-double _wrap_BoolWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+double _wrap_BoolWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7294,7 +7608,7 @@ double _wrap_BoolWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::BoolWeight 
 }
 
 
-void _wrap_delete_BoolWeight_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+void _wrap_delete_BoolWeight_xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   
   arg1 = *(Xapian::BoolWeight **)&_swig_go_0; 
@@ -7304,7 +7618,7 @@ void _wrap_delete_BoolWeight_xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_g
 }
 
 
-bool _wrap_BoolWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+bool _wrap_BoolWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7318,7 +7632,7 @@ bool _wrap_BoolWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_BoolWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+bool _wrap_BoolWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7332,7 +7646,7 @@ bool _wrap_BoolWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Boo
 }
 
 
-bool _wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::BoolWeight *_swig_go_0) {
+bool _wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::BoolWeight *_swig_go_0) {
   Xapian::BoolWeight *arg1 = (Xapian::BoolWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7346,7 +7660,7 @@ bool _wrap_BoolWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::TfIdfWeight *result = 0 ;
   Xapian::TfIdfWeight *_swig_go_result;
@@ -7362,7 +7676,7 @@ Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_0_xapian_1797894d64db9bab(_gost
 }
 
 
-Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::TfIdfWeight *result = 0 ;
   Xapian::TfIdfWeight *_swig_go_result;
   
@@ -7373,7 +7687,7 @@ Xapian::TfIdfWeight *_wrap_new_TfIdfWeight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_TfIdfWeight_name_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+_gostring_ _wrap_TfIdfWeight_name_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7386,7 +7700,7 @@ _gostring_ _wrap_TfIdfWeight_name_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_
 }
 
 
-double _wrap_TfIdfWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_TfIdfWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7405,7 +7719,7 @@ double _wrap_TfIdfWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::TfIdfWeight
 }
 
 
-double _wrap_TfIdfWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+double _wrap_TfIdfWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7418,7 +7732,7 @@ double _wrap_TfIdfWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::TfIdfWeight
 }
 
 
-double _wrap_TfIdfWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_TfIdfWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7435,7 +7749,7 @@ double _wrap_TfIdfWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::TfIdfWeigh
 }
 
 
-double _wrap_TfIdfWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+double _wrap_TfIdfWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7448,7 +7762,7 @@ double _wrap_TfIdfWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::TfIdfWeigh
 }
 
 
-void _wrap_delete_TfIdfWeight_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+void _wrap_delete_TfIdfWeight_xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   
   arg1 = *(Xapian::TfIdfWeight **)&_swig_go_0; 
@@ -7458,7 +7772,7 @@ void _wrap_delete_TfIdfWeight_xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig
 }
 
 
-bool _wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+bool _wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7472,7 +7786,7 @@ bool _wrap_TfIdfWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapi
 }
 
 
-bool _wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+bool _wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7486,7 +7800,7 @@ bool _wrap_TfIdfWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Tf
 }
 
 
-bool _wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::TfIdfWeight *_swig_go_0) {
+bool _wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::TfIdfWeight *_swig_go_0) {
   Xapian::TfIdfWeight *arg1 = (Xapian::TfIdfWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7500,7 +7814,7 @@ bool _wrap_TfIdfWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xa
 }
 
 
-Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0, double _swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4) {
+Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0, double _swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4) {
   double arg1 ;
   double arg2 ;
   double arg3 ;
@@ -7521,7 +7835,7 @@ Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_0_xapian_1797894d64db9bab(double 
 }
 
 
-Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::BM25Weight *result = 0 ;
   Xapian::BM25Weight *_swig_go_result;
   
@@ -7532,7 +7846,7 @@ Xapian::BM25Weight *_wrap_new_BM25Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_BM25Weight_name_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+_gostring_ _wrap_BM25Weight_name_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7545,7 +7859,7 @@ _gostring_ _wrap_BM25Weight_name_xapian_1797894d64db9bab(Xapian::BM25Weight *_sw
 }
 
 
-double _wrap_BM25Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_BM25Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7564,7 +7878,7 @@ double _wrap_BM25Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::BM25Weight *
 }
 
 
-double _wrap_BM25Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+double _wrap_BM25Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7577,7 +7891,7 @@ double _wrap_BM25Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::BM25Weight *
 }
 
 
-double _wrap_BM25Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_BM25Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7594,7 +7908,7 @@ double _wrap_BM25Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::BM25Weight 
 }
 
 
-double _wrap_BM25Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+double _wrap_BM25Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7607,7 +7921,7 @@ double _wrap_BM25Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::BM25Weight 
 }
 
 
-void _wrap_delete_BM25Weight_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+void _wrap_delete_BM25Weight_xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   
   arg1 = *(Xapian::BM25Weight **)&_swig_go_0; 
@@ -7617,7 +7931,7 @@ void _wrap_delete_BM25Weight_xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_g
 }
 
 
-bool _wrap_BM25Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+bool _wrap_BM25Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7631,7 +7945,7 @@ bool _wrap_BM25Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_BM25Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+bool _wrap_BM25Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7645,7 +7959,7 @@ bool _wrap_BM25Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BM2
 }
 
 
-bool _wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::BM25Weight *_swig_go_0) {
+bool _wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::BM25Weight *_swig_go_0) {
   Xapian::BM25Weight *arg1 = (Xapian::BM25Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7659,7 +7973,7 @@ bool _wrap_BM25Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0, double _swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4, double _swig_go_5) {
+Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0, double _swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4, double _swig_go_5) {
   double arg1 ;
   double arg2 ;
   double arg3 ;
@@ -7682,7 +7996,7 @@ Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_0_xapian_1797894d64db9bab
 }
 
 
-Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::BM25PlusWeight *result = 0 ;
   Xapian::BM25PlusWeight *_swig_go_result;
   
@@ -7693,7 +8007,7 @@ Xapian::BM25PlusWeight *_wrap_new_BM25PlusWeight__SWIG_1_xapian_1797894d64db9bab
 }
 
 
-_gostring_ _wrap_BM25PlusWeight_name_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+_gostring_ _wrap_BM25PlusWeight_name_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7706,7 +8020,7 @@ _gostring_ _wrap_BM25PlusWeight_name_xapian_1797894d64db9bab(Xapian::BM25PlusWei
 }
 
 
-double _wrap_BM25PlusWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_BM25PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7725,7 +8039,7 @@ double _wrap_BM25PlusWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::BM25Plus
 }
 
 
-double _wrap_BM25PlusWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+double _wrap_BM25PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7738,7 +8052,7 @@ double _wrap_BM25PlusWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::BM25Plus
 }
 
 
-double _wrap_BM25PlusWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_BM25PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7755,7 +8069,7 @@ double _wrap_BM25PlusWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::BM25Plu
 }
 
 
-double _wrap_BM25PlusWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+double _wrap_BM25PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7768,7 +8082,7 @@ double _wrap_BM25PlusWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::BM25Plu
 }
 
 
-void _wrap_delete_BM25PlusWeight_xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+void _wrap_delete_BM25PlusWeight_xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   
   arg1 = *(Xapian::BM25PlusWeight **)&_swig_go_0; 
@@ -7778,7 +8092,7 @@ void _wrap_delete_BM25PlusWeight_xapian_1797894d64db9bab(Xapian::BM25PlusWeight 
 }
 
 
-bool _wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+bool _wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7792,7 +8106,7 @@ bool _wrap_BM25PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(X
 }
 
 
-bool _wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+bool _wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7806,7 +8120,7 @@ bool _wrap_BM25PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian:
 }
 
 
-bool _wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::BM25PlusWeight *_swig_go_0) {
+bool _wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::BM25PlusWeight *_swig_go_0) {
   Xapian::BM25PlusWeight *arg1 = (Xapian::BM25PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7820,7 +8134,7 @@ bool _wrap_BM25PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab
 }
 
 
-Xapian::TradWeight *_wrap_new_TradWeight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::TradWeight *_wrap_new_TradWeight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::TradWeight *result = 0 ;
   Xapian::TradWeight *_swig_go_result;
@@ -7833,7 +8147,7 @@ Xapian::TradWeight *_wrap_new_TradWeight__SWIG_0_xapian_1797894d64db9bab(double 
 }
 
 
-Xapian::TradWeight *_wrap_new_TradWeight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::TradWeight *_wrap_new_TradWeight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::TradWeight *result = 0 ;
   Xapian::TradWeight *_swig_go_result;
   
@@ -7844,7 +8158,7 @@ Xapian::TradWeight *_wrap_new_TradWeight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_TradWeight_name_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+_gostring_ _wrap_TradWeight_name_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -7857,7 +8171,7 @@ _gostring_ _wrap_TradWeight_name_xapian_1797894d64db9bab(Xapian::TradWeight *_sw
 }
 
 
-double _wrap_TradWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_TradWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7876,7 +8190,7 @@ double _wrap_TradWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::TradWeight *
 }
 
 
-double _wrap_TradWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+double _wrap_TradWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7889,7 +8203,7 @@ double _wrap_TradWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::TradWeight *
 }
 
 
-double _wrap_TradWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_TradWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -7906,7 +8220,7 @@ double _wrap_TradWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::TradWeight 
 }
 
 
-double _wrap_TradWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+double _wrap_TradWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -7919,7 +8233,7 @@ double _wrap_TradWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::TradWeight 
 }
 
 
-void _wrap_delete_TradWeight_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+void _wrap_delete_TradWeight_xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   
   arg1 = *(Xapian::TradWeight **)&_swig_go_0; 
@@ -7929,7 +8243,7 @@ void _wrap_delete_TradWeight_xapian_1797894d64db9bab(Xapian::TradWeight *_swig_g
 }
 
 
-bool _wrap_TradWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+bool _wrap_TradWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7943,7 +8257,7 @@ bool _wrap_TradWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_TradWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+bool _wrap_TradWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7957,7 +8271,7 @@ bool _wrap_TradWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Tra
 }
 
 
-bool _wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::TradWeight *_swig_go_0) {
+bool _wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::TradWeight *_swig_go_0) {
   Xapian::TradWeight *arg1 = (Xapian::TradWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -7971,7 +8285,7 @@ bool _wrap_TradWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::InL2Weight *result = 0 ;
   Xapian::InL2Weight *_swig_go_result;
@@ -7984,7 +8298,7 @@ Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_0_xapian_1797894d64db9bab(double 
 }
 
 
-Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::InL2Weight *result = 0 ;
   Xapian::InL2Weight *_swig_go_result;
   
@@ -7995,7 +8309,7 @@ Xapian::InL2Weight *_wrap_new_InL2Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_InL2Weight_name_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+_gostring_ _wrap_InL2Weight_name_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8008,7 +8322,7 @@ _gostring_ _wrap_InL2Weight_name_xapian_1797894d64db9bab(Xapian::InL2Weight *_sw
 }
 
 
-double _wrap_InL2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_InL2Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8027,7 +8341,7 @@ double _wrap_InL2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::InL2Weight *
 }
 
 
-double _wrap_InL2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+double _wrap_InL2Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8040,7 +8354,7 @@ double _wrap_InL2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::InL2Weight *
 }
 
 
-double _wrap_InL2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_InL2Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8057,7 +8371,7 @@ double _wrap_InL2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::InL2Weight 
 }
 
 
-double _wrap_InL2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+double _wrap_InL2Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8070,7 +8384,7 @@ double _wrap_InL2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::InL2Weight 
 }
 
 
-void _wrap_delete_InL2Weight_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+void _wrap_delete_InL2Weight_xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   
   arg1 = *(Xapian::InL2Weight **)&_swig_go_0; 
@@ -8080,7 +8394,7 @@ void _wrap_delete_InL2Weight_xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_g
 }
 
 
-bool _wrap_InL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+bool _wrap_InL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8094,7 +8408,7 @@ bool _wrap_InL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_InL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+bool _wrap_InL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8108,7 +8422,7 @@ bool _wrap_InL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::InL
 }
 
 
-bool _wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::InL2Weight *_swig_go_0) {
+bool _wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::InL2Weight *_swig_go_0) {
   Xapian::InL2Weight *arg1 = (Xapian::InL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8122,7 +8436,7 @@ bool _wrap_InL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::IfB2Weight *result = 0 ;
   Xapian::IfB2Weight *_swig_go_result;
@@ -8135,7 +8449,7 @@ Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_0_xapian_1797894d64db9bab(double 
 }
 
 
-Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::IfB2Weight *result = 0 ;
   Xapian::IfB2Weight *_swig_go_result;
   
@@ -8146,7 +8460,7 @@ Xapian::IfB2Weight *_wrap_new_IfB2Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_IfB2Weight_name_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+_gostring_ _wrap_IfB2Weight_name_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8159,7 +8473,7 @@ _gostring_ _wrap_IfB2Weight_name_xapian_1797894d64db9bab(Xapian::IfB2Weight *_sw
 }
 
 
-double _wrap_IfB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_IfB2Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8178,7 +8492,7 @@ double _wrap_IfB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::IfB2Weight *
 }
 
 
-double _wrap_IfB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+double _wrap_IfB2Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8191,7 +8505,7 @@ double _wrap_IfB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::IfB2Weight *
 }
 
 
-double _wrap_IfB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_IfB2Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8208,7 +8522,7 @@ double _wrap_IfB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::IfB2Weight 
 }
 
 
-double _wrap_IfB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+double _wrap_IfB2Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8221,7 +8535,7 @@ double _wrap_IfB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::IfB2Weight 
 }
 
 
-void _wrap_delete_IfB2Weight_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+void _wrap_delete_IfB2Weight_xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   
   arg1 = *(Xapian::IfB2Weight **)&_swig_go_0; 
@@ -8231,7 +8545,7 @@ void _wrap_delete_IfB2Weight_xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_g
 }
 
 
-bool _wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+bool _wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8245,7 +8559,7 @@ bool _wrap_IfB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+bool _wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8259,7 +8573,7 @@ bool _wrap_IfB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::IfB
 }
 
 
-bool _wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::IfB2Weight *_swig_go_0) {
+bool _wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::IfB2Weight *_swig_go_0) {
   Xapian::IfB2Weight *arg1 = (Xapian::IfB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8273,7 +8587,7 @@ bool _wrap_IfB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::IneB2Weight *result = 0 ;
   Xapian::IneB2Weight *_swig_go_result;
@@ -8286,7 +8600,7 @@ Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_0_xapian_1797894d64db9bab(doubl
 }
 
 
-Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::IneB2Weight *result = 0 ;
   Xapian::IneB2Weight *_swig_go_result;
   
@@ -8297,7 +8611,7 @@ Xapian::IneB2Weight *_wrap_new_IneB2Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_IneB2Weight_name_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+_gostring_ _wrap_IneB2Weight_name_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8310,7 +8624,7 @@ _gostring_ _wrap_IneB2Weight_name_xapian_1797894d64db9bab(Xapian::IneB2Weight *_
 }
 
 
-double _wrap_IneB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_IneB2Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8329,7 +8643,7 @@ double _wrap_IneB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::IneB2Weight
 }
 
 
-double _wrap_IneB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+double _wrap_IneB2Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8342,7 +8656,7 @@ double _wrap_IneB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::IneB2Weight
 }
 
 
-double _wrap_IneB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_IneB2Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8359,7 +8673,7 @@ double _wrap_IneB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::IneB2Weigh
 }
 
 
-double _wrap_IneB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+double _wrap_IneB2Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8372,7 +8686,7 @@ double _wrap_IneB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::IneB2Weigh
 }
 
 
-void _wrap_delete_IneB2Weight_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+void _wrap_delete_IneB2Weight_xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   
   arg1 = *(Xapian::IneB2Weight **)&_swig_go_0; 
@@ -8382,7 +8696,7 @@ void _wrap_delete_IneB2Weight_xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig
 }
 
 
-bool _wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+bool _wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8396,7 +8710,7 @@ bool _wrap_IneB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapi
 }
 
 
-bool _wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+bool _wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8410,7 +8724,7 @@ bool _wrap_IneB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::In
 }
 
 
-bool _wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::IneB2Weight *_swig_go_0) {
+bool _wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::IneB2Weight *_swig_go_0) {
   Xapian::IneB2Weight *arg1 = (Xapian::IneB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8424,7 +8738,7 @@ bool _wrap_IneB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xa
 }
 
 
-Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::BB2Weight *result = 0 ;
   Xapian::BB2Weight *_swig_go_result;
@@ -8437,7 +8751,7 @@ Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_0_xapian_1797894d64db9bab(double _s
 }
 
 
-Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::BB2Weight *result = 0 ;
   Xapian::BB2Weight *_swig_go_result;
   
@@ -8448,7 +8762,7 @@ Xapian::BB2Weight *_wrap_new_BB2Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_BB2Weight_name_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+_gostring_ _wrap_BB2Weight_name_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8461,7 +8775,7 @@ _gostring_ _wrap_BB2Weight_name_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig
 }
 
 
-double _wrap_BB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_BB2Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8480,7 +8794,7 @@ double _wrap_BB2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::BB2Weight *_s
 }
 
 
-double _wrap_BB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+double _wrap_BB2Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8493,7 +8807,7 @@ double _wrap_BB2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::BB2Weight *_s
 }
 
 
-double _wrap_BB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_BB2Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8510,7 +8824,7 @@ double _wrap_BB2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::BB2Weight *_
 }
 
 
-double _wrap_BB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+double _wrap_BB2Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8523,7 +8837,7 @@ double _wrap_BB2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::BB2Weight *_
 }
 
 
-void _wrap_delete_BB2Weight_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+void _wrap_delete_BB2Weight_xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   
   arg1 = *(Xapian::BB2Weight **)&_swig_go_0; 
@@ -8533,7 +8847,7 @@ void _wrap_delete_BB2Weight_xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_
 }
 
 
-bool _wrap_BB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+bool _wrap_BB2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8547,7 +8861,7 @@ bool _wrap_BB2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_BB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+bool _wrap_BB2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8561,7 +8875,7 @@ bool _wrap_BB2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::BB2W
 }
 
 
-bool _wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::BB2Weight *_swig_go_0) {
+bool _wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::BB2Weight *_swig_go_0) {
   Xapian::BB2Weight *arg1 = (Xapian::BB2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8575,7 +8889,7 @@ bool _wrap_BB2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::DLHWeight *_wrap_new_DLHWeight_xapian_1797894d64db9bab() {
+Xapian::DLHWeight *_wrap_new_DLHWeight_xapian_245a1afe1629f0b1() {
   Xapian::DLHWeight *result = 0 ;
   Xapian::DLHWeight *_swig_go_result;
   
@@ -8586,7 +8900,7 @@ Xapian::DLHWeight *_wrap_new_DLHWeight_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_DLHWeight_name_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+_gostring_ _wrap_DLHWeight_name_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8599,7 +8913,7 @@ _gostring_ _wrap_DLHWeight_name_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig
 }
 
 
-double _wrap_DLHWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_DLHWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8618,7 +8932,7 @@ double _wrap_DLHWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::DLHWeight *_s
 }
 
 
-double _wrap_DLHWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+double _wrap_DLHWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8631,7 +8945,7 @@ double _wrap_DLHWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::DLHWeight *_s
 }
 
 
-double _wrap_DLHWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_DLHWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8648,7 +8962,7 @@ double _wrap_DLHWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::DLHWeight *_
 }
 
 
-double _wrap_DLHWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+double _wrap_DLHWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8661,7 +8975,7 @@ double _wrap_DLHWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::DLHWeight *_
 }
 
 
-void _wrap_delete_DLHWeight_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+void _wrap_delete_DLHWeight_xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   
   arg1 = *(Xapian::DLHWeight **)&_swig_go_0; 
@@ -8671,7 +8985,7 @@ void _wrap_delete_DLHWeight_xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_
 }
 
 
-bool _wrap_DLHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+bool _wrap_DLHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8685,7 +8999,7 @@ bool _wrap_DLHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_DLHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+bool _wrap_DLHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8699,7 +9013,7 @@ bool _wrap_DLHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::DLHW
 }
 
 
-bool _wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::DLHWeight *_swig_go_0) {
+bool _wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::DLHWeight *_swig_go_0) {
   Xapian::DLHWeight *arg1 = (Xapian::DLHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8713,7 +9027,7 @@ bool _wrap_DLHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::PL2Weight *result = 0 ;
   Xapian::PL2Weight *_swig_go_result;
@@ -8726,7 +9040,7 @@ Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_0_xapian_1797894d64db9bab(double _s
 }
 
 
-Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::PL2Weight *result = 0 ;
   Xapian::PL2Weight *_swig_go_result;
   
@@ -8737,7 +9051,7 @@ Xapian::PL2Weight *_wrap_new_PL2Weight__SWIG_1_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_PL2Weight_name_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+_gostring_ _wrap_PL2Weight_name_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8750,7 +9064,7 @@ _gostring_ _wrap_PL2Weight_name_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig
 }
 
 
-double _wrap_PL2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_PL2Weight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8769,7 +9083,7 @@ double _wrap_PL2Weight_get_sumpart_xapian_1797894d64db9bab(Xapian::PL2Weight *_s
 }
 
 
-double _wrap_PL2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+double _wrap_PL2Weight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8782,7 +9096,7 @@ double _wrap_PL2Weight_get_maxpart_xapian_1797894d64db9bab(Xapian::PL2Weight *_s
 }
 
 
-double _wrap_PL2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_PL2Weight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8799,7 +9113,7 @@ double _wrap_PL2Weight_get_sumextra_xapian_1797894d64db9bab(Xapian::PL2Weight *_
 }
 
 
-double _wrap_PL2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+double _wrap_PL2Weight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8812,7 +9126,7 @@ double _wrap_PL2Weight_get_maxextra_xapian_1797894d64db9bab(Xapian::PL2Weight *_
 }
 
 
-void _wrap_delete_PL2Weight_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+void _wrap_delete_PL2Weight_xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   
   arg1 = *(Xapian::PL2Weight **)&_swig_go_0; 
@@ -8822,7 +9136,7 @@ void _wrap_delete_PL2Weight_xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_
 }
 
 
-bool _wrap_PL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+bool _wrap_PL2Weight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8836,7 +9150,7 @@ bool _wrap_PL2Weight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_PL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+bool _wrap_PL2Weight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8850,7 +9164,7 @@ bool _wrap_PL2Weight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::PL2W
 }
 
 
-bool _wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::PL2Weight *_swig_go_0) {
+bool _wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::PL2Weight *_swig_go_0) {
   Xapian::PL2Weight *arg1 = (Xapian::PL2Weight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8864,7 +9178,7 @@ bool _wrap_PL2Weight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0, double _swig_go_1) {
+Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0, double _swig_go_1) {
   double arg1 ;
   double arg2 ;
   Xapian::PL2PlusWeight *result = 0 ;
@@ -8879,7 +9193,7 @@ Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_0_xapian_1797894d64db9bab(d
 }
 
 
-Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_1_xapian_1797894d64db9bab() {
+Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_1_xapian_245a1afe1629f0b1() {
   Xapian::PL2PlusWeight *result = 0 ;
   Xapian::PL2PlusWeight *_swig_go_result;
   
@@ -8890,7 +9204,7 @@ Xapian::PL2PlusWeight *_wrap_new_PL2PlusWeight__SWIG_1_xapian_1797894d64db9bab()
 }
 
 
-_gostring_ _wrap_PL2PlusWeight_name_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+_gostring_ _wrap_PL2PlusWeight_name_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -8903,7 +9217,7 @@ _gostring_ _wrap_PL2PlusWeight_name_xapian_1797894d64db9bab(Xapian::PL2PlusWeigh
 }
 
 
-double _wrap_PL2PlusWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_PL2PlusWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8922,7 +9236,7 @@ double _wrap_PL2PlusWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::PL2PlusWe
 }
 
 
-double _wrap_PL2PlusWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+double _wrap_PL2PlusWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8935,7 +9249,7 @@ double _wrap_PL2PlusWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::PL2PlusWe
 }
 
 
-double _wrap_PL2PlusWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_PL2PlusWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -8952,7 +9266,7 @@ double _wrap_PL2PlusWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::PL2PlusW
 }
 
 
-double _wrap_PL2PlusWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+double _wrap_PL2PlusWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -8965,7 +9279,7 @@ double _wrap_PL2PlusWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::PL2PlusW
 }
 
 
-void _wrap_delete_PL2PlusWeight_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+void _wrap_delete_PL2PlusWeight_xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   
   arg1 = *(Xapian::PL2PlusWeight **)&_swig_go_0; 
@@ -8975,7 +9289,7 @@ void _wrap_delete_PL2PlusWeight_xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_
 }
 
 
-bool _wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+bool _wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -8989,7 +9303,7 @@ bool _wrap_PL2PlusWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xa
 }
 
 
-bool _wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+bool _wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9003,7 +9317,7 @@ bool _wrap_PL2PlusWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::
 }
 
 
-bool _wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::PL2PlusWeight *_swig_go_0) {
+bool _wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::PL2PlusWeight *_swig_go_0) {
   Xapian::PL2PlusWeight *arg1 = (Xapian::PL2PlusWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9017,7 +9331,7 @@ bool _wrap_PL2PlusWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(
 }
 
 
-Xapian::DPHWeight *_wrap_new_DPHWeight_xapian_1797894d64db9bab() {
+Xapian::DPHWeight *_wrap_new_DPHWeight_xapian_245a1afe1629f0b1() {
   Xapian::DPHWeight *result = 0 ;
   Xapian::DPHWeight *_swig_go_result;
   
@@ -9028,7 +9342,7 @@ Xapian::DPHWeight *_wrap_new_DPHWeight_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_DPHWeight_name_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+_gostring_ _wrap_DPHWeight_name_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9041,7 +9355,7 @@ _gostring_ _wrap_DPHWeight_name_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig
 }
 
 
-double _wrap_DPHWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_DPHWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9060,7 +9374,7 @@ double _wrap_DPHWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::DPHWeight *_s
 }
 
 
-double _wrap_DPHWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+double _wrap_DPHWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9073,7 +9387,7 @@ double _wrap_DPHWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::DPHWeight *_s
 }
 
 
-double _wrap_DPHWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_DPHWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9090,7 +9404,7 @@ double _wrap_DPHWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::DPHWeight *_
 }
 
 
-double _wrap_DPHWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+double _wrap_DPHWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9103,7 +9417,7 @@ double _wrap_DPHWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::DPHWeight *_
 }
 
 
-void _wrap_delete_DPHWeight_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+void _wrap_delete_DPHWeight_xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   
   arg1 = *(Xapian::DPHWeight **)&_swig_go_0; 
@@ -9113,7 +9427,7 @@ void _wrap_delete_DPHWeight_xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_
 }
 
 
-bool _wrap_DPHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+bool _wrap_DPHWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9127,7 +9441,7 @@ bool _wrap_DPHWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_DPHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+bool _wrap_DPHWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9141,7 +9455,7 @@ bool _wrap_DPHWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::DPHW
 }
 
 
-bool _wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::DPHWeight *_swig_go_0) {
+bool _wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::DPHWeight *_swig_go_0) {
   Xapian::DPHWeight *arg1 = (Xapian::DPHWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9155,7 +9469,7 @@ bool _wrap_DPHWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::LMWeight *_wrap_new_LMWeight__SWIG_0_xapian_1797894d64db9bab(double _swig_go_0, intgo _swig_go_1, double _swig_go_2, double _swig_go_3) {
+Xapian::LMWeight *_wrap_new_LMWeight__SWIG_0_xapian_245a1afe1629f0b1(double _swig_go_0, intgo _swig_go_1, double _swig_go_2, double _swig_go_3) {
   double arg1 ;
   Xapian::Weight::type_smoothing arg2 ;
   double arg3 ;
@@ -9174,7 +9488,7 @@ Xapian::LMWeight *_wrap_new_LMWeight__SWIG_0_xapian_1797894d64db9bab(double _swi
 }
 
 
-Xapian::LMWeight *_wrap_new_LMWeight__SWIG_1_xapian_1797894d64db9bab(double _swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+Xapian::LMWeight *_wrap_new_LMWeight__SWIG_1_xapian_245a1afe1629f0b1(double _swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   double arg1 ;
   Xapian::Weight::type_smoothing arg2 ;
   double arg3 ;
@@ -9191,7 +9505,7 @@ Xapian::LMWeight *_wrap_new_LMWeight__SWIG_1_xapian_1797894d64db9bab(double _swi
 }
 
 
-Xapian::LMWeight *_wrap_new_LMWeight__SWIG_2_xapian_1797894d64db9bab(double _swig_go_0, intgo _swig_go_1) {
+Xapian::LMWeight *_wrap_new_LMWeight__SWIG_2_xapian_245a1afe1629f0b1(double _swig_go_0, intgo _swig_go_1) {
   double arg1 ;
   Xapian::Weight::type_smoothing arg2 ;
   Xapian::LMWeight *result = 0 ;
@@ -9206,7 +9520,7 @@ Xapian::LMWeight *_wrap_new_LMWeight__SWIG_2_xapian_1797894d64db9bab(double _swi
 }
 
 
-Xapian::LMWeight *_wrap_new_LMWeight__SWIG_3_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::LMWeight *_wrap_new_LMWeight__SWIG_3_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::LMWeight *result = 0 ;
   Xapian::LMWeight *_swig_go_result;
@@ -9219,7 +9533,7 @@ Xapian::LMWeight *_wrap_new_LMWeight__SWIG_3_xapian_1797894d64db9bab(double _swi
 }
 
 
-Xapian::LMWeight *_wrap_new_LMWeight__SWIG_4_xapian_1797894d64db9bab() {
+Xapian::LMWeight *_wrap_new_LMWeight__SWIG_4_xapian_245a1afe1629f0b1() {
   Xapian::LMWeight *result = 0 ;
   Xapian::LMWeight *_swig_go_result;
   
@@ -9230,7 +9544,7 @@ Xapian::LMWeight *_wrap_new_LMWeight__SWIG_4_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_LMWeight_name_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+_gostring_ _wrap_LMWeight_name_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9243,7 +9557,7 @@ _gostring_ _wrap_LMWeight_name_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_g
 }
 
 
-double _wrap_LMWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_LMWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9262,7 +9576,7 @@ double _wrap_LMWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::LMWeight *_swi
 }
 
 
-double _wrap_LMWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+double _wrap_LMWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9275,7 +9589,7 @@ double _wrap_LMWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::LMWeight *_swi
 }
 
 
-double _wrap_LMWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_LMWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9292,7 +9606,7 @@ double _wrap_LMWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::LMWeight *_sw
 }
 
 
-double _wrap_LMWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+double _wrap_LMWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9305,7 +9619,7 @@ double _wrap_LMWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::LMWeight *_sw
 }
 
 
-void _wrap_delete_LMWeight_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+void _wrap_delete_LMWeight_xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   
   arg1 = *(Xapian::LMWeight **)&_swig_go_0; 
@@ -9315,7 +9629,7 @@ void _wrap_delete_LMWeight_xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0)
 }
 
 
-bool _wrap_LMWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+bool _wrap_LMWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9329,7 +9643,7 @@ bool _wrap_LMWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian:
 }
 
 
-bool _wrap_LMWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+bool _wrap_LMWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9343,7 +9657,7 @@ bool _wrap_LMWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::LMWei
 }
 
 
-bool _wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::LMWeight *_swig_go_0) {
+bool _wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::LMWeight *_swig_go_0) {
   Xapian::LMWeight *arg1 = (Xapian::LMWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9357,7 +9671,7 @@ bool _wrap_LMWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_CoordWeight_init_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0, double _swig_go_1) {
+void _wrap_CoordWeight_init_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0, double _swig_go_1) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   double arg2 ;
   
@@ -9369,7 +9683,7 @@ void _wrap_CoordWeight_init_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_g
 }
 
 
-Xapian::CoordWeight *_wrap_new_CoordWeight_xapian_1797894d64db9bab() {
+Xapian::CoordWeight *_wrap_new_CoordWeight_xapian_245a1afe1629f0b1() {
   Xapian::CoordWeight *result = 0 ;
   Xapian::CoordWeight *_swig_go_result;
   
@@ -9380,7 +9694,7 @@ Xapian::CoordWeight *_wrap_new_CoordWeight_xapian_1797894d64db9bab() {
 }
 
 
-_gostring_ _wrap_CoordWeight_name_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+_gostring_ _wrap_CoordWeight_name_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9393,7 +9707,7 @@ _gostring_ _wrap_CoordWeight_name_xapian_1797894d64db9bab(Xapian::CoordWeight *_
 }
 
 
-double _wrap_CoordWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+double _wrap_CoordWeight_get_sumpart_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9412,7 +9726,7 @@ double _wrap_CoordWeight_get_sumpart_xapian_1797894d64db9bab(Xapian::CoordWeight
 }
 
 
-double _wrap_CoordWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+double _wrap_CoordWeight_get_maxpart_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9425,7 +9739,7 @@ double _wrap_CoordWeight_get_maxpart_xapian_1797894d64db9bab(Xapian::CoordWeight
 }
 
 
-double _wrap_CoordWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+double _wrap_CoordWeight_get_sumextra_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   Xapian::termcount arg2 ;
   Xapian::termcount arg3 ;
@@ -9442,7 +9756,7 @@ double _wrap_CoordWeight_get_sumextra_xapian_1797894d64db9bab(Xapian::CoordWeigh
 }
 
 
-double _wrap_CoordWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+double _wrap_CoordWeight_get_maxextra_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   double result;
   double _swig_go_result;
@@ -9455,7 +9769,7 @@ double _wrap_CoordWeight_get_maxextra_xapian_1797894d64db9bab(Xapian::CoordWeigh
 }
 
 
-void _wrap_delete_CoordWeight_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+void _wrap_delete_CoordWeight_xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   
   arg1 = *(Xapian::CoordWeight **)&_swig_go_0; 
@@ -9465,7 +9779,7 @@ void _wrap_delete_CoordWeight_xapian_1797894d64db9bab(Xapian::CoordWeight *_swig
 }
 
 
-bool _wrap_CoordWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+bool _wrap_CoordWeight_get_sumpart_needs_doclength__xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9479,7 +9793,7 @@ bool _wrap_CoordWeight_get_sumpart_needs_doclength__xapian_1797894d64db9bab(Xapi
 }
 
 
-bool _wrap_CoordWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+bool _wrap_CoordWeight_get_sumpart_needs_wdf__xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9493,7 +9807,7 @@ bool _wrap_CoordWeight_get_sumpart_needs_wdf__xapian_1797894d64db9bab(Xapian::Co
 }
 
 
-bool _wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xapian::CoordWeight *_swig_go_0) {
+bool _wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_245a1afe1629f0b1(Xapian::CoordWeight *_swig_go_0) {
   Xapian::CoordWeight *arg1 = (Xapian::CoordWeight *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9507,7 +9821,7 @@ bool _wrap_CoordWeight_get_sumpart_needs_uniqueterms__xapian_1797894d64db9bab(Xa
 }
 
 
-Xapian::Compactor *_wrap__swig_NewDirectorCompactorCompactor_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::Compactor *_wrap__swig_NewDirectorCompactorCompactor_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::Compactor *result = 0 ;
   Xapian::Compactor *_swig_go_result;
@@ -9520,7 +9834,7 @@ Xapian::Compactor *_wrap__swig_NewDirectorCompactorCompactor_xapian_1797894d64db
 }
 
 
-void _wrap_DeleteDirectorCompactor_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0) {
+void _wrap_DeleteDirectorCompactor_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   
   arg1 = *(Xapian::Compactor **)&_swig_go_0; 
@@ -9530,7 +9844,7 @@ void _wrap_DeleteDirectorCompactor_xapian_1797894d64db9bab(Xapian::Compactor *_s
 }
 
 
-void _wrap__swig_DirectorCompactor_upcall_Set_status_xapian_1797894d64db9bab(SwigDirector_Compactor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap__swig_DirectorCompactor_upcall_Set_status_xapian_245a1afe1629f0b1(SwigDirector_Compactor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   SwigDirector_Compactor *arg1 = (SwigDirector_Compactor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -9550,7 +9864,7 @@ void _wrap__swig_DirectorCompactor_upcall_Set_status_xapian_1797894d64db9bab(Swi
 }
 
 
-intgo _wrap_STANDARD_Compactor_xapian_1797894d64db9bab() {
+intgo _wrap_STANDARD_Compactor_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -9562,7 +9876,7 @@ intgo _wrap_STANDARD_Compactor_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FULL_Compactor_xapian_1797894d64db9bab() {
+intgo _wrap_FULL_Compactor_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -9574,7 +9888,7 @@ intgo _wrap_FULL_Compactor_xapian_1797894d64db9bab() {
 }
 
 
-intgo _wrap_FULLER_Compactor_xapian_1797894d64db9bab() {
+intgo _wrap_FULLER_Compactor_xapian_245a1afe1629f0b1() {
   int result;
   intgo _swig_go_result;
   
@@ -9586,7 +9900,7 @@ intgo _wrap_FULLER_Compactor_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::Compactor *_wrap_new_Compactor_xapian_1797894d64db9bab() {
+Xapian::Compactor *_wrap_new_Compactor_xapian_245a1afe1629f0b1() {
   Xapian::Compactor *result = 0 ;
   Xapian::Compactor *_swig_go_result;
   
@@ -9597,7 +9911,7 @@ Xapian::Compactor *_wrap_new_Compactor_xapian_1797894d64db9bab() {
 }
 
 
-void _wrap_delete_Compactor_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0) {
+void _wrap_delete_Compactor_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   
   arg1 = *(Xapian::Compactor **)&_swig_go_0; 
@@ -9607,7 +9921,7 @@ void _wrap_delete_Compactor_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_
 }
 
 
-void _wrap_Compactor_set_block_size_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, long long _swig_go_1) {
+void _wrap_Compactor_set_block_size_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, long long _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   size_t arg2 ;
   
@@ -9619,7 +9933,7 @@ void _wrap_Compactor_set_block_size_xapian_1797894d64db9bab(Xapian::Compactor *_
 }
 
 
-void _wrap_Compactor_set_renumber_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, bool _swig_go_1) {
+void _wrap_Compactor_set_renumber_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, bool _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   bool arg2 ;
   
@@ -9631,7 +9945,7 @@ void _wrap_Compactor_set_renumber_xapian_1797894d64db9bab(Xapian::Compactor *_sw
 }
 
 
-void _wrap_Compactor_set_multipass_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, bool _swig_go_1) {
+void _wrap_Compactor_set_multipass_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, bool _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   bool arg2 ;
   
@@ -9643,7 +9957,7 @@ void _wrap_Compactor_set_multipass_xapian_1797894d64db9bab(Xapian::Compactor *_s
 }
 
 
-void _wrap_Compactor_set_compaction_level_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Compactor_set_compaction_level_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, intgo _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   Xapian::Compactor::compaction_level arg2 ;
   
@@ -9655,7 +9969,7 @@ void _wrap_Compactor_set_compaction_level_xapian_1797894d64db9bab(Xapian::Compac
 }
 
 
-void _wrap_Compactor_set_destdir_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Compactor_set_destdir_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -9670,7 +9984,7 @@ void _wrap_Compactor_set_destdir_xapian_1797894d64db9bab(Xapian::Compactor *_swi
 }
 
 
-void _wrap_Compactor_add_source_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Compactor_add_source_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -9685,7 +9999,7 @@ void _wrap_Compactor_add_source_xapian_1797894d64db9bab(Xapian::Compactor *_swig
 }
 
 
-void _wrap_Compactor_compact_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0) {
+void _wrap_Compactor_compact_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   
   arg1 = *(Xapian::Compactor **)&_swig_go_0; 
@@ -9695,7 +10009,7 @@ void _wrap_Compactor_compact_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go
 }
 
 
-void _wrap_Compactor_set_status_xapian_1797894d64db9bab(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_Compactor_set_status_xapian_245a1afe1629f0b1(Xapian::Compactor *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Compactor *arg1 = (Xapian::Compactor *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -9715,7 +10029,7 @@ void _wrap_Compactor_set_status_xapian_1797894d64db9bab(Xapian::Compactor *_swig
 }
 
 
-Xapian::PostingSource *_wrap__swig_NewDirectorPostingSourcePostingSource_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::PostingSource *_wrap__swig_NewDirectorPostingSourcePostingSource_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -9728,7 +10042,7 @@ Xapian::PostingSource *_wrap__swig_NewDirectorPostingSourcePostingSource_xapian_
 }
 
 
-void _wrap_DeleteDirectorPostingSource_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+void _wrap_DeleteDirectorPostingSource_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   
   arg1 = *(Xapian::PostingSource **)&_swig_go_0; 
@@ -9738,7 +10052,7 @@ void _wrap_DeleteDirectorPostingSource_xapian_1797894d64db9bab(Xapian::PostingSo
 }
 
 
-double _wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_1797894d64db9bab(SwigDirector_PostingSource *_swig_go_0) {
+double _wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_245a1afe1629f0b1(SwigDirector_PostingSource *_swig_go_0) {
   SwigDirector_PostingSource *arg1 = (SwigDirector_PostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -9751,7 +10065,7 @@ double _wrap__swig_DirectorPostingSource_upcall_Get_weight_xapian_1797894d64db9b
 }
 
 
-void _wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_1797894d64db9bab(SwigDirector_PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_245a1afe1629f0b1(SwigDirector_PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   SwigDirector_PostingSource *arg1 = (SwigDirector_PostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -9765,7 +10079,7 @@ void _wrap__swig_DirectorPostingSource_upcall_Skip_to_xapian_1797894d64db9bab(Sw
 }
 
 
-bool _wrap__swig_DirectorPostingSource_upcall_Check_xapian_1797894d64db9bab(SwigDirector_PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap__swig_DirectorPostingSource_upcall_Check_xapian_245a1afe1629f0b1(SwigDirector_PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   SwigDirector_PostingSource *arg1 = (SwigDirector_PostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -9782,7 +10096,7 @@ bool _wrap__swig_DirectorPostingSource_upcall_Check_xapian_1797894d64db9bab(Swig
 }
 
 
-_gostring_ _wrap__swig_DirectorPostingSource_upcall_Name_xapian_1797894d64db9bab(SwigDirector_PostingSource *_swig_go_0) {
+_gostring_ _wrap__swig_DirectorPostingSource_upcall_Name_xapian_245a1afe1629f0b1(SwigDirector_PostingSource *_swig_go_0) {
   SwigDirector_PostingSource *arg1 = (SwigDirector_PostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9795,7 +10109,7 @@ _gostring_ _wrap__swig_DirectorPostingSource_upcall_Name_xapian_1797894d64db9bab
 }
 
 
-_gostring_ _wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_1797894d64db9bab(SwigDirector_PostingSource *_swig_go_0) {
+_gostring_ _wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_245a1afe1629f0b1(SwigDirector_PostingSource *_swig_go_0) {
   SwigDirector_PostingSource *arg1 = (SwigDirector_PostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9808,7 +10122,7 @@ _gostring_ _wrap__swig_DirectorPostingSource_upcall_Get_description_xapian_17978
 }
 
 
-void _wrap_delete_PostingSource_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+void _wrap_delete_PostingSource_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   
   arg1 = *(Xapian::PostingSource **)&_swig_go_0; 
@@ -9818,7 +10132,7 @@ void _wrap_delete_PostingSource_xapian_1797894d64db9bab(Xapian::PostingSource *_
 }
 
 
-intgo _wrap_PostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+intgo _wrap_PostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -9831,7 +10145,7 @@ intgo _wrap_PostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::Posti
 }
 
 
-intgo _wrap_PostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+intgo _wrap_PostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -9844,7 +10158,7 @@ intgo _wrap_PostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::Posti
 }
 
 
-intgo _wrap_PostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+intgo _wrap_PostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -9857,7 +10171,7 @@ intgo _wrap_PostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::Posti
 }
 
 
-void _wrap_PostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_PostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   double arg2 ;
   
@@ -9869,7 +10183,7 @@ void _wrap_PostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::PostingSo
 }
 
 
-double _wrap_PostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+double _wrap_PostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -9882,7 +10196,7 @@ double _wrap_PostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::Posting
 }
 
 
-double _wrap_PostingSource_get_weight_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+double _wrap_PostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -9895,7 +10209,7 @@ double _wrap_PostingSource_get_weight_xapian_1797894d64db9bab(Xapian::PostingSou
 }
 
 
-intgo _wrap_PostingSource_get_docid_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+intgo _wrap_PostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -9908,7 +10222,7 @@ intgo _wrap_PostingSource_get_docid_xapian_1797894d64db9bab(Xapian::PostingSourc
 }
 
 
-void _wrap_PostingSource_next_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_PostingSource_next_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   double arg2 ;
   
@@ -9920,7 +10234,7 @@ void _wrap_PostingSource_next_xapian_1797894d64db9bab(Xapian::PostingSource *_sw
 }
 
 
-void _wrap_PostingSource_skip_to_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_PostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -9934,7 +10248,7 @@ void _wrap_PostingSource_skip_to_xapian_1797894d64db9bab(Xapian::PostingSource *
 }
 
 
-bool _wrap_PostingSource_check_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_PostingSource_check_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -9951,7 +10265,7 @@ bool _wrap_PostingSource_check_xapian_1797894d64db9bab(Xapian::PostingSource *_s
 }
 
 
-bool _wrap_PostingSource_at_end_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+bool _wrap_PostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -9964,7 +10278,7 @@ bool _wrap_PostingSource_at_end_xapian_1797894d64db9bab(Xapian::PostingSource *_
 }
 
 
-_gostring_ _wrap_PostingSource_name_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+_gostring_ _wrap_PostingSource_name_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -9977,7 +10291,7 @@ _gostring_ _wrap_PostingSource_name_xapian_1797894d64db9bab(Xapian::PostingSourc
 }
 
 
-void _wrap_PostingSource_init_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_PostingSource_init_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -9989,7 +10303,7 @@ void _wrap_PostingSource_init_xapian_1797894d64db9bab(Xapian::PostingSource *_sw
 }
 
 
-_gostring_ _wrap_PostingSource_get_description_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+_gostring_ _wrap_PostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10002,7 +10316,7 @@ _gostring_ _wrap_PostingSource_get_description_xapian_1797894d64db9bab(Xapian::P
 }
 
 
-Xapian::PostingSource *_wrap_PostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_PostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10015,7 +10329,7 @@ Xapian::PostingSource *_wrap_PostingSource_release__SWIG_0_xapian_1797894d64db9b
 }
 
 
-Xapian::PostingSource *_wrap_PostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::PostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_PostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::PostingSource *_swig_go_0) {
   Xapian::PostingSource *arg1 = (Xapian::PostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10028,7 +10342,7 @@ Xapian::PostingSource *_wrap_PostingSource_release__SWIG_1_xapian_1797894d64db9b
 }
 
 
-Xapian::ValuePostingSource *_wrap_new_ValuePostingSource_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ValuePostingSource *_wrap_new_ValuePostingSource_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::ValuePostingSource *result = 0 ;
   Xapian::ValuePostingSource *_swig_go_result;
@@ -10041,7 +10355,7 @@ Xapian::ValuePostingSource *_wrap_new_ValuePostingSource_xapian_1797894d64db9bab
 }
 
 
-intgo _wrap_ValuePostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+intgo _wrap_ValuePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10054,7 +10368,7 @@ intgo _wrap_ValuePostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::
 }
 
 
-intgo _wrap_ValuePostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+intgo _wrap_ValuePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10067,7 +10381,7 @@ intgo _wrap_ValuePostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::
 }
 
 
-intgo _wrap_ValuePostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+intgo _wrap_ValuePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10080,7 +10394,7 @@ intgo _wrap_ValuePostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_ValuePostingSource_next_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValuePostingSource_next_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   double arg2 ;
   
@@ -10092,7 +10406,7 @@ void _wrap_ValuePostingSource_next_xapian_1797894d64db9bab(Xapian::ValuePostingS
 }
 
 
-void _wrap_ValuePostingSource_skip_to_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_ValuePostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10106,7 +10420,7 @@ void _wrap_ValuePostingSource_skip_to_xapian_1797894d64db9bab(Xapian::ValuePosti
 }
 
 
-bool _wrap_ValuePostingSource_check_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_ValuePostingSource_check_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10123,7 +10437,7 @@ bool _wrap_ValuePostingSource_check_xapian_1797894d64db9bab(Xapian::ValuePosting
 }
 
 
-bool _wrap_ValuePostingSource_at_end_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+bool _wrap_ValuePostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -10136,7 +10450,7 @@ bool _wrap_ValuePostingSource_at_end_xapian_1797894d64db9bab(Xapian::ValuePostin
 }
 
 
-intgo _wrap_ValuePostingSource_get_docid_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+intgo _wrap_ValuePostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -10149,7 +10463,7 @@ intgo _wrap_ValuePostingSource_get_docid_xapian_1797894d64db9bab(Xapian::ValuePo
 }
 
 
-void _wrap_ValuePostingSource_init_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_ValuePostingSource_init_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -10161,7 +10475,7 @@ void _wrap_ValuePostingSource_init_xapian_1797894d64db9bab(Xapian::ValuePostingS
 }
 
 
-Xapian::Database *_wrap_ValuePostingSource_get_database_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+Xapian::Database *_wrap_ValuePostingSource_get_database_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -10174,7 +10488,7 @@ Xapian::Database *_wrap_ValuePostingSource_get_database_xapian_1797894d64db9bab(
 }
 
 
-intgo _wrap_ValuePostingSource_get_slot_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+intgo _wrap_ValuePostingSource_get_slot_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -10187,7 +10501,7 @@ intgo _wrap_ValuePostingSource_get_slot_xapian_1797894d64db9bab(Xapian::ValuePos
 }
 
 
-_gostring_ _wrap_ValuePostingSource_get_value_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+_gostring_ _wrap_ValuePostingSource_get_value_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10200,7 +10514,7 @@ _gostring_ _wrap_ValuePostingSource_get_value_xapian_1797894d64db9bab(Xapian::Va
 }
 
 
-void _wrap_ValuePostingSource_done_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+void _wrap_ValuePostingSource_done_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   
   arg1 = *(Xapian::ValuePostingSource **)&_swig_go_0; 
@@ -10210,7 +10524,7 @@ void _wrap_ValuePostingSource_done_xapian_1797894d64db9bab(Xapian::ValuePostingS
 }
 
 
-bool _wrap_ValuePostingSource_get_started_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+bool _wrap_ValuePostingSource_get_started_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -10223,7 +10537,7 @@ bool _wrap_ValuePostingSource_get_started_xapian_1797894d64db9bab(Xapian::ValueP
 }
 
 
-void _wrap_ValuePostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValuePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10235,7 +10549,7 @@ void _wrap_ValuePostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-void _wrap_ValuePostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValuePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10247,7 +10561,7 @@ void _wrap_ValuePostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-void _wrap_ValuePostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValuePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10259,7 +10573,7 @@ void _wrap_ValuePostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-void _wrap_delete_ValuePostingSource_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+void _wrap_delete_ValuePostingSource_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   
   arg1 = *(Xapian::ValuePostingSource **)&_swig_go_0; 
@@ -10269,7 +10583,7 @@ void _wrap_delete_ValuePostingSource_xapian_1797894d64db9bab(Xapian::ValuePostin
 }
 
 
-void _wrap_ValuePostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValuePostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   double arg2 ;
   
@@ -10282,7 +10596,7 @@ void _wrap_ValuePostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::Valu
 }
 
 
-double _wrap_ValuePostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+double _wrap_ValuePostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -10296,7 +10610,7 @@ double _wrap_ValuePostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::Va
 }
 
 
-double _wrap_ValuePostingSource_get_weight_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+double _wrap_ValuePostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -10310,7 +10624,7 @@ double _wrap_ValuePostingSource_get_weight_xapian_1797894d64db9bab(Xapian::Value
 }
 
 
-_gostring_ _wrap_ValuePostingSource_name_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+_gostring_ _wrap_ValuePostingSource_name_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10324,7 +10638,7 @@ _gostring_ _wrap_ValuePostingSource_name_xapian_1797894d64db9bab(Xapian::ValuePo
 }
 
 
-_gostring_ _wrap_ValuePostingSource_get_description_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+_gostring_ _wrap_ValuePostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10338,7 +10652,7 @@ _gostring_ _wrap_ValuePostingSource_get_description_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10352,7 +10666,7 @@ Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_0_xapian_1797894d6
 }
 
 
-Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ValuePostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ValuePostingSource *_swig_go_0) {
   Xapian::ValuePostingSource *arg1 = (Xapian::ValuePostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10366,7 +10680,7 @@ Xapian::PostingSource *_wrap_ValuePostingSource_release__SWIG_1_xapian_1797894d6
 }
 
 
-Xapian::ValueWeightPostingSource *_wrap_new_ValueWeightPostingSource_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ValueWeightPostingSource *_wrap_new_ValueWeightPostingSource_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::ValueWeightPostingSource *result = 0 ;
   Xapian::ValueWeightPostingSource *_swig_go_result;
@@ -10379,7 +10693,7 @@ Xapian::ValueWeightPostingSource *_wrap_new_ValueWeightPostingSource_xapian_1797
 }
 
 
-double _wrap_ValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+double _wrap_ValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -10392,7 +10706,7 @@ double _wrap_ValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(Xapian:
 }
 
 
-_gostring_ _wrap_ValueWeightPostingSource_name_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueWeightPostingSource_name_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10405,7 +10719,7 @@ _gostring_ _wrap_ValueWeightPostingSource_name_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-void _wrap_ValueWeightPostingSource_init_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_ValueWeightPostingSource_init_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -10417,7 +10731,7 @@ void _wrap_ValueWeightPostingSource_init_xapian_1797894d64db9bab(Xapian::ValueWe
 }
 
 
-_gostring_ _wrap_ValueWeightPostingSource_get_description_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10430,7 +10744,7 @@ _gostring_ _wrap_ValueWeightPostingSource_get_description_xapian_1797894d64db9ba
 }
 
 
-void _wrap_delete_ValueWeightPostingSource_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+void _wrap_delete_ValueWeightPostingSource_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   
   arg1 = *(Xapian::ValueWeightPostingSource **)&_swig_go_0; 
@@ -10440,7 +10754,7 @@ void _wrap_delete_ValueWeightPostingSource_xapian_1797894d64db9bab(Xapian::Value
 }
 
 
-intgo _wrap_ValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_ValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10454,7 +10768,7 @@ intgo _wrap_ValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xa
 }
 
 
-intgo _wrap_ValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_ValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10468,7 +10782,7 @@ intgo _wrap_ValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xa
 }
 
 
-intgo _wrap_ValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_ValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10482,7 +10796,7 @@ intgo _wrap_ValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xa
 }
 
 
-void _wrap_ValueWeightPostingSource_next_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValueWeightPostingSource_next_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -10495,7 +10809,7 @@ void _wrap_ValueWeightPostingSource_next_xapian_1797894d64db9bab(Xapian::ValueWe
 }
 
 
-void _wrap_ValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_ValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10510,7 +10824,7 @@ void _wrap_ValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::Valu
 }
 
 
-bool _wrap_ValueWeightPostingSource_check_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_ValueWeightPostingSource_check_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10528,7 +10842,7 @@ bool _wrap_ValueWeightPostingSource_check_xapian_1797894d64db9bab(Xapian::ValueW
 }
 
 
-bool _wrap_ValueWeightPostingSource_at_end_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+bool _wrap_ValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -10542,7 +10856,7 @@ bool _wrap_ValueWeightPostingSource_at_end_xapian_1797894d64db9bab(Xapian::Value
 }
 
 
-intgo _wrap_ValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_ValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -10556,7 +10870,7 @@ intgo _wrap_ValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-Xapian::Database *_wrap_ValueWeightPostingSource_get_database_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+Xapian::Database *_wrap_ValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -10570,7 +10884,7 @@ Xapian::Database *_wrap_ValueWeightPostingSource_get_database_xapian_1797894d64d
 }
 
 
-intgo _wrap_ValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_ValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -10584,7 +10898,7 @@ intgo _wrap_ValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(Xapian::Va
 }
 
 
-_gostring_ _wrap_ValueWeightPostingSource_get_value_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10598,7 +10912,7 @@ _gostring_ _wrap_ValueWeightPostingSource_get_value_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_ValueWeightPostingSource_done_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+void _wrap_ValueWeightPostingSource_done_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   
   arg1 = *(Xapian::ValueWeightPostingSource **)&_swig_go_0; 
@@ -10609,7 +10923,7 @@ void _wrap_ValueWeightPostingSource_done_xapian_1797894d64db9bab(Xapian::ValueWe
 }
 
 
-bool _wrap_ValueWeightPostingSource_get_started_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+bool _wrap_ValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -10623,7 +10937,7 @@ bool _wrap_ValueWeightPostingSource_get_started_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_ValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10636,7 +10950,7 @@ void _wrap_ValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xap
 }
 
 
-void _wrap_ValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10649,7 +10963,7 @@ void _wrap_ValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xap
 }
 
 
-void _wrap_ValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -10662,7 +10976,7 @@ void _wrap_ValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xap
 }
 
 
-void _wrap_ValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -10676,7 +10990,7 @@ void _wrap_ValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian
 }
 
 
-double _wrap_ValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+double _wrap_ValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -10691,7 +11005,7 @@ double _wrap_ValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10706,7 +11020,7 @@ Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_0_xapian_179
 }
 
 
-Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ValueWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ValueWeightPostingSource *_swig_go_0) {
   Xapian::ValueWeightPostingSource *arg1 = (Xapian::ValueWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -10721,7 +11035,7 @@ Xapian::PostingSource *_wrap_ValueWeightPostingSource_release__SWIG_1_xapian_179
 }
 
 
-Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::valueno arg1 ;
   Xapian::docid arg2 ;
   Xapian::docid arg3 ;
@@ -10738,7 +11052,7 @@ Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPosti
 }
 
 
-Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1) {
+Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1) {
   Xapian::valueno arg1 ;
   Xapian::docid arg2 ;
   Xapian::DecreasingValueWeightPostingSource *result = 0 ;
@@ -10753,7 +11067,7 @@ Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPosti
 }
 
 
-Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPostingSource__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::DecreasingValueWeightPostingSource *result = 0 ;
   Xapian::DecreasingValueWeightPostingSource *_swig_go_result;
@@ -10766,7 +11080,7 @@ Xapian::DecreasingValueWeightPostingSource *_wrap_new_DecreasingValueWeightPosti
 }
 
 
-double _wrap_DecreasingValueWeightPostingSource_get_weight_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+double _wrap_DecreasingValueWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -10779,7 +11093,7 @@ double _wrap_DecreasingValueWeightPostingSource_get_weight_xapian_1797894d64db9b
 }
 
 
-_gostring_ _wrap_DecreasingValueWeightPostingSource_name_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_DecreasingValueWeightPostingSource_name_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10792,7 +11106,7 @@ _gostring_ _wrap_DecreasingValueWeightPostingSource_name_xapian_1797894d64db9bab
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_init_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_init_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -10804,7 +11118,7 @@ void _wrap_DecreasingValueWeightPostingSource_init_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_next_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_next_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -10816,7 +11130,7 @@ void _wrap_DecreasingValueWeightPostingSource_next_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_DecreasingValueWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10830,7 +11144,7 @@ void _wrap_DecreasingValueWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xa
 }
 
 
-bool _wrap_DecreasingValueWeightPostingSource_check_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_DecreasingValueWeightPostingSource_check_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -10847,7 +11161,7 @@ bool _wrap_DecreasingValueWeightPostingSource_check_xapian_1797894d64db9bab(Xapi
 }
 
 
-_gostring_ _wrap_DecreasingValueWeightPostingSource_get_description_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_DecreasingValueWeightPostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10860,7 +11174,7 @@ _gostring_ _wrap_DecreasingValueWeightPostingSource_get_description_xapian_17978
 }
 
 
-void _wrap_delete_DecreasingValueWeightPostingSource_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+void _wrap_delete_DecreasingValueWeightPostingSource_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   
   arg1 = *(Xapian::DecreasingValueWeightPostingSource **)&_swig_go_0; 
@@ -10870,7 +11184,7 @@ void _wrap_delete_DecreasingValueWeightPostingSource_xapian_1797894d64db9bab(Xap
 }
 
 
-intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10885,7 +11199,7 @@ intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_min_xapian_1797894d6
 }
 
 
-intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10900,7 +11214,7 @@ intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_est_xapian_1797894d6
 }
 
 
-intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -10915,7 +11229,7 @@ intgo _wrap_DecreasingValueWeightPostingSource_get_termfreq_max_xapian_1797894d6
 }
 
 
-bool _wrap_DecreasingValueWeightPostingSource_at_end_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+bool _wrap_DecreasingValueWeightPostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -10930,7 +11244,7 @@ bool _wrap_DecreasingValueWeightPostingSource_at_end_xapian_1797894d64db9bab(Xap
 }
 
 
-intgo _wrap_DecreasingValueWeightPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_DecreasingValueWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -10945,7 +11259,7 @@ intgo _wrap_DecreasingValueWeightPostingSource_get_docid_xapian_1797894d64db9bab
 }
 
 
-Xapian::Database *_wrap_DecreasingValueWeightPostingSource_get_database_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+Xapian::Database *_wrap_DecreasingValueWeightPostingSource_get_database_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -10960,7 +11274,7 @@ Xapian::Database *_wrap_DecreasingValueWeightPostingSource_get_database_xapian_1
 }
 
 
-intgo _wrap_DecreasingValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+intgo _wrap_DecreasingValueWeightPostingSource_get_slot_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -10975,7 +11289,7 @@ intgo _wrap_DecreasingValueWeightPostingSource_get_slot_xapian_1797894d64db9bab(
 }
 
 
-_gostring_ _wrap_DecreasingValueWeightPostingSource_get_value_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_DecreasingValueWeightPostingSource_get_value_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -10990,7 +11304,7 @@ _gostring_ _wrap_DecreasingValueWeightPostingSource_get_value_xapian_1797894d64d
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_done_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+void _wrap_DecreasingValueWeightPostingSource_done_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   
   arg1 = *(Xapian::DecreasingValueWeightPostingSource **)&_swig_go_0; 
@@ -11002,7 +11316,7 @@ void _wrap_DecreasingValueWeightPostingSource_done_xapian_1797894d64db9bab(Xapia
 }
 
 
-bool _wrap_DecreasingValueWeightPostingSource_get_started_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+bool _wrap_DecreasingValueWeightPostingSource_get_started_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -11017,7 +11331,7 @@ bool _wrap_DecreasingValueWeightPostingSource_get_started_xapian_1797894d64db9ba
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11031,7 +11345,7 @@ void _wrap_DecreasingValueWeightPostingSource_set_termfreq_min_xapian_1797894d64
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11045,7 +11359,7 @@ void _wrap_DecreasingValueWeightPostingSource_set_termfreq_est_xapian_1797894d64
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11059,7 +11373,7 @@ void _wrap_DecreasingValueWeightPostingSource_set_termfreq_max_xapian_1797894d64
 }
 
 
-void _wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -11074,7 +11388,7 @@ void _wrap_DecreasingValueWeightPostingSource_set_maxweight_xapian_1797894d64db9
 }
 
 
-double _wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+double _wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -11090,7 +11404,7 @@ double _wrap_DecreasingValueWeightPostingSource_get_maxweight_xapian_1797894d64d
 }
 
 
-Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11106,7 +11420,7 @@ Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_0_
 }
 
 
-Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::DecreasingValueWeightPostingSource *_swig_go_0) {
   Xapian::DecreasingValueWeightPostingSource *arg1 = (Xapian::DecreasingValueWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11122,7 +11436,7 @@ Xapian::PostingSource *_wrap_DecreasingValueWeightPostingSource_release__SWIG_1_
 }
 
 
-Xapian::ValueMapPostingSource *_wrap_new_ValueMapPostingSource_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ValueMapPostingSource *_wrap_new_ValueMapPostingSource_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::ValueMapPostingSource *result = 0 ;
   Xapian::ValueMapPostingSource *_swig_go_result;
@@ -11135,7 +11449,7 @@ Xapian::ValueMapPostingSource *_wrap_new_ValueMapPostingSource_xapian_1797894d64
 }
 
 
-void _wrap_ValueMapPostingSource_add_mapping_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, _gostring_ _swig_go_1, double _swig_go_2) {
+void _wrap_ValueMapPostingSource_add_mapping_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, _gostring_ _swig_go_1, double _swig_go_2) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   std::string *arg2 = 0 ;
   double arg3 ;
@@ -11152,7 +11466,7 @@ void _wrap_ValueMapPostingSource_add_mapping_xapian_1797894d64db9bab(Xapian::Val
 }
 
 
-void _wrap_ValueMapPostingSource_clear_mappings_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+void _wrap_ValueMapPostingSource_clear_mappings_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   
   arg1 = *(Xapian::ValueMapPostingSource **)&_swig_go_0; 
@@ -11162,7 +11476,7 @@ void _wrap_ValueMapPostingSource_clear_mappings_xapian_1797894d64db9bab(Xapian::
 }
 
 
-void _wrap_ValueMapPostingSource_set_default_weight_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValueMapPostingSource_set_default_weight_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   double arg2 ;
   
@@ -11174,7 +11488,7 @@ void _wrap_ValueMapPostingSource_set_default_weight_xapian_1797894d64db9bab(Xapi
 }
 
 
-double _wrap_ValueMapPostingSource_get_weight_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+double _wrap_ValueMapPostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -11187,7 +11501,7 @@ double _wrap_ValueMapPostingSource_get_weight_xapian_1797894d64db9bab(Xapian::Va
 }
 
 
-_gostring_ _wrap_ValueMapPostingSource_name_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueMapPostingSource_name_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11200,7 +11514,7 @@ _gostring_ _wrap_ValueMapPostingSource_name_xapian_1797894d64db9bab(Xapian::Valu
 }
 
 
-void _wrap_ValueMapPostingSource_init_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_ValueMapPostingSource_init_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -11212,7 +11526,7 @@ void _wrap_ValueMapPostingSource_init_xapian_1797894d64db9bab(Xapian::ValueMapPo
 }
 
 
-_gostring_ _wrap_ValueMapPostingSource_get_description_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueMapPostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11225,7 +11539,7 @@ _gostring_ _wrap_ValueMapPostingSource_get_description_xapian_1797894d64db9bab(X
 }
 
 
-void _wrap_delete_ValueMapPostingSource_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+void _wrap_delete_ValueMapPostingSource_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   
   arg1 = *(Xapian::ValueMapPostingSource **)&_swig_go_0; 
@@ -11235,7 +11549,7 @@ void _wrap_delete_ValueMapPostingSource_xapian_1797894d64db9bab(Xapian::ValueMap
 }
 
 
-intgo _wrap_ValueMapPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+intgo _wrap_ValueMapPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11249,7 +11563,7 @@ intgo _wrap_ValueMapPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapia
 }
 
 
-intgo _wrap_ValueMapPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+intgo _wrap_ValueMapPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11263,7 +11577,7 @@ intgo _wrap_ValueMapPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapia
 }
 
 
-intgo _wrap_ValueMapPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+intgo _wrap_ValueMapPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11277,7 +11591,7 @@ intgo _wrap_ValueMapPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_ValueMapPostingSource_next_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValueMapPostingSource_next_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   double arg2 ;
   
@@ -11290,7 +11604,7 @@ void _wrap_ValueMapPostingSource_next_xapian_1797894d64db9bab(Xapian::ValueMapPo
 }
 
 
-void _wrap_ValueMapPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_ValueMapPostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -11305,7 +11619,7 @@ void _wrap_ValueMapPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::ValueMa
 }
 
 
-bool _wrap_ValueMapPostingSource_check_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_ValueMapPostingSource_check_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -11323,7 +11637,7 @@ bool _wrap_ValueMapPostingSource_check_xapian_1797894d64db9bab(Xapian::ValueMapP
 }
 
 
-bool _wrap_ValueMapPostingSource_at_end_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+bool _wrap_ValueMapPostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -11337,7 +11651,7 @@ bool _wrap_ValueMapPostingSource_at_end_xapian_1797894d64db9bab(Xapian::ValueMap
 }
 
 
-intgo _wrap_ValueMapPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+intgo _wrap_ValueMapPostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -11351,7 +11665,7 @@ intgo _wrap_ValueMapPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::Valu
 }
 
 
-Xapian::Database *_wrap_ValueMapPostingSource_get_database_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+Xapian::Database *_wrap_ValueMapPostingSource_get_database_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -11365,7 +11679,7 @@ Xapian::Database *_wrap_ValueMapPostingSource_get_database_xapian_1797894d64db9b
 }
 
 
-intgo _wrap_ValueMapPostingSource_get_slot_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+intgo _wrap_ValueMapPostingSource_get_slot_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -11379,7 +11693,7 @@ intgo _wrap_ValueMapPostingSource_get_slot_xapian_1797894d64db9bab(Xapian::Value
 }
 
 
-_gostring_ _wrap_ValueMapPostingSource_get_value_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+_gostring_ _wrap_ValueMapPostingSource_get_value_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11393,7 +11707,7 @@ _gostring_ _wrap_ValueMapPostingSource_get_value_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_ValueMapPostingSource_done_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+void _wrap_ValueMapPostingSource_done_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   
   arg1 = *(Xapian::ValueMapPostingSource **)&_swig_go_0; 
@@ -11404,7 +11718,7 @@ void _wrap_ValueMapPostingSource_done_xapian_1797894d64db9bab(Xapian::ValueMapPo
 }
 
 
-bool _wrap_ValueMapPostingSource_get_started_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+bool _wrap_ValueMapPostingSource_get_started_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -11418,7 +11732,7 @@ bool _wrap_ValueMapPostingSource_get_started_xapian_1797894d64db9bab(Xapian::Val
 }
 
 
-void _wrap_ValueMapPostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueMapPostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11431,7 +11745,7 @@ void _wrap_ValueMapPostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_ValueMapPostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueMapPostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11444,7 +11758,7 @@ void _wrap_ValueMapPostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_ValueMapPostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_ValueMapPostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -11457,7 +11771,7 @@ void _wrap_ValueMapPostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_ValueMapPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_ValueMapPostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   double arg2 ;
   
@@ -11471,7 +11785,7 @@ void _wrap_ValueMapPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::V
 }
 
 
-double _wrap_ValueMapPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+double _wrap_ValueMapPostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -11486,7 +11800,7 @@ double _wrap_ValueMapPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11501,7 +11815,7 @@ Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_0_xapian_179789
 }
 
 
-Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ValueMapPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ValueMapPostingSource *_swig_go_0) {
   Xapian::ValueMapPostingSource *arg1 = (Xapian::ValueMapPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11516,7 +11830,7 @@ Xapian::PostingSource *_wrap_ValueMapPostingSource_release__SWIG_1_xapian_179789
 }
 
 
-Xapian::FixedWeightPostingSource *_wrap_new_FixedWeightPostingSource_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::FixedWeightPostingSource *_wrap_new_FixedWeightPostingSource_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::FixedWeightPostingSource *result = 0 ;
   Xapian::FixedWeightPostingSource *_swig_go_result;
@@ -11529,7 +11843,7 @@ Xapian::FixedWeightPostingSource *_wrap_new_FixedWeightPostingSource_xapian_1797
 }
 
 
-intgo _wrap_FixedWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+intgo _wrap_FixedWeightPostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11542,7 +11856,7 @@ intgo _wrap_FixedWeightPostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xa
 }
 
 
-intgo _wrap_FixedWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+intgo _wrap_FixedWeightPostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11555,7 +11869,7 @@ intgo _wrap_FixedWeightPostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xa
 }
 
 
-intgo _wrap_FixedWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+intgo _wrap_FixedWeightPostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -11568,7 +11882,7 @@ intgo _wrap_FixedWeightPostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xa
 }
 
 
-double _wrap_FixedWeightPostingSource_get_weight_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+double _wrap_FixedWeightPostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -11581,7 +11895,7 @@ double _wrap_FixedWeightPostingSource_get_weight_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_FixedWeightPostingSource_next_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_FixedWeightPostingSource_next_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -11593,7 +11907,7 @@ void _wrap_FixedWeightPostingSource_next_xapian_1797894d64db9bab(Xapian::FixedWe
 }
 
 
-void _wrap_FixedWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_FixedWeightPostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -11607,7 +11921,7 @@ void _wrap_FixedWeightPostingSource_skip_to_xapian_1797894d64db9bab(Xapian::Fixe
 }
 
 
-bool _wrap_FixedWeightPostingSource_check_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_FixedWeightPostingSource_check_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -11624,7 +11938,7 @@ bool _wrap_FixedWeightPostingSource_check_xapian_1797894d64db9bab(Xapian::FixedW
 }
 
 
-bool _wrap_FixedWeightPostingSource_at_end_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+bool _wrap_FixedWeightPostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -11637,7 +11951,7 @@ bool _wrap_FixedWeightPostingSource_at_end_xapian_1797894d64db9bab(Xapian::Fixed
 }
 
 
-intgo _wrap_FixedWeightPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+intgo _wrap_FixedWeightPostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -11650,7 +11964,7 @@ intgo _wrap_FixedWeightPostingSource_get_docid_xapian_1797894d64db9bab(Xapian::F
 }
 
 
-_gostring_ _wrap_FixedWeightPostingSource_name_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_FixedWeightPostingSource_name_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11663,7 +11977,7 @@ _gostring_ _wrap_FixedWeightPostingSource_name_xapian_1797894d64db9bab(Xapian::F
 }
 
 
-void _wrap_FixedWeightPostingSource_init_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_FixedWeightPostingSource_init_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -11675,7 +11989,7 @@ void _wrap_FixedWeightPostingSource_init_xapian_1797894d64db9bab(Xapian::FixedWe
 }
 
 
-_gostring_ _wrap_FixedWeightPostingSource_get_description_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+_gostring_ _wrap_FixedWeightPostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11688,7 +12002,7 @@ _gostring_ _wrap_FixedWeightPostingSource_get_description_xapian_1797894d64db9ba
 }
 
 
-void _wrap_delete_FixedWeightPostingSource_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+void _wrap_delete_FixedWeightPostingSource_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   
   arg1 = *(Xapian::FixedWeightPostingSource **)&_swig_go_0; 
@@ -11698,7 +12012,7 @@ void _wrap_delete_FixedWeightPostingSource_xapian_1797894d64db9bab(Xapian::Fixed
 }
 
 
-void _wrap_FixedWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_FixedWeightPostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   double arg2 ;
   
@@ -11711,7 +12025,7 @@ void _wrap_FixedWeightPostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian
 }
 
 
-double _wrap_FixedWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+double _wrap_FixedWeightPostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -11725,7 +12039,7 @@ double _wrap_FixedWeightPostingSource_get_maxweight_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11739,7 +12053,7 @@ Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_0_xapian_179
 }
 
 
-Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::FixedWeightPostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::FixedWeightPostingSource *_swig_go_0) {
   Xapian::FixedWeightPostingSource *arg1 = (Xapian::FixedWeightPostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -11753,7 +12067,7 @@ Xapian::PostingSource *_wrap_FixedWeightPostingSource_release__SWIG_1_xapian_179
 }
 
 
-Xapian::MatchSpy *_wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::MatchSpy *_wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::MatchSpy *result = 0 ;
   Xapian::MatchSpy *_swig_go_result;
@@ -11766,7 +12080,7 @@ Xapian::MatchSpy *_wrap__swig_NewDirectorMatchSpyMatchSpy_xapian_1797894d64db9ba
 }
 
 
-void _wrap_DeleteDirectorMatchSpy_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+void _wrap_DeleteDirectorMatchSpy_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   
   arg1 = *(Xapian::MatchSpy **)&_swig_go_0; 
@@ -11776,7 +12090,7 @@ void _wrap_DeleteDirectorMatchSpy_xapian_1797894d64db9bab(Xapian::MatchSpy *_swi
 }
 
 
-_gostring_ _wrap__swig_DirectorMatchSpy_upcall_Name_xapian_1797894d64db9bab(SwigDirector_MatchSpy *_swig_go_0) {
+_gostring_ _wrap__swig_DirectorMatchSpy_upcall_Name_xapian_245a1afe1629f0b1(SwigDirector_MatchSpy *_swig_go_0) {
   SwigDirector_MatchSpy *arg1 = (SwigDirector_MatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11789,7 +12103,7 @@ _gostring_ _wrap__swig_DirectorMatchSpy_upcall_Name_xapian_1797894d64db9bab(Swig
 }
 
 
-void _wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_1797894d64db9bab(SwigDirector_MatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_245a1afe1629f0b1(SwigDirector_MatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
   SwigDirector_MatchSpy *arg1 = (SwigDirector_MatchSpy *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -11804,7 +12118,7 @@ void _wrap__swig_DirectorMatchSpy_upcall_Merge_results_xapian_1797894d64db9bab(S
 }
 
 
-_gostring_ _wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_1797894d64db9bab(SwigDirector_MatchSpy *_swig_go_0) {
+_gostring_ _wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_245a1afe1629f0b1(SwigDirector_MatchSpy *_swig_go_0) {
   SwigDirector_MatchSpy *arg1 = (SwigDirector_MatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11817,7 +12131,7 @@ _gostring_ _wrap__swig_DirectorMatchSpy_upcall_Get_description_xapian_1797894d64
 }
 
 
-void _wrap_delete_MatchSpy_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+void _wrap_delete_MatchSpy_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   
   arg1 = *(Xapian::MatchSpy **)&_swig_go_0; 
@@ -11827,7 +12141,7 @@ void _wrap_delete_MatchSpy_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0)
 }
 
 
-void _wrap_MatchSpy_Apply_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0, Xapian::Document *_swig_go_1, double _swig_go_2) {
+void _wrap_MatchSpy_Apply_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0, Xapian::Document *_swig_go_1, double _swig_go_2) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   Xapian::Document *arg2 = 0 ;
   double arg3 ;
@@ -11841,7 +12155,7 @@ void _wrap_MatchSpy_Apply_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0, 
 }
 
 
-_gostring_ _wrap_MatchSpy_name_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+_gostring_ _wrap_MatchSpy_name_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11854,7 +12168,7 @@ _gostring_ _wrap_MatchSpy_name_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_g
 }
 
 
-void _wrap_MatchSpy_merge_results_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_MatchSpy_merge_results_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -11869,7 +12183,7 @@ void _wrap_MatchSpy_merge_results_xapian_1797894d64db9bab(Xapian::MatchSpy *_swi
 }
 
 
-_gostring_ _wrap_MatchSpy_get_description_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+_gostring_ _wrap_MatchSpy_get_description_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -11882,7 +12196,7 @@ _gostring_ _wrap_MatchSpy_get_description_xapian_1797894d64db9bab(Xapian::MatchS
 }
 
 
-Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_0_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   Xapian::MatchSpy *result = 0 ;
   Xapian::MatchSpy *_swig_go_result;
@@ -11895,7 +12209,7 @@ Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_0_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_1_xapian_1797894d64db9bab(Xapian::MatchSpy *_swig_go_0) {
+Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::MatchSpy *_swig_go_0) {
   Xapian::MatchSpy *arg1 = (Xapian::MatchSpy *) 0 ;
   Xapian::MatchSpy *result = 0 ;
   Xapian::MatchSpy *_swig_go_result;
@@ -11908,7 +12222,7 @@ Xapian::MatchSpy *_wrap_MatchSpy_release__SWIG_1_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::ValueCountMatchSpy *result = 0 ;
   Xapian::ValueCountMatchSpy *_swig_go_result;
   
@@ -11919,7 +12233,7 @@ Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_0_xapian_1797894d
 }
 
 
-Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   Xapian::valueno arg1 ;
   Xapian::ValueCountMatchSpy *result = 0 ;
   Xapian::ValueCountMatchSpy *_swig_go_result;
@@ -11932,7 +12246,7 @@ Xapian::ValueCountMatchSpy *_wrap_new_ValueCountMatchSpy__SWIG_1_xapian_1797894d
 }
 
 
-long long _wrap_ValueCountMatchSpy_get_total_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+long long _wrap_ValueCountMatchSpy_get_total_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   size_t result;
   long long _swig_go_result;
@@ -11945,7 +12259,7 @@ long long _wrap_ValueCountMatchSpy_get_total_xapian_1797894d64db9bab(Xapian::Val
 }
 
 
-Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_begin_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_begin_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -11958,7 +12272,7 @@ Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_begin_xapian_1797894d64db9
 }
 
 
-Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_end_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_end_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -11971,7 +12285,7 @@ Xapian::TermIterator *_wrap_ValueCountMatchSpy_values_end_xapian_1797894d64db9ba
 }
 
 
-Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_begin_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0, long long _swig_go_1) {
+Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_begin_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0, long long _swig_go_1) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   size_t arg2 ;
   Xapian::TermIterator result;
@@ -11986,7 +12300,7 @@ Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_begin_xapian_1797894d6
 }
 
 
-Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_end_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0, long long _swig_go_1) {
+Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_end_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0, long long _swig_go_1) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   size_t arg2 ;
   Xapian::TermIterator result;
@@ -12001,7 +12315,7 @@ Xapian::TermIterator *_wrap_ValueCountMatchSpy_top_values_end_xapian_1797894d64d
 }
 
 
-void _wrap_ValueCountMatchSpy_Apply_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0, Xapian::Document *_swig_go_1, double _swig_go_2) {
+void _wrap_ValueCountMatchSpy_Apply_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0, Xapian::Document *_swig_go_1, double _swig_go_2) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   Xapian::Document *arg2 = 0 ;
   double arg3 ;
@@ -12015,7 +12329,7 @@ void _wrap_ValueCountMatchSpy_Apply_xapian_1797894d64db9bab(Xapian::ValueCountMa
 }
 
 
-_gostring_ _wrap_ValueCountMatchSpy_name_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+_gostring_ _wrap_ValueCountMatchSpy_name_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12028,7 +12342,7 @@ _gostring_ _wrap_ValueCountMatchSpy_name_xapian_1797894d64db9bab(Xapian::ValueCo
 }
 
 
-void _wrap_ValueCountMatchSpy_merge_results_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_ValueCountMatchSpy_merge_results_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -12043,7 +12357,7 @@ void _wrap_ValueCountMatchSpy_merge_results_xapian_1797894d64db9bab(Xapian::Valu
 }
 
 
-_gostring_ _wrap_ValueCountMatchSpy_get_description_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+_gostring_ _wrap_ValueCountMatchSpy_get_description_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12056,7 +12370,7 @@ _gostring_ _wrap_ValueCountMatchSpy_get_description_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_delete_ValueCountMatchSpy_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+void _wrap_delete_ValueCountMatchSpy_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   
   arg1 = *(Xapian::ValueCountMatchSpy **)&_swig_go_0; 
@@ -12066,7 +12380,7 @@ void _wrap_delete_ValueCountMatchSpy_xapian_1797894d64db9bab(Xapian::ValueCountM
 }
 
 
-Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_0_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   Xapian::MatchSpy *result = 0 ;
   Xapian::MatchSpy *_swig_go_result;
@@ -12080,7 +12394,7 @@ Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_0_xapian_1797894d64db9b
 }
 
 
-Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_1_xapian_1797894d64db9bab(Xapian::ValueCountMatchSpy *_swig_go_0) {
+Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::ValueCountMatchSpy *_swig_go_0) {
   Xapian::ValueCountMatchSpy *arg1 = (Xapian::ValueCountMatchSpy *) 0 ;
   Xapian::MatchSpy *result = 0 ;
   Xapian::MatchSpy *_swig_go_result;
@@ -12094,7 +12408,7 @@ Xapian::MatchSpy *_wrap_ValueCountMatchSpy_release__SWIG_1_xapian_1797894d64db9b
 }
 
 
-double _wrap_miles_to_metres_xapian_1797894d64db9bab(double _swig_go_0) {
+double _wrap_miles_to_metres_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   double result;
   double _swig_go_result;
@@ -12107,7 +12421,7 @@ double _wrap_miles_to_metres_xapian_1797894d64db9bab(double _swig_go_0) {
 }
 
 
-double _wrap_metres_to_miles_xapian_1797894d64db9bab(double _swig_go_0) {
+double _wrap_metres_to_miles_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   double result;
   double _swig_go_result;
@@ -12120,7 +12434,7 @@ double _wrap_metres_to_miles_xapian_1797894d64db9bab(double _swig_go_0) {
 }
 
 
-void _wrap_LatLongCoord_latitude_set_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0, double _swig_go_1) {
+void _wrap_LatLongCoord_latitude_set_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0, double _swig_go_1) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   double arg2 ;
   
@@ -12132,7 +12446,7 @@ void _wrap_LatLongCoord_latitude_set_xapian_1797894d64db9bab(Xapian::LatLongCoor
 }
 
 
-double _wrap_LatLongCoord_latitude_get_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+double _wrap_LatLongCoord_latitude_get_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   double result;
   double _swig_go_result;
@@ -12145,7 +12459,7 @@ double _wrap_LatLongCoord_latitude_get_xapian_1797894d64db9bab(Xapian::LatLongCo
 }
 
 
-void _wrap_LatLongCoord_longitude_set_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0, double _swig_go_1) {
+void _wrap_LatLongCoord_longitude_set_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0, double _swig_go_1) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   double arg2 ;
   
@@ -12157,7 +12471,7 @@ void _wrap_LatLongCoord_longitude_set_xapian_1797894d64db9bab(Xapian::LatLongCoo
 }
 
 
-double _wrap_LatLongCoord_longitude_get_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+double _wrap_LatLongCoord_longitude_get_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   double result;
   double _swig_go_result;
@@ -12170,7 +12484,7 @@ double _wrap_LatLongCoord_longitude_get_xapian_1797894d64db9bab(Xapian::LatLongC
 }
 
 
-Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::LatLongCoord *result = 0 ;
   Xapian::LatLongCoord *_swig_go_result;
   
@@ -12181,7 +12495,7 @@ Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_0_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_1_xapian_1797894d64db9bab(double _swig_go_0, double _swig_go_1) {
+Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_1_xapian_245a1afe1629f0b1(double _swig_go_0, double _swig_go_1) {
   double arg1 ;
   double arg2 ;
   Xapian::LatLongCoord *result = 0 ;
@@ -12196,7 +12510,7 @@ Xapian::LatLongCoord *_wrap_new_LatLongCoord__SWIG_1_xapian_1797894d64db9bab(dou
 }
 
 
-void _wrap_LatLongCoord_unserialise_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_LatLongCoord_unserialise_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -12211,7 +12525,7 @@ void _wrap_LatLongCoord_unserialise_xapian_1797894d64db9bab(Xapian::LatLongCoord
 }
 
 
-_gostring_ _wrap_LatLongCoord_serialise_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+_gostring_ _wrap_LatLongCoord_serialise_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12224,7 +12538,7 @@ _gostring_ _wrap_LatLongCoord_serialise_xapian_1797894d64db9bab(Xapian::LatLongC
 }
 
 
-_gostring_ _wrap_LatLongCoord_get_description_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+_gostring_ _wrap_LatLongCoord_get_description_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12237,7 +12551,7 @@ _gostring_ _wrap_LatLongCoord_get_description_xapian_1797894d64db9bab(Xapian::La
 }
 
 
-void _wrap_delete_LatLongCoord_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+void _wrap_delete_LatLongCoord_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = (Xapian::LatLongCoord *) 0 ;
   
   arg1 = *(Xapian::LatLongCoord **)&_swig_go_0; 
@@ -12247,7 +12561,7 @@ void _wrap_delete_LatLongCoord_xapian_1797894d64db9bab(Xapian::LatLongCoord *_sw
 }
 
 
-Xapian::LatLongCoordsIterator *_wrap_new_LatLongCoordsIterator_xapian_1797894d64db9bab() {
+Xapian::LatLongCoordsIterator *_wrap_new_LatLongCoordsIterator_xapian_245a1afe1629f0b1() {
   Xapian::LatLongCoordsIterator *result = 0 ;
   Xapian::LatLongCoordsIterator *_swig_go_result;
   
@@ -12258,7 +12572,7 @@ Xapian::LatLongCoordsIterator *_wrap_new_LatLongCoordsIterator_xapian_1797894d64
 }
 
 
-bool _wrap_LatLongCoordsIterator_equals_xapian_1797894d64db9bab(Xapian::LatLongCoordsIterator *_swig_go_0, Xapian::LatLongCoordsIterator *_swig_go_1) {
+bool _wrap_LatLongCoordsIterator_equals_xapian_245a1afe1629f0b1(Xapian::LatLongCoordsIterator *_swig_go_0, Xapian::LatLongCoordsIterator *_swig_go_1) {
   Xapian::LatLongCoordsIterator *arg1 = (Xapian::LatLongCoordsIterator *) 0 ;
   Xapian::LatLongCoordsIterator *arg2 = 0 ;
   bool result;
@@ -12273,7 +12587,7 @@ bool _wrap_LatLongCoordsIterator_equals_xapian_1797894d64db9bab(Xapian::LatLongC
 }
 
 
-Xapian::LatLongCoord *_wrap_LatLongCoordsIterator_get_coord_xapian_1797894d64db9bab(Xapian::LatLongCoordsIterator *_swig_go_0) {
+Xapian::LatLongCoord *_wrap_LatLongCoordsIterator_get_coord_xapian_245a1afe1629f0b1(Xapian::LatLongCoordsIterator *_swig_go_0) {
   Xapian::LatLongCoordsIterator *arg1 = (Xapian::LatLongCoordsIterator *) 0 ;
   Xapian::LatLongCoord result;
   Xapian::LatLongCoord *_swig_go_result;
@@ -12286,7 +12600,7 @@ Xapian::LatLongCoord *_wrap_LatLongCoordsIterator_get_coord_xapian_1797894d64db9
 }
 
 
-void _wrap_LatLongCoordsIterator_next_xapian_1797894d64db9bab(Xapian::LatLongCoordsIterator *_swig_go_0) {
+void _wrap_LatLongCoordsIterator_next_xapian_245a1afe1629f0b1(Xapian::LatLongCoordsIterator *_swig_go_0) {
   Xapian::LatLongCoordsIterator *arg1 = (Xapian::LatLongCoordsIterator *) 0 ;
   
   arg1 = *(Xapian::LatLongCoordsIterator **)&_swig_go_0; 
@@ -12296,7 +12610,7 @@ void _wrap_LatLongCoordsIterator_next_xapian_1797894d64db9bab(Xapian::LatLongCoo
 }
 
 
-void _wrap_delete_LatLongCoordsIterator_xapian_1797894d64db9bab(Xapian::LatLongCoordsIterator *_swig_go_0) {
+void _wrap_delete_LatLongCoordsIterator_xapian_245a1afe1629f0b1(Xapian::LatLongCoordsIterator *_swig_go_0) {
   Xapian::LatLongCoordsIterator *arg1 = (Xapian::LatLongCoordsIterator *) 0 ;
   
   arg1 = *(Xapian::LatLongCoordsIterator **)&_swig_go_0; 
@@ -12306,7 +12620,7 @@ void _wrap_delete_LatLongCoordsIterator_xapian_1797894d64db9bab(Xapian::LatLongC
 }
 
 
-Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_begin_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_begin_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   Xapian::LatLongCoordsIterator result;
   Xapian::LatLongCoordsIterator *_swig_go_result;
@@ -12319,7 +12633,7 @@ Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_begin_xapian_1797894d64db9bab
 }
 
 
-Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_end_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_end_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   Xapian::LatLongCoordsIterator result;
   Xapian::LatLongCoordsIterator *_swig_go_result;
@@ -12332,7 +12646,7 @@ Xapian::LatLongCoordsIterator *_wrap_LatLongCoords_end_xapian_1797894d64db9bab(X
 }
 
 
-long long _wrap_LatLongCoords_size_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+long long _wrap_LatLongCoords_size_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   size_t result;
   long long _swig_go_result;
@@ -12345,7 +12659,7 @@ long long _wrap_LatLongCoords_size_xapian_1797894d64db9bab(Xapian::LatLongCoords
 }
 
 
-bool _wrap_LatLongCoords_empty_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+bool _wrap_LatLongCoords_empty_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -12358,7 +12672,7 @@ bool _wrap_LatLongCoords_empty_xapian_1797894d64db9bab(Xapian::LatLongCoords *_s
 }
 
 
-void _wrap_LatLongCoords_append_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0, Xapian::LatLongCoord *_swig_go_1) {
+void _wrap_LatLongCoords_append_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0, Xapian::LatLongCoord *_swig_go_1) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   
@@ -12370,7 +12684,7 @@ void _wrap_LatLongCoords_append_xapian_1797894d64db9bab(Xapian::LatLongCoords *_
 }
 
 
-Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::LatLongCoords *result = 0 ;
   Xapian::LatLongCoords *_swig_go_result;
   
@@ -12381,7 +12695,7 @@ Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_0_xapian_1797894d64db9bab()
 }
 
 
-Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_1_xapian_1797894d64db9bab(Xapian::LatLongCoord *_swig_go_0) {
+Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_1_xapian_245a1afe1629f0b1(Xapian::LatLongCoord *_swig_go_0) {
   Xapian::LatLongCoord *arg1 = 0 ;
   Xapian::LatLongCoords *result = 0 ;
   Xapian::LatLongCoords *_swig_go_result;
@@ -12394,7 +12708,7 @@ Xapian::LatLongCoords *_wrap_new_LatLongCoords__SWIG_1_xapian_1797894d64db9bab(X
 }
 
 
-void _wrap_LatLongCoords_unserialise_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_LatLongCoords_unserialise_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -12409,7 +12723,7 @@ void _wrap_LatLongCoords_unserialise_xapian_1797894d64db9bab(Xapian::LatLongCoor
 }
 
 
-_gostring_ _wrap_LatLongCoords_serialise_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+_gostring_ _wrap_LatLongCoords_serialise_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12422,7 +12736,7 @@ _gostring_ _wrap_LatLongCoords_serialise_xapian_1797894d64db9bab(Xapian::LatLong
 }
 
 
-_gostring_ _wrap_LatLongCoords_get_description_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+_gostring_ _wrap_LatLongCoords_get_description_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12435,7 +12749,7 @@ _gostring_ _wrap_LatLongCoords_get_description_xapian_1797894d64db9bab(Xapian::L
 }
 
 
-void _wrap_delete_LatLongCoords_xapian_1797894d64db9bab(Xapian::LatLongCoords *_swig_go_0) {
+void _wrap_delete_LatLongCoords_xapian_245a1afe1629f0b1(Xapian::LatLongCoords *_swig_go_0) {
   Xapian::LatLongCoords *arg1 = (Xapian::LatLongCoords *) 0 ;
   
   arg1 = *(Xapian::LatLongCoords **)&_swig_go_0; 
@@ -12445,7 +12759,7 @@ void _wrap_delete_LatLongCoords_xapian_1797894d64db9bab(Xapian::LatLongCoords *_
 }
 
 
-Xapian::LatLongMetric *_wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::LatLongMetric *_wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::LatLongMetric *result = 0 ;
   Xapian::LatLongMetric *_swig_go_result;
@@ -12458,7 +12772,7 @@ Xapian::LatLongMetric *_wrap__swig_NewDirectorLatLongMetricLatLongMetric_xapian_
 }
 
 
-void _wrap_DeleteDirectorLatLongMetric_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0) {
+void _wrap_DeleteDirectorLatLongMetric_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   
   arg1 = *(Xapian::LatLongMetric **)&_swig_go_0; 
@@ -12468,7 +12782,7 @@ void _wrap_DeleteDirectorLatLongMetric_xapian_1797894d64db9bab(Xapian::LatLongMe
 }
 
 
-void _wrap_delete_LatLongMetric_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0) {
+void _wrap_delete_LatLongMetric_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   
   arg1 = *(Xapian::LatLongMetric **)&_swig_go_0; 
@@ -12478,7 +12792,7 @@ void _wrap_delete_LatLongMetric_xapian_1797894d64db9bab(Xapian::LatLongMetric *_
 }
 
 
-double _wrap_LatLongMetric_pointwise_distance_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongCoord *_swig_go_2) {
+double _wrap_LatLongMetric_pointwise_distance_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongCoord *_swig_go_2) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   Xapian::LatLongCoord *arg3 = 0 ;
@@ -12495,7 +12809,7 @@ double _wrap_LatLongMetric_pointwise_distance_xapian_1797894d64db9bab(Xapian::La
 }
 
 
-double _wrap_LatLongMetric_Apply__SWIG_0_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongCoords *_swig_go_2) {
+double _wrap_LatLongMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongCoords *_swig_go_2) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongCoords *arg3 = 0 ;
@@ -12512,7 +12826,7 @@ double _wrap_LatLongMetric_Apply__SWIG_0_xapian_1797894d64db9bab(Xapian::LatLong
 }
 
 
-double _wrap_LatLongMetric_Apply__SWIG_1_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2) {
+double _wrap_LatLongMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -12532,7 +12846,7 @@ double _wrap_LatLongMetric_Apply__SWIG_1_xapian_1797894d64db9bab(Xapian::LatLong
 }
 
 
-double _wrap_LatLongMetric_Apply__SWIG_2_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2, long long _swig_go_3) {
+double _wrap_LatLongMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2, long long _swig_go_3) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   char *arg3 = (char *) 0 ;
@@ -12551,7 +12865,7 @@ double _wrap_LatLongMetric_Apply__SWIG_2_xapian_1797894d64db9bab(Xapian::LatLong
 }
 
 
-_gostring_ _wrap_LatLongMetric_name_xapian_1797894d64db9bab(Xapian::LatLongMetric *_swig_go_0) {
+_gostring_ _wrap_LatLongMetric_name_xapian_245a1afe1629f0b1(Xapian::LatLongMetric *_swig_go_0) {
   Xapian::LatLongMetric *arg1 = (Xapian::LatLongMetric *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12564,7 +12878,7 @@ _gostring_ _wrap_LatLongMetric_name_xapian_1797894d64db9bab(Xapian::LatLongMetri
 }
 
 
-Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::GreatCircleMetric *result = 0 ;
   Xapian::GreatCircleMetric *_swig_go_result;
   
@@ -12575,7 +12889,7 @@ Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_0_xapian_1797894d64
 }
 
 
-Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_1_xapian_1797894d64db9bab(double _swig_go_0) {
+Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_1_xapian_245a1afe1629f0b1(double _swig_go_0) {
   double arg1 ;
   Xapian::GreatCircleMetric *result = 0 ;
   Xapian::GreatCircleMetric *_swig_go_result;
@@ -12588,7 +12902,7 @@ Xapian::GreatCircleMetric *_wrap_new_GreatCircleMetric__SWIG_1_xapian_1797894d64
 }
 
 
-double _wrap_GreatCircleMetric_pointwise_distance_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongCoord *_swig_go_2) {
+double _wrap_GreatCircleMetric_pointwise_distance_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongCoord *_swig_go_2) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   Xapian::LatLongCoord *arg3 = 0 ;
@@ -12605,7 +12919,7 @@ double _wrap_GreatCircleMetric_pointwise_distance_xapian_1797894d64db9bab(Xapian
 }
 
 
-_gostring_ _wrap_GreatCircleMetric_name_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0) {
+_gostring_ _wrap_GreatCircleMetric_name_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12618,7 +12932,7 @@ _gostring_ _wrap_GreatCircleMetric_name_xapian_1797894d64db9bab(Xapian::GreatCir
 }
 
 
-void _wrap_delete_GreatCircleMetric_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0) {
+void _wrap_delete_GreatCircleMetric_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   
   arg1 = *(Xapian::GreatCircleMetric **)&_swig_go_0; 
@@ -12628,7 +12942,7 @@ void _wrap_delete_GreatCircleMetric_xapian_1797894d64db9bab(Xapian::GreatCircleM
 }
 
 
-double _wrap_GreatCircleMetric_Apply__SWIG_0_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongCoords *_swig_go_2) {
+double _wrap_GreatCircleMetric_Apply__SWIG_0_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongCoords *_swig_go_2) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongCoords *arg3 = 0 ;
@@ -12646,7 +12960,7 @@ double _wrap_GreatCircleMetric_Apply__SWIG_0_xapian_1797894d64db9bab(Xapian::Gre
 }
 
 
-double _wrap_GreatCircleMetric_Apply__SWIG_1_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2) {
+double _wrap_GreatCircleMetric_Apply__SWIG_1_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -12667,7 +12981,7 @@ double _wrap_GreatCircleMetric_Apply__SWIG_1_xapian_1797894d64db9bab(Xapian::Gre
 }
 
 
-double _wrap_GreatCircleMetric_Apply__SWIG_2_xapian_1797894d64db9bab(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2, long long _swig_go_3) {
+double _wrap_GreatCircleMetric_Apply__SWIG_2_xapian_245a1afe1629f0b1(Xapian::GreatCircleMetric *_swig_go_0, Xapian::LatLongCoords *_swig_go_1, _gostring_ _swig_go_2, long long _swig_go_3) {
   Xapian::GreatCircleMetric *arg1 = (Xapian::GreatCircleMetric *) 0 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   char *arg3 = (char *) 0 ;
@@ -12687,7 +13001,7 @@ double _wrap_GreatCircleMetric_Apply__SWIG_2_xapian_1797894d64db9bab(Xapian::Gre
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3, double _swig_go_4, double _swig_go_5) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3, double _swig_go_4, double _swig_go_5) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -12710,7 +13024,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3, double _swig_go_4) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3, double _swig_go_4) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -12731,7 +13045,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -12750,7 +13064,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -12767,7 +13081,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2, double _swig_go_3, double _swig_go_4) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   double arg3 ;
@@ -12788,7 +13102,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2, double _swig_go_3) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_5_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2, double _swig_go_3) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   double arg3 ;
@@ -12807,7 +13121,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_6_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, double _swig_go_2) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   double arg3 ;
@@ -12824,7 +13138,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1) {
+Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SWIG_7_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongDistancePostingSource *result = 0 ;
@@ -12839,7 +13153,7 @@ Xapian::LatLongDistancePostingSource *_wrap_new_LatLongDistancePostingSource__SW
 }
 
 
-void _wrap_delete_LatLongDistancePostingSource_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+void _wrap_delete_LatLongDistancePostingSource_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   
   arg1 = *(Xapian::LatLongDistancePostingSource **)&_swig_go_0; 
@@ -12849,7 +13163,7 @@ void _wrap_delete_LatLongDistancePostingSource_xapian_1797894d64db9bab(Xapian::L
 }
 
 
-void _wrap_LatLongDistancePostingSource_next_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_LatLongDistancePostingSource_next_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   double arg2 ;
   
@@ -12861,7 +13175,7 @@ void _wrap_LatLongDistancePostingSource_next_xapian_1797894d64db9bab(Xapian::Lat
 }
 
 
-void _wrap_LatLongDistancePostingSource_skip_to_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+void _wrap_LatLongDistancePostingSource_skip_to_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -12875,7 +13189,7 @@ void _wrap_LatLongDistancePostingSource_skip_to_xapian_1797894d64db9bab(Xapian::
 }
 
 
-bool _wrap_LatLongDistancePostingSource_check_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
+bool _wrap_LatLongDistancePostingSource_check_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1, double _swig_go_2) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::docid arg2 ;
   double arg3 ;
@@ -12892,7 +13206,7 @@ bool _wrap_LatLongDistancePostingSource_check_xapian_1797894d64db9bab(Xapian::La
 }
 
 
-double _wrap_LatLongDistancePostingSource_get_weight_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+double _wrap_LatLongDistancePostingSource_get_weight_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -12905,7 +13219,7 @@ double _wrap_LatLongDistancePostingSource_get_weight_xapian_1797894d64db9bab(Xap
 }
 
 
-_gostring_ _wrap_LatLongDistancePostingSource_name_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+_gostring_ _wrap_LatLongDistancePostingSource_name_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12918,7 +13232,7 @@ _gostring_ _wrap_LatLongDistancePostingSource_name_xapian_1797894d64db9bab(Xapia
 }
 
 
-void _wrap_LatLongDistancePostingSource_init_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_LatLongDistancePostingSource_init_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -12930,7 +13244,7 @@ void _wrap_LatLongDistancePostingSource_init_xapian_1797894d64db9bab(Xapian::Lat
 }
 
 
-_gostring_ _wrap_LatLongDistancePostingSource_get_description_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+_gostring_ _wrap_LatLongDistancePostingSource_get_description_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -12943,7 +13257,7 @@ _gostring_ _wrap_LatLongDistancePostingSource_get_description_xapian_1797894d64d
 }
 
 
-intgo _wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+intgo _wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -12957,7 +13271,7 @@ intgo _wrap_LatLongDistancePostingSource_get_termfreq_min_xapian_1797894d64db9ba
 }
 
 
-intgo _wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+intgo _wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -12971,7 +13285,7 @@ intgo _wrap_LatLongDistancePostingSource_get_termfreq_est_xapian_1797894d64db9ba
 }
 
 
-intgo _wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+intgo _wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -12985,7 +13299,7 @@ intgo _wrap_LatLongDistancePostingSource_get_termfreq_max_xapian_1797894d64db9ba
 }
 
 
-bool _wrap_LatLongDistancePostingSource_at_end_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+bool _wrap_LatLongDistancePostingSource_at_end_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -12999,7 +13313,7 @@ bool _wrap_LatLongDistancePostingSource_at_end_xapian_1797894d64db9bab(Xapian::L
 }
 
 
-intgo _wrap_LatLongDistancePostingSource_get_docid_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+intgo _wrap_LatLongDistancePostingSource_get_docid_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -13013,7 +13327,7 @@ intgo _wrap_LatLongDistancePostingSource_get_docid_xapian_1797894d64db9bab(Xapia
 }
 
 
-Xapian::Database *_wrap_LatLongDistancePostingSource_get_database_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+Xapian::Database *_wrap_LatLongDistancePostingSource_get_database_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -13027,7 +13341,7 @@ Xapian::Database *_wrap_LatLongDistancePostingSource_get_database_xapian_1797894
 }
 
 
-intgo _wrap_LatLongDistancePostingSource_get_slot_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+intgo _wrap_LatLongDistancePostingSource_get_slot_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::valueno result;
   intgo _swig_go_result;
@@ -13041,7 +13355,7 @@ intgo _wrap_LatLongDistancePostingSource_get_slot_xapian_1797894d64db9bab(Xapian
 }
 
 
-_gostring_ _wrap_LatLongDistancePostingSource_get_value_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+_gostring_ _wrap_LatLongDistancePostingSource_get_value_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -13055,7 +13369,7 @@ _gostring_ _wrap_LatLongDistancePostingSource_get_value_xapian_1797894d64db9bab(
 }
 
 
-void _wrap_LatLongDistancePostingSource_done_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+void _wrap_LatLongDistancePostingSource_done_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   
   arg1 = *(Xapian::LatLongDistancePostingSource **)&_swig_go_0; 
@@ -13066,7 +13380,7 @@ void _wrap_LatLongDistancePostingSource_done_xapian_1797894d64db9bab(Xapian::Lat
 }
 
 
-bool _wrap_LatLongDistancePostingSource_get_started_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+bool _wrap_LatLongDistancePostingSource_get_started_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -13080,7 +13394,7 @@ bool _wrap_LatLongDistancePostingSource_get_started_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -13093,7 +13407,7 @@ void _wrap_LatLongDistancePostingSource_set_termfreq_min_xapian_1797894d64db9bab
 }
 
 
-void _wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -13106,7 +13420,7 @@ void _wrap_LatLongDistancePostingSource_set_termfreq_est_xapian_1797894d64db9bab
 }
 
 
-void _wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
+void _wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, intgo _swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::doccount arg2 ;
   
@@ -13119,7 +13433,7 @@ void _wrap_LatLongDistancePostingSource_set_termfreq_max_xapian_1797894d64db9bab
 }
 
 
-void _wrap_LatLongDistancePostingSource_set_maxweight_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0, double _swig_go_1) {
+void _wrap_LatLongDistancePostingSource_set_maxweight_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0, double _swig_go_1) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   double arg2 ;
   
@@ -13133,7 +13447,7 @@ void _wrap_LatLongDistancePostingSource_set_maxweight_xapian_1797894d64db9bab(Xa
 }
 
 
-double _wrap_LatLongDistancePostingSource_get_maxweight_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+double _wrap_LatLongDistancePostingSource_get_maxweight_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   double result;
   double _swig_go_result;
@@ -13148,7 +13462,7 @@ double _wrap_LatLongDistancePostingSource_get_maxweight_xapian_1797894d64db9bab(
 }
 
 
-Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -13163,7 +13477,7 @@ Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_0_xapian
 }
 
 
-Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_1797894d64db9bab(Xapian::LatLongDistancePostingSource *_swig_go_0) {
+Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::LatLongDistancePostingSource *_swig_go_0) {
   Xapian::LatLongDistancePostingSource *arg1 = (Xapian::LatLongDistancePostingSource *) 0 ;
   Xapian::PostingSource *result = 0 ;
   Xapian::PostingSource *_swig_go_result;
@@ -13178,7 +13492,7 @@ Xapian::PostingSource *_wrap_LatLongDistancePostingSource_release__SWIG_1_xapian
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -13197,7 +13511,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_0_xapia
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -13214,7 +13528,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_1_xapia
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoords *_swig_go_1) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoords *arg2 = 0 ;
   Xapian::LatLongDistanceKeyMaker *result = 0 ;
@@ -13229,7 +13543,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_2_xapia
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongMetric *_swig_go_2, double _swig_go_3) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -13248,7 +13562,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_3_xapia
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1, Xapian::LatLongMetric *_swig_go_2) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   Xapian::LatLongMetric *arg3 = 0 ;
@@ -13265,7 +13579,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_4_xapia
 }
 
 
-Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_1797894d64db9bab(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1) {
+Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapian_245a1afe1629f0b1(intgo _swig_go_0, Xapian::LatLongCoord *_swig_go_1) {
   Xapian::valueno arg1 ;
   Xapian::LatLongCoord *arg2 = 0 ;
   Xapian::LatLongDistanceKeyMaker *result = 0 ;
@@ -13280,7 +13594,7 @@ Xapian::LatLongDistanceKeyMaker *_wrap_new_LatLongDistanceKeyMaker__SWIG_5_xapia
 }
 
 
-void _wrap_delete_LatLongDistanceKeyMaker_xapian_1797894d64db9bab(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
+void _wrap_delete_LatLongDistanceKeyMaker_xapian_245a1afe1629f0b1(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
   Xapian::LatLongDistanceKeyMaker *arg1 = (Xapian::LatLongDistanceKeyMaker *) 0 ;
   
   arg1 = *(Xapian::LatLongDistanceKeyMaker **)&_swig_go_0; 
@@ -13290,7 +13604,7 @@ void _wrap_delete_LatLongDistanceKeyMaker_xapian_1797894d64db9bab(Xapian::LatLon
 }
 
 
-_gostring_ _wrap_LatLongDistanceKeyMaker_Apply_xapian_1797894d64db9bab(Xapian::LatLongDistanceKeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
+_gostring_ _wrap_LatLongDistanceKeyMaker_Apply_xapian_245a1afe1629f0b1(Xapian::LatLongDistanceKeyMaker *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::LatLongDistanceKeyMaker *arg1 = (Xapian::LatLongDistanceKeyMaker *) 0 ;
   Xapian::Document *arg2 = 0 ;
   std::string result;
@@ -13305,7 +13619,7 @@ _gostring_ _wrap_LatLongDistanceKeyMaker_Apply_xapian_1797894d64db9bab(Xapian::L
 }
 
 
-Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_1797894d64db9bab(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_245a1afe1629f0b1(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
   Xapian::LatLongDistanceKeyMaker *arg1 = (Xapian::LatLongDistanceKeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -13319,7 +13633,7 @@ Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_0_xapian_1797894d6
 }
 
 
-Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_1797894d64db9bab(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
+Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_245a1afe1629f0b1(Xapian::LatLongDistanceKeyMaker *_swig_go_0) {
   Xapian::LatLongDistanceKeyMaker *arg1 = (Xapian::LatLongDistanceKeyMaker *) 0 ;
   Xapian::KeyMaker *result = 0 ;
   Xapian::KeyMaker *_swig_go_result;
@@ -13333,7 +13647,7 @@ Xapian::KeyMaker *_wrap_LatLongDistanceKeyMaker_release__SWIG_1_xapian_1797894d6
 }
 
 
-void _wrap_Database_add_database_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_Database_add_database_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -13345,7 +13659,7 @@ void _wrap_Database_add_database_xapian_1797894d64db9bab(Xapian::Database *_swig
 }
 
 
-Xapian::Database *_wrap_new_Database__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::Database *_wrap_new_Database__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::Database *result = 0 ;
   Xapian::Database *_swig_go_result;
   
@@ -13356,7 +13670,7 @@ Xapian::Database *_wrap_new_Database__SWIG_0_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::Database *_wrap_new_Database__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::Database *_wrap_new_Database__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   Xapian::Database *result = 0 ;
@@ -13374,7 +13688,7 @@ Xapian::Database *_wrap_new_Database__SWIG_1_xapian_1797894d64db9bab(_gostring_ 
 }
 
 
-Xapian::Database *_wrap_new_Database__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Database *_wrap_new_Database__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Database *result = 0 ;
   Xapian::Database *_swig_go_result;
@@ -13390,7 +13704,7 @@ Xapian::Database *_wrap_new_Database__SWIG_2_xapian_1797894d64db9bab(_gostring_ 
 }
 
 
-Xapian::Database *_wrap_new_Database__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1) {
+Xapian::Database *_wrap_new_Database__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1) {
   int arg1 ;
   int arg2 ;
   Xapian::Database *result = 0 ;
@@ -13405,7 +13719,7 @@ Xapian::Database *_wrap_new_Database__SWIG_3_xapian_1797894d64db9bab(intgo _swig
 }
 
 
-Xapian::Database *_wrap_new_Database__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0) {
+Xapian::Database *_wrap_new_Database__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   Xapian::Database *result = 0 ;
   Xapian::Database *_swig_go_result;
@@ -13418,7 +13732,7 @@ Xapian::Database *_wrap_new_Database__SWIG_4_xapian_1797894d64db9bab(intgo _swig
 }
 
 
-void _wrap_delete_Database_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+void _wrap_delete_Database_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   
   arg1 = *(Xapian::Database **)&_swig_go_0; 
@@ -13428,7 +13742,7 @@ void _wrap_delete_Database_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0)
 }
 
 
-bool _wrap_Database_reopen_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+bool _wrap_Database_reopen_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -13441,7 +13755,7 @@ bool _wrap_Database_reopen_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0)
 }
 
 
-void _wrap_Database_close_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+void _wrap_Database_close_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   
   arg1 = *(Xapian::Database **)&_swig_go_0; 
@@ -13451,7 +13765,7 @@ void _wrap_Database_close_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) 
 }
 
 
-_gostring_ _wrap_Database_get_description_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+_gostring_ _wrap_Database_get_description_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -13464,7 +13778,7 @@ _gostring_ _wrap_Database_get_description_xapian_1797894d64db9bab(Xapian::Databa
 }
 
 
-Xapian::PostingIterator *_wrap_Database_postlist_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::PostingIterator *_wrap_Database_postlist_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::PostingIterator result;
@@ -13482,7 +13796,7 @@ Xapian::PostingIterator *_wrap_Database_postlist_begin_xapian_1797894d64db9bab(X
 }
 
 
-Xapian::PostingIterator *_wrap_Database_postlist_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::PostingIterator *_wrap_Database_postlist_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::PostingIterator result;
@@ -13500,7 +13814,7 @@ Xapian::PostingIterator *_wrap_Database_postlist_end_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::TermIterator *_wrap_Database_termlist_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_termlist_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -13515,7 +13829,7 @@ Xapian::TermIterator *_wrap_Database_termlist_begin_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::TermIterator *_wrap_Database_termlist_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_termlist_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -13530,7 +13844,7 @@ Xapian::TermIterator *_wrap_Database_termlist_end_xapian_1797894d64db9bab(Xapian
 }
 
 
-bool _wrap_Database_has_positions_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+bool _wrap_Database_has_positions_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -13543,7 +13857,7 @@ bool _wrap_Database_has_positions_xapian_1797894d64db9bab(Xapian::Database *_swi
 }
 
 
-Xapian::PositionIterator *_wrap_Database_positionlist_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::PositionIterator *_wrap_Database_positionlist_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   std::string *arg3 = 0 ;
@@ -13563,7 +13877,7 @@ Xapian::PositionIterator *_wrap_Database_positionlist_begin_xapian_1797894d64db9
 }
 
 
-Xapian::PositionIterator *_wrap_Database_positionlist_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::PositionIterator *_wrap_Database_positionlist_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   std::string *arg3 = 0 ;
@@ -13583,7 +13897,7 @@ Xapian::PositionIterator *_wrap_Database_positionlist_end_xapian_1797894d64db9ba
 }
 
 
-Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -13601,7 +13915,7 @@ Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_0_xapian_1797894d64db9
 }
 
 
-Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -13614,7 +13928,7 @@ Xapian::TermIterator *_wrap_Database_allterms_begin__SWIG_1_xapian_1797894d64db9
 }
 
 
-Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -13632,7 +13946,7 @@ Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_0_xapian_1797894d64db9ba
 }
 
 
-Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -13645,7 +13959,7 @@ Xapian::TermIterator *_wrap_Database_allterms_end__SWIG_1_xapian_1797894d64db9ba
 }
 
 
-intgo _wrap_Database_get_doccount_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+intgo _wrap_Database_get_doccount_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -13658,7 +13972,7 @@ intgo _wrap_Database_get_doccount_xapian_1797894d64db9bab(Xapian::Database *_swi
 }
 
 
-intgo _wrap_Database_get_lastdocid_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+intgo _wrap_Database_get_lastdocid_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -13671,7 +13985,7 @@ intgo _wrap_Database_get_lastdocid_xapian_1797894d64db9bab(Xapian::Database *_sw
 }
 
 
-double _wrap_Database_get_avlength_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+double _wrap_Database_get_avlength_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::doclength result;
   double _swig_go_result;
@@ -13684,7 +13998,7 @@ double _wrap_Database_get_avlength_xapian_1797894d64db9bab(Xapian::Database *_sw
 }
 
 
-XAPIAN_TOTALLENGTH_TYPE *_wrap_Database_get_total_length_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+XAPIAN_TOTALLENGTH_TYPE *_wrap_Database_get_total_length_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::totallength result;
   XAPIAN_TOTALLENGTH_TYPE *_swig_go_result;
@@ -13697,7 +14011,7 @@ XAPIAN_TOTALLENGTH_TYPE *_wrap_Database_get_total_length_xapian_1797894d64db9bab
 }
 
 
-intgo _wrap_Database_get_termfreq_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_Database_get_termfreq_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::doccount result;
@@ -13715,7 +14029,7 @@ intgo _wrap_Database_get_termfreq_xapian_1797894d64db9bab(Xapian::Database *_swi
 }
 
 
-bool _wrap_Database_term_exists_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_Database_term_exists_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -13733,7 +14047,7 @@ bool _wrap_Database_term_exists_xapian_1797894d64db9bab(Xapian::Database *_swig_
 }
 
 
-intgo _wrap_Database_get_collection_freq_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_Database_get_collection_freq_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount result;
@@ -13751,7 +14065,7 @@ intgo _wrap_Database_get_collection_freq_xapian_1797894d64db9bab(Xapian::Databas
 }
 
 
-intgo _wrap_Database_get_value_freq_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_Database_get_value_freq_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::doccount result;
@@ -13766,7 +14080,7 @@ intgo _wrap_Database_get_value_freq_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-_gostring_ _wrap_Database_get_value_lower_bound_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+_gostring_ _wrap_Database_get_value_lower_bound_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::valueno arg2 ;
   std::string result;
@@ -13781,7 +14095,7 @@ _gostring_ _wrap_Database_get_value_lower_bound_xapian_1797894d64db9bab(Xapian::
 }
 
 
-_gostring_ _wrap_Database_get_value_upper_bound_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+_gostring_ _wrap_Database_get_value_upper_bound_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::valueno arg2 ;
   std::string result;
@@ -13796,7 +14110,7 @@ _gostring_ _wrap_Database_get_value_upper_bound_xapian_1797894d64db9bab(Xapian::
 }
 
 
-intgo _wrap_Database_get_doclength_lower_bound_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+intgo _wrap_Database_get_doclength_lower_bound_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -13809,7 +14123,7 @@ intgo _wrap_Database_get_doclength_lower_bound_xapian_1797894d64db9bab(Xapian::D
 }
 
 
-intgo _wrap_Database_get_doclength_upper_bound_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+intgo _wrap_Database_get_doclength_upper_bound_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -13822,7 +14136,7 @@ intgo _wrap_Database_get_doclength_upper_bound_xapian_1797894d64db9bab(Xapian::D
 }
 
 
-intgo _wrap_Database_get_wdf_upper_bound_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_Database_get_wdf_upper_bound_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount result;
@@ -13840,7 +14154,7 @@ intgo _wrap_Database_get_wdf_upper_bound_xapian_1797894d64db9bab(Xapian::Databas
 }
 
 
-Xapian::ValueIterator *_wrap_Database_valuestream_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+Xapian::ValueIterator *_wrap_Database_valuestream_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::ValueIterator result;
@@ -13855,7 +14169,7 @@ Xapian::ValueIterator *_wrap_Database_valuestream_begin_xapian_1797894d64db9bab(
 }
 
 
-Xapian::ValueIterator *_wrap_Database_valuestream_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+Xapian::ValueIterator *_wrap_Database_valuestream_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::ValueIterator result;
@@ -13870,7 +14184,7 @@ Xapian::ValueIterator *_wrap_Database_valuestream_end_xapian_1797894d64db9bab(Xa
 }
 
 
-intgo _wrap_Database_get_doclength_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_Database_get_doclength_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   Xapian::termcount result;
@@ -13885,7 +14199,7 @@ intgo _wrap_Database_get_doclength_xapian_1797894d64db9bab(Xapian::Database *_sw
 }
 
 
-intgo _wrap_Database_get_unique_terms_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_Database_get_unique_terms_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   Xapian::termcount result;
@@ -13900,7 +14214,7 @@ intgo _wrap_Database_get_unique_terms_xapian_1797894d64db9bab(Xapian::Database *
 }
 
 
-void _wrap_Database_keep_alive_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+void _wrap_Database_keep_alive_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   
   arg1 = *(Xapian::Database **)&_swig_go_0; 
@@ -13910,7 +14224,7 @@ void _wrap_Database_keep_alive_xapian_1797894d64db9bab(Xapian::Database *_swig_g
 }
 
 
-Xapian::Document *_wrap_Database_get_document__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+Xapian::Document *_wrap_Database_get_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   Xapian::Document result;
@@ -13925,7 +14239,7 @@ Xapian::Document *_wrap_Database_get_document__SWIG_0_xapian_1797894d64db9bab(Xa
 }
 
 
-Xapian::Document *_wrap_Database_get_document__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::Document *_wrap_Database_get_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::docid arg2 ;
   unsigned int arg3 ;
@@ -13942,7 +14256,7 @@ Xapian::Document *_wrap_Database_get_document__SWIG_1_xapian_1797894d64db9bab(Xa
 }
 
 
-_gostring_ _wrap_Database_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+_gostring_ _wrap_Database_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -13962,7 +14276,7 @@ _gostring_ _wrap_Database_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9ba
 }
 
 
-_gostring_ _wrap_Database_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_Database_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -13980,7 +14294,7 @@ _gostring_ _wrap_Database_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9ba
 }
 
 
-Xapian::TermIterator *_wrap_Database_spellings_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_spellings_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -13993,7 +14307,7 @@ Xapian::TermIterator *_wrap_Database_spellings_begin_xapian_1797894d64db9bab(Xap
 }
 
 
-Xapian::TermIterator *_wrap_Database_spellings_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_spellings_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14006,7 +14320,7 @@ Xapian::TermIterator *_wrap_Database_spellings_end_xapian_1797894d64db9bab(Xapia
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonyms_begin_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_synonyms_begin_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14024,7 +14338,7 @@ Xapian::TermIterator *_wrap_Database_synonyms_begin_xapian_1797894d64db9bab(Xapi
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonyms_end_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_synonyms_end_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14042,7 +14356,7 @@ Xapian::TermIterator *_wrap_Database_synonyms_end_xapian_1797894d64db9bab(Xapian
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14060,7 +14374,7 @@ Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_0_xapian_1797894d6
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14073,7 +14387,7 @@ Xapian::TermIterator *_wrap_Database_synonym_keys_begin__SWIG_1_xapian_1797894d6
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14091,7 +14405,7 @@ Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_0_xapian_1797894d64d
 }
 
 
-Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14104,7 +14418,7 @@ Xapian::TermIterator *_wrap_Database_synonym_keys_end__SWIG_1_xapian_1797894d64d
 }
 
 
-_gostring_ _wrap_Database_get_metadata_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_Database_get_metadata_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -14122,7 +14436,7 @@ _gostring_ _wrap_Database_get_metadata_xapian_1797894d64db9bab(Xapian::Database 
 }
 
 
-Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14140,7 +14454,7 @@ Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_0_xapian_1797894d
 }
 
 
-Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14153,7 +14467,7 @@ Xapian::TermIterator *_wrap_Database_metadata_keys_begin__SWIG_1_xapian_1797894d
 }
 
 
-Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14171,7 +14485,7 @@ Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_0_xapian_1797894d64
 }
 
 
-Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14184,7 +14498,7 @@ Xapian::TermIterator *_wrap_Database_metadata_keys_end__SWIG_1_xapian_1797894d64
 }
 
 
-_gostring_ _wrap_Database_get_uuid_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+_gostring_ _wrap_Database_get_uuid_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -14197,7 +14511,7 @@ _gostring_ _wrap_Database_get_uuid_xapian_1797894d64db9bab(Xapian::Database *_sw
 }
 
 
-bool _wrap_Database_locked_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+bool _wrap_Database_locked_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -14210,7 +14524,7 @@ bool _wrap_Database_locked_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0)
 }
 
 
-XAPIAN_REVISION_TYPE *_wrap_Database_get_revision_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0) {
+XAPIAN_REVISION_TYPE *_wrap_Database_get_revision_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   Xapian::rev result;
   XAPIAN_REVISION_TYPE *_swig_go_result;
@@ -14223,7 +14537,7 @@ XAPIAN_REVISION_TYPE *_wrap_Database_get_revision_xapian_1797894d64db9bab(Xapian
 }
 
 
-long long _wrap_Database_check__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+long long _wrap_Database_check__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   size_t result;
@@ -14241,7 +14555,7 @@ long long _wrap_Database_check__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_
 }
 
 
-long long _wrap_Database_check__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+long long _wrap_Database_check__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   size_t result;
   long long _swig_go_result;
@@ -14257,7 +14571,7 @@ long long _wrap_Database_check__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_
 }
 
 
-long long _wrap_Database_check__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, std::ostream *_swig_go_2) {
+long long _wrap_Database_check__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, std::ostream *_swig_go_2) {
   int arg1 ;
   int arg2 ;
   std::ostream *arg3 = (std::ostream *) 0 ;
@@ -14274,7 +14588,7 @@ long long _wrap_Database_check__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-long long _wrap_Database_check__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1) {
+long long _wrap_Database_check__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1) {
   int arg1 ;
   int arg2 ;
   size_t result;
@@ -14289,7 +14603,7 @@ long long _wrap_Database_check__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0,
 }
 
 
-long long _wrap_Database_check__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0) {
+long long _wrap_Database_check__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   size_t result;
   long long _swig_go_result;
@@ -14302,7 +14616,7 @@ long long _wrap_Database_check__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0)
 }
 
 
-void _wrap_Database_compact__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_Database_compact__SWIG_0_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -14321,7 +14635,7 @@ void _wrap_Database_compact__SWIG_0_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_Database_compact__SWIG_1_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -14338,7 +14652,7 @@ void _wrap_Database_compact__SWIG_1_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_2_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_Database_compact__SWIG_2_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -14353,7 +14667,7 @@ void _wrap_Database_compact__SWIG_2_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_3_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_Database_compact__SWIG_3_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -14369,7 +14683,7 @@ void _wrap_Database_compact__SWIG_3_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_4_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+void _wrap_Database_compact__SWIG_4_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -14383,7 +14697,7 @@ void _wrap_Database_compact__SWIG_4_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_5_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
+void _wrap_Database_compact__SWIG_5_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   int arg2 ;
   
@@ -14395,7 +14709,7 @@ void _wrap_Database_compact__SWIG_5_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_6_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
+void _wrap_Database_compact__SWIG_6_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -14416,7 +14730,7 @@ void _wrap_Database_compact__SWIG_6_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_Database_compact__SWIG_7_xapian_1797894d64db9bab(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
+void _wrap_Database_compact__SWIG_7_xapian_245a1afe1629f0b1(Xapian::Database *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
   Xapian::Database *arg1 = (Xapian::Database *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -14434,7 +14748,7 @@ void _wrap_Database_compact__SWIG_7_xapian_1797894d64db9bab(Xapian::Database *_s
 }
 
 
-void _wrap_delete_WritableDatabase_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_delete_WritableDatabase_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14444,7 +14758,7 @@ void _wrap_delete_WritableDatabase_xapian_1797894d64db9bab(Xapian::WritableDatab
 }
 
 
-Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_0_xapian_1797894d64db9bab() {
+Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_0_xapian_245a1afe1629f0b1() {
   Xapian::WritableDatabase *result = 0 ;
   Xapian::WritableDatabase *_swig_go_result;
   
@@ -14455,7 +14769,7 @@ Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_0_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   int arg2 ;
   int arg3 ;
@@ -14475,7 +14789,7 @@ Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_1_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   Xapian::WritableDatabase *result = 0 ;
@@ -14493,7 +14807,7 @@ Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_2_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_3_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_3_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::WritableDatabase *result = 0 ;
   Xapian::WritableDatabase *_swig_go_result;
@@ -14509,7 +14823,7 @@ Xapian::WritableDatabase *_wrap_new_WritableDatabase__SWIG_3_xapian_1797894d64db
 }
 
 
-void _wrap_WritableDatabase_commit_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_commit_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14519,7 +14833,7 @@ void _wrap_WritableDatabase_commit_xapian_1797894d64db9bab(Xapian::WritableDatab
 }
 
 
-void _wrap_WritableDatabase_flush_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_flush_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14529,7 +14843,7 @@ void _wrap_WritableDatabase_flush_xapian_1797894d64db9bab(Xapian::WritableDataba
 }
 
 
-void _wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, bool _swig_go_1) {
+void _wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, bool _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   bool arg2 ;
   
@@ -14541,7 +14855,7 @@ void _wrap_WritableDatabase_begin_transaction__SWIG_0_xapian_1797894d64db9bab(Xa
 }
 
 
-void _wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14551,7 +14865,7 @@ void _wrap_WritableDatabase_begin_transaction__SWIG_1_xapian_1797894d64db9bab(Xa
 }
 
 
-void _wrap_WritableDatabase_commit_transaction_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_commit_transaction_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14561,7 +14875,7 @@ void _wrap_WritableDatabase_commit_transaction_xapian_1797894d64db9bab(Xapian::W
 }
 
 
-void _wrap_WritableDatabase_cancel_transaction_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_cancel_transaction_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14571,7 +14885,7 @@ void _wrap_WritableDatabase_cancel_transaction_xapian_1797894d64db9bab(Xapian::W
 }
 
 
-intgo _wrap_WritableDatabase_add_document_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, Xapian::Document *_swig_go_1) {
+intgo _wrap_WritableDatabase_add_document_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, Xapian::Document *_swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::Document *arg2 = 0 ;
   Xapian::docid result;
@@ -14586,7 +14900,7 @@ intgo _wrap_WritableDatabase_add_document_xapian_1797894d64db9bab(Xapian::Writab
 }
 
 
-void _wrap_WritableDatabase_delete_document__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+void _wrap_WritableDatabase_delete_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   
@@ -14598,7 +14912,7 @@ void _wrap_WritableDatabase_delete_document__SWIG_0_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_WritableDatabase_delete_document__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_WritableDatabase_delete_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -14613,7 +14927,7 @@ void _wrap_WritableDatabase_delete_document__SWIG_1_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_WritableDatabase_replace_document__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, Xapian::Document *_swig_go_2) {
+void _wrap_WritableDatabase_replace_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, Xapian::Document *_swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::Document *arg3 = 0 ;
@@ -14627,7 +14941,7 @@ void _wrap_WritableDatabase_replace_document__SWIG_0_xapian_1797894d64db9bab(Xap
 }
 
 
-intgo _wrap_WritableDatabase_replace_document__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, Xapian::Document *_swig_go_2) {
+intgo _wrap_WritableDatabase_replace_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, Xapian::Document *_swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::Document *arg3 = 0 ;
@@ -14647,7 +14961,7 @@ intgo _wrap_WritableDatabase_replace_document__SWIG_1_xapian_1797894d64db9bab(Xa
 }
 
 
-void _wrap_WritableDatabase_add_spelling__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_WritableDatabase_add_spelling__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -14664,7 +14978,7 @@ void _wrap_WritableDatabase_add_spelling__SWIG_0_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_WritableDatabase_add_spelling__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_WritableDatabase_add_spelling__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -14679,7 +14993,7 @@ void _wrap_WritableDatabase_add_spelling__SWIG_1_xapian_1797894d64db9bab(Xapian:
 }
 
 
-void _wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount arg3 ;
@@ -14696,7 +15010,7 @@ void _wrap_WritableDatabase_remove_spelling__SWIG_0_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -14711,7 +15025,7 @@ void _wrap_WritableDatabase_remove_spelling__SWIG_1_xapian_1797894d64db9bab(Xapi
 }
 
 
-void _wrap_WritableDatabase_add_synonym_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_WritableDatabase_add_synonym_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -14731,7 +15045,7 @@ void _wrap_WritableDatabase_add_synonym_xapian_1797894d64db9bab(Xapian::Writable
 }
 
 
-void _wrap_WritableDatabase_remove_synonym_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_WritableDatabase_remove_synonym_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -14751,7 +15065,7 @@ void _wrap_WritableDatabase_remove_synonym_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-void _wrap_WritableDatabase_clear_synonyms_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_WritableDatabase_clear_synonyms_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -14766,7 +15080,7 @@ void _wrap_WritableDatabase_clear_synonyms_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-void _wrap_WritableDatabase_set_metadata_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
+void _wrap_WritableDatabase_set_metadata_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -14786,7 +15100,7 @@ void _wrap_WritableDatabase_set_metadata_xapian_1797894d64db9bab(Xapian::Writabl
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_description_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+_gostring_ _wrap_WritableDatabase_get_description_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -14799,7 +15113,7 @@ _gostring_ _wrap_WritableDatabase_get_description_xapian_1797894d64db9bab(Xapian
 }
 
 
-void _wrap_WritableDatabase_add_database_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, Xapian::Database *_swig_go_1) {
+void _wrap_WritableDatabase_add_database_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, Xapian::Database *_swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::Database *arg2 = 0 ;
   
@@ -14812,7 +15126,7 @@ void _wrap_WritableDatabase_add_database_xapian_1797894d64db9bab(Xapian::Writabl
 }
 
 
-bool _wrap_WritableDatabase_reopen_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+bool _wrap_WritableDatabase_reopen_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -14826,7 +15140,7 @@ bool _wrap_WritableDatabase_reopen_xapian_1797894d64db9bab(Xapian::WritableDatab
 }
 
 
-void _wrap_WritableDatabase_close_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_close_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -14837,7 +15151,7 @@ void _wrap_WritableDatabase_close_xapian_1797894d64db9bab(Xapian::WritableDataba
 }
 
 
-Xapian::PostingIterator *_wrap_WritableDatabase_postlist_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::PostingIterator *_wrap_WritableDatabase_postlist_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::PostingIterator result;
@@ -14856,7 +15170,7 @@ Xapian::PostingIterator *_wrap_WritableDatabase_postlist_begin_xapian_1797894d64
 }
 
 
-Xapian::PostingIterator *_wrap_WritableDatabase_postlist_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::PostingIterator *_wrap_WritableDatabase_postlist_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::PostingIterator result;
@@ -14875,7 +15189,7 @@ Xapian::PostingIterator *_wrap_WritableDatabase_postlist_end_xapian_1797894d64db
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_termlist_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_termlist_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -14891,7 +15205,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_termlist_begin_xapian_1797894d64db9
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_termlist_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_termlist_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::TermIterator result;
@@ -14907,7 +15221,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_termlist_end_xapian_1797894d64db9ba
 }
 
 
-bool _wrap_WritableDatabase_has_positions_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+bool _wrap_WritableDatabase_has_positions_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -14921,7 +15235,7 @@ bool _wrap_WritableDatabase_has_positions_xapian_1797894d64db9bab(Xapian::Writab
 }
 
 
-Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   std::string *arg3 = 0 ;
@@ -14942,7 +15256,7 @@ Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_begin_xapian_17978
 }
 
 
-Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
+Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, _gostring_ _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   std::string *arg3 = 0 ;
@@ -14963,7 +15277,7 @@ Xapian::PositionIterator *_wrap_WritableDatabase_positionlist_end_xapian_1797894
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -14982,7 +15296,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_0_xapian_17978
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -14996,7 +15310,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_allterms_begin__SWIG_1_xapian_17978
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15015,7 +15329,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_0_xapian_1797894
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15029,7 +15343,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_allterms_end__SWIG_1_xapian_1797894
 }
 
 
-intgo _wrap_WritableDatabase_get_doccount_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+intgo _wrap_WritableDatabase_get_doccount_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::doccount result;
   intgo _swig_go_result;
@@ -15043,7 +15357,7 @@ intgo _wrap_WritableDatabase_get_doccount_xapian_1797894d64db9bab(Xapian::Writab
 }
 
 
-intgo _wrap_WritableDatabase_get_lastdocid_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+intgo _wrap_WritableDatabase_get_lastdocid_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid result;
   intgo _swig_go_result;
@@ -15057,7 +15371,7 @@ intgo _wrap_WritableDatabase_get_lastdocid_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-double _wrap_WritableDatabase_get_avlength_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+double _wrap_WritableDatabase_get_avlength_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::doclength result;
   double _swig_go_result;
@@ -15071,7 +15385,7 @@ double _wrap_WritableDatabase_get_avlength_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-XAPIAN_TOTALLENGTH_TYPE *_wrap_WritableDatabase_get_total_length_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+XAPIAN_TOTALLENGTH_TYPE *_wrap_WritableDatabase_get_total_length_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::totallength result;
   XAPIAN_TOTALLENGTH_TYPE *_swig_go_result;
@@ -15085,7 +15399,7 @@ XAPIAN_TOTALLENGTH_TYPE *_wrap_WritableDatabase_get_total_length_xapian_1797894d
 }
 
 
-intgo _wrap_WritableDatabase_get_termfreq_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_WritableDatabase_get_termfreq_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::doccount result;
@@ -15104,7 +15418,7 @@ intgo _wrap_WritableDatabase_get_termfreq_xapian_1797894d64db9bab(Xapian::Writab
 }
 
 
-bool _wrap_WritableDatabase_term_exists_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+bool _wrap_WritableDatabase_term_exists_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   bool result;
@@ -15123,7 +15437,7 @@ bool _wrap_WritableDatabase_term_exists_xapian_1797894d64db9bab(Xapian::Writable
 }
 
 
-intgo _wrap_WritableDatabase_get_collection_freq_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_WritableDatabase_get_collection_freq_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount result;
@@ -15142,7 +15456,7 @@ intgo _wrap_WritableDatabase_get_collection_freq_xapian_1797894d64db9bab(Xapian:
 }
 
 
-intgo _wrap_WritableDatabase_get_value_freq_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_WritableDatabase_get_value_freq_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::doccount result;
@@ -15158,7 +15472,7 @@ intgo _wrap_WritableDatabase_get_value_freq_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_value_lower_bound_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+_gostring_ _wrap_WritableDatabase_get_value_lower_bound_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::valueno arg2 ;
   std::string result;
@@ -15174,7 +15488,7 @@ _gostring_ _wrap_WritableDatabase_get_value_lower_bound_xapian_1797894d64db9bab(
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_value_upper_bound_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+_gostring_ _wrap_WritableDatabase_get_value_upper_bound_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::valueno arg2 ;
   std::string result;
@@ -15190,7 +15504,7 @@ _gostring_ _wrap_WritableDatabase_get_value_upper_bound_xapian_1797894d64db9bab(
 }
 
 
-intgo _wrap_WritableDatabase_get_doclength_lower_bound_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+intgo _wrap_WritableDatabase_get_doclength_lower_bound_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -15204,7 +15518,7 @@ intgo _wrap_WritableDatabase_get_doclength_lower_bound_xapian_1797894d64db9bab(X
 }
 
 
-intgo _wrap_WritableDatabase_get_doclength_upper_bound_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+intgo _wrap_WritableDatabase_get_doclength_upper_bound_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
@@ -15218,7 +15532,7 @@ intgo _wrap_WritableDatabase_get_doclength_upper_bound_xapian_1797894d64db9bab(X
 }
 
 
-intgo _wrap_WritableDatabase_get_wdf_upper_bound_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+intgo _wrap_WritableDatabase_get_wdf_upper_bound_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::termcount result;
@@ -15237,7 +15551,7 @@ intgo _wrap_WritableDatabase_get_wdf_upper_bound_xapian_1797894d64db9bab(Xapian:
 }
 
 
-Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::ValueIterator result;
@@ -15253,7 +15567,7 @@ Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_begin_xapian_1797894d6
 }
 
 
-Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::valueno arg2 ;
   Xapian::ValueIterator result;
@@ -15269,7 +15583,7 @@ Xapian::ValueIterator *_wrap_WritableDatabase_valuestream_end_xapian_1797894d64d
 }
 
 
-intgo _wrap_WritableDatabase_get_doclength_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_WritableDatabase_get_doclength_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::termcount result;
@@ -15285,7 +15599,7 @@ intgo _wrap_WritableDatabase_get_doclength_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-intgo _wrap_WritableDatabase_get_unique_terms_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+intgo _wrap_WritableDatabase_get_unique_terms_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::termcount result;
@@ -15301,7 +15615,7 @@ intgo _wrap_WritableDatabase_get_unique_terms_xapian_1797894d64db9bab(Xapian::Wr
 }
 
 
-void _wrap_WritableDatabase_keep_alive_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+void _wrap_WritableDatabase_keep_alive_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   
   arg1 = *(Xapian::WritableDatabase **)&_swig_go_0; 
@@ -15312,7 +15626,7 @@ void _wrap_WritableDatabase_keep_alive_xapian_1797894d64db9bab(Xapian::WritableD
 }
 
 
-Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   Xapian::Document result;
@@ -15328,7 +15642,7 @@ Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_0_xapian_1797894d64d
 }
 
 
-Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::docid arg2 ;
   unsigned int arg3 ;
@@ -15346,7 +15660,7 @@ Xapian::Document *_wrap_WritableDatabase_get_document__SWIG_1_xapian_1797894d64d
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+_gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -15367,7 +15681,7 @@ _gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_0_xapian_1797894
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -15386,7 +15700,7 @@ _gostring_ _wrap_WritableDatabase_get_spelling_suggestion__SWIG_1_xapian_1797894
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_spellings_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_spellings_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15400,7 +15714,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_spellings_begin_xapian_1797894d64db
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_spellings_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_spellings_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15414,7 +15728,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_spellings_end_xapian_1797894d64db9b
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonyms_begin_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonyms_begin_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15433,7 +15747,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonyms_begin_xapian_1797894d64db9
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonyms_end_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonyms_end_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15452,7 +15766,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonyms_end_xapian_1797894d64db9ba
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15471,7 +15785,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_0_xapian_1
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15485,7 +15799,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_begin__SWIG_1_xapian_1
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15504,7 +15818,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_0_xapian_179
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15518,7 +15832,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_synonym_keys_end__SWIG_1_xapian_179
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_metadata_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+_gostring_ _wrap_WritableDatabase_get_metadata_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   std::string result;
@@ -15537,7 +15851,7 @@ _gostring_ _wrap_WritableDatabase_get_metadata_xapian_1797894d64db9bab(Xapian::W
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15556,7 +15870,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_0_xapian_
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15570,7 +15884,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_begin__SWIG_1_xapian_
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   Xapian::TermIterator result;
@@ -15589,7 +15903,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_0_xapian_17
 }
 
 
-Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::TermIterator result;
   Xapian::TermIterator *_swig_go_result;
@@ -15603,7 +15917,7 @@ Xapian::TermIterator *_wrap_WritableDatabase_metadata_keys_end__SWIG_1_xapian_17
 }
 
 
-_gostring_ _wrap_WritableDatabase_get_uuid_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+_gostring_ _wrap_WritableDatabase_get_uuid_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string result;
   _gostring_ _swig_go_result;
@@ -15617,7 +15931,7 @@ _gostring_ _wrap_WritableDatabase_get_uuid_xapian_1797894d64db9bab(Xapian::Writa
 }
 
 
-bool _wrap_WritableDatabase_locked_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+bool _wrap_WritableDatabase_locked_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   bool result;
   bool _swig_go_result;
@@ -15631,7 +15945,7 @@ bool _wrap_WritableDatabase_locked_xapian_1797894d64db9bab(Xapian::WritableDatab
 }
 
 
-XAPIAN_REVISION_TYPE *_wrap_WritableDatabase_get_revision_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0) {
+XAPIAN_REVISION_TYPE *_wrap_WritableDatabase_get_revision_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   Xapian::rev result;
   XAPIAN_REVISION_TYPE *_swig_go_result;
@@ -15645,7 +15959,7 @@ XAPIAN_REVISION_TYPE *_wrap_WritableDatabase_get_revision_xapian_1797894d64db9ba
 }
 
 
-long long _wrap_WritableDatabase_check__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+long long _wrap_WritableDatabase_check__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   size_t result;
@@ -15663,7 +15977,7 @@ long long _wrap_WritableDatabase_check__SWIG_0_xapian_1797894d64db9bab(_gostring
 }
 
 
-long long _wrap_WritableDatabase_check__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+long long _wrap_WritableDatabase_check__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   size_t result;
   long long _swig_go_result;
@@ -15679,7 +15993,7 @@ long long _wrap_WritableDatabase_check__SWIG_1_xapian_1797894d64db9bab(_gostring
 }
 
 
-long long _wrap_WritableDatabase_check__SWIG_2_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1, std::ostream *_swig_go_2) {
+long long _wrap_WritableDatabase_check__SWIG_2_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1, std::ostream *_swig_go_2) {
   int arg1 ;
   int arg2 ;
   std::ostream *arg3 = (std::ostream *) 0 ;
@@ -15696,7 +16010,7 @@ long long _wrap_WritableDatabase_check__SWIG_2_xapian_1797894d64db9bab(intgo _sw
 }
 
 
-long long _wrap_WritableDatabase_check__SWIG_3_xapian_1797894d64db9bab(intgo _swig_go_0, intgo _swig_go_1) {
+long long _wrap_WritableDatabase_check__SWIG_3_xapian_245a1afe1629f0b1(intgo _swig_go_0, intgo _swig_go_1) {
   int arg1 ;
   int arg2 ;
   size_t result;
@@ -15711,7 +16025,7 @@ long long _wrap_WritableDatabase_check__SWIG_3_xapian_1797894d64db9bab(intgo _sw
 }
 
 
-long long _wrap_WritableDatabase_check__SWIG_4_xapian_1797894d64db9bab(intgo _swig_go_0) {
+long long _wrap_WritableDatabase_check__SWIG_4_xapian_245a1afe1629f0b1(intgo _swig_go_0) {
   int arg1 ;
   size_t result;
   long long _swig_go_result;
@@ -15724,7 +16038,7 @@ long long _wrap_WritableDatabase_check__SWIG_4_xapian_1797894d64db9bab(intgo _sw
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_0_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_WritableDatabase_compact__SWIG_0_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -15744,7 +16058,7 @@ void _wrap_WritableDatabase_compact__SWIG_0_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_1_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+void _wrap_WritableDatabase_compact__SWIG_1_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -15762,7 +16076,7 @@ void _wrap_WritableDatabase_compact__SWIG_1_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_2_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
+void _wrap_WritableDatabase_compact__SWIG_2_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -15778,7 +16092,7 @@ void _wrap_WritableDatabase_compact__SWIG_2_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_3_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+void _wrap_WritableDatabase_compact__SWIG_3_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -15795,7 +16109,7 @@ void _wrap_WritableDatabase_compact__SWIG_3_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_4_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+void _wrap_WritableDatabase_compact__SWIG_4_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -15810,7 +16124,7 @@ void _wrap_WritableDatabase_compact__SWIG_4_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_5_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
+void _wrap_WritableDatabase_compact__SWIG_5_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   int arg2 ;
   
@@ -15823,7 +16137,7 @@ void _wrap_WritableDatabase_compact__SWIG_5_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_6_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
+void _wrap_WritableDatabase_compact__SWIG_6_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   std::string *arg2 = 0 ;
   unsigned int arg3 ;
@@ -15845,7 +16159,7 @@ void _wrap_WritableDatabase_compact__SWIG_6_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-void _wrap_WritableDatabase_compact__SWIG_7_xapian_1797894d64db9bab(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
+void _wrap_WritableDatabase_compact__SWIG_7_xapian_245a1afe1629f0b1(Xapian::WritableDatabase *_swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, Xapian::Compactor *_swig_go_4) {
   Xapian::WritableDatabase *arg1 = (Xapian::WritableDatabase *) 0 ;
   int arg2 ;
   unsigned int arg3 ;
@@ -15864,7 +16178,7 @@ void _wrap_WritableDatabase_compact__SWIG_7_xapian_1797894d64db9bab(Xapian::Writ
 }
 
 
-Xapian::Database *_wrap_open_stub__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Database *_wrap_open_stub__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -15880,7 +16194,7 @@ Xapian::Database *_wrap_open_stub__SWIG_0_xapian_1797894d64db9bab(_gostring_ _sw
 }
 
 
-Xapian::WritableDatabase *_wrap_open_stub__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::WritableDatabase *_wrap_open_stub__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   Xapian::WritableDatabase result;
@@ -15898,7 +16212,7 @@ Xapian::WritableDatabase *_wrap_open_stub__SWIG_1_xapian_1797894d64db9bab(_gostr
 }
 
 
-Xapian::WritableDatabase *_wrap_inmemory_open_xapian_1797894d64db9bab() {
+Xapian::WritableDatabase *_wrap_inmemory_open_xapian_245a1afe1629f0b1() {
   Xapian::WritableDatabase result;
   Xapian::WritableDatabase *_swig_go_result;
   
@@ -15909,7 +16223,7 @@ Xapian::WritableDatabase *_wrap_inmemory_open_xapian_1797894d64db9bab() {
 }
 
 
-Xapian::Database *_wrap_chert_open__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0) {
+Xapian::Database *_wrap_chert_open__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0) {
   std::string *arg1 = 0 ;
   Xapian::Database result;
   Xapian::Database *_swig_go_result;
@@ -15925,7 +16239,7 @@ Xapian::Database *_wrap_chert_open__SWIG_0_xapian_1797894d64db9bab(_gostring_ _s
 }
 
 
-Xapian::WritableDatabase *_wrap_chert_open__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::WritableDatabase *_wrap_chert_open__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   int arg2 ;
   int arg3 ;
@@ -15945,7 +16259,7 @@ Xapian::WritableDatabase *_wrap_chert_open__SWIG_1_xapian_1797894d64db9bab(_gost
 }
 
 
-Xapian::WritableDatabase *_wrap_chert_open__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::WritableDatabase *_wrap_chert_open__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   int arg2 ;
   Xapian::WritableDatabase result;
@@ -15963,7 +16277,7 @@ Xapian::WritableDatabase *_wrap_chert_open__SWIG_2_xapian_1797894d64db9bab(_gost
 }
 
 
-Xapian::Database *_wrap_remote_open__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::Database *_wrap_remote_open__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   useconds_t arg3 ;
@@ -15985,7 +16299,7 @@ Xapian::Database *_wrap_remote_open__SWIG_0_xapian_1797894d64db9bab(_gostring_ _
 }
 
 
-Xapian::Database *_wrap_remote_open__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::Database *_wrap_remote_open__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   useconds_t arg3 ;
@@ -16005,7 +16319,7 @@ Xapian::Database *_wrap_remote_open__SWIG_1_xapian_1797894d64db9bab(_gostring_ _
 }
 
 
-Xapian::Database *_wrap_remote_open__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::Database *_wrap_remote_open__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   Xapian::Database result;
@@ -16023,7 +16337,7 @@ Xapian::Database *_wrap_remote_open__SWIG_2_xapian_1797894d64db9bab(_gostring_ _
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_0_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, intgo _swig_go_4) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_0_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3, intgo _swig_go_4) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   useconds_t arg3 ;
@@ -16047,7 +16361,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_0_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_1_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_1_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   useconds_t arg3 ;
@@ -16069,7 +16383,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_1_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_2_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_2_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   useconds_t arg3 ;
@@ -16089,7 +16403,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_2_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_3_xapian_1797894d64db9bab(_gostring_ _swig_go_0, intgo _swig_go_1) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_3_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, intgo _swig_go_1) {
   std::string *arg1 = 0 ;
   unsigned int arg2 ;
   Xapian::WritableDatabase result;
@@ -16107,7 +16421,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_3_xapian_1797894d64db
 }
 
 
-Xapian::Database *_wrap_remote_open__SWIG_3_xapian_1797894d64db9bab(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::Database *_wrap_remote_open__SWIG_3_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   useconds_t arg3 ;
@@ -16130,7 +16444,7 @@ Xapian::Database *_wrap_remote_open__SWIG_3_xapian_1797894d64db9bab(_gostring_ _
 }
 
 
-Xapian::Database *_wrap_remote_open__SWIG_4_xapian_1797894d64db9bab(_gostring_ _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::Database *_wrap_remote_open__SWIG_4_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, _gostring_ _swig_go_1) {
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   Xapian::Database result;
@@ -16151,7 +16465,7 @@ Xapian::Database *_wrap_remote_open__SWIG_4_xapian_1797894d64db9bab(_gostring_ _
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_4_xapian_1797894d64db9bab(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_4_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2, intgo _swig_go_3) {
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   useconds_t arg3 ;
@@ -16176,7 +16490,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_4_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_5_xapian_1797894d64db9bab(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_5_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, _gostring_ _swig_go_1, intgo _swig_go_2) {
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   useconds_t arg3 ;
@@ -16199,7 +16513,7 @@ Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_5_xapian_1797894d64db
 }
 
 
-Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_6_xapian_1797894d64db9bab(_gostring_ _swig_go_0, _gostring_ _swig_go_1) {
+Xapian::WritableDatabase *_wrap_remote_open_writable__SWIG_6_xapian_245a1afe1629f0b1(_gostring_ _swig_go_0, _gostring_ _swig_go_1) {
   std::string *arg1 = 0 ;
   std::string *arg2 = 0 ;
   Xapian::WritableDatabase result;
