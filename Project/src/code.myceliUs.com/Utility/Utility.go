@@ -1014,7 +1014,7 @@ func ToString(value interface{}) string {
 	if reflect.TypeOf(value).Kind() == reflect.String {
 		str += value.(string)
 	} else if reflect.TypeOf(value).Kind() == reflect.Int {
-		str += strconv.Itoa(value.(int))
+		str += strconv.Itoa(toInt(value))
 	} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
 		str += strconv.Itoa(int(value.(int8)))
 	} else if reflect.TypeOf(value).Kind() == reflect.Int16 {

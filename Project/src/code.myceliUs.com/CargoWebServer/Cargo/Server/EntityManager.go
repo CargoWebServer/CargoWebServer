@@ -194,9 +194,16 @@ func (this *EntityManager) isEntityExist(uuid string) bool {
 }
 
 func (this *EntityManager) getEntities(typeName string, storeId string, query *EntityQuery) ([]Entity, *CargoEntities.Error) {
-	query.Fields = []string{"UUID"} // Only the uuid is need here...
-	val, err := json.Marshal(query)
+
 	var q string
+	if query == nil {
+		query = new(EntityQuery)
+		query.TYPENAME = "Server.EntityQuery"
+		query.TypeName = typeName
+		query.Query = query.TypeName + `.TYPENAME=="` + query.TypeName + `"`
+	}
+
+	val, err := json.Marshal(query)
 	if err == nil {
 		q = string(val)
 	}
@@ -212,11 +219,22 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 	entities := make([]Entity, 0)
 	for i := 0; i < len(results); i++ {
 		if results[i][0] != nil {
-			if reflect.TypeOf(results[i][0]).Kind() == reflect.String {
-				entity, err := this.getEntityByUuid(results[i][0].(string))
-				if err == nil {
-					entities = append(entities, entity)
+			obj, err := Utility.InitializeStructure(results[i][0].(map[string]interface{}), setEntityFct)
+			if err == nil {
+				var entity Entity
+				// So here I will retreive the entity uuid from the entity id.
+				if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
+					entity = obj.Interface().(Entity)
+					// Set the entity in the cache
+					this.setEntity(entity)
+				} else {
+					// Dynamic entity here.
+					entity = NewDynamicEntity()
+					entity.(*DynamicEntity).setObject(results[i][0].(map[string]interface{}))
+					// set the entity in the cache.
+					this.setEntity(entity)
 				}
+				entities = append(entities, entity)
 			}
 		}
 	}
@@ -306,7 +324,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
 		return nil, errObj
 	}
-	log.Println("result ---> ", results)
+
 	obj, err := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.
@@ -333,7 +351,6 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 
 	// here the id is generated with parent uuid.
 	uuid, errObj := this.getEntityUuidById(typeName, storeId, ids)
-
 	if errObj == nil {
 		return this.getEntityByUuid(uuid)
 	}
@@ -686,7 +703,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 }
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
-	log.Println("---> remove entity ", entity.GetUuid())
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
 	//store := GetServer().GetDataManager().getDataStore(storeId)
 	uuids := make([]string, 0)

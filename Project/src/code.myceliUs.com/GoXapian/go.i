@@ -55,6 +55,5 @@ namespace Xapian{
 %extend Xapian::MSetIterator {
 	Xapian::Document get_document() const{
 		return self->get_document();
-	}
-	
+	}	
 }

@@ -978,7 +978,7 @@ func (this *Server) Start() {
 		this.GetLdapManager().synchronizeAll()
 
 		// Sync projects.
-		this.GetProjectManager().synchronize()
+		//this.GetProjectManager().synchronize()
 
 	}()
 }

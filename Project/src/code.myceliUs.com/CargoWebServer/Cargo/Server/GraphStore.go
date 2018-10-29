@@ -1085,15 +1085,19 @@ func (this *GraphStore) indexStringField(data string, field string, typeName str
 		data_, err := base64.StdEncoding.DecodeString(data)
 		if err == nil {
 			if strings.Index(data, ":text/") > -1 || strings.Index(data, ":application/") > -1 {
-				log.Println("1092 ----> base64", data_)
+				termGenerator.Index_text(strings.ToLower(string(data_)))
+				termGenerator.Index_text(strings.ToLower(string(data_)), uint(1), generatePrefix(typeName, field))
 			}
 		}
 	} else if Utility.IsStdBase64(data) {
 		data_, err := base64.StdEncoding.DecodeString(data)
 		if err == nil {
-			log.Println("1087 ----> base64", data_)
 			termGenerator.Index_text(strings.ToLower(string(data_)))
 			termGenerator.Index_text(strings.ToLower(string(data_)), uint(1), generatePrefix(typeName, field))
+			if field != "M_data" {
+				termGenerator.Index_text(strings.ToLower(string(data)))
+				termGenerator.Index_text(strings.ToLower(string(data)), uint(1), generatePrefix(typeName, field))
+			}
 		}
 	} else {
 		termGenerator.Index_text(strings.ToLower(data))
@@ -1129,6 +1133,8 @@ func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
 
 	// Index the typename
 	termGenerator.Index_text(entity.GetTypeName(), uint(1), "S")
+	typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + strings.TrimSpace(strings.ToLower(Utility.ToString(entity.GetTypeName())))
+	doc.Add_boolean_term(typeNameIndex)
 
 	// Index each part it typename.
 	values_ := strings.Split(entity.GetTypeName(), ".")
@@ -1245,7 +1251,7 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 		return results, nil
 	}
 
-	// Creation of triples...
+	// Creation of entity
 	for i := 0; i < len(values); i++ {
 		v := values[i]
 		// If the value is an entity...
@@ -1265,7 +1271,6 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 					doc.Set_data(data)
 					doc.Add_boolean_term("Q" + uuid.(string))
 					db.Replace_document("Q"+uuid.(string), doc)
-					log.Println("---> append entity ", v.(Entity))
 				}
 			}
 		}
@@ -1371,6 +1376,8 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return results.([][]interface{}), nil
 	}
 
+	//log.Println("1168 ---> read query ", queryStr)
+
 	// First of all i will init the query...
 	var query EntityQuery
 	err = json.Unmarshal([]byte(queryStr), &query)
@@ -1378,12 +1385,9 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return nil, err
 	}
 
-	if len(query.Query) > 0 {
-		var err error
-		results, err = this.executeSearchQuery(query.Query, query.Fields)
-		if err != nil {
-			return nil, err
-		}
+	results, err = this.executeSearchQuery(query.Query, query.Fields)
+	if err != nil {
+		return nil, err
 	}
 
 	return
@@ -1481,8 +1485,29 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 	}
 
 	// The value to be save.
-	log.Println("---> update entity ", values)
-	// So in that case I will udate the values.
+	for i := 0; i < len(values); i++ {
+		v := values[i]
+		// If the value is an entity...
+		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct {
+			typeName := Utility.GetProperty(v, "TYPENAME")
+			if typeName != nil {
+				uuid := Utility.GetProperty(v, "UUID")
+				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
+				if err == nil {
+					defer db.Close()
+					// So here I will index the property found in the entity.
+					doc := xapian.NewDocument()
+
+					// Keep json data...
+					data, _ := Utility.ToJson(v)
+					this.indexEntity(doc, v.(Entity))
+					doc.Set_data(data)
+					doc.Add_boolean_term("Q" + uuid.(string))
+					db.Replace_document("Q"+uuid.(string), doc)
+				}
+			}
+		}
+	}
 
 	return
 }
@@ -1573,7 +1598,7 @@ func (this *GraphStore) Delete(queryStr string, values []interface{}) (err error
 	}
 
 	// Remove the list of obsolete triples from the datastore.
-	log.Println("---> remove entity ", values)
+	//log.Println("---> remove entity ", values)
 
 	return
 }
@@ -1861,6 +1886,20 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 			return nil, err
 		}
 
+		if fieldName == "TYPENAME" {
+			values, err := this.getIndexation(typeName, fieldName, typeName)
+			if err != nil {
+				return results, err
+			}
+
+			for i := 0; i < len(values); i++ {
+				results[values[i]["UUID"].(string)] = values[i]
+			}
+
+			// return the results...
+			return results, nil
+
+		}
 		fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 		isArray := strings.HasPrefix(fieldType, "[]")
 		isRef := strings.HasSuffix(fieldType, ":Ref")
@@ -1916,7 +1955,7 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 					}
 				} else if comparator == "~=" || comparator == "!=" || comparator == "^=" || comparator == "$=" || (isRegex && comparator == "==") {
 					// Here I will use the typename as indexation key...
-					indexations, err := this.getIndexation(typeName, "", "")
+					indexations, err := this.getIndexation(typeName, "TYPENAME", typeName)
 					if err == nil {
 						for i := 0; i < len(indexations); i++ {
 							values := indexations[i]
@@ -2023,7 +2062,6 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 						if err != nil {
 							return nil, err
 						}
-
 						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
 						if err != nil {
 							return nil, err
@@ -2061,8 +2099,6 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 	if len(results) == 0 {
 		return nil, errors.New("no result found!")
 	}
-
-	log.Println("----> 2103", results)
 	return results, nil
 }
 
@@ -2071,10 +2107,6 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
  */
 func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]interface{}, error) {
 
-	query = `(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"`
-	query = `CargoEntities.Entities.M_id == "CARGO_ENTITIES"`
-
-	log.Println("---> run query: ", query)
 	s := lexer.NewLexer([]byte(query))
 	p := parser.NewParser()
 	a, err := p.Parse(s)
@@ -2104,7 +2136,8 @@ func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]i
 
 		return results, err
 	} else {
-		log.Panicln("--> search error ", err)
+		log.Panicln("--> search error ", err, query)
 	}
-	return nil, err
+
+	return nil, errors.New("no results found!")
 }
