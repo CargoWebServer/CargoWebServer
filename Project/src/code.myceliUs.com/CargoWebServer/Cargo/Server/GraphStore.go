@@ -131,7 +131,8 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 							if Utility.Exists(path) {
 								db = xapian.NewDatabase()
 								// log.Println(db)
-								db.Add_database(xapian.NewDatabase(path))
+								db_ := xapian.NewDatabase(path)
+								db.Add_database(db_)
 							} else {
 								err = errors.New("fail to open " + path)
 							}
@@ -1126,9 +1127,13 @@ func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
 
 	// The term generator
 	termGenerator := xapian.NewTermGenerator()
+	defer xapian.DeleteTermGenerator(termGenerator)
 
 	// set english by default.
-	termGenerator.Set_stemmer(xapian.NewStem("en"))
+	stemmer := xapian.NewStem("en")
+	defer xapian.DeleteStem(stemmer)
+
+	termGenerator.Set_stemmer(stemmer)
 	termGenerator.Set_document(doc)
 
 	// Index the typename
@@ -1261,7 +1266,8 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 			if typeName != nil {
 				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
 				if err == nil {
-					defer db.Close()
+
+					defer xapian.DeleteWritableDatabase(db)
 					// So here I will index the property found in the entity.
 					doc := xapian.NewDocument()
 
@@ -1271,6 +1277,8 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 					doc.Set_data(data)
 					doc.Add_boolean_term("Q" + uuid.(string))
 					db.Replace_document("Q"+uuid.(string), doc)
+					xapian.DeleteDocument(doc)
+					db.Close()
 				}
 			}
 		}
@@ -1494,7 +1502,7 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 				uuid := Utility.GetProperty(v, "UUID")
 				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
 				if err == nil {
-					defer db.Close()
+					defer xapian.DeleteWritableDatabase(db)
 					// So here I will index the property found in the entity.
 					doc := xapian.NewDocument()
 
@@ -1504,7 +1512,9 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 					doc.Set_data(data)
 					doc.Add_boolean_term("Q" + uuid.(string))
 					db.Replace_document("Q"+uuid.(string), doc)
+					xapian.DeleteDocument(doc)
 				}
+				db.Close()
 			}
 		}
 	}
@@ -1809,14 +1819,19 @@ func (this *GraphStore) getIndexation(typeName string, fieldName string, expecte
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+
+	defer xapian.DeleteDatabase(db)
 
 	term := generatePrefix(typeName, fieldName) + strings.TrimSpace(strings.ToLower(Utility.ToString(expected)))
 	var results []map[string]interface{}
 
 	// Here the term will be search.
 	q := xapian.NewQuery(term)
+	defer xapian.DeleteQuery(q)
+
 	enquire := xapian.NewEnquire(db)
+	defer xapian.DeleteEnquire(enquire)
+
 	enquire.Set_query(q)
 	mset := enquire.Get_mset(uint(0), uint(100000))
 	for i := 0; i < mset.Size(); i++ {
@@ -1824,10 +1839,12 @@ func (this *GraphStore) getIndexation(typeName string, fieldName string, expecte
 		var v map[string]interface{}
 		err := json.Unmarshal([]byte(it.Get_document().Get_data()), &v)
 		if err != nil {
+			db.Close()
 			return nil, err
 		}
 		results = append(results, v)
 	}
+	db.Close()
 	return results, nil
 }
 
