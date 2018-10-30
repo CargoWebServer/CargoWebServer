@@ -17,6 +17,8 @@ type TextMessage struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -69,6 +71,36 @@ func (this *TextMessage) GetUuid() string{
 }
 func (this *TextMessage) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *TextMessage) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *TextMessage) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *TextMessage) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *TextMessage) SetFieldValue(field string, value interface{}) error{
@@ -184,6 +216,7 @@ func (this *TextMessage) GetFromRef()*Account{
 
 func (this *TextMessage) SetFromRef(val *Account){
 	this.M_fromRef= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_fromRef")
 	this.setEntity(this)
 }
 
@@ -203,6 +236,7 @@ func (this *TextMessage) GetToRef()*Account{
 
 func (this *TextMessage) SetToRef(val *Account){
 	this.M_toRef= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_toRef")
 	this.setEntity(this)
 }
 
@@ -233,6 +267,7 @@ func (this *TextMessage) GetEntitiesPtr()*Entities{
 
 func (this *TextMessage) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
 }
 

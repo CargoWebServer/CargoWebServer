@@ -495,3 +495,44 @@ func (this *DynamicEntity) GetChildsUuid() []string {
 	}
 	return childs
 }
+
+/**
+ * Return the list of reference UUID:FieldName where that entity is referenced.
+ */
+func (this *DynamicEntity) GetReferenced() []string {
+	referenced := this.getValue("Referenced").([]string)
+	if referenced == nil {
+		referenced = make([]string, 0)
+		this.setValue("Referenced", referenced)
+	}
+
+	// return the list of references
+	return referenced
+}
+
+/**
+ * Set a reference
+ */
+func (this *DynamicEntity) SetReferenced(uuid string, field string) {
+	referenced := this.GetReferenced()
+	if !Utility.Contains(referenced, uuid+":"+field) {
+		referenced = append(referenced, uuid+":"+field)
+		this.setValue("Referenced", referenced)
+	}
+}
+
+/**
+ * Remove a reference.
+ */
+func (this *DynamicEntity) RemoveReferenced(uuid string, field string) {
+	referenced := this.GetReferenced()
+	referenced_ := make([]string, 0)
+	for i := 0; i < len(referenced); i++ {
+		if referenced[i] != uuid+":"+field {
+			referenced_ = append(referenced_, referenced[i])
+		}
+	}
+
+	// Set back the value without the uuid:field.
+	this.setValue("Referenced", referenced_)
+}

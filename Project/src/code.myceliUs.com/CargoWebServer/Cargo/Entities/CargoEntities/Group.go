@@ -17,6 +17,8 @@ type Group struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -58,6 +60,36 @@ func (this *Group) GetUuid() string{
 }
 func (this *Group) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *Group) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *Group) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *Group) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *Group) SetFieldValue(field string, value interface{}) error{
@@ -166,6 +198,7 @@ func (this *Group) GetMembersRef()[]*User{
 func (this *Group) SetMembersRef(val []*User){
 	this.M_membersRef= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetReferenced(this.UUID,"M_membersRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -179,6 +212,7 @@ func (this *Group) AppendMembersRef(val *User){
 		}
 	}
 	this.M_membersRef = append(this.M_membersRef, val.GetUuid())
+	val.SetReferenced(this.UUID,"M_membersRef")
 	this.setEntity(this)
 }
 
@@ -191,6 +225,7 @@ func (this *Group) RemoveMembersRef(val *User){
 	}
 	this.M_membersRef = values
 	this.setEntity(this)
+	val.RemoveReferenced(this.UUID,"M_membersRef")
 }
 
 
@@ -204,6 +239,7 @@ func (this *Group) GetEntitiesPtr()*Entities{
 
 func (this *Group) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
 }
 

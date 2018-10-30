@@ -154,6 +154,7 @@ func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) []*CargoEntities.Project {
+	log.Println("----------> get all project call ", sessionId)
 	projects := make([]*CargoEntities.Project, 0)
 	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", "CargoEntities", nil)
 	if errObj != nil {

@@ -219,22 +219,26 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 	entities := make([]Entity, 0)
 	for i := 0; i < len(results); i++ {
 		if results[i][0] != nil {
-			obj, err := Utility.InitializeStructure(results[i][0].(map[string]interface{}), setEntityFct)
-			if err == nil {
-				var entity Entity
-				// So here I will retreive the entity uuid from the entity id.
-				if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
-					entity = obj.Interface().(Entity)
-					// Set the entity in the cache
-					this.setEntity(entity)
-				} else {
-					// Dynamic entity here.
-					entity = NewDynamicEntity()
-					entity.(*DynamicEntity).setObject(results[i][0].(map[string]interface{}))
-					// set the entity in the cache.
-					this.setEntity(entity)
+			if reflect.TypeOf(results[i][0]).Kind() == reflect.Ptr || reflect.TypeOf(results[i][0]).Kind() == reflect.Struct || reflect.TypeOf(results[i][0]).Kind() == reflect.Map {
+				obj, err := Utility.InitializeStructure(results[i][0].(map[string]interface{}), setEntityFct)
+				if err == nil {
+					var entity Entity
+					// So here I will retreive the entity uuid from the entity id.
+					if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
+						entity = obj.Interface().(Entity)
+						// Set the entity in the cache
+						this.setEntity(entity)
+					} else {
+						// Dynamic entity here.
+						entity = NewDynamicEntity()
+						entity.(*DynamicEntity).setObject(results[i][0].(map[string]interface{}))
+						// set the entity in the cache.
+						this.setEntity(entity)
+					}
+					entities = append(entities, entity)
 				}
-				entities = append(entities, entity)
+			} else {
+				log.Println("----> results not an entity: ", results[i])
 			}
 		}
 	}
@@ -252,6 +256,7 @@ func (this *EntityManager) removeEntity(entity Entity) {
 }
 
 func (this *EntityManager) setEntity(entity Entity) {
+	log.Println("---> set entity: ", entity.GetUuid())
 	// Set the entity function...
 	entity.SetEntityGetter(getEntityFct)
 	entity.SetEntitySetter(setEntityFct)
@@ -272,6 +277,7 @@ func (this *EntityManager) setEntity(entity Entity) {
 }
 
 func (this *EntityManager) getEntity(uuid string) Entity {
+	log.Println("---> get entity: ", uuid)
 	infos := make(map[string]interface{})
 	infos["name"] = "getEntity"
 	infos["uuid"] = uuid
@@ -285,6 +291,7 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 		entity.SetEntitySetter(setEntityFct)
 		entity.SetUuidGenerator(generateUuidFct)
 	}
+
 	return entity
 }
 
@@ -711,40 +718,19 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	// Now I will clear other references...
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entity.GetTypeName(), storeId)
 
-	// Now entity are quadify I will save it in the graph store.
-	/*
-		var triples []interface{}
-		values, err_ := store.Read("(?,?, "+entity.GetUuid()+")", []interface{}{}, []interface{}{})
-		if err_ == nil {
-			for i := 0; i < len(values); i++ {
-				triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
-				if Utility.IsValidEntityReferenceName(values[i][0].(string)) {
-					if !Utility.Contains(uuids, values[i][0].(string)) {
-						uuids = append(uuids, values[i][0].(string))
-					}
-				}
+	// I will remove it references...
+	/*referenced := entity.GetReferenced()
+	for i := 0; i < len(referenced); i++ {
+		values := strings.Split(referenced, ":")
+		refOwer, err := this.getEntityByUuid(values[0])
+		if err == nil {
+			if reflect.TypeOf(refOwer).String() == "*Server.DynamicEntity" {
+				log.Println("---> ref owner is a dynamic entity")
 			}
 		}
+	}*/
 
-		values, err_ = store.Read("("+entity.GetUuid()+",?,?)", []interface{}{}, []interface{}{})
-		if err_ == nil {
-			for i := 0; i < len(values); i++ {
-				triples = append(triples, Triple{values[i][0].(string), values[i][1].(string), values[i][2]})
-				if reflect.TypeOf(values[i][2]).Kind() == reflect.String {
-					if Utility.IsValidEntityReferenceName(values[i][2].(string)) {
-						if !Utility.Contains(uuids, values[i][2].(string)) {
-							uuids = append(uuids, values[i][2].(string))
-						}
-					}
-				}
-			}
-		}
-
-		err := store.Delete("", triples)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-			return cargoError
-		}*/
+	// I will remove it child...
 
 	// Now I will remove the values from the cache.
 	for i := 0; i < len(uuids); i++ {
@@ -785,7 +771,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
-	log.Println("---> delete complete ")
 	return nil
 }
 
@@ -1802,7 +1787,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, query in
 	}
 
 	// If no order ar specified i will use the id's as order.
-
 	if len(orderBy) == 0 {
 		// Here I will sort by it it's without it uuid...
 		prototype, err := this.getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])

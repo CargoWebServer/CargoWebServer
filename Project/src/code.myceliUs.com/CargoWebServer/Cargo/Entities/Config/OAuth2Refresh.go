@@ -17,6 +17,8 @@ type OAuth2Refresh struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -50,6 +52,36 @@ func (this *OAuth2Refresh) GetUuid() string{
 }
 func (this *OAuth2Refresh) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *OAuth2Refresh) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *OAuth2Refresh) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *OAuth2Refresh) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *OAuth2Refresh) SetFieldValue(field string, value interface{}) error{
@@ -143,6 +175,7 @@ func (this *OAuth2Refresh) GetAccess()*OAuth2Access{
 
 func (this *OAuth2Refresh) SetAccess(val *OAuth2Access){
 	this.M_access= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_access")
 	this.setEntity(this)
 }
 
@@ -162,6 +195,7 @@ func (this *OAuth2Refresh) GetParentPtr()*OAuth2Configuration{
 
 func (this *OAuth2Refresh) SetParentPtr(val *OAuth2Configuration){
 	this.M_parentPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_parentPtr")
 	this.setEntity(this)
 }
 

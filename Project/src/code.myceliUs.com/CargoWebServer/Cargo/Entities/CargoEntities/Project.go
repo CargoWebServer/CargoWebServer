@@ -17,6 +17,8 @@ type Project struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -58,6 +60,36 @@ func (this *Project) GetUuid() string{
 }
 func (this *Project) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *Project) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *Project) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *Project) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *Project) SetFieldValue(field string, value interface{}) error{
@@ -166,6 +198,7 @@ func (this *Project) GetFilesRef()[]*File{
 func (this *Project) SetFilesRef(val []*File){
 	this.M_filesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetReferenced(this.UUID,"M_filesRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -179,6 +212,7 @@ func (this *Project) AppendFilesRef(val *File){
 		}
 	}
 	this.M_filesRef = append(this.M_filesRef, val.GetUuid())
+	val.SetReferenced(this.UUID,"M_filesRef")
 	this.setEntity(this)
 }
 
@@ -191,6 +225,7 @@ func (this *Project) RemoveFilesRef(val *File){
 	}
 	this.M_filesRef = values
 	this.setEntity(this)
+	val.RemoveReferenced(this.UUID,"M_filesRef")
 }
 
 
@@ -204,6 +239,7 @@ func (this *Project) GetEntitiesPtr()*Entities{
 
 func (this *Project) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
 }
 

@@ -17,6 +17,8 @@ type Permission struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -53,6 +55,36 @@ func (this *Permission) GetUuid() string{
 }
 func (this *Permission) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *Permission) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *Permission) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *Permission) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *Permission) SetFieldValue(field string, value interface{}) error{
@@ -161,6 +193,7 @@ func (this *Permission) GetAccountsRef()[]*Account{
 func (this *Permission) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetReferenced(this.UUID,"M_accountsRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -174,6 +207,7 @@ func (this *Permission) AppendAccountsRef(val *Account){
 		}
 	}
 	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
+	val.SetReferenced(this.UUID,"M_accountsRef")
 	this.setEntity(this)
 }
 
@@ -186,6 +220,7 @@ func (this *Permission) RemoveAccountsRef(val *Account){
 	}
 	this.M_accountsRef = values
 	this.setEntity(this)
+	val.RemoveReferenced(this.UUID,"M_accountsRef")
 }
 
 
@@ -199,6 +234,7 @@ func (this *Permission) GetEntitiesPtr()*Entities{
 
 func (this *Permission) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
 }
 

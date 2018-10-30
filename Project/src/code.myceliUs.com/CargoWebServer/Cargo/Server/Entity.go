@@ -75,6 +75,21 @@ type Entity interface {
 	 */
 	GetChildsUuid() []string
 
+	/**
+	 * Return the list of reference UUID:FieldName where that entity is referenced.
+	 */
+	GetReferenced() []string
+
+	/**
+	 * Set a reference
+	 */
+	SetReferenced(uuid string, field string)
+
+	/**
+	 * Remove a reference.
+	 */
+	RemoveReferenced(uuid string, field string)
+
 	// External function linking...
 
 	/**

@@ -17,6 +17,8 @@ type User struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -67,6 +69,36 @@ func (this *User) GetUuid() string{
 }
 func (this *User) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *User) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *User) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *User) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *User) SetFieldValue(field string, value interface{}) error{
@@ -219,6 +251,7 @@ func (this *User) GetMemberOfRef()[]*Group{
 func (this *User) SetMemberOfRef(val []*Group){
 	this.M_memberOfRef= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetReferenced(this.UUID,"M_memberOfRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -232,6 +265,7 @@ func (this *User) AppendMemberOfRef(val *Group){
 		}
 	}
 	this.M_memberOfRef = append(this.M_memberOfRef, val.GetUuid())
+	val.SetReferenced(this.UUID,"M_memberOfRef")
 	this.setEntity(this)
 }
 
@@ -244,6 +278,7 @@ func (this *User) RemoveMemberOfRef(val *Group){
 	}
 	this.M_memberOfRef = values
 	this.setEntity(this)
+	val.RemoveReferenced(this.UUID,"M_memberOfRef")
 }
 
 
@@ -261,6 +296,7 @@ func (this *User) GetAccounts()[]*Account{
 func (this *User) SetAccounts(val []*Account){
 	this.M_accounts= make([]string,0)
 	for i:=0; i < len(val); i++{
+		val[i].SetReferenced(this.UUID,"M_accounts")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
@@ -274,6 +310,7 @@ func (this *User) AppendAccounts(val *Account){
 		}
 	}
 	this.M_accounts = append(this.M_accounts, val.GetUuid())
+	val.SetReferenced(this.UUID,"M_accounts")
 	this.setEntity(this)
 }
 
@@ -286,6 +323,7 @@ func (this *User) RemoveAccounts(val *Account){
 	}
 	this.M_accounts = values
 	this.setEntity(this)
+	val.RemoveReferenced(this.UUID,"M_accounts")
 }
 
 
@@ -299,6 +337,7 @@ func (this *User) GetEntitiesPtr()*Entities{
 
 func (this *User) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
 }
 

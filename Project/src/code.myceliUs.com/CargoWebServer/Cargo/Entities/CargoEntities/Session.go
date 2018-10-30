@@ -17,6 +17,8 @@ type Session struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** Keep reference to entity that made use of thit entity **/
+	Referenced []string
 	/** Get entity by uuid function **/
 	getEntityByUuid func(string)(interface{}, error)
 	/** Use to put the entity in the cache **/
@@ -59,6 +61,36 @@ func (this *Session) GetUuid() string{
 }
 func (this *Session) SetUuid(uuid string){
 	this.UUID = uuid
+}
+
+func (this *Session) GetReferenced() []string {
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+	// return the list of references
+	return this.Referenced
+}
+
+func (this *Session) SetReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	this.Referenced = make([]string, 0)
+ }
+ if !Utility.Contains(this.Referenced, uuid+":"+field) {
+ 	this.Referenced = append(this.Referenced, uuid+":"+field)
+ }
+}
+
+func (this *Session) RemoveReferenced(uuid string, field string){
+ if this.Referenced == nil {
+ 	return
+ }
+ referenced := make([]string,0)
+ for i:=0; i < len(this.Referenced); i++ {
+ 	if this.Referenced[i] != uuid+":"+field {
+ 		referenced = append(referenced, uuid+":"+field)
+ 	}
+ }
+ 	this.Referenced = referenced
 }
 
 func (this *Session) SetFieldValue(field string, value interface{}) error{
@@ -199,6 +231,7 @@ func (this *Session) GetComputerRef()*Computer{
 
 func (this *Session) SetComputerRef(val *Computer){
 	this.M_computerRef= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_computerRef")
 	this.setEntity(this)
 }
 
@@ -218,6 +251,7 @@ func (this *Session) GetAccountPtr()*Account{
 
 func (this *Session) SetAccountPtr(val *Account){
 	this.M_accountPtr= val.GetUuid()
+		val.SetReferenced(this.UUID,"M_accountPtr")
 	this.setEntity(this)
 }
 
