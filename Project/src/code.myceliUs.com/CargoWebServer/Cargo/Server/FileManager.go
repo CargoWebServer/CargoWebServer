@@ -170,13 +170,12 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		// Create the file information here...
 		filePath__ := filePath_ + "/" + f.Name()
 		fileId := Utility.CreateSha1Key([]byte(filePath__))
-		//log.Println("Get file ", filePath__)
-		fileEntity, err := this.getFileById(fileId)
+		fileExist := this.isFileExist(fileId)
 
 		// Remove from file to delete...
 		delete(toDelete, fileId)
 
-		if err != nil {
+		if !fileExist {
 			log.Println("---> create file ", this.root+filePath__)
 			// here I will create the new entity...
 			if !f.IsDir() {
@@ -202,15 +201,14 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				}
 			}
 		} else {
+
 			log.Println("---> synchronize file ", this.root+filePath__)
 			// I will test the checksum to see if the file has change...
 			if !f.IsDir() {
 				// Update the file checksum and save it if the file has change...
 				if !strings.HasPrefix(f.Name(), ".") {
 					filedata, _ := ioutil.ReadFile(this.root + filePath__)
-					this.saveFile(fileEntity.GetUuid(), filedata, "", 128, 128, false)
-					fileEntity.SetParentDirPtr(dirEntity)
-					dirEntity.AppendFiles(fileEntity)
+					this.saveFile(fileId, filedata, "", 128, 128, false)
 				}
 			} else {
 				// make a recursion...
@@ -550,12 +548,12 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 /**
  * Save the content of the file...
  */
-func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string, thumbnailMaxHeight int, thumbnailMaxWidth int, dbFile bool) error {
+func (this *FileManager) saveFile(fileId string, filedata []byte, sessionId string, thumbnailMaxHeight int, thumbnailMaxWidth int, dbFile bool) error {
 
 	// Create a temporary file object from the data...
-	f_, err := ioutil.TempFile(os.TempDir(), uuid)
+	f_, err := ioutil.TempFile(os.TempDir(), fileId)
 	if err != nil {
-		log.Println("Fail to open _cargo_tmp_file_ for file ", uuid, " ", err)
+		log.Println("Fail to open _cargo_tmp_file_ for file ", fileId, " ", err)
 		return err
 	}
 
@@ -568,7 +566,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	os.Remove(f_.Name())
 
 	// I will retreive the file, the uuid must exist in that case.
-	fileEntity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+	fileEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
 	file := fileEntity.(*CargoEntities.File)
 
 	if file.GetChecksum() != checksum {
@@ -633,7 +631,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 func (this *FileManager) updateHtmlChecksum(oldChecksum string, newChecksum string, filePath string) {
 	// So first of all I need to get all html files...
 	var query EntityQuery
-	query.Fields = []string{"UUID", "M_path", "M_name", "M_mime"}
+	query.Fields = []string{"M_id", "M_path", "M_name", "M_mime"}
 	query.TYPENAME = "Server.EntityQuery"
 	query.TypeName = "CargoEntities.File"
 	query.Query = `CargoEntities.File.M_mime == "text/html"`
@@ -968,6 +966,41 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", dbFile)
 
 	return dbFile
+}
+
+// Test if a file exist.
+func (this *FileManager) isFileExist(id string) bool {
+	var query EntityQuery
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.File"
+	query.Fields = []string{"UUID"}
+	query.Query = `CargoEntities.File.M_id=="` + id + `"`
+	store := GetServer().GetDataManager().getDataStore("CargoEntities")
+	queryStr, _ := json.Marshal(query)
+	results, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return false
+	}
+
+	return len(results) == 1
+}
+
+// Return the file checksum.
+func (this *FileManager) getFileChecksum(id string) (string, error) {
+	var query EntityQuery
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.File"
+	query.Fields = []string{"M_checksum"}
+	query.Query = `CargoEntities.File.M_id=="` + id + `"`
+	store := GetServer().GetDataManager().getDataStore("CargoEntities")
+	queryStr, _ := json.Marshal(query)
+	results, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return "", err
+	}
+
+	// must contain the file checksum.
+	return results[0][0].(string), nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1347,7 +1380,7 @@ func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight f
 		return
 	}
 
-	err = this.saveFile(file.UUID, filedata, sessionId, int(thumbnailMaxHeight), int(thumbnailMaxWidth), file.M_fileType == CargoEntities.FileType_DbFile)
+	err = this.saveFile(file.M_id, filedata, sessionId, int(thumbnailMaxHeight), int(thumbnailMaxWidth), file.M_fileType == CargoEntities.FileType_DbFile)
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1419,13 +1452,8 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 //    )
 //}
 func (this *FileManager) IsFileExist(filename string, filepath string, messageId string, sessionId string) bool {
-
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
-	uuid, err := GetServer().GetEntityManager().getEntityUuidById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
-	if err != nil {
-		return false
-	}
-	return len(uuid) > 0
+	return this.isFileExist(fileId)
 }
 
 // @api 1.0

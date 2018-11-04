@@ -95,7 +95,6 @@ func newCache() *Cache {
 				if operation["name"] == "getEntity" {
 					uuid := operation["uuid"].(string)
 					getEntity := operation["getEntity"].(chan Entity)
-
 					entity, _ := cache.getEntity(uuid)
 
 					// Return the found values.
@@ -103,6 +102,7 @@ func newCache() *Cache {
 
 				} else if operation["name"] == "setEntity" {
 					entity := operation["entity"].(Entity)
+					log.Println("--> set entity ", entity.GetUuid())
 					// Append in the map: setObject set the value for DynamicEntity...
 					if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
 						//log.Println("--->cache set entity: ", entity.GetUuid())
@@ -133,7 +133,6 @@ func newCache() *Cache {
 				} else if operation["name"] == "remove" {
 					uuid := operation["uuid"].(string)
 					// Remove from the cache.
-					log.Println("--->cache remove ", uuid)
 					cache.m_cache.Delete(uuid)
 				} else if operation["name"] == "getValue" {
 					uuid := operation["uuid"].(string)
@@ -152,7 +151,6 @@ func newCache() *Cache {
 					getValue <- value
 
 				} else if operation["name"] == "getValues" {
-
 					uuid := operation["uuid"].(string)
 					getValues := operation["getValues"].(chan map[string]interface{})
 					//log.Println("--->cache getValues ", uuid)
@@ -167,7 +165,6 @@ func newCache() *Cache {
 					// Return the found values.
 					getValues <- values
 				} else if operation["name"] == "setValues" {
-					//log.Println("--->cache setValues ")
 					values := operation["values"].(map[string]interface{})
 					var bytes, err = Utility.ToBytes(values)
 					if err == nil {

@@ -13,14 +13,16 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
-
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/Parser"
 	"code.myceliUs.com/Utility"
 
 	// Xapian datastore.
 	base64 "encoding/base64"
 
 	"code.myceliUs.com/GoXapian"
+	"code.myceliUs.com/XML_Schemas"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +66,6 @@ func getServiceContainerConnection() *WebSocketConnection {
 	var port int
 	port = 9494 // Try to get it from the db...
 	conn = GetServer().getConnectionByIp("127.0.0.1", port)
-
 	return conn
 }
 
@@ -120,7 +121,6 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 						if !op["isWritable"].(bool) {
 							if Utility.Exists(path) {
 								db = xapian.NewDatabase()
-								// log.Println(db)
 								db_ := xapian.NewDatabase(path)
 								db.Add_database(db_)
 							} else {
@@ -261,6 +261,7 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 
 		return results.(error) // return an error message instead.
 	}
+
 	// Here i will append super type fields...
 	prototype.setSuperTypeFields()
 
@@ -561,6 +562,7 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
 	}
 
 	delete(this.m_prototypes, typeName)
+
 	err := os.Remove(this.m_path + "/" + prototype.TypeName + ".gob")
 
 	return err
@@ -777,6 +779,7 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 		}
 
 		this.m_prototypes[typeName] = prototype
+
 		return prototype, err
 	}
 
@@ -1062,97 +1065,6 @@ func (this *GraphStore) Ping() error {
 	return err
 }
 
-func generatePrefix(typeName string, field string) string {
-	// remove the M_ part of the field name
-	prefix := typeName + "." + field
-	prefix = strings.Replace(prefix, ".", "_", -1) + "%"
-	return "X" + strings.ToLower(prefix)
-}
-
-// Index entity string field.
-func (this *GraphStore) indexStringField(data string, field string, typeName string, termGenerator xapian.TermGenerator) {
-
-	if Utility.IsUriBase64(data) {
-		data_, err := base64.StdEncoding.DecodeString(data)
-		if err == nil {
-			if strings.Index(data, ":text/") > -1 || strings.Index(data, ":application/") > -1 {
-				termGenerator.Index_text(strings.ToLower(string(data_)))
-				termGenerator.Index_text(strings.ToLower(string(data_)), uint(1), generatePrefix(typeName, field))
-			}
-		}
-	} else if Utility.IsStdBase64(data) {
-		data_, err := base64.StdEncoding.DecodeString(data)
-		if err == nil {
-			termGenerator.Index_text(strings.ToLower(string(data_)))
-			termGenerator.Index_text(strings.ToLower(string(data_)), uint(1), generatePrefix(typeName, field))
-			if field != "M_data" {
-				termGenerator.Index_text(strings.ToLower(string(data)))
-				termGenerator.Index_text(strings.ToLower(string(data)), uint(1), generatePrefix(typeName, field))
-			}
-		}
-	} else {
-		termGenerator.Index_text(strings.ToLower(data))
-		termGenerator.Index_text(strings.ToLower(data), uint(1), generatePrefix(typeName, field))
-	}
-}
-
-// Index entity field
-func (this *GraphStore) indexField(data interface{}, field string, fieldType string, typeName string, termGenerator xapian.TermGenerator, doc xapian.Document, index uint) {
-	if data != nil {
-		if reflect.TypeOf(data).Kind() == reflect.Slice {
-			s := reflect.ValueOf(data)
-			for i := 0; i < s.Len(); i++ {
-				this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, index)
-			}
-		} else if reflect.TypeOf(data).Kind() == reflect.String {
-			this.indexStringField(data.(string), field, typeName, termGenerator)
-		} else {
-			doc.Add_value(index, Utility.ToString(data))
-		}
-	}
-}
-
-// index entity information.
-func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
-
-	// The term generator
-	termGenerator := xapian.NewTermGenerator()
-	defer xapian.DeleteTermGenerator(termGenerator)
-
-	// set english by default.
-	stemmer := xapian.NewStem("en")
-	defer xapian.DeleteStem(stemmer)
-
-	termGenerator.Set_stemmer(stemmer)
-	termGenerator.Set_document(doc)
-
-	// Index the typename
-	termGenerator.Index_text(entity.GetTypeName(), uint(1), "S")
-	typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + strings.TrimSpace(strings.ToLower(Utility.ToString(entity.GetTypeName())))
-	doc.Add_boolean_term(typeNameIndex)
-
-	prototype, _ := this.GetEntityPrototype(entity.GetTypeName())
-
-	// also index value supertype...
-	for i := 0; i < len(prototype.SuperTypeNames); i++ {
-		termGenerator.Index_text(prototype.SuperTypeNames[i], uint(1), "S")
-		typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + strings.TrimSpace(strings.ToLower(Utility.ToString(prototype.SuperTypeNames[i])))
-		doc.Add_boolean_term(typeNameIndex)
-	}
-
-	// Here I will append boolean term.
-	for i := 0; i < len(prototype.Fields); i++ {
-		value := Utility.GetProperty(entity, prototype.Fields[i])
-		index := uint(prototype.getFieldIndex(prototype.Fields[i]))
-		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, index)
-		if Utility.Contains(prototype.Ids, prototype.Fields[i]) || Utility.Contains(prototype.Indexs, prototype.Fields[i]) {
-			// append a boolean term.
-			term := generatePrefix(prototype.TypeName, prototype.Fields[i]) + strings.TrimSpace(strings.ToLower(Utility.ToString(value)))
-			doc.Add_boolean_term(term)
-		}
-	}
-}
-
 /**
  * Create a new entry in the database.
  */
@@ -1255,8 +1167,8 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 					data, _ := Utility.ToJson(v)
 					this.indexEntity(doc, v.(Entity))
 					doc.Set_data(data)
-					doc.Add_boolean_term("Q" + uuid.(string))
-					db.Replace_document("Q"+uuid.(string), doc)
+					doc.Add_boolean_term("Q" + formalize(uuid.(string)))
+					db.Replace_document("Q"+formalize(uuid.(string)), doc)
 					xapian.DeleteDocument(doc)
 					db.Close()
 				}
@@ -1371,7 +1283,7 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return nil, err
 	}
 
-	results, err = this.executeSearchQuery(query.Query, query.Fields)
+	results, err = this.executeSearchQuery(query.TypeName, query.Query, query.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -1489,8 +1401,8 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 					data, _ := Utility.ToJson(v)
 					this.indexEntity(doc, v.(Entity))
 					doc.Set_data(data)
-					doc.Add_boolean_term("Q" + uuid.(string))
-					db.Replace_document("Q"+uuid.(string), doc)
+					doc.Add_boolean_term("Q" + formalize(uuid.(string)))
+					db.Replace_document("Q"+formalize(uuid.(string)), doc)
 					xapian.DeleteDocument(doc)
 				}
 				db.Close()
@@ -1503,8 +1415,6 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 
 /**
  * Delete entity from the store...
- * Must append referenced in entity to be able to remove it from other side of
- * the references... the code must be in the entity manager.
  */
 func (this *GraphStore) Delete(queryStr string, values []interface{}) (err error) {
 	// Remote server.
@@ -1589,7 +1499,34 @@ func (this *GraphStore) Delete(queryStr string, values []interface{}) (err error
 	}
 
 	// Remove the list of obsolete triples from the datastore.
-	//log.Println("---> remove entity ", values)
+	log.Println("---> remove entity ", values)
+	for i := 0; i < len(values); i++ {
+		toDelete := values[i]
+		if reflect.TypeOf(toDelete).Kind() == reflect.String {
+			if Utility.IsValidEntityReferenceName(toDelete.(string)) {
+				// Here I need to retreive it doc id.
+				uuid := toDelete.(string)
+				query := xapian.NewQuery("Q" + formalize(toDelete.(string)))
+				storePath := this.m_path + "/" + uuid[0:strings.Index(uuid, "%")] + ".glass"
+				store, err := this.OpenDataStoreWrite([]string{storePath})
+				if err == nil {
+					enquire := xapian.NewEnquire(store)
+					defer xapian.DeleteEnquire(enquire)
+					enquire.Set_query(query)
+					mset := enquire.Get_mset(uint(0), uint(10000))
+					// Now I will process the results.
+					for i := 0; i < mset.Size(); i++ {
+						doc := mset.Get_hit(uint(i)).Get_document()
+						// Remove the document
+						store.Delete_document(doc.Get_docid())
+					}
+				}
+				xapian.DeleteQuery(query)
+				store.Close()
+				xapian.DeleteWritableDatabase(store)
+			}
+		}
+	}
 
 	return
 }
@@ -1614,14 +1551,317 @@ func (this *GraphStore) Close() error {
 // Search functionality.
 ////////////////////////////////////////////////////////////////////////////////
 
-// To get the information I need to convert JSONiq query into Xapian query and
-// from the result recontruct a JSON document tha match the query.
+// Generate prefix is use to create a indexation key for a given document.
+// the field must be in the index or id's.
+func generatePrefix(typeName string, field string) string {
+	// remove the M_ part of the field name
+	prefix := typeName
+
+	if len(field) > 0 {
+		prefix += "." + field
+	}
+
+	// replace unwanted character's
+	prefix = strings.Replace(prefix, ".", "_", -1) + "%"
+	prefix = "X" + strings.ToLower(prefix)
+
+	return prefix
+}
+
+// Remove ambiquous query symbols % - . and replace it with _
+func formalize(uuid string) string {
+	return strings.TrimSpace(strings.ToLower(Utility.ToString(strings.Replace(strings.Replace(strings.Replace(uuid, "-", "_", -1), ".", "_", -1), "%", "_", -1))))
+}
+
+// Index entity string field.
+func (this *GraphStore) indexStringField(data string, field string, typeName string, termGenerator xapian.TermGenerator) {
+	// I will index all string field to be able to found it back latter.
+	if strings.HasPrefix(field, "M_") {
+		termGenerator.Index_text(strings.ToLower(data), uint(1), strings.ToUpper(field))
+	}
+
+	if Utility.IsUriBase64(data) {
+		data_, err := base64.StdEncoding.DecodeString(data)
+		if err == nil {
+			if strings.Index(data, ":text/") > -1 || strings.Index(data, ":application/") > -1 {
+				termGenerator.Index_text(strings.ToLower(string(data_)))
+			}
+		}
+	} else if Utility.IsStdBase64(data) {
+		data_, err := base64.StdEncoding.DecodeString(data)
+		if err == nil {
+			termGenerator.Index_text(strings.ToLower(string(data_)))
+			if field != "M_data" {
+				termGenerator.Index_text(strings.ToLower(string(data)))
+			}
+		}
+	} else {
+		termGenerator.Index_text(strings.ToLower(data))
+	}
+}
+
+// Index entity field
+func (this *GraphStore) indexField(data interface{}, field string, fieldType string, typeName string, termGenerator xapian.TermGenerator, doc xapian.Document, index int) {
+	// This will give possibility to search for given fields.
+	if data != nil {
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			s := reflect.ValueOf(data)
+			for i := 0; i < s.Len(); i++ {
+				this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, -1)
+			}
+			str_, err := Utility.ToJson(data)
+			if err == nil {
+				doc.Add_value(uint(index), Utility.ToString(str_))
+			}
+		} else {
+			if index != -1 {
+				doc.Add_value(uint(index), Utility.ToString(data))
+			}
+			if reflect.TypeOf(data).Kind() == reflect.String {
+				// If the the value is a valid entity reference i I will use boolean term.
+				if Utility.IsValidEntityReferenceName(data.(string)) {
+					term := generatePrefix(typeName, field) + formalize(data.(string))
+					doc.Add_boolean_term(term)
+				} else {
+					this.indexStringField(data.(string), field, typeName, termGenerator)
+				}
+			} else if (XML_Schemas.IsXsNumeric(fieldType) || XML_Schemas.IsXsInt(fieldType)) && index != -1 {
+				doc.Add_value(uint(index), xapian.Sortable_serialise(Utility.ToNumeric(data)))
+			} else if index != -1 {
+				doc.Add_value(uint(index), Utility.ToString(data))
+			}
+		}
+	} else {
+		doc.Add_value(uint(index), "null")
+	}
+}
+
+// index entity information.
+func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
+
+	// The term generator
+	termGenerator := xapian.NewTermGenerator()
+	defer xapian.DeleteTermGenerator(termGenerator)
+
+	// set english by default.
+	stemmer := xapian.NewStem("en")
+	defer xapian.DeleteStem(stemmer)
+
+	termGenerator.Set_stemmer(stemmer)
+	termGenerator.Set_document(doc)
+
+	// Regular text indexation...
+	termGenerator.Index_text(entity.GetTypeName(), uint(1), "TYPENAME")
+
+	// Boolean term indexation exact match.
+	typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + formalize(entity.GetTypeName())
+	doc.Add_boolean_term(typeNameIndex)
+
+	prototype, _ := this.GetEntityPrototype(entity.GetTypeName())
+
+	// also index value supertype...
+	for i := 0; i < len(prototype.SuperTypeNames); i++ {
+		termGenerator.Index_text(prototype.SuperTypeNames[i], uint(1), "TYPENAME")
+		typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + formalize(prototype.SuperTypeNames[i])
+		doc.Add_boolean_term(typeNameIndex)
+	}
+
+	// Here I will append boolean term.
+	for i := 0; i < len(prototype.Fields); i++ {
+		// Index the value.
+		value := Utility.GetProperty(entity, prototype.Fields[i])
+		if Utility.Contains(prototype.Ids, prototype.Fields[i]) || Utility.Contains(prototype.Indexs, prototype.Fields[i]) {
+			// Index the unique value index for the typeName and this field.
+			term := generatePrefix(prototype.TypeName, prototype.Fields[i]) + formalize(value.(string))
+			doc.Add_boolean_term(term)
+		}
+		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, i)
+	}
+}
 
 /**
  * Execute a search query.
  */
-func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]interface{}, error) {
-	log.Println("---> run query ", fields, query)
+func (this *GraphStore) executeSearchQuery(typename string, querystring string, fields []string) ([][]interface{}, error) {
+	store, err := this.OpenDataStoreRead([]string{this.m_path + "/" + typename + ".glass"})
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	// Close the datastore when done.
+	defer store.Close()
+
+	// Now i will add where I want to search...
+	query := parseXapianQuery(querystring)
+
+	enquire := xapian.NewEnquire(store)
+	defer xapian.DeleteEnquire(enquire)
+
+	enquire.Set_query(query)
+
+	mset := enquire.Get_mset(uint(0), uint(10000))
+
+	results := make([][]interface{}, 0)
+	var prototype *EntityPrototype
+	prototype, err = this.GetEntityPrototype(typename)
+	if err != nil {
+		return nil, err
+	}
+
+	// Now I will process the results.
+	for i := 0; i < mset.Size(); i++ {
+		doc := mset.Get_hit(uint(i)).Get_document()
+		if len(fields) > 0 {
+			values := make([]interface{}, 0)
+			for j := 0; j < len(fields); j++ {
+				fieldIndex := prototype.getFieldIndex(fields[j])
+				if fieldIndex != -1 {
+					values = append(values, doc.Get_value(uint(fieldIndex)))
+				}
+			}
+			results = append(results, values)
+		} else {
+			// In that case the data contain in the document are return.
+			var v map[string]interface{}
+			json.Unmarshal([]byte(doc.Get_data()), &v)
+			results = append(results, []interface{}{v})
+		}
+	}
+
+	if len(results) == 0 {
+		return nil, errors.New("No results found!")
+	}
+
+	return results, nil
+}
+
+/**
+ * Generate a xapian query from the minimalist query string.
+ */
+func parseXapianQuery(str string) xapian.Query {
+	// Parse the query
+	l := new(XapianQueryListener)
+	l.q = make(chan xapian.Query)
+
+	go func() {
+		QueryParser.Parse(str, l)
+	}()
+
+	return <-l.q
+}
+
+type XapianQueryListener struct {
+	*parser.BaseQueryListener
+
+	reference string
+	operator  string
+	value     string
+	valueType string
+
+	// That will contain the xapian query.
+	query string
+
+	// The channel to set back string to the query parser
+	// when parsing is done.
+	q chan xapian.Query
+	p xapian.QueryParser
+}
+
+func (l *XapianQueryListener) EnterQuery(ctx *parser.QueryContext) {
+
+	// initialyse the query parser.
+	l.p = xapian.NewQueryParser()
+
+}
+
+// Finish parsing a query
+func (l *XapianQueryListener) ExitQuery(ctx *parser.QueryContext) {
+
+	defer xapian.DeleteQueryParser(l.p)
+
+	stemmer := xapian.NewStem("en")
+	defer xapian.DeleteStem(stemmer)
+
+	l.p.Set_stemmer(stemmer)
+	l.p.Set_stemming_strategy(xapian.XapianQueryParserStem_strategy(xapian.QueryParserSTEM_SOME))
+
+	query := l.p.Parse_query(l.query)
+
+	if strings.HasPrefix(l.query, "X") {
+		query = xapian.NewQuery(l.query)
+	}
+
+	l.q <- query
+}
+
+func (l *XapianQueryListener) ExitReference(ctx *parser.ReferenceContext) {
+	l.reference = ctx.GetText()
+}
+
+// ExitOperator is called when production operator is exited.
+func (l *XapianQueryListener) ExitOperator(ctx *parser.OperatorContext) {
+	l.operator = ctx.GetText()
+}
+
+// ExitIntegerValue is called when production IntegerValue is exited.
+func (l *XapianQueryListener) ExitIntegerValue(ctx *parser.IntegerValueContext) {
+	l.valueType = "int"
+	l.value = ctx.GetText()
+}
+
+// ExitDoubleValue is called when production DoubleValue is exited.
+func (l *XapianQueryListener) ExitDoubleValue(ctx *parser.DoubleValueContext) {
+	l.valueType = "double"
+	l.value = ctx.GetText()
+}
+
+// ExitBooleanValue is called when production BooleanValue is exited.
+func (l *XapianQueryListener) ExitBooleanValue(ctx *parser.BooleanValueContext) {
+	l.valueType = "bool"
+	l.value = ctx.GetText()
+}
+
+// ExitStringValue is called when production StringValue is exited.
+func (l *XapianQueryListener) ExitStringValue(ctx *parser.StringValueContext) {
+	l.valueType = "string"
+	l.value = strings.ToLower(ctx.GetText())
+}
+
+// ExitPredicate is called when production predicate is exited.
+func (l *XapianQueryListener) ExitPredicate(ctx *parser.PredicateContext) {
+	// Here I must call create the predicate expression.
+	v_ := strings.Split(l.reference, ".")
+
+	// The first value is the store id BPMN, Config, CargoEntities etc
+	storeId := v_[0]
+
+	// the second is the TYPENAME User Task Computer...
+	typeName := v_[1]
+
+	// the third one is the field M_id UUID TYPENAME etc...
+	field := v_[2]
+
+	if strings.HasPrefix(field, "M_") {
+		// String values query
+		if l.valueType == "string" {
+			// I ill add the prefix to the query parser.
+			l.p.Add_prefix(field[2:], strings.ToUpper(field))
+			// Now I will set the query.
+			l.query = field[2:] + ":" + l.value
+		}
+	} else if field == "UUID" || field == "TYPENAME" || field == "ParentUuid" || field == "ParentLnk" {
+		// Search for a unique value.
+		v := strings.Replace(l.value, `"`, "", -1)
+		l.query = generatePrefix(storeId+"."+typeName, field) + formalize(v)
+	}
+}
+
+// EnterBracketExpression is called when production BracketExpression is entered.
+func (l *XapianQueryListener) EnterBracketExpression(ctx *parser.BracketExpressionContext) {
+	l.query += "("
+}
+
+// ExitBracketExpression is called when production BracketExpression is exited.
+func (l *XapianQueryListener) ExitBracketExpression(ctx *parser.BracketExpressionContext) {
+	l.query += ")"
 }

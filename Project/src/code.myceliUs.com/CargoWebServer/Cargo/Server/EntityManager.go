@@ -84,11 +84,11 @@ func newEntityManager() *EntityManager {
 	entityManager = new(EntityManager)
 
 	// Create prototypes for config objects and entities objects...
-	entityManager.createConfigPrototypes()
 	entityManager.registerConfigObjects()
+	entityManager.createConfigPrototypes()
 
-	entityManager.createCargoEntitiesPrototypes()
 	entityManager.registerCargoEntitiesObjects()
+	entityManager.createCargoEntitiesPrototypes()
 
 	// Entity prototype is a dynamic type.
 	// ** Dynamic type must have the TYPENAME property!
@@ -217,6 +217,7 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 	}
 
 	entities := make([]Entity, 0)
+
 	for i := 0; i < len(results); i++ {
 		if results[i][0] != nil {
 			if reflect.TypeOf(results[i][0]).Kind() == reflect.Ptr || reflect.TypeOf(results[i][0]).Kind() == reflect.Struct || reflect.TypeOf(results[i][0]).Kind() == reflect.Map {
@@ -256,7 +257,6 @@ func (this *EntityManager) removeEntity(entity Entity) {
 }
 
 func (this *EntityManager) setEntity(entity Entity) {
-	log.Println("---> set entity: ", entity.GetUuid())
 	// Set the entity function...
 	entity.SetEntityGetter(getEntityFct)
 	entity.SetEntitySetter(setEntityFct)
@@ -277,7 +277,6 @@ func (this *EntityManager) setEntity(entity Entity) {
 }
 
 func (this *EntityManager) getEntity(uuid string) Entity {
-	log.Println("---> get entity: ", uuid)
 	infos := make(map[string]interface{})
 	infos["name"] = "getEntity"
 	infos["uuid"] = uuid
@@ -711,26 +710,61 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
-	//store := GetServer().GetDataManager().getDataStore(storeId)
+	store := GetServer().GetDataManager().getDataStore(storeId)
 	uuids := make([]string, 0)
 	uuids = append(uuids, entity.GetUuid())
 
 	// Now I will clear other references...
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entity.GetTypeName(), storeId)
+	log.Println("---> remove entity: ", entity.GetUuid())
+	log.Println("---> remove referenced: ", entity.GetReferenced())
+	log.Println("---> remove child: ", entity.GetChildsUuid())
 
 	// I will remove it references...
-	/*referenced := entity.GetReferenced()
+	referenced := entity.GetReferenced()
 	for i := 0; i < len(referenced); i++ {
-		values := strings.Split(referenced, ":")
+		values := strings.Split(referenced[i], ":")
 		refOwer, err := this.getEntityByUuid(values[0])
 		if err == nil {
 			if reflect.TypeOf(refOwer).String() == "*Server.DynamicEntity" {
 				log.Println("---> ref owner is a dynamic entity")
+			} else {
+				log.Println("---> ref owner is a static entity")
 			}
 		}
-	}*/
+	}
 
-	// I will remove it child...
+	// Remove it child.
+	for i := 0; i < len(entity.GetChildsUuid()); i++ {
+		child, err := this.getEntityByUuid(entity.GetChildsUuid()[i])
+		if err == nil {
+			this.deleteEntity(child)
+		}
+	}
+
+	// TODO remove child uuid in it parent child uuid
+	if len(entity.GetParentUuid()) > 0 {
+		parent, err := this.getEntityByUuid(entity.GetParentUuid())
+		if err == nil {
+			if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
+				log.Println("---> parent is a dynamic entity ")
+			} else {
+				removeMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
+				removeMethodName = "Remove" + strings.ToUpper(removeMethodName[0:1]) + removeMethodName[1:]
+				params := make([]interface{}, 1)
+				params[0] = entity
+				_, err_ := Utility.CallMethod(parent, removeMethodName, params)
+				if err_ != nil {
+					log.Println("fail to call method ", removeMethodName, " on ", parent)
+					cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+					return cargoError
+				}
+			}
+		}
+	}
+
+	// I will remove it data.
+	store.Delete("", []interface{}{entity.GetUuid()})
 
 	// Now I will remove the values from the cache.
 	for i := 0; i < len(uuids); i++ {

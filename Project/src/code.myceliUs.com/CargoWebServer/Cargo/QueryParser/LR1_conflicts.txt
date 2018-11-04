@@ -1,9 +1,0 @@
-2 LR-1 conflicts: 
-	S12
-		symbol: operator
-			Reduce(2:Query : Query operator Query	<< ast.AppendQueryAst(X[0], X[1], X[2]) >>)
-			Shift(5)
-	S26
-		symbol: operator
-			Reduce(2:Query : Query operator Query	<< ast.AppendQueryAst(X[0], X[1], X[2]) >>)
-			Shift(14)

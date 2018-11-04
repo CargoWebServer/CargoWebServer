@@ -31,9 +31,22 @@ func GetTypeOf(typeName string) reflect.Type {
 }
 
 /**
+ * Return a new instance of a given typename
+ */
+func GetInstanceOf(typeName string) interface{} {
+	if t, ok := typeRegistry[typeName]; ok {
+		instance := reflect.New(t).Interface()
+		SetProperty(instance, "TYPENAME", typeName)
+		return instance
+	}
+	return nil
+}
+
+/**
  * Register an instance of the type.
  */
 func RegisterType(typedNil interface{}) {
+
 	t := reflect.TypeOf(typedNil).Elem()
 	index := strings.LastIndex(t.PkgPath(), "/")
 	var typeName = t.Name()
@@ -41,11 +54,11 @@ func RegisterType(typedNil interface{}) {
 		if index > 0 {
 			typeRegistry[t.PkgPath()[index+1:]+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
-			//log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
+			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
 		} else {
 			typeRegistry[t.PkgPath()+"."+typeName] = t
 			gob.RegisterName(t.PkgPath()+"."+typeName, typedNil)
-			//log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
+			log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
 		}
 	}
 }

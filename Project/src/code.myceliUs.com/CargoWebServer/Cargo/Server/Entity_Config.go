@@ -356,7 +356,7 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 8)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_extra")
-	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.[]uint8")
+	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.hexBinary")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "undefined")
 
 	/** associations of OAuth2Client **/
