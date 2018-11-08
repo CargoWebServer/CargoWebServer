@@ -1,4 +1,4 @@
-#Welcome to Cargo 
+# Welcome to Cargo 
 Cargo is a complete web application framework. It's fast, easy and lightweight. 
 
 Cargo was created with a Service Oriented Achitecture (SOA) in mind. The basic services offered by the framework are:
@@ -18,7 +18,7 @@ Cargo uses the websocket/tcp scoket to communicate with clients. To do so it has
 
 To compile the project on your computer you must have a Go environement properly configured.
 
-###Compiling
+### Compiling
 The Go source code of Cargo are in the directories:
 CargoWebServer(master depending if you clone the project or not)
   * Project (That must be part of your GOPATH)
@@ -45,7 +45,7 @@ CargoWebServer(master depending if you clone the project or not)
 - go get github.com/RangelReale/osin
 - go get golang.org/x/oauth2
 
-###Build
+### Build
 To build Cago from the top level directory:
 
 `cd CargoWebServer/Project/src/code.myceliUs.com/CargoWebServer`
@@ -56,7 +56,7 @@ You should see the file 'Main.go' it this directory, now call:
 
 The output file should be 'CargoWebServer' in linux and 'CargoWebServer.exe' in windows.
 
-###Run
+### Run
 Now to run Cargo you must move CargoWebServer(.exe) at the top level directory, or create a new directory and put the following files inside:
 
 - CargoWebServer/WebApp
