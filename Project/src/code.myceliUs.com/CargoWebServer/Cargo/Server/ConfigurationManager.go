@@ -132,11 +132,12 @@ func newConfigurationManager() *ConfigurationManager {
 func (this *ConfigurationManager) getActiveConfigurations() *Config.Configurations {
 	// Get the entity from the cache...
 	entity, _ := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
+
 	if entity != nil {
 		return entity.(*Config.Configurations)
 	}
 
-	return nil
+	return this.m_activeConfigurations
 }
 
 /**

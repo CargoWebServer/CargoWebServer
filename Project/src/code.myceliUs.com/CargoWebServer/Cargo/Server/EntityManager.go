@@ -32,8 +32,10 @@ var setEntityFct func(interface{})
 var (
 	generateUuidFct = func(entity interface{}) string {
 		// Here If the entity id's is not set I will set it...
-		if len(entity.(Entity).GetFieldValue("UUID").(string)) > 0 {
-			return entity.(Entity).GetFieldValue("UUID").(string)
+		if entity.(Entity).GetFieldValue("UUID") != nil {
+			if len(entity.(Entity).GetFieldValue("UUID").(string)) > 0 {
+				return entity.(Entity).GetFieldValue("UUID").(string)
+			}
 		}
 
 		uuid := generateEntityUuid(entity.(Entity).GetTypeName(), entity.(Entity).GetParentUuid(), entity.(Entity).Ids())
@@ -164,6 +166,9 @@ func (this *EntityManager) getCargoEntities() *CargoEntities.Entities {
 		cargoEntities.SetId("CARGO_ENTITIES")
 		cargoEntities.SetName("Cargo entities")
 		cargoEntities.SetVersion("1.0")
+		cargoEntities.SetEntityGetter(getEntityFct)
+		cargoEntities.SetEntitySetter(setEntityFct)
+		cargoEntities.SetUuidGenerator(generateUuidFct)
 		this.saveEntity(cargoEntities)
 	}
 	return cargoEntities
@@ -202,6 +207,9 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 		query.TypeName = typeName
 		query.Query = query.TypeName + `.TYPENAME=="` + query.TypeName + `"`
 	}
+
+	// need all fields...
+	query.Fields = make([]string, 0)
 
 	val, err := json.Marshal(query)
 	if err == nil {
@@ -294,6 +302,23 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 	return entity
 }
 
+func (this *EntityManager) needSave(uuid string) bool {
+	infos := make(map[string]interface{})
+	infos["name"] = "needSaveEntity"
+	infos["uuid"] = uuid
+	infos["needSaveEntity"] = make(chan bool)
+	this.m_cache.m_operations <- infos
+
+	return <-infos["needSaveEntity"].(chan bool)
+}
+
+func (this *EntityManager) resetNeedSave(uuid string) {
+	infos := make(map[string]interface{})
+	infos["name"] = "resetNeedSave"
+	infos["uuid"] = uuid
+	this.m_cache.m_operations <- infos
+}
+
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
 
 	if len(uuid) == 0 {
@@ -331,19 +356,29 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		return nil, errObj
 	}
 
-	obj, err := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
+	obj, _ := Utility.InitializeStructure(results[0][0].(map[string]interface{}), setEntityFct)
 
 	// So here I will retreive the entity uuid from the entity id.
-	if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
-		entity = obj.Interface().(Entity)
-		// Set the entity in the cache
-		this.setEntity(entity)
+	if obj.IsValid() {
+		if obj.IsNil() {
+			errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
+			return nil, errObj
+		} else {
+			if obj.Type().String() != "map[string]interface {}" {
+				entity = obj.Interface().(Entity)
+				// Set the entity in the cache
+				this.setEntity(entity)
+			} else {
+				// Dynamic entity here.
+				entity = NewDynamicEntity()
+				entity.(*DynamicEntity).setObject(results[0][0].(map[string]interface{}))
+				// set the entity in the cache.
+				this.setEntity(entity)
+			}
+		}
 	} else {
-		// Dynamic entity here.
-		entity = NewDynamicEntity()
-		entity.(*DynamicEntity).setObject(results[0][0].(map[string]interface{}))
-		// set the entity in the cache.
-		this.setEntity(entity)
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
+		return nil, errObj
 	}
 
 	return entity, nil
@@ -470,8 +505,6 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 			}
 			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		}
-		// Set the parent in the map with it value...
-		this.setEntity(parent)
 	} else {
 		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
 		if strings.HasPrefix(fieldType, "[]") {
@@ -530,42 +563,34 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
-	// Generate the quads, it will also set the entity uuid at the same time
-	// if not already set.
-	var values map[string]interface{}
-	var err error
-
-	// Get values as map[string]interface{} and also set the entity in it parent.
-	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		values = entity.(*DynamicEntity).getValues()
-	} else {
-		values, err = Utility.ToMap(entity)
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
-			return nil, cargoError
-		}
-	}
-
-	// Now I will save it in the datastore.
-	// I will set the entity parent.
-	cargoError := this.setParent(parent, entity)
-	if cargoError != nil {
-		return nil, cargoError
-	}
-
 	// Now entity are quadify I will save it in the graph store.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
 	// I will create the entity.
-	_, err = store.Create("", []interface{}{entity})
+	_, err := store.Create("", []interface{}{entity})
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+		return nil, cargoError
+	}
 
 	// also save it parent.
 	if parent != nil {
-		store.Update("", []interface{}{parent}, []interface{}{})
-	}
+		// Now I will save it in the datastore.
+		// I will set the entity parent.
+		cargoError := this.setParent(parent, entity)
+		if cargoError != nil {
+			return nil, cargoError
+		}
 
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+		err := store.Update("", []interface{}{parent}, []interface{}{})
+		this.setEntity(parent)
+
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return nil, cargoError
+		}
+	} else {
+		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, errors.New("parent must not be nil when createEntity is call."))
 		return nil, cargoError
 	}
 
@@ -574,7 +599,7 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	msgData0 := new(MessageData)
 	msgData0.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-		msgData0.Value = values
+		msgData0.Value = entity.(*DynamicEntity).getValues()
 	} else {
 		msgData0.Value = entity
 	}
@@ -620,30 +645,32 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
-	// Here I will set the entity on the cache...
-	this.setEntity(entity)
 	typeName := entity.GetTypeName() // Set the type name if not already set...
 
 	storeId := typeName[0:strings.Index(typeName, ".")]
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
-	// Here is the triple to be saved.
-	// Set parent entity stuff...
-	var parent Entity
-	if len(entity.GetParentUuid()) > 0 {
-		var cargoError *CargoEntities.Error
-		parent, _ = this.getEntityByUuid(entity.GetParentUuid())
-		if parent != nil {
-			// if the parent exist...
-			cargoError = this.setParent(parent, entity)
-		} else {
-			err := errors.New("Parent " + entity.GetParentUuid() + " not found for entity " + entity.GetUuid())
-			cargoError = NewError(Utility.FileLine(), ENTITY_UUID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
-		}
-		if cargoError != nil {
-			return cargoError
+	// So now I will retreive the list of values associated with that uuid.
+	var q EntityQuery
+	q.TYPENAME = "Server.EntityQuery"
+	q.TypeName = entity.GetTypeName()
+	q.Fields = append(q.Fields, "UUID")
+	q.Query = entity.GetTypeName() + `.UUID=="` + entity.GetUuid() + `"`
+	query, _ := json.Marshal(q)
+
+	// Test if the entity is in the database.
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	_, err := store.Read(string(query), []interface{}{}, []interface{}{})
+	// If the to string are the same no save is needed.
+	if err == nil {
+		if !this.needSave(entity.GetUuid()) {
+			return nil
 		}
 	}
+
+	// Here I will set the entity on the cache...
+	this.setEntity(entity)
+
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
 	eventData := make([]*MessageData, 2)
 	msgData0 := new(MessageData)
@@ -662,19 +689,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Send save event if something has change.
 	// I will get the existing value from the datastore is it exist.
-
-	// So now I will retreive the list of values associated with that uuid.
-	var q EntityQuery
-	q.TYPENAME = "Server.EntityQuery"
-	q.TypeName = entity.GetTypeName()
-	q.Fields = append(q.Fields, "UUID")
-	q.Query = entity.GetTypeName() + `.UUID=="` + entity.GetUuid() + `"`
-	query, _ := json.Marshal(q)
-
-	// Test if the entity is in the database.
-	store := GetServer().GetDataManager().getDataStore(storeId)
-	_, err := store.Read(string(query), []interface{}{}, []interface{}{})
-
 	var evt *Event
 
 	if err == nil {
@@ -694,16 +708,14 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 	}
 
-	// also save it parent.
-	if parent != nil {
-		store.Update("", []interface{}{parent}, []interface{}{})
-	}
-
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
 	// Set it childs...
 	this.saveChilds(entity, prototype)
+
+	// reset from need save.
+	this.resetNeedSave(entity.GetUuid())
 
 	return nil
 }
@@ -1501,13 +1513,19 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		return nil
 	}
 
+	var parent Entity
+	parent, errObj = this.getEntityByUuid(parentUuid)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
 		obj, err := Utility.InitializeStructure(values.(map[string]interface{}), setEntityFct)
 		if err == nil {
 			// Here I will take assumption I got an entity...
 			// Now I will save the entity.
 			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
-				parent, _ := this.getEntityByUuid(parentUuid)
 				_, errObj = this.createEntity(parent, attributeName, obj.Interface().(Entity))
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1517,7 +1535,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			} else {
 				entity := NewDynamicEntity()
 				entity.setObject(values.(map[string]interface{}))
-				parent, _ := this.getEntityByUuid(parentUuid)
 				_, errObj = this.createEntity(parent, attributeName, entity)
 				if errObj != nil {
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1531,7 +1548,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			return nil
 		}
 	} else {
-		parent, _ := this.getEntityByUuid(parentUuid)
 		result, errObj := this.createEntity(parent, attributeName, values.(Entity))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1539,7 +1555,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		}
 		return result
 	}
-
 }
 
 // @api 1.0
@@ -2085,7 +2100,7 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
+	log.Println("---> ", entity)
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		obj := entity.(*DynamicEntity).getValues()
 		return obj

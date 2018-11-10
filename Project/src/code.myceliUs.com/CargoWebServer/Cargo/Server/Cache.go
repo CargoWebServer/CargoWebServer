@@ -73,7 +73,7 @@ func newCache() *Cache {
 			// cache will not allocate more memory than this limit, value in MB
 			// if value is reached then the oldest entries can be overridden for the new ones
 			// 0 value means no size limit
-			HardMaxCacheSize: 4192,
+			HardMaxCacheSize: 1024,
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.
@@ -85,14 +85,28 @@ func newCache() *Cache {
 
 		// The operation channel.
 		cache.m_operations = make(chan map[string]interface{}, 0)
+
 	}
 
 	// Cache processing loop...
 	go func(cache *Cache) {
+		// Keep information if an entity need to be saved.
+		needSaveEntity := make(map[string]bool, 0)
 		for {
 			select {
 			case operation := <-cache.m_operations:
-				if operation["name"] == "getEntity" {
+				if operation["name"] == "needSaveEntity" {
+					uuid := operation["uuid"].(string)
+					result := operation["needSaveEntity"].(chan bool)
+					if exist, ok := needSaveEntity[uuid]; ok {
+						result <- exist
+					} else {
+						result <- false
+					}
+				} else if operation["name"] == "resetNeedSaveEntity" {
+					uuid := operation["uuid"].(string)
+					needSaveEntity[uuid] = false
+				} else if operation["name"] == "getEntity" {
 					uuid := operation["uuid"].(string)
 					getEntity := operation["getEntity"].(chan Entity)
 					entity, _ := cache.getEntity(uuid)
@@ -102,19 +116,32 @@ func newCache() *Cache {
 
 				} else if operation["name"] == "setEntity" {
 					entity := operation["entity"].(Entity)
-					log.Println("--> set entity ", entity.GetUuid())
 					// Append in the map: setObject set the value for DynamicEntity...
 					if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
-						//log.Println("--->cache set entity: ", entity.GetUuid())
 						var bytes, err = Utility.ToBytes(entity)
 						if err == nil {
-							// By id
-							if len(entity.Ids()) > 0 {
-								id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
-								cache.m_cache.Set(id, []byte(entity.GetUuid()))
+							bytes_, err := cache.m_cache.Get(entity.GetUuid())
+							if err == nil {
+								if string(bytes_) != string(bytes) {
+									// By id
+									if len(entity.Ids()) > 0 {
+										id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
+										cache.m_cache.Set(id, []byte(entity.GetUuid()))
+									}
+									// By uuid
+									cache.m_cache.Set(entity.GetUuid(), bytes)
+									needSaveEntity[entity.GetUuid()] = true
+								}
+							} else {
+								// By id
+								if len(entity.Ids()) > 0 {
+									id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
+									cache.m_cache.Set(id, []byte(entity.GetUuid()))
+								}
+								// By uuid
+								cache.m_cache.Set(entity.GetUuid(), bytes)
 							}
-							// By uuid
-							cache.m_cache.Set(entity.GetUuid(), bytes)
+
 						} else {
 							log.Println("---> fail to serialyse entity!")
 						}
@@ -130,6 +157,9 @@ func newCache() *Cache {
 					// Remove from the cache.
 					cache.m_cache.Delete(entity.GetUuid())
 					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
+
+					delete(needSaveEntity, entity.GetUuid())
+
 				} else if operation["name"] == "remove" {
 					uuid := operation["uuid"].(string)
 					// Remove from the cache.
@@ -168,13 +198,27 @@ func newCache() *Cache {
 					values := operation["values"].(map[string]interface{})
 					var bytes, err = Utility.ToBytes(values)
 					if err == nil {
-						// By id
-						if values["Ids"] != nil {
-							id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
-							cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+						bytes_, err := cache.m_cache.Get(values["UUID"].(string))
+						if err == nil {
+							if string(bytes) != string(bytes_) {
+								// By id
+								if values["Ids"] != nil {
+									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+								}
+								// By uuid
+								cache.m_cache.Set(values["UUID"].(string), bytes)
+								needSaveEntity[values["UUID"].(string)] = true
+							}
+						} else {
+							if values["Ids"] != nil {
+								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+								cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+							}
+							// By uuid
+							cache.m_cache.Set(values["UUID"].(string), bytes)
 						}
-						// By uuid
-						cache.m_cache.Set(values["UUID"].(string), bytes)
+
 					}
 				} else if operation["name"] == "setValue" {
 					uuid := operation["uuid"].(string)
@@ -196,6 +240,7 @@ func newCache() *Cache {
 								}
 								// By uuid
 								cache.m_cache.Set(values["UUID"].(string), bytes)
+								needSaveEntity[values["UUID"].(string)] = true
 							}
 						}
 					}
@@ -218,6 +263,7 @@ func newCache() *Cache {
 								}
 								// By uuid
 								cache.m_cache.Set(values["UUID"].(string), bytes)
+								needSaveEntity[values["UUID"].(string)] = true
 							}
 						}
 					}

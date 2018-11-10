@@ -132,11 +132,12 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
 	var filter string = "(&(objectClass=user)(objectcategory=Person)(memberOf=" + groupId + "))"
 	var attributes []string = []string{"sAMAccountName"}
 	results, err := this.search(id, "", "", base_dn, filter, attributes)
+
 	var members []string
 
 	if err != nil {
 		log.Println("error, fail to search the members information for group on ldap...")
-		return members, err
+		return []string{}, err
 	}
 
 	// Here I will print the information...
@@ -225,7 +226,7 @@ func (this *LdapManager) search(id string, login string, psswd string, base_dn s
 
 	sr, err := conn.Search(search_request)
 	if err != nil {
-		log.Println("--> search error", err)
+		log.Println("228 --> search error", err)
 		return nil, err
 	}
 
@@ -325,44 +326,46 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 
 		// Specific ...
 		// here i will test if the user exist...
-		userEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.User", "CargoEntities", []interface{}{user.GetId()})
-		if userEntity == nil {
-			if len(user.GetEmail()) > 0 {
-
-				// The user must be save...
+		if !this.isUserExist(user.GetId()) {
+			userEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.User", "CargoEntities", []interface{}{user.GetId()})
+			if userEntity == nil {
 				if len(user.GetEmail()) > 0 {
 
-					// Create the account in memory...
-					if len(accountId) > 0 {
-						account := new(CargoEntities.Account)
-						account.M_id = accountId
-						account.M_password = "Dowty123"
-						account.M_name = user.GetId()
-						account.M_email = user.GetEmail()
+					// The user must be save...
+					if len(user.GetEmail()) > 0 {
 
-						// Set the account uuid.
-						accountEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", account)
-						account = accountEntity.(*CargoEntities.Account)
+						// Create the account in memory...
+						if len(accountId) > 0 {
+							account := new(CargoEntities.Account)
+							account.M_id = accountId
+							account.M_password = "Dowty123"
+							account.M_name = user.GetId()
+							account.M_email = user.GetEmail()
 
-						// Link the account and the user...
-						if err == nil {
-							userEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
-							user = userEntity.(*CargoEntities.User)
+							// Set the account uuid.
+							accountEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", account)
+							account = accountEntity.(*CargoEntities.Account)
+
+							// Link the account and the user...
 							if err == nil {
-								log.Println("--> Create user: ", user.GetId())
-								account.SetUserRef(user)
-								user.AppendAccounts(account)
-								// Save both entity...
-								GetServer().GetEntityManager().saveEntity(account)
-								GetServer().GetEntityManager().saveEntity(user)
-							} else {
-								log.Fatal("------> fail to create user!")
+								userEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
+								user = userEntity.(*CargoEntities.User)
+								if err == nil {
+									log.Println("--> Create user: ", user.GetId())
+									account.SetUserRef(user)
+									user.AppendAccounts(account)
+									// Save both entity...
+									GetServer().GetEntityManager().saveEntity(account)
+									GetServer().GetEntityManager().saveEntity(user)
+								} else {
+									log.Fatal("------> fail to create user!")
+								}
 							}
+						} else {
+							// save only the user here.
+							GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
+							log.Println("--> User ", user.GetFirstName()+" "+user.GetLastName(), " is not active")
 						}
-					} else {
-						// save only the user here.
-						GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
-						log.Println("--> User ", user.GetFirstName()+" "+user.GetLastName(), " is not active")
 					}
 				}
 			}
@@ -399,7 +402,9 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 		// Here I will get the user in the group...
 		row := results[i]
 		group := new(CargoEntities.Group)
-
+		group.SetEntityGetter(getEntityFct)
+		group.SetEntitySetter(setEntityFct)
+		group.SetUuidGenerator(generateUuidFct)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "distinguishedName" {
@@ -430,9 +435,9 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 								GetServer().GetEntityManager().saveEntity(member)
 							}
 						}
-					} else {
-						group = nil
 					}
+				} else {
+					return err
 				}
 
 			} else if attributes[j] == "name" {
@@ -441,9 +446,8 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 				group.SetName(row[j].(string))
 			}
 		}
-		if group != nil {
-			GetServer().GetEntityManager().saveEntity(group)
-		}
+		// log.Println("---> group ", group)
+		GetServer().GetEntityManager().saveEntity(group)
 	}
 
 	return nil
@@ -610,41 +614,42 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 				computer.SetId(strings.ToUpper(row[j].(string)))
 			}
 		}
-
-		computerEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Computer", "CargoEntities", []interface{}{computer.GetId()})
-		if computerEntity == nil {
-			addrs, err := net.LookupIP(computer.GetName())
-			for _, addr := range addrs {
-				if ipv4 := addr.To4(); ipv4 != nil {
-					computer.SetIpv4(ipv4.String())
-				}
-			}
-			if err != nil {
-				log.Println("Adress not found!", computer.GetName())
-			} else {
-				log.Println("Save computer", computer.GetName(), computer.GetIpv4())
-			}
-			computerEntity, _ = GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", computer)
-			if computerEntity != nil {
-				computer = computerEntity.(*CargoEntities.Computer)
-			}
-			log.Println("----> create computer ", computer.GetId())
-		} /*else {
-			addrs, err := net.LookupIP(computer.GetName())
-			if err == nil {
+		if !this.isComputerExist(computer.GetId()) {
+			computerEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Computer", "CargoEntities", []interface{}{computer.GetId()})
+			if computerEntity == nil {
+				addrs, err := net.LookupIP(computer.GetName())
 				for _, addr := range addrs {
 					if ipv4 := addr.To4(); ipv4 != nil {
 						computer.SetIpv4(ipv4.String())
 					}
 				}
-			}
-			// Call save on Entities...
-			computer.UUID = computerEntity.GetUuid()
-			computer.ParentUuid = computerEntity.GetParentUuid()
-			computer.ParentLnk = computerEntity.GetParentLnk()
-			GetServer().GetEntityManager().saveEntity(computer)
-			log.Println("----> save computer ", computer.GetName(), computer.GetIpv4())
-		}*/
+				if err != nil {
+					log.Println("Adress not found!", computer.GetName())
+				} else {
+					log.Println("Save computer", computer.GetName(), computer.GetIpv4())
+				}
+				computerEntity, _ = GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", computer)
+				if computerEntity != nil {
+					computer = computerEntity.(*CargoEntities.Computer)
+				}
+				log.Println("----> create computer ", computer.GetId())
+			} /*else {
+				addrs, err := net.LookupIP(computer.GetName())
+				if err == nil {
+					for _, addr := range addrs {
+						if ipv4 := addr.To4(); ipv4 != nil {
+							computer.SetIpv4(ipv4.String())
+						}
+					}
+				}
+				// Call save on Entities...
+				computer.UUID = computerEntity.GetUuid()
+				computer.ParentUuid = computerEntity.GetParentUuid()
+				computer.ParentLnk = computerEntity.GetParentLnk()
+				GetServer().GetEntityManager().saveEntity(computer)
+				log.Println("----> save computer ", computer.GetName(), computer.GetIpv4())
+			}*/
+		}
 	}
 
 	return nil
@@ -775,4 +780,55 @@ func (this *LdapManager) GetComputerByName(name string, messageId string, sessio
 		return nil
 	}
 	return computer
+}
+
+// Test if a Computer exist.
+func (this *LdapManager) isComputerExist(id string) bool {
+	var query EntityQuery
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.Computer"
+	query.Fields = []string{"UUID"}
+	query.Query = `CargoEntities.Computer.M_id=="` + id + `"`
+	store := GetServer().GetDataManager().getDataStore("CargoEntities")
+	queryStr, _ := json.Marshal(query)
+	results, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return false
+	}
+
+	return len(results) == 1
+}
+
+// Test if a user exist.
+func (this *LdapManager) isUserExist(id string) bool {
+	var query EntityQuery
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.User"
+	query.Fields = []string{"UUID"}
+	query.Query = `CargoEntities.User.M_id=="` + id + `"`
+	store := GetServer().GetDataManager().getDataStore("CargoEntities")
+	queryStr, _ := json.Marshal(query)
+	results, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return false
+	}
+
+	return len(results) == 1
+}
+
+// Test if a user exist.
+func (this *LdapManager) isGroupExist(id string) bool {
+	var query EntityQuery
+	query.TYPENAME = "Server.EntityQuery"
+	query.TypeName = "CargoEntities.Group"
+	query.Fields = []string{"UUID"}
+	query.Query = `CargoEntities.Group.M_id=="` + id + `"`
+	store := GetServer().GetDataManager().getDataStore("CargoEntities")
+	queryStr, _ := json.Marshal(query)
+	results, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return false
+	}
+
+	return len(results) == 1
 }

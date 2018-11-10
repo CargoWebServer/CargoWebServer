@@ -129,6 +129,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 
 						} else {
 							// create of open de db.
+							//log.Println("----> create db or open it: ", path)
 							db = xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
 						}
 					}
@@ -1069,7 +1070,6 @@ func (this *GraphStore) Ping() error {
  * Create a new entry in the database.
  */
 func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId interface{}, err error) {
-
 	if this.m_ipv4 != "127.0.0.1" {
 		if this.m_conn != nil {
 			if !this.m_conn.IsOpen() {
@@ -1152,27 +1152,34 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 	// Creation of entity
 	for i := 0; i < len(values); i++ {
 		v := values[i]
-		// If the value is an entity...
-		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct {
-			typeName := Utility.GetProperty(v, "TYPENAME")
-			uuid := Utility.GetProperty(v, "UUID")
-			if typeName != nil {
-				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
-				if err == nil {
-					defer xapian.DeleteWritableDatabase(db)
-					// So here I will index the property found in the entity.
-					doc := xapian.NewDocument()
 
-					// Keep json data...
-					data, _ := Utility.ToJson(v)
+		// If the value is a dynamic entity...
+		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct || reflect.TypeOf(v).Kind() == reflect.Map {
+			typeName := v.(Entity).GetTypeName()
+			uuid := v.(Entity).GetUuid()
+			db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName + ".glass"})
+			if err == nil {
+				// So here I will index the property found in the entity.
+				doc := xapian.NewDocument()
+
+				// Keep json data...
+				var data string
+
+				if reflect.TypeOf(v).String() == "*Server.DynamicEntity" {
+					data, err = Utility.ToJson(v.(*DynamicEntity).getValues())
+				} else {
+					data, err = Utility.ToJson(v)
+				}
+				if err == nil && len(data) > 0 {
 					this.indexEntity(doc, v.(Entity))
 					doc.Set_data(data)
-					doc.Add_boolean_term("Q" + formalize(uuid.(string)))
-					db.Replace_document("Q"+formalize(uuid.(string)), doc)
-					xapian.DeleteDocument(doc)
-					db.Close()
+					doc.Add_boolean_term("Q" + formalize(uuid))
+					db.Replace_document("Q"+formalize(uuid), doc)
 				}
+				xapian.DeleteDocument(doc)
 			}
+			db.Close()
+			xapian.DeleteWritableDatabase(db)
 		}
 	}
 
@@ -1388,25 +1395,32 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 		v := values[i]
 		// If the value is an entity...
 		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct {
-			typeName := Utility.GetProperty(v, "TYPENAME")
-			if typeName != nil {
-				uuid := Utility.GetProperty(v, "UUID")
-				db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName.(string) + ".glass"})
-				if err == nil {
-					defer xapian.DeleteWritableDatabase(db)
-					// So here I will index the property found in the entity.
-					doc := xapian.NewDocument()
+			typeName := v.(Entity).GetTypeName()
+			uuid := v.(Entity).GetUuid()
+			db, err := this.OpenDataStoreWrite([]string{this.m_path + "/" + typeName + ".glass"})
+			if err == nil {
+				// So here I will index the property found in the entity.
+				doc := xapian.NewDocument()
 
-					// Keep json data...
-					data, _ := Utility.ToJson(v)
+				// Keep json data...
+				var data string
+				if reflect.TypeOf(v).String() == "*Server.DynamicEntity" {
+					data, err = Utility.ToJson(v.(*DynamicEntity).getValues())
+				} else {
+					data, err = Utility.ToJson(v)
+				}
+
+				if err == nil && len(data) > 0 {
 					this.indexEntity(doc, v.(Entity))
 					doc.Set_data(data)
-					doc.Add_boolean_term("Q" + formalize(uuid.(string)))
-					db.Replace_document("Q"+formalize(uuid.(string)), doc)
-					xapian.DeleteDocument(doc)
+					doc.Add_boolean_term("Q" + formalize(uuid))
+					db.Replace_document("Q"+formalize(uuid), doc)
 				}
-				db.Close()
+				// free the memory.
+				xapian.DeleteDocument(doc)
 			}
+			db.Close()
+			xapian.DeleteWritableDatabase(db)
 		}
 	}
 
@@ -1514,6 +1528,7 @@ func (this *GraphStore) Delete(queryStr string, values []interface{}) (err error
 					defer xapian.DeleteEnquire(enquire)
 					enquire.Set_query(query)
 					mset := enquire.Get_mset(uint(0), uint(10000))
+					defer xapian.DeleteMSet(mset)
 					// Now I will process the results.
 					for i := 0; i < mset.Size(); i++ {
 						doc := mset.Get_hit(uint(i)).Get_document()
@@ -1576,10 +1591,7 @@ func formalize(uuid string) string {
 // Index entity string field.
 func (this *GraphStore) indexStringField(data string, field string, typeName string, termGenerator xapian.TermGenerator) {
 	// I will index all string field to be able to found it back latter.
-	if strings.HasPrefix(field, "M_") {
-		termGenerator.Index_text(strings.ToLower(data), uint(1), strings.ToUpper(field))
-	}
-
+	termGenerator.Index_text(strings.ToLower(data), uint(1), strings.ToUpper(field))
 	if Utility.IsUriBase64(data) {
 		data_, err := base64.StdEncoding.DecodeString(data)
 		if err == nil {
@@ -1605,28 +1617,42 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 	// This will give possibility to search for given fields.
 	if data != nil {
 		if reflect.TypeOf(data).Kind() == reflect.Slice {
-			s := reflect.ValueOf(data)
-			for i := 0; i < s.Len(); i++ {
-				this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, -1)
-			}
 			str_, err := Utility.ToJson(data)
 			if err == nil {
+				s := reflect.ValueOf(data)
+				for i := 0; i < s.Len(); i++ {
+					// I will remove nil values.
+					item := s.Index(i)
+					if item.IsValid() {
+						zeroValue := reflect.Zero(item.Type())
+						if zeroValue != item {
+							//log.Println("---> index field ", field, fieldType, data)
+							this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, -1)
+						} else {
+							log.Println("---> index nil field ", field, fieldType, data)
+							this.indexField(nil, field, fieldType, typeName, termGenerator, doc, -1)
+						}
+
+					}
+				}
 				doc.Add_value(uint(index), Utility.ToString(str_))
 			}
 		} else {
 			if index != -1 {
 				doc.Add_value(uint(index), Utility.ToString(data))
 			}
-			if reflect.TypeOf(data).Kind() == reflect.String {
+			if (XML_Schemas.IsXsNumeric(fieldType) || XML_Schemas.IsXsInt(fieldType)) && index != -1 {
+				value := Utility.ToNumeric(data)
+				doc.Add_value(uint(index), xapian.Sortable_serialise(value))
+			} else if reflect.TypeOf(data).Kind() == reflect.String {
+				str := Utility.ToString(data)
 				// If the the value is a valid entity reference i I will use boolean term.
-				if Utility.IsValidEntityReferenceName(data.(string)) {
-					term := generatePrefix(typeName, field) + formalize(data.(string))
+				if Utility.IsValidEntityReferenceName(str) {
+					term := generatePrefix(typeName, field) + formalize(str)
 					doc.Add_boolean_term(term)
 				} else {
-					this.indexStringField(data.(string), field, typeName, termGenerator)
+					this.indexStringField(str, field, typeName, termGenerator)
 				}
-			} else if (XML_Schemas.IsXsNumeric(fieldType) || XML_Schemas.IsXsInt(fieldType)) && index != -1 {
-				doc.Add_value(uint(index), xapian.Sortable_serialise(Utility.ToNumeric(data)))
 			} else if index != -1 {
 				doc.Add_value(uint(index), Utility.ToString(data))
 			}
@@ -1638,7 +1664,6 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 
 // index entity information.
 func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
-
 	// The term generator
 	termGenerator := xapian.NewTermGenerator()
 	defer xapian.DeleteTermGenerator(termGenerator)
@@ -1669,11 +1694,18 @@ func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
 	// Here I will append boolean term.
 	for i := 0; i < len(prototype.Fields); i++ {
 		// Index the value.
-		value := Utility.GetProperty(entity, prototype.Fields[i])
+		var value interface{}
+		if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+			value = entity.(*DynamicEntity).getValue(prototype.Fields[i])
+		} else {
+			value = Utility.GetProperty(entity, prototype.Fields[i])
+		}
 		if Utility.Contains(prototype.Ids, prototype.Fields[i]) || Utility.Contains(prototype.Indexs, prototype.Fields[i]) {
 			// Index the unique value index for the typeName and this field.
-			term := generatePrefix(prototype.TypeName, prototype.Fields[i]) + formalize(value.(string))
-			doc.Add_boolean_term(term)
+			if value != nil {
+				term := generatePrefix(prototype.TypeName, prototype.Fields[i]) + formalize(Utility.ToString(value))
+				doc.Add_boolean_term(term)
+			}
 		}
 		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, i)
 	}
@@ -1693,6 +1725,7 @@ func (this *GraphStore) executeSearchQuery(typename string, querystring string, 
 
 	// Now i will add where I want to search...
 	query := parseXapianQuery(querystring)
+	defer xapian.DeleteQuery(query)
 
 	enquire := xapian.NewEnquire(store)
 	defer xapian.DeleteEnquire(enquire)
@@ -1700,6 +1733,7 @@ func (this *GraphStore) executeSearchQuery(typename string, querystring string, 
 	enquire.Set_query(query)
 
 	mset := enquire.Get_mset(uint(0), uint(10000))
+	defer xapian.DeleteMSet(mset)
 
 	results := make([][]interface{}, 0)
 	var prototype *EntityPrototype
@@ -1711,20 +1745,32 @@ func (this *GraphStore) executeSearchQuery(typename string, querystring string, 
 	// Now I will process the results.
 	for i := 0; i < mset.Size(); i++ {
 		doc := mset.Get_hit(uint(i)).Get_document()
+		defer xapian.DeleteDocument(doc)
+		//log.Println("---> doc ", fields, doc.Get_data())
 		if len(fields) > 0 {
 			values := make([]interface{}, 0)
 			for j := 0; j < len(fields); j++ {
+				// Get the field index.
 				fieldIndex := prototype.getFieldIndex(fields[j])
-				if fieldIndex != -1 {
-					values = append(values, doc.Get_value(uint(fieldIndex)))
+				value := doc.Get_value(uint(fieldIndex))
+				if XML_Schemas.IsXsNumeric(prototype.FieldsType[fieldIndex]) {
+					values = append(values, xapian.Sortable_unserialise(value))
+				} else if XML_Schemas.IsXsString(prototype.FieldsType[fieldIndex]) {
+					values = append(values, value)
+				} else {
+					log.Println("----> typeName not supported!")
 				}
 			}
 			results = append(results, values)
 		} else {
 			// In that case the data contain in the document are return.
 			var v map[string]interface{}
-			json.Unmarshal([]byte(doc.Get_data()), &v)
-			results = append(results, []interface{}{v})
+			err := json.Unmarshal([]byte(doc.Get_data()), &v)
+			if err == nil {
+				results = append(results, []interface{}{v})
+			} else {
+				return nil, err
+			}
 		}
 	}
 

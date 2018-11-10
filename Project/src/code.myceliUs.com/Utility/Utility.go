@@ -286,7 +286,6 @@ func RemoveAccent(text string) string {
  */
 func GetChecksum(values interface{}) string {
 	var checksum string
-	checksum = ""
 
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
 		var keys []string
@@ -1106,9 +1105,9 @@ func ToNumeric(value interface{}) float64 {
 	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
 		val = float64(int(value.(int64)))
 	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
-		val = float64(int(value.(float32)))
+		val = float64(value.(float32))
 	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
-		val = float64(int(value.(float64)))
+		val = value.(float64)
 	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
 		if value.(bool) {
 			val = 1.0

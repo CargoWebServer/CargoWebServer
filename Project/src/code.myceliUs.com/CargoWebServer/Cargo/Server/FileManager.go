@@ -561,6 +561,14 @@ func (this *FileManager) saveFile(fileId string, filedata []byte, sessionId stri
 
 	checksum := Utility.CreateFileChecksum(f_)
 
+	// Nothing todo if the file has not change.
+	checksum_, err := this.getFileChecksum(fileId)
+	if err == nil {
+		if checksum == checksum_ {
+			return nil
+		}
+	}
+
 	// close the file and remove it.
 	f_.Close()
 	os.Remove(f_.Name())
@@ -687,25 +695,24 @@ func (this *FileManager) setHtmlIncludes(path string, filedata []byte) []byte {
 	f_ := func(basePath string, path string, a *html.Attribute) {
 		// Retreive the existing file...
 		fileId := Utility.CreateSha1Key([]byte(path))
-		file, _ := this.getFileById(fileId)
-
+		checksum_, err := this.getFileChecksum(fileId)
 		var checksum string
 		if len(strings.Split(path, "?")) > 1 {
 			checksum = strings.Split(path, "?")[1]
 			path = strings.Split(path, "?")[0]
 		}
-		if file != nil {
-			if checksum != file.GetChecksum() {
+		if err == nil {
+			if checksum != checksum_ {
 				// Change the actual value with the new checksum
-				a.Val = path + "?" + file.GetChecksum()
+				a.Val = path + "?" + checksum_
 			}
 		} else {
 			fileId := Utility.CreateSha1Key([]byte(basePath + "/" + path))
-			file, _ := this.getFileById(fileId)
-			if file != nil {
-				if checksum != file.GetChecksum() {
+			checksum_, err := this.getFileChecksum(fileId)
+			if err == nil {
+				if checksum != checksum_ {
 					// Change the actual value with the new checksum
-					a.Val = path + "?" + file.GetChecksum()
+					a.Val = path + "?" + checksum_
 				}
 			}
 		}

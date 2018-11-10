@@ -83,10 +83,10 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			var results_ []interface{}
 			// In case of error.
 			defer func(wait chan []interface{}, results *[]interface{}) { //catch or finally
-				if err := recover(); err != nil { //catch
-					log.Println("Exception: %v\n", err)
+				/*if err := recover(); err != nil { //catch
 					*results = []interface{}{nil, err}
-				}
+					log.Panicln(err)
+				}*/
 				wait <- *results
 			}(wait, &results_)
 
@@ -95,16 +95,32 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			if len(results) > 0 {
 				if len(results) == 1 {
 					// One result here...
-					switch goError := results[0].Interface().(type) {
-					case error:
-						results_ = []interface{}{nil, goError}
-						return
+					result := results[0]
+					zeroValue := reflect.Zero(result.Type())
+					if result.IsValid() {
+						if result != zeroValue {
+							switch goError := result.Interface().(type) {
+							case error:
+								results_ = []interface{}{nil, goError}
+								return
+							}
+							results_ = []interface{}{result.Interface(), nil}
+						}
 					}
-					results_ = []interface{}{results[0].Interface(), nil}
 					return
 				} else if len(results) == 2 {
 					// Return the result and the error after.
-					results_ = []interface{}{results[0].Interface(), results[1].Interface()}
+					result0 := results[0]
+					zeroValue0 := reflect.Zero(result0.Type())
+					result1 := results[0]
+					zeroValue1 := reflect.Zero(result1.Type())
+					if result0 != zeroValue0 && result1 != zeroValue1 {
+						results_ = []interface{}{results[0].Interface(), results[1].Interface()}
+					} else if result0 == zeroValue0 && result1 != zeroValue1 {
+						results_ = []interface{}{nil, results[1].Interface()}
+					} else if result0 != zeroValue0 && result1 == zeroValue1 {
+						results_ = []interface{}{results[0].Interface(), nil}
+					}
 					return
 				}
 			}
