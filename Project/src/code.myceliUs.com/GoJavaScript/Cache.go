@@ -62,7 +62,7 @@ func newCache() {
 				} else if operation["name"] == "setJsObject" {
 					// set the object in the map.
 					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(interface{})
-					//log.Println("---> cache contain: ", len(cache.m_jsObjects))
+					log.Println("set object ----> ", operation["id"].(string))
 				} else if operation["name"] == "removeObject" {
 					// The object will leave for more 30 second the time the
 					// script get object from it reference.

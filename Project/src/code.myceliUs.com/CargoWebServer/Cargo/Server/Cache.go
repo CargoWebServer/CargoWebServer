@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"runtime/debug"
+
 	"code.myceliUs.com/Utility"
 	"github.com/allegro/bigcache"
 )
@@ -73,11 +75,11 @@ func newCache() *Cache {
 			// cache will not allocate more memory than this limit, value in MB
 			// if value is reached then the oldest entries can be overridden for the new ones
 			// 0 value means no size limit
-			HardMaxCacheSize: 1024,
+			HardMaxCacheSize: 4000,
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.
-			OnRemove: nil,
+			OnRemove: func(key string, data []byte) { debug.FreeOSMemory() },
 		}
 
 		// The Cache...
