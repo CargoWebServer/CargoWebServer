@@ -3,6 +3,8 @@ package GoJavaScript
 import "code.myceliUs.com/Utility"
 import "reflect"
 
+//import "log"
+
 // The object must be contain entirely in the client a get by the server when he's
 // ready to use it with getObjectByUuid... so no channel will dead lock.
 /**
@@ -101,6 +103,11 @@ func (self *Object) Get(name string) (interface{}, error) {
  * value The value that method return, it can be a Go function.
  */
 func (self *Object) Set(name string, value interface{}) {
+	if value == nil {
+		self.Properties[name] = nil
+		return
+	}
+
 	// If the value is a function
 	if reflect.TypeOf(value).Kind() == reflect.Func {
 		// Set a go method.

@@ -58,7 +58,7 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	infos["value"] = value
 
 	// set the values in the cache.
-	cache.m_operations <- infos
+	cache.m_setValue <- infos
 	return nil
 }
 
@@ -76,7 +76,7 @@ func (this *DynamicEntity) getValue(field string) interface{} {
 	infos["uuid"] = this.uuid
 	infos["field"] = field
 	infos["getValue"] = make(chan interface{})
-	cache.m_operations <- infos
+	cache.m_getValue <- infos
 	value := <-infos["getValue"].(chan interface{})
 	return value
 }
@@ -94,7 +94,7 @@ func (this *DynamicEntity) deleteValue(field string) {
 	infos["name"] = "deleteValue"
 	infos["uuid"] = this.uuid
 	infos["field"] = field
-	cache.m_operations <- infos
+	cache.m_deleteValue <- infos
 }
 
 /**
@@ -108,7 +108,7 @@ func (this *DynamicEntity) getValues() map[string]interface{} {
 	infos["name"] = "getValues"
 	infos["uuid"] = this.uuid
 	infos["getValues"] = make(chan map[string]interface{})
-	cache.m_operations <- infos
+	cache.m_getValues <- infos
 	values := <-infos["getValues"].(chan map[string]interface{})
 	return values
 }
@@ -283,7 +283,7 @@ func (this *DynamicEntity) setValues(values map[string]interface{}) {
 	infos["values"] = values
 
 	// set the values in the cache.
-	cache.m_operations <- infos
+	cache.m_setValues <- infos
 }
 
 /**

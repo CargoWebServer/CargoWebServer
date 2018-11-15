@@ -76,7 +76,7 @@ AdminCategoryPage.prototype.getCategoriesFromKeyword = function(keyword){
     var q = new EntityQuery()
     q.TypeName = "CatalogSchema.CategoryType"
     q.Fields = ["M_name"]
-    q.Query = 'CatalogSchema.CategoryType.M_name~="'+ keyword +'"'
+    q.Query = 'CatalogSchema.CategoryType.M_name=="'+ keyword +'"'
     
     server.entityManager.getEntities("CatalogSchema.CategoryType", "CatalogSchema", q, 0,-1,[],true,false, 
         function(index,total, caller){

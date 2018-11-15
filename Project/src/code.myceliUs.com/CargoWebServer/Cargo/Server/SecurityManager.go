@@ -3,7 +3,8 @@ package Server
 import (
 	"errors"
 	"log"
-	"strings"
+
+	//"strings"
 
 	"regexp"
 
@@ -372,59 +373,62 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
  */
 func (this *SecurityManager) canExecuteAction(sessionId string, actionName string) *CargoEntities.Error {
 	// Local action, when no sessionId was given.
-	if len(sessionId) == 0 {
-		return nil
-	}
-
-	// format the action name...
-	actionName = actionName[strings.LastIndex(actionName, "/")+1:]
-	actionName = strings.Replace(actionName, "*", "", -1)
-	actionName = strings.Replace(actionName, ")", "", -1)
-	actionName = strings.Replace(actionName, "(", "", -1)
-
-	// Here is the list of function where no permission apply...
-	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
-	if err != nil {
-		return err
-	}
-
-	action := actionEntity.(*CargoEntities.Action)
-
-	// if the action is public or hidden no validation is required.
-	if action.GetAccessType() == CargoEntities.AccessType_Hidden || action.GetAccessType() == CargoEntities.AccessType_Public {
-		return nil
-	}
-
-	// Format action name from code.myceliUs.com/CargoWebServer/Cargo/Server.(*WorkflowManager).StartProcess
-	// to Server.WorkflowManager.StartProcess
-	actionName = strings.Replace(actionName, "code.myceliUs.com/CargoWebServer/Cargo/", "", -1)
-	actionName = strings.Replace(actionName, "(", "", -1)
-	actionName = strings.Replace(actionName, "*", "", -1)
-	actionName = strings.Replace(actionName, ")", "", -1)
-
-	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
-	var account *CargoEntities.Account
-	if session != nil {
-		account = session.GetAccountPtr()
-		roles := account.GetRolesRef()
-		for i := 0; i < len(roles); i++ {
-			if this.hasAction(roles[i].GetId(), actionName) {
-				//log.Println("account ", account.GetId(), " can execute action ", action.GetName())
-				return nil
-			}
+	return nil
+	/*
+		if len(sessionId) == 0 {
+			return nil
 		}
-	} else {
+
+		// format the action name...
+		actionName = actionName[strings.LastIndex(actionName, "/")+1:]
+		actionName = strings.Replace(actionName, "*", "", -1)
+		actionName = strings.Replace(actionName, ")", "", -1)
+		actionName = strings.Replace(actionName, "(", "", -1)
+
+		// Here is the list of function where no permission apply...
+		actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
+		if err != nil {
+			return err
+		}
+
+		action := actionEntity.(*CargoEntities.Action)
+
+		// if the action is public or hidden no validation is required.
+		if action.GetAccessType() == CargoEntities.AccessType_Hidden || action.GetAccessType() == CargoEntities.AccessType_Public {
+			return nil
+		}
+
+		// Format action name from code.myceliUs.com/CargoWebServer/Cargo/Server.(*WorkflowManager).StartProcess
+		// to Server.WorkflowManager.StartProcess
+		actionName = strings.Replace(actionName, "code.myceliUs.com/CargoWebServer/Cargo/", "", -1)
+		actionName = strings.Replace(actionName, "(", "", -1)
+		actionName = strings.Replace(actionName, "*", "", -1)
+		actionName = strings.Replace(actionName, ")", "", -1)
+
+		session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
+		var account *CargoEntities.Account
+		if session != nil {
+			account = session.GetAccountPtr()
+			roles := account.GetRolesRef()
+			for i := 0; i < len(roles); i++ {
+				if this.hasAction(roles[i].GetId(), actionName) {
+					//log.Println("account ", account.GetId(), " can execute action ", action.GetName())
+					return nil
+				}
+			}
+		} else {
+			// Create the error message
+			cargoError := NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with the uuid '"+sessionId+"' dosen't exist!"))
+			// Return the uuid of the created error in the err return param.
+			return cargoError
+		}
+
 		// Create the error message
-		cargoError := NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with the uuid '"+sessionId+"' dosen't exist!"))
+		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, errors.New("The action with the name '"+actionName+"' cannot be executed by '"+account.GetId()+"'."))
+
 		// Return the uuid of the created error in the err return param.
 		return cargoError
-	}
-
-	// Create the error message
-	cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, errors.New("The action with the name '"+actionName+"' cannot be executed by '"+account.GetId()+"'."))
-
-	// Return the uuid of the created error in the err return param.
-	return cargoError
+	*/
 }
 
 /////////////////////////////////////////////////////////////////////////////

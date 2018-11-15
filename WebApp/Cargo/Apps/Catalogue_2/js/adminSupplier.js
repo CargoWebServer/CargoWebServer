@@ -83,7 +83,7 @@ AdminSupplierPage.prototype.getSuppliersFromKeyword = function(keyword){
     var q = new EntityQuery()
     q.TypeName = "CatalogSchema.SupplierType"
     q.Fields = ["M_name","M_id"]
-    q.Query = 'CatalogSchema.SupplierType.M_name~="'+ keyword +'" '
+    q.Query = 'CatalogSchema.SupplierType.M_name=="'+ keyword +'" '
     
     server.entityManager.getEntities("CatalogSchema.SupplierType", "CatalogSchema", q, 0,-1,[],true,true, 
         function(index,total, caller){

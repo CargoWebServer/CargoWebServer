@@ -184,6 +184,8 @@ OrderPage.prototype.addOrderItem = function (newOrderLine, firstLoad) {
                             }
                         }
                         if(!isExist){
+                            caller.newOrderLine.ParentUuid = mainPage.orderPage.currentOrder.UUID
+                            caller.newOrderLine.ParentLnk = "ParentLnk"
                             mainPage.orderPage.currentOrder.M_items.push(caller.newOrderLine)
                         }
                         

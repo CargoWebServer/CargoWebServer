@@ -80,7 +80,7 @@ AdminManufacturerPage.prototype.getManufacturersFromKeyword = function(keyword){
     var q = new EntityQuery()
     q.TypeName = "CatalogSchema.ManufacturerType"
     q.Fields = ["M_name","M_id"]
-    q.Query = 'CatalogSchema.ManufacturerType.M_name~="'+ keyword +'" '
+    q.Query = 'CatalogSchema.ManufacturerType.M_name=="'+ keyword +'" '
     
     server.entityManager.getEntities("CatalogSchema.ManufacturerType", "CatalogSchema", q, 0,-1,[],true,false, 
         function(index,total, caller){

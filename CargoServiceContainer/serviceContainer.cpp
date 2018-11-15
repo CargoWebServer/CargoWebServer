@@ -284,7 +284,6 @@ QString ServiceContainer::GetServicesClientCode(){
 
        // qDebug() << "Get client code: " << (*it).toObject()["IID"];
     }
-    qDebug() << clientCode;
     return clientCode;
 }
 

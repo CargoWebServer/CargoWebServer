@@ -144,8 +144,9 @@ func (this *SchemaManager) initialize() {
 			ipv4 := serverConfig.GetIpv4()
 			port := serverConfig.GetServerPort()
 			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CARGO)
+
 			if errObj != nil {
-				//log.Println(errObj.GetBody())
+				log.Println(errObj.GetBody())
 			}
 		}
 

@@ -315,7 +315,22 @@ var MainPage = function () {
                 console.log(mainPage)
             },
             function(errObj,caller){
-
+                    var order = new CatalogSchema.OrderType()
+                    order.M_userId = caller.userId
+                    order.M_creationDate = new Date()
+                    order.M_status = new CatalogSchema.OrderStatus()
+                    order.M_status.M_valueOf = "Open";
+                    
+                    server.entityManager.createEntity(catalog.UUID, "M_orders", order, 
+                        function (result,caller){
+                            caller.orderPage.setOrder(result)
+                        },function(errObj,caller){
+                            
+                        },caller)
+                        
+                    mainPage.personalPage = new PersonalPage(caller.userId, [])
+                    mainPage.orderHistory = new OrderHistory([], mainPage.contentPanel)
+                
                 
             },{"userId" : user.M_id, "orderPage" : mainPage.orderPage})
            
@@ -660,8 +675,8 @@ function loadQuickSearchData(panel){
  // The query.
 	var q = new EntityQuery()
     q.TypeName = "CatalogSchema.LocalisationType"
-    q.Fields = ["M_parent"]
-    q.Query = 'CatalogSchema.LocalisationType.M_parent==null '
+    q.Fields = ["ParentUuid"]
+    q.Query = 'CatalogSchema.LocalisationType.ParentUuid=="" '
 
     server.entityManager.getEntities("CatalogSchema.LocalisationType", "CatalogSchema", q, 0,-1,[],true,true, 
         function(index,total, caller){

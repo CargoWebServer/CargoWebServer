@@ -102,19 +102,7 @@ function main() {
                                                                                 eval(results);
                                                                                 // Xapian test...
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service);
-                                                                                
-                                                                                // Because require is already define with an empty function
-                                                                                // i will get it from require.js and injected it here.
-                                                                                require = undefined // reset the actual one (empty)
-                                                                                server.fileManager.readTextFile("/lib/require.js", 
-                                                                                    function(results, caller){
-                                                                                        eval(results[0])
-                                                                                        init();
-                                                                                    },
-                                                                                    function(err, caller){
-                                                                                        
-                                                                                    }, {})
-                                                                               
+                                                                                init();
                                                                             },
                                                                             // error callback.
                                                                             function () {

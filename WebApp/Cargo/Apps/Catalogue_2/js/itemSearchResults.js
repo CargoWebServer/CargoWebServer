@@ -51,6 +51,8 @@ var ItemSearchResultPage = function (parent) {
 
 ItemSearchResultPage.prototype.displayResults = function (results, query) {
     
+    console.log("---> reuslts ", results)
+    
     var headerText = "No results found for \"" + results.query + "\""
     spinner.panel.element.style.display = "none";
     query = query.replace("*", "-");

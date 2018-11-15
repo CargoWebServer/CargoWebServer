@@ -1039,6 +1039,7 @@ func (this *FileManager) ReadTextFile(filePath string, messageId string, session
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		log.Println("---> ", errObj.GetBody())
 		return ""
 	}
 

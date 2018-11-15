@@ -21,7 +21,17 @@ type Cache struct {
 	m_cache *bigcache.BigCache
 
 	// The operation channel.
-	m_operations chan map[string]interface{}
+	m_needSaveEntity      chan map[string]interface{}
+	m_resetNeedSaveEntity chan map[string]interface{}
+	m_setEntity           chan map[string]interface{}
+	m_getEntity           chan map[string]interface{}
+	m_removeEntity        chan map[string]interface{}
+	m_remove              chan map[string]interface{}
+	m_getValue            chan map[string]interface{}
+	m_getValues           chan map[string]interface{}
+	m_setValues           chan map[string]interface{}
+	m_setValue            chan map[string]interface{}
+	m_deleteValue         chan map[string]interface{}
 }
 
 func (cache *Cache) getEntity(uuid string) (Entity, error) {
@@ -85,8 +95,18 @@ func newCache() *Cache {
 		// The Cache...
 		cache.m_cache, _ = bigcache.NewBigCache(config)
 
-		// The operation channel.
-		cache.m_operations = make(chan map[string]interface{}, 0)
+		// The operations channel.
+		cache.m_needSaveEntity = make(chan map[string]interface{}, 0)
+		cache.m_resetNeedSaveEntity = make(chan map[string]interface{}, 0)
+		cache.m_setEntity = make(chan map[string]interface{}, 0)
+		cache.m_getEntity = make(chan map[string]interface{}, 0)
+		cache.m_removeEntity = make(chan map[string]interface{}, 0)
+		cache.m_remove = make(chan map[string]interface{}, 0)
+		cache.m_getValue = make(chan map[string]interface{}, 0)
+		cache.m_getValues = make(chan map[string]interface{}, 0)
+		cache.m_setValues = make(chan map[string]interface{}, 0)
+		cache.m_setValue = make(chan map[string]interface{}, 0)
+		cache.m_deleteValue = make(chan map[string]interface{}, 0)
 
 	}
 
@@ -96,45 +116,40 @@ func newCache() *Cache {
 		needSaveEntity := make(map[string]bool, 0)
 		for {
 			select {
-			case operation := <-cache.m_operations:
-				if operation["name"] == "needSaveEntity" {
-					uuid := operation["uuid"].(string)
-					result := operation["needSaveEntity"].(chan bool)
-					if exist, ok := needSaveEntity[uuid]; ok {
-						result <- exist
-					} else {
-						result <- false
-					}
-				} else if operation["name"] == "resetNeedSaveEntity" {
-					uuid := operation["uuid"].(string)
-					needSaveEntity[uuid] = false
-				} else if operation["name"] == "getEntity" {
-					uuid := operation["uuid"].(string)
-					getEntity := operation["getEntity"].(chan Entity)
-					entity, _ := cache.getEntity(uuid)
+			case operation := <-cache.m_needSaveEntity:
 
-					// Return the found values.
-					getEntity <- entity
+				uuid := operation["uuid"].(string)
+				result := operation["needSaveEntity"].(chan bool)
+				if exist, ok := needSaveEntity[uuid]; ok {
+					result <- exist
+				} else {
+					result <- false
+				}
 
-				} else if operation["name"] == "setEntity" {
-					entity := operation["entity"].(Entity)
-					// Append in the map: setObject set the value for DynamicEntity...
-					if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
-						var bytes, err = Utility.ToBytes(entity)
+			case operation := <-cache.m_resetNeedSaveEntity:
+
+				uuid := operation["uuid"].(string)
+				needSaveEntity[uuid] = false
+
+			case operation := <-cache.m_getEntity:
+
+				uuid := operation["uuid"].(string)
+				getEntity := operation["getEntity"].(chan Entity)
+				entity, _ := cache.getEntity(uuid)
+
+				// Return the found values.
+				getEntity <- entity
+
+			case operation := <-cache.m_setEntity:
+
+				entity := operation["entity"].(Entity)
+				// Append in the map: setObject set the value for DynamicEntity...
+				if reflect.TypeOf(entity).String() != "*Server.DynamicEntity" {
+					var bytes, err = Utility.ToBytes(entity)
+					if err == nil {
+						bytes_, err := cache.m_cache.Get(entity.GetUuid())
 						if err == nil {
-							bytes_, err := cache.m_cache.Get(entity.GetUuid())
-							if err == nil {
-								if string(bytes_) != string(bytes) {
-									// By id
-									if len(entity.Ids()) > 0 {
-										id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
-										cache.m_cache.Set(id, []byte(entity.GetUuid()))
-									}
-									// By uuid
-									cache.m_cache.Set(entity.GetUuid(), bytes)
-									needSaveEntity[entity.GetUuid()] = true
-								}
-							} else {
+							if string(bytes_) != string(bytes) {
 								// By id
 								if len(entity.Ids()) > 0 {
 									id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
@@ -142,131 +157,147 @@ func newCache() *Cache {
 								}
 								// By uuid
 								cache.m_cache.Set(entity.GetUuid(), bytes)
+								needSaveEntity[entity.GetUuid()] = true
 							}
-
 						} else {
-							log.Println("---> fail to serialyse entity!")
+							// By id
+							if len(entity.Ids()) > 0 {
+								id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
+								cache.m_cache.Set(id, []byte(entity.GetUuid()))
+							}
+							// By uuid
+							cache.m_cache.Set(entity.GetUuid(), bytes)
 						}
-					}
-				} else if operation["name"] == "removeEntity" {
-					entity := operation["entity"].(Entity)
-					// Remove it from the map.
-					if len(entity.Ids()) > 0 {
-						id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
-						cache.m_cache.Delete(id)
-					}
-					log.Println("--->cache delete entity: ", entity.GetUuid())
-					// Remove from the cache.
-					cache.m_cache.Delete(entity.GetUuid())
-					log.Println("Entity was remove successfully from cache ", entity.GetUuid())
 
-					delete(needSaveEntity, entity.GetUuid())
-
-				} else if operation["name"] == "remove" {
-					uuid := operation["uuid"].(string)
-					// Remove from the cache.
-					cache.m_cache.Delete(uuid)
-				} else if operation["name"] == "getValue" {
-					uuid := operation["uuid"].(string)
-					field := operation["field"].(string)
-					//log.Println("--->cache getValue ", uuid)
-					getValue := operation["getValue"].(chan interface{})
-					var value interface{}
-					typeName := strings.Split(uuid, "%")[0]
-					if entry, err := cache.m_cache.Get(uuid); err == nil {
-						val, err := Utility.FromBytes(entry, typeName)
-						if err == nil {
-							value = val.(map[string]interface{})[field]
-						}
+					} else {
+						log.Println("---> fail to serialyse entity!")
 					}
-					// Return the found values.
-					getValue <- value
+				}
+			case operation := <-cache.m_removeEntity:
 
-				} else if operation["name"] == "getValues" {
-					uuid := operation["uuid"].(string)
-					getValues := operation["getValues"].(chan map[string]interface{})
-					//log.Println("--->cache getValues ", uuid)
-					var values map[string]interface{}
-					typeName := strings.Split(uuid, "%")[0]
-					if entry, err := cache.m_cache.Get(uuid); err == nil {
-						val, err := Utility.FromBytes(entry, typeName)
-						if err == nil {
-							values = val.(map[string]interface{})
-						}
-					}
-					// Return the found values.
-					getValues <- values
-				} else if operation["name"] == "setValues" {
-					values := operation["values"].(map[string]interface{})
-					var bytes, err = Utility.ToBytes(values)
+				entity := operation["entity"].(Entity)
+				// Remove it from the map.
+				if len(entity.Ids()) > 0 {
+					id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
+					cache.m_cache.Delete(id)
+				}
+				log.Println("--->cache delete entity: ", entity.GetUuid())
+				// Remove from the cache.
+				cache.m_cache.Delete(entity.GetUuid())
+				log.Println("Entity was remove successfully from cache ", entity.GetUuid())
+
+				delete(needSaveEntity, entity.GetUuid())
+
+			case operation := <-cache.m_remove:
+
+				uuid := operation["uuid"].(string)
+				// Remove from the cache.
+				cache.m_cache.Delete(uuid)
+
+			case operation := <-cache.m_getValue:
+
+				uuid := operation["uuid"].(string)
+				field := operation["field"].(string)
+				//log.Println("--->cache getValue ", uuid)
+				getValue := operation["getValue"].(chan interface{})
+				var value interface{}
+				typeName := strings.Split(uuid, "%")[0]
+				if entry, err := cache.m_cache.Get(uuid); err == nil {
+					val, err := Utility.FromBytes(entry, typeName)
 					if err == nil {
-						bytes_, err := cache.m_cache.Get(values["UUID"].(string))
-						if err == nil {
-							if string(bytes) != string(bytes_) {
-								// By id
-								if values["Ids"] != nil {
-									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
-									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
-								}
-								// By uuid
-								cache.m_cache.Set(values["UUID"].(string), bytes)
-								needSaveEntity[values["UUID"].(string)] = true
-							}
-						} else {
+						value = val.(map[string]interface{})[field]
+					}
+				}
+				// Return the found values.
+				getValue <- value
+
+			case operation := <-cache.m_getValues:
+
+				uuid := operation["uuid"].(string)
+				getValues := operation["getValues"].(chan map[string]interface{})
+				//log.Println("--->cache getValues ", uuid)
+				var values map[string]interface{}
+				typeName := strings.Split(uuid, "%")[0]
+				if entry, err := cache.m_cache.Get(uuid); err == nil {
+					val, err := Utility.FromBytes(entry, typeName)
+					if err == nil {
+						values = val.(map[string]interface{})
+					}
+				}
+				// Return the found values.
+				getValues <- values
+
+			case operation := <-cache.m_setValues:
+
+				values := operation["values"].(map[string]interface{})
+				var bytes, err = Utility.ToBytes(values)
+				if err == nil {
+					bytes_, err := cache.m_cache.Get(values["UUID"].(string))
+					if err == nil {
+						if string(bytes) != string(bytes_) {
+							// By id
 							if values["Ids"] != nil {
 								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
 								cache.m_cache.Set(id, []byte(values["UUID"].(string)))
 							}
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
+							needSaveEntity[values["UUID"].(string)] = true
 						}
+					} else {
+						if values["Ids"] != nil {
+							id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+							cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+						}
+						// By uuid
+						cache.m_cache.Set(values["UUID"].(string), bytes)
+					}
 
-					}
-				} else if operation["name"] == "setValue" {
-					uuid := operation["uuid"].(string)
-					field := operation["field"].(string)
-					value := operation["value"].(interface{})
-					//log.Println("--->cache setValue: ", uuid)
-					typeName := strings.Split(uuid, "%")[0]
-					if entry, err := cache.m_cache.Get(uuid); err == nil {
-						val, err := Utility.FromBytes(entry, typeName)
+				}
+			case operation := <-cache.m_setValue:
+				uuid := operation["uuid"].(string)
+				field := operation["field"].(string)
+				value := operation["value"].(interface{})
+				//log.Println("--->cache setValue: ", uuid)
+				typeName := strings.Split(uuid, "%")[0]
+				if entry, err := cache.m_cache.Get(uuid); err == nil {
+					val, err := Utility.FromBytes(entry, typeName)
+					if err == nil {
+						values := val.(map[string]interface{})
+						values[field] = value
+						var bytes, err = Utility.ToBytes(values)
 						if err == nil {
-							values := val.(map[string]interface{})
-							values[field] = value
-							var bytes, err = Utility.ToBytes(values)
-							if err == nil {
-								// By id
-								if values["ids"] != nil {
-									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
-									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
-								}
-								// By uuid
-								cache.m_cache.Set(values["UUID"].(string), bytes)
-								needSaveEntity[values["UUID"].(string)] = true
+							// By id
+							if values["ids"] != nil {
+								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+								cache.m_cache.Set(id, []byte(values["UUID"].(string)))
 							}
+							// By uuid
+							cache.m_cache.Set(values["UUID"].(string), bytes)
+							needSaveEntity[values["UUID"].(string)] = true
 						}
 					}
-				} else if operation["name"] == "deleteValue" {
-					uuid := operation["uuid"].(string)
-					field := operation["field"].(string)
-					// log.Println("--->cache deleteValue: ", uuid)
-					typeName := strings.Split(uuid, "%")[0]
-					if entry, err := cache.m_cache.Get(uuid); err == nil {
-						val, err := Utility.FromBytes(entry, typeName)
+				}
+			case operation := <-cache.m_deleteValue:
+				uuid := operation["uuid"].(string)
+				field := operation["field"].(string)
+				// log.Println("--->cache deleteValue: ", uuid)
+				typeName := strings.Split(uuid, "%")[0]
+				if entry, err := cache.m_cache.Get(uuid); err == nil {
+					val, err := Utility.FromBytes(entry, typeName)
+					if err == nil {
+						values := val.(map[string]interface{})
+						delete(values, field)
+						var bytes, err = Utility.ToBytes(values)
 						if err == nil {
-							values := val.(map[string]interface{})
-							delete(values, field)
-							var bytes, err = Utility.ToBytes(values)
-							if err == nil {
-								// By id
-								if values["ids"] != nil {
-									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
-									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
-								}
-								// By uuid
-								cache.m_cache.Set(values["UUID"].(string), bytes)
-								needSaveEntity[values["UUID"].(string)] = true
+							// By id
+							if values["ids"] != nil {
+								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+								cache.m_cache.Set(id, []byte(values["UUID"].(string)))
 							}
+							// By uuid
+							cache.m_cache.Set(values["UUID"].(string), bytes)
+							needSaveEntity[values["UUID"].(string)] = true
 						}
 					}
 				}

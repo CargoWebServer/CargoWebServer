@@ -261,7 +261,7 @@ func (this *EntityManager) removeEntity(entity Entity) {
 	infos["entity"] = entity
 
 	// set the entity
-	this.m_cache.m_operations <- infos
+	this.m_cache.m_removeEntity <- infos
 }
 
 func (this *EntityManager) setEntity(entity Entity) {
@@ -281,7 +281,7 @@ func (this *EntityManager) setEntity(entity Entity) {
 	infos["entity"] = entity
 
 	// set the entity
-	this.m_cache.m_operations <- infos
+	this.m_cache.m_setEntity <- infos
 }
 
 func (this *EntityManager) getEntity(uuid string) Entity {
@@ -289,7 +289,7 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 	infos["name"] = "getEntity"
 	infos["uuid"] = uuid
 	infos["getEntity"] = make(chan Entity)
-	this.m_cache.m_operations <- infos
+	this.m_cache.m_getEntity <- infos
 	entity := <-infos["getEntity"].(chan Entity)
 
 	// Set the entity function pointer...
@@ -307,7 +307,7 @@ func (this *EntityManager) needSave(uuid string) bool {
 	infos["name"] = "needSaveEntity"
 	infos["uuid"] = uuid
 	infos["needSaveEntity"] = make(chan bool)
-	this.m_cache.m_operations <- infos
+	this.m_cache.m_needSaveEntity <- infos
 
 	return <-infos["needSaveEntity"].(chan bool)
 }
@@ -316,7 +316,7 @@ func (this *EntityManager) resetNeedSave(uuid string) {
 	infos := make(map[string]interface{})
 	infos["name"] = "resetNeedSave"
 	infos["uuid"] = uuid
-	this.m_cache.m_operations <- infos
+	this.m_cache.m_resetNeedSaveEntity <- infos
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
@@ -534,6 +534,8 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 		}
 	}
 
+	this.saveEntity(parent)
+
 	return nil
 }
 
@@ -581,14 +583,6 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 		if cargoError != nil {
 			return nil, cargoError
 		}
-
-		err := store.Update("", []interface{}{parent}, []interface{}{})
-		this.setEntity(parent)
-
-		if err != nil {
-			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-			return nil, cargoError
-		}
 	} else {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, errors.New("parent must not be nil when createEntity is call."))
 		return nil, cargoError
@@ -615,30 +609,6 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 
 	// Set it childs...
 	this.saveChilds(entity, prototype)
-
-	// I will save the parent here.
-	if parent != nil {
-		// Also save it parent.
-		// The event data...
-		eventData := make([]*MessageData, 2)
-		msgData0 := new(MessageData)
-		msgData0.Name = "entity"
-		if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-			msgData0.Value = parent.(*DynamicEntity).getValues()
-		} else {
-			msgData0.Value = parent
-		}
-
-		eventData[0] = msgData0
-
-		msgData1 := new(MessageData)
-		msgData1.Name = "prototype"
-		msgData1.Value = prototype
-		eventData[1] = msgData1
-
-		evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
-		GetServer().GetEventManager().BroadcastEvent(evt)
-	}
 
 	return entity, nil
 }
@@ -711,11 +681,26 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
+	// reset from need save.
+	this.resetNeedSave(entity.GetUuid())
+
 	// Set it childs...
 	this.saveChilds(entity, prototype)
 
-	// reset from need save.
-	this.resetNeedSave(entity.GetUuid())
+	// also save it parent.
+	if len(entity.GetParentUuid()) > 0 {
+		parent, cargoError := this.getEntityByUuid(entity.GetParentUuid())
+		if cargoError == nil {
+			// Now I will save it in the datastore.
+			// I will set the entity parent.
+			cargoError := this.setParent(parent, entity)
+			if cargoError != nil {
+				return cargoError
+			}
+		} else {
+			return cargoError
+		}
+	}
 
 	return nil
 }
@@ -784,7 +769,7 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 		infos["name"] = "remove"
 		infos["uuid"] = uuids[i]
 		// set the entity
-		this.m_cache.m_operations <- infos
+		this.m_cache.m_remove <- infos
 
 		// also remove it by it ids indexation.
 		if len(entity.Ids()) > 0 {
@@ -793,8 +778,8 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 			infos["name"] = "remove"
 			infos["uuid"] = id
 		}
-		// set the entity
-		this.m_cache.m_operations <- infos
+
+		this.m_cache.m_remove <- infos
 	}
 
 	// Send event message...

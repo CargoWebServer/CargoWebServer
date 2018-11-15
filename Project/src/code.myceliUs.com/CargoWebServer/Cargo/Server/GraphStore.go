@@ -21,6 +21,8 @@ import (
 	// Xapian datastore.
 	base64 "encoding/base64"
 
+	"sync"
+
 	"code.myceliUs.com/GoXapian"
 	"code.myceliUs.com/XML_Schemas"
 )
@@ -57,8 +59,10 @@ type GraphStore struct {
 	/** The store path **/
 	m_path string
 
-	// This the channel to comminicate with the datastore.
-	m_db_channel chan map[string]interface{}
+	// Operation channels
+	m_set_entity_channel    chan interface{}
+	m_get_entity_channel    chan interface{}
+	m_delete_entity_channel chan interface{}
 }
 
 func getServiceContainerConnection() *WebSocketConnection {
@@ -104,15 +108,12 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	}
 
 	// Open a db channel.
-	store.m_db_channel = make(chan map[string]interface{})
+	store.m_set_entity_channel = make(chan interface{})
+	store.m_get_entity_channel = make(chan interface{})
+	store.m_delete_entity_channel = make(chan interface{})
 
 	// datastore operation presscessing function.
-	go func(db_channel chan map[string]interface{}, store *GraphStore) {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Println("Recovered in f", r)
-			}
-		}()
+	go func(store *GraphStore) {
 
 		// The readable datastore.
 		rstores := make(map[string]xapian.Database)
@@ -120,138 +121,144 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 		// Keep store in memory.
 		for {
 			select {
-			case op := <-db_channel:
-				if op["operation"].(string) == "setEntity" {
-					entity := op["entity"].(Entity)
-					typeName := entity.GetTypeName()
-					uuid := entity.GetUuid()
+			case op := <-store.m_set_entity_channel:
 
-					path := store.m_path + "/" + typeName + ".glass"
-					db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
-					// So here I will index the property found in the entity.
-					doc := xapian.NewDocument()
+				values, _ := op.(*sync.Map).Load("values")
 
-					// Keep json data...
-					var data string
+				typeName := values.(map[string]interface{})["TYPENAME"].(string)
+				uuid := values.(map[string]interface{})["UUID"].(string)
 
-					if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-						data, err = Utility.ToJson(entity.(*DynamicEntity).getValues())
-					} else {
-						data, err = Utility.ToJson(entity)
-					}
-					if err == nil && len(data) > 0 {
-						store.indexEntity(doc, entity)
-						doc.Set_data(data)
-						doc.Add_boolean_term("Q" + formalize(uuid))
-						db.Replace_document("Q"+formalize(uuid), doc)
-					}
+				path := store.m_path + "/" + typeName + ".glass"
+				db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+				// So here I will index the property found in the entity.
+				doc := xapian.NewDocument()
+
+				// Keep json data...
+				var data string
+				data, err = Utility.ToJson(values)
+
+				if err == nil && len(data) > 0 {
+					store.indexEntity(doc, values.(map[string]interface{}))
+					doc.Set_data(data)
+					doc.Add_boolean_term("Q" + formalize(uuid))
+					db.Replace_document("Q"+formalize(uuid), doc)
+				}
+				xapian.DeleteDocument(doc)
+				db.Close()
+				xapian.DeleteWritableDatabase(db)
+
+				// Reopen the datastore to reflect change.
+				if rstores[path] != nil {
+					rstores[path].Reopen()
+				}
+
+				done, _ := op.(*sync.Map).Load("done")
+				done.(chan bool) <- true
+
+			case op := <-store.m_delete_entity_channel:
+				uuid := op.(map[string]interface{})["uuid"].(string)
+				query := xapian.NewQuery("Q" + formalize(uuid))
+				path := store.m_path + "/" + uuid[0:strings.Index(uuid, "%")] + ".glass"
+				db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+
+				enquire := xapian.NewEnquire(db)
+				defer xapian.DeleteEnquire(enquire)
+				enquire.Set_query(query)
+				mset := enquire.Get_mset(uint(0), uint(10000))
+				defer xapian.DeleteMSet(mset)
+				// Now I will process the results.
+				for i := 0; i < mset.Size(); i++ {
+					doc := mset.Get_hit(uint(i)).Get_document()
+					// Remove the document
+					db.Delete_document(doc.Get_docid())
 					xapian.DeleteDocument(doc)
-					db.Close()
-					xapian.DeleteWritableDatabase(db)
+				}
+				xapian.DeleteQuery(query)
+				db.Close()
+				xapian.DeleteWritableDatabase(db)
+				// Reopen the datastore to reflect change.
+				if rstores[path] != nil {
+					rstores[path].Reopen()
+				}
+				op.(map[string]interface{})["done"].(chan bool) <- true
 
-					// Reopen the datastore to reflect change.
-					if rstores[path] != nil {
-						rstores[path].Reopen()
+			case op := <-store.m_get_entity_channel:
+				queryString := op.(map[string]interface{})["queryString"].(string)
+				typeName := op.(map[string]interface{})["typeName"].(string)
+				fields := op.(map[string]interface{})["fields"].([]string)
+				path := store.m_path + "/" + typeName + ".glass"
+
+				// The results.
+				results := make([][]interface{}, 0)
+				var err error
+				if !Utility.Exists(path) {
+					// Here no database was found.
+					err = errors.New("Datastore " + path + " dosent exit!")
+				} else {
+					if rstores[path] == nil {
+						rstores[path] = xapian.NewDatabase()
+						rstores[path].Add_database(xapian.NewDatabase(path))
 					}
-					op["done"].(chan bool) <- true
-				} else if op["operation"].(string) == "deleteEntity" {
-					uuid := op["uuid"].(string)
-					query := xapian.NewQuery("Q" + formalize(uuid))
-					path := store.m_path + "/" + uuid[0:strings.Index(uuid, "%")] + ".glass"
-					db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
 
-					enquire := xapian.NewEnquire(db)
+					// Now i will add where I want to search...
+					query := parseXapianQuery(queryString)
+					defer xapian.DeleteQuery(query)
+
+					enquire := xapian.NewEnquire(rstores[path])
 					defer xapian.DeleteEnquire(enquire)
+
 					enquire.Set_query(query)
+
 					mset := enquire.Get_mset(uint(0), uint(10000))
 					defer xapian.DeleteMSet(mset)
+
 					// Now I will process the results.
 					for i := 0; i < mset.Size(); i++ {
 						doc := mset.Get_hit(uint(i)).Get_document()
-						// Remove the document
-						db.Delete_document(doc.Get_docid())
-						xapian.DeleteDocument(doc)
-					}
-					xapian.DeleteQuery(query)
-					db.Close()
-					xapian.DeleteWritableDatabase(db)
-					// Reopen the datastore to reflect change.
-					if rstores[path] != nil {
-						rstores[path].Reopen()
-					}
-					op["done"].(chan bool) <- true
-				} else if op["operation"].(string) == "getValues" {
-					queryString := op["queryString"].(string)
-					typeName := op["typeName"].(string)
-					fields := op["fields"].([]string)
-					path := store.m_path + "/" + typeName + ".glass"
-					// The results.
-					results := make([][]interface{}, 0)
-					var err error
-					if !Utility.Exists(path) {
-						// Here no database was found.
-						err = errors.New("Datastore " + path + " dosent exit!")
-					} else {
-						if rstores[path] == nil {
-							rstores[path] = xapian.NewDatabase()
-							rstores[path].Add_database(xapian.NewDatabase(path))
-						}
-
-						// Now i will add where I want to search...
-						query := parseXapianQuery(queryString)
-						defer xapian.DeleteQuery(query)
-
-						enquire := xapian.NewEnquire(rstores[path])
-						defer xapian.DeleteEnquire(enquire)
-
-						enquire.Set_query(query)
-
-						mset := enquire.Get_mset(uint(0), uint(10000))
-						defer xapian.DeleteMSet(mset)
-
-						// Now I will process the results.
-						for i := 0; i < mset.Size(); i++ {
-							doc := mset.Get_hit(uint(i)).Get_document()
-							defer xapian.DeleteDocument(doc)
-							if len(fields) > 0 {
-								var prototype *EntityPrototype
-								prototype, err = store.GetEntityPrototype(typeName)
-								if err == nil {
-									values := make([]interface{}, 0)
-									for j := 0; j < len(fields); j++ {
-										// Get the field index.
-										fieldIndex := prototype.getFieldIndex(fields[j])
-										value := doc.Get_value(uint(fieldIndex))
-										if XML_Schemas.IsXsNumeric(prototype.FieldsType[fieldIndex]) {
-											values = append(values, xapian.Sortable_unserialise(value))
-										} else if XML_Schemas.IsXsString(prototype.FieldsType[fieldIndex]) {
-											values = append(values, value)
-										} else {
-											log.Println("----> typeName not supported! ", prototype.FieldsType[fieldIndex])
-										}
+						defer xapian.DeleteDocument(doc)
+						if len(fields) > 0 {
+							var prototype *EntityPrototype
+							prototype, err = store.GetEntityPrototype(typeName)
+							if err == nil {
+								values := make([]interface{}, 0)
+								for j := 0; j < len(fields); j++ {
+									// Get the field index.
+									fieldIndex := prototype.getFieldIndex(fields[j])
+									value := doc.Get_value(uint(fieldIndex))
+									if XML_Schemas.IsXsNumeric(prototype.FieldsType[fieldIndex]) {
+										values = append(values, xapian.Sortable_unserialise(value))
+									} else if XML_Schemas.IsXsString(prototype.FieldsType[fieldIndex]) {
+										values = append(values, value)
+									} else if XML_Schemas.IsXsId(prototype.FieldsType[fieldIndex]) {
+										values = append(values, value)
+									} else if XML_Schemas.IsXsDate(prototype.FieldsType[fieldIndex]) {
+										values = append(values, xapian.Sortable_unserialise(value))
+									} else {
+										log.Println("----> typeName not supported! ", prototype.FieldsType[fieldIndex])
 									}
-									results = append(results, values)
 								}
-							} else {
-								// In that case the data contain in the document are return.
-								var v map[string]interface{}
-								err := json.Unmarshal([]byte(doc.Get_data()), &v)
-								if err == nil {
-									results = append(results, []interface{}{v})
-								}
+								results = append(results, values)
+							}
+						} else {
+							// In that case the data contain in the document are return.
+							var v map[string]interface{}
+							err := json.Unmarshal([]byte(doc.Get_data()), &v)
+							if err == nil {
+								results = append(results, []interface{}{v})
 							}
 						}
-
-						if len(results) == 0 {
-							err = errors.New("No results found!")
-						}
 					}
-					op["results"].(chan []interface{}) <- []interface{}{results, err}
+
+					if len(results) == 0 {
+						err = errors.New("No results found!")
+					}
 				}
+				op.(map[string]interface{})["results"].(chan []interface{}) <- []interface{}{results, err}
 			}
+
 		}
 
-	}(store.m_db_channel, store)
+	}(store)
 
 	return
 }
@@ -264,13 +271,23 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
  * Create or Save entity in it store.
  */
 func (this *GraphStore) setEntity(entity Entity) {
-	op := make(map[string]interface{})
-	op["operation"] = "setEntity"
-	op["entity"] = entity
+	var values map[string]interface{}
 
-	this.m_db_channel <- op
-	op["done"] = make(chan bool)
-	<-op["done"].(chan bool)
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+		values = entity.(*DynamicEntity).getValues()
+	} else {
+		values, _ = Utility.ToMap(entity)
+	}
+
+	op := new(sync.Map)
+	op.Store("values", values)
+
+	this.m_set_entity_channel <- op
+
+	done := make(chan bool)
+	op.Store("done", done)
+
+	<-done
 }
 
 /**
@@ -278,9 +295,8 @@ func (this *GraphStore) setEntity(entity Entity) {
  */
 func (this *GraphStore) deleteEntity(uuid string) {
 	op := make(map[string]interface{})
-	op["operation"] = "deleteEntity"
 	op["uuid"] = uuid
-	this.m_db_channel <- op
+	this.m_delete_entity_channel <- op
 	op["done"] = make(chan bool)
 	<-op["done"].(chan bool)
 }
@@ -290,13 +306,12 @@ func (this *GraphStore) deleteEntity(uuid string) {
  */
 func (this *GraphStore) getValues(queryString string, typeName string, fields []string) ([][]interface{}, error) {
 	op := make(map[string]interface{})
-	op["operation"] = "getValues"
 	op["queryString"] = queryString
 	op["typeName"] = typeName
 	op["fields"] = fields
 	op["results"] = make(chan []interface{})
 
-	this.m_db_channel <- op
+	this.m_get_entity_channel <- op
 	results := <-op["results"].(chan []interface{})
 	if results[1] != nil {
 		return nil, results[1].(error)
@@ -1282,34 +1297,6 @@ func (this *GraphStore) Create(queryStr string, values []interface{}) (lastId in
 		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct || reflect.TypeOf(v).Kind() == reflect.Map {
 			this.setEntity(v.(Entity))
 		}
-		/*if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct || reflect.TypeOf(v).Kind() == reflect.Map {
-			typeName := v.(Entity).GetTypeName()
-			uuid := v.(Entity).GetUuid()
-
-			path := this.m_path + "/" + typeName + ".glass"
-			db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
-			// So here I will index the property found in the entity.
-			doc := xapian.NewDocument()
-
-			// Keep json data...
-			var data string
-
-			if reflect.TypeOf(v).String() == "*Server.DynamicEntity" {
-				data, err = Utility.ToJson(v.(*DynamicEntity).getValues())
-			} else {
-				data, err = Utility.ToJson(v)
-			}
-			if err == nil && len(data) > 0 {
-				this.indexEntity(doc, v.(Entity))
-				doc.Set_data(data)
-				doc.Add_boolean_term("Q" + formalize(uuid))
-				db.Replace_document("Q"+formalize(uuid), doc)
-			}
-			xapian.DeleteDocument(doc)
-			db.Close()
-			xapian.DeleteWritableDatabase(db)
-		}*/
-
 	}
 
 	return
@@ -1744,7 +1731,8 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 }
 
 // index entity information.
-func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
+func (this *GraphStore) indexEntity(doc xapian.Document, values map[string]interface{}) {
+
 	// The term generator
 	termGenerator := xapian.NewTermGenerator()
 	defer xapian.DeleteTermGenerator(termGenerator)
@@ -1757,18 +1745,18 @@ func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
 	termGenerator.Set_document(doc)
 
 	// Regular text indexation...
-	termGenerator.Index_text(entity.GetTypeName(), uint(1), "TYPENAME")
+	termGenerator.Index_text(values["TYPENAME"].(string), uint(1), "TYPENAME")
 
 	// Boolean term indexation exact match.
-	typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + formalize(entity.GetTypeName())
+	typeNameIndex := generatePrefix(values["TYPENAME"].(string), "TYPENAME") + formalize(values["TYPENAME"].(string))
 	doc.Add_boolean_term(typeNameIndex)
 
-	prototype, _ := this.GetEntityPrototype(entity.GetTypeName())
+	prototype, _ := this.GetEntityPrototype(values["TYPENAME"].(string))
 
 	// also index value supertype...
 	for i := 0; i < len(prototype.SuperTypeNames); i++ {
 		termGenerator.Index_text(prototype.SuperTypeNames[i], uint(1), "TYPENAME")
-		typeNameIndex := generatePrefix(entity.GetTypeName(), "TYPENAME") + formalize(prototype.SuperTypeNames[i])
+		typeNameIndex := generatePrefix(prototype.SuperTypeNames[i], "TYPENAME") + formalize(prototype.SuperTypeNames[i])
 		doc.Add_boolean_term(typeNameIndex)
 	}
 
@@ -1776,11 +1764,7 @@ func (this *GraphStore) indexEntity(doc xapian.Document, entity Entity) {
 	for i := 0; i < len(prototype.Fields); i++ {
 		// Index the value.
 		var value interface{}
-		if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-			value = entity.(*DynamicEntity).getValue(prototype.Fields[i])
-		} else {
-			value = Utility.GetProperty(entity, prototype.Fields[i])
-		}
+		value = values[prototype.Fields[i]]
 		if Utility.Contains(prototype.Ids, prototype.Fields[i]) || Utility.Contains(prototype.Indexs, prototype.Fields[i]) {
 			// Index the unique value index for the typeName and this field.
 			if value != nil {

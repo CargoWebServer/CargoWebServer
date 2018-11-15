@@ -85,7 +85,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_refInfos = make(map[string][][]string, 0)
 
 	if store.m_vendor == Config.DataStoreVendor_CARGO {
-		return nil, errors.New("ArgangoDB is store not a sql store.")
+		return nil, errors.New("Cargo is store not a sql store.")
 	}
 
 	store.m_prototypes = make(map[string]*EntityPrototype, 0)
@@ -396,7 +396,7 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
  * Cast sql type into it go equivalent type.
  */
 func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) interface{} {
-
+	// log.Println("---> convert typename ", sqlTypeName, Utility.ToString(value))
 	/////////////////////////// Integer ////////////////////////////////
 	if strings.HasSuffix(sqlTypeName, "tinyint") || strings.HasSuffix(sqlTypeName, "smallint") || strings.HasSuffix(sqlTypeName, "int") || strings.HasSuffix(sqlTypeName, "bigint") || strings.HasSuffix(sqlTypeName, "timestampNumeric") {
 		var val int
