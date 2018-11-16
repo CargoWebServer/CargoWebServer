@@ -329,7 +329,7 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	}
 
 	// Save the dir.
-	log.Println("---> save dir ", dir.GetUuid())
+	log.Println("---> save dir ", dirPath)
 	GetServer().GetEntityManager().saveEntity(dir)
 
 	return dir, nil

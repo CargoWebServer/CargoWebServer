@@ -19,6 +19,8 @@ type File struct {
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -79,6 +81,14 @@ func (this *File) GetUuid() string {
 }
 func (this *File) SetUuid(uuid string) {
 	this.UUID = uuid
+}
+
+/** Need save **/
+func (this *File) IsNeedSave() bool {
+	return this.needSave
+}
+func (this *File) SetNeedSave(needSave bool) {
+	this.needSave = needSave
 }
 
 func (this *File) GetReferenced() []string {
@@ -305,6 +315,7 @@ func (this *File) SetFiles(val []*File) {
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *File) AppendFiles(val *File) {
@@ -313,6 +324,10 @@ func (this *File) AppendFiles(val *File) {
 			return
 		}
 	}
+	if this.M_files == nil {
+		this.M_files = make([]string, 0)
+	}
+
 	this.M_files = append(this.M_files, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 && len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -329,6 +344,7 @@ func (this *File) AppendFiles(val *File) {
 	val.SetParentLnk("M_files")
 	this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *File) RemoveFiles(val *File) {
@@ -352,6 +368,7 @@ func (this *File) SetFileType(val FileType) {
 
 func (this *File) ResetFileType() {
 	this.M_fileType = 0
+	this.setEntity(this)
 }
 
 func (this *File) GetParentDirPtr() *File {
@@ -364,12 +381,13 @@ func (this *File) GetParentDirPtr() *File {
 
 func (this *File) SetParentDirPtr(val *File) {
 	this.M_parentDirPtr = val.GetUuid()
-	val.SetReferenced(this.UUID, "M_parentDirPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *File) ResetParentDirPtr() {
 	this.M_parentDirPtr = ""
+	this.setEntity(this)
 }
 
 func (this *File) GetEntitiesPtr() *Entities {
@@ -382,10 +400,11 @@ func (this *File) GetEntitiesPtr() *Entities {
 
 func (this *File) SetEntitiesPtr(val *Entities) {
 	this.M_entitiesPtr = val.GetUuid()
-	val.SetReferenced(this.UUID, "M_entitiesPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *File) ResetEntitiesPtr() {
 	this.M_entitiesPtr = ""
+	this.setEntity(this)
 }

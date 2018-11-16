@@ -18,6 +18,8 @@ type Action struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -62,34 +64,42 @@ func (this *Action) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *Action) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *Action) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *Action) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *Action) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *Action) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *Action) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *Action) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *Action) SetFieldValue(field string, value interface{}) error{
@@ -231,6 +241,7 @@ func (this *Action) SetParameters(val []*Parameter){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -240,6 +251,10 @@ func (this *Action) AppendParameters(val *Parameter){
 			return
 		}
 	}
+	if this.M_parameters== nil {
+		this.M_parameters = make([]string, 0)
+	}
+
 	this.M_parameters = append(this.M_parameters, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -256,6 +271,7 @@ func (this *Action) AppendParameters(val *Parameter){
 	val.SetParentLnk("M_parameters")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Action) RemoveParameters(val *Parameter){
@@ -301,6 +317,7 @@ func (this *Action) SetResults(val []*Parameter){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -310,6 +327,10 @@ func (this *Action) AppendResults(val *Parameter){
 			return
 		}
 	}
+	if this.M_results== nil {
+		this.M_results = make([]string, 0)
+	}
+
 	this.M_results = append(this.M_results, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -326,6 +347,7 @@ func (this *Action) AppendResults(val *Parameter){
 	val.SetParentLnk("M_results")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Action) RemoveResults(val *Parameter){
@@ -351,6 +373,7 @@ func (this *Action) SetAccessType(val AccessType){
 
 func (this *Action) ResetAccessType(){
 	this.M_accessType= 0
+	this.setEntity(this)
 }
 
 
@@ -364,12 +387,13 @@ func (this *Action) GetEntitiesPtr()*Entities{
 
 func (this *Action) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *Action) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""
+	this.setEntity(this)
 }
 

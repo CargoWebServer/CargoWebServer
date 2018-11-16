@@ -204,6 +204,7 @@ func (this *ConfigurationManager) initialize() {
 	}
 
 	// Set the service container configuration
+
 	this.setServiceConfiguration("CargoServiceContainer", this.m_activeConfigurations.GetServerConfig().GetServiceContainerPort())
 }
 

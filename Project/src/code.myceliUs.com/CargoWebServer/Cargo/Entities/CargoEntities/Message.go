@@ -40,16 +40,6 @@ type Message interface{
 	SetParentLnk(string)
 
 	/**
-	 * Return link to entity childs.
-	 */
-	GetChilds() []interface{}
-
-	/**
-	 * Return list of childs uuid.
-	 */
-	GetChildsUuid() []string
-
-	/**
 	 * Return the list of reference UUID:FieldName where that entity is referenced.
 	 */
 	GetReferenced() []string
@@ -63,6 +53,16 @@ type Message interface{
 	 * Remove a reference.
 	 */
 	RemoveReferenced(uuid string, field string)
+
+	/**
+	 * Return link to entity childs.
+	 */
+	GetChilds() []interface{}
+
+	/**
+	 * Return list of childs uuid.
+	 */
+	GetChildsUuid() []string
 
 	/**
 	 * Set a given field
@@ -84,6 +84,16 @@ type Message interface{
 
 	/** Use that function to generate the entity UUID**/
 	SetUuidGenerator(fct func(entity interface{}) string)
+
+	/**
+	 * Return true if the entity need to be saved.
+	 */
+	IsNeedSave() bool
+
+	/**
+	 * Set the needsave value.
+	 */
+	SetNeedSave(needsave bool)
 
 
 GetBody()string

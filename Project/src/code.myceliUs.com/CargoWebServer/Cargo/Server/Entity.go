@@ -118,4 +118,14 @@ type Entity interface {
 	 * Get the field value
 	 */
 	GetFieldValue(field string) interface{}
+
+	/**
+	 * Return true if the entity need to be saved.
+	 */
+	IsNeedSave() bool
+
+	/**
+	 * Set the needsave value.
+	 */
+	SetNeedSave(needsave bool)
 }

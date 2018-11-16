@@ -18,6 +18,8 @@ type Account struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -75,34 +77,42 @@ func (this *Account) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *Account) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *Account) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *Account) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *Account) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *Account) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *Account) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *Account) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *Account) SetFieldValue(field string, value interface{}) error{
@@ -266,6 +276,7 @@ func (this *Account) SetSessions(val []*Session){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -275,6 +286,10 @@ func (this *Account) AppendSessions(val *Session){
 			return
 		}
 	}
+	if this.M_sessions== nil {
+		this.M_sessions = make([]string, 0)
+	}
+
 	this.M_sessions = append(this.M_sessions, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -291,6 +306,7 @@ func (this *Account) AppendSessions(val *Session){
 	val.SetParentLnk("M_sessions")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Account) RemoveSessions(val *Session){
@@ -336,6 +352,7 @@ func (this *Account) SetMessages(val []Message){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -345,6 +362,10 @@ func (this *Account) AppendMessages(val Message){
 			return
 		}
 	}
+	if this.M_messages== nil {
+		this.M_messages = make([]string, 0)
+	}
+
 	this.M_messages = append(this.M_messages, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -361,6 +382,7 @@ func (this *Account) AppendMessages(val Message){
 	val.SetParentLnk("M_messages")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Account) RemoveMessages(val Message){
@@ -385,13 +407,14 @@ func (this *Account) GetUserRef()*User{
 
 func (this *Account) SetUserRef(val *User){
 	this.M_userRef= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_userRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *Account) ResetUserRef(){
 	this.M_userRef= ""
+	this.setEntity(this)
 }
 
 
@@ -409,10 +432,10 @@ func (this *Account) GetRolesRef()[]*Role{
 func (this *Account) SetRolesRef(val []*Role){
 	this.M_rolesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetReferenced(this.UUID,"M_rolesRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -422,9 +445,13 @@ func (this *Account) AppendRolesRef(val *Role){
 			return
 		}
 	}
+	if this.M_rolesRef== nil {
+		this.M_rolesRef = make([]string, 0)
+	}
+
 	this.M_rolesRef = append(this.M_rolesRef, val.GetUuid())
-	val.SetReferenced(this.UUID,"M_rolesRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Account) RemoveRolesRef(val *Role){
@@ -436,7 +463,6 @@ func (this *Account) RemoveRolesRef(val *Role){
 	}
 	this.M_rolesRef = values
 	this.setEntity(this)
-	val.RemoveReferenced(this.UUID,"M_rolesRef")
 }
 
 
@@ -454,10 +480,10 @@ func (this *Account) GetPermissionsRef()[]*Permission{
 func (this *Account) SetPermissionsRef(val []*Permission){
 	this.M_permissionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetReferenced(this.UUID,"M_permissionsRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -467,9 +493,13 @@ func (this *Account) AppendPermissionsRef(val *Permission){
 			return
 		}
 	}
+	if this.M_permissionsRef== nil {
+		this.M_permissionsRef = make([]string, 0)
+	}
+
 	this.M_permissionsRef = append(this.M_permissionsRef, val.GetUuid())
-	val.SetReferenced(this.UUID,"M_permissionsRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Account) RemovePermissionsRef(val *Permission){
@@ -481,7 +511,6 @@ func (this *Account) RemovePermissionsRef(val *Permission){
 	}
 	this.M_permissionsRef = values
 	this.setEntity(this)
-	val.RemoveReferenced(this.UUID,"M_permissionsRef")
 }
 
 
@@ -495,12 +524,13 @@ func (this *Account) GetEntitiesPtr()*Entities{
 
 func (this *Account) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *Account) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""
+	this.setEntity(this)
 }
 

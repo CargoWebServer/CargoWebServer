@@ -21,17 +21,16 @@ type Cache struct {
 	m_cache *bigcache.BigCache
 
 	// The operation channel.
-	m_needSaveEntity      chan map[string]interface{}
-	m_resetNeedSaveEntity chan map[string]interface{}
-	m_setEntity           chan map[string]interface{}
-	m_getEntity           chan map[string]interface{}
-	m_removeEntity        chan map[string]interface{}
-	m_remove              chan map[string]interface{}
-	m_getValue            chan map[string]interface{}
-	m_getValues           chan map[string]interface{}
-	m_setValues           chan map[string]interface{}
-	m_setValue            chan map[string]interface{}
-	m_deleteValue         chan map[string]interface{}
+	m_getEntry     chan map[string]interface{}
+	m_setEntity    chan map[string]interface{}
+	m_getEntity    chan map[string]interface{}
+	m_removeEntity chan map[string]interface{}
+	m_remove       chan map[string]interface{}
+	m_getValue     chan map[string]interface{}
+	m_getValues    chan map[string]interface{}
+	m_setValues    chan map[string]interface{}
+	m_setValue     chan map[string]interface{}
+	m_deleteValue  chan map[string]interface{}
 }
 
 func (cache *Cache) getEntity(uuid string) (Entity, error) {
@@ -96,8 +95,7 @@ func newCache() *Cache {
 		cache.m_cache, _ = bigcache.NewBigCache(config)
 
 		// The operations channel.
-		cache.m_needSaveEntity = make(chan map[string]interface{}, 0)
-		cache.m_resetNeedSaveEntity = make(chan map[string]interface{}, 0)
+		cache.m_getEntry = make(chan map[string]interface{}, 0)
 		cache.m_setEntity = make(chan map[string]interface{}, 0)
 		cache.m_getEntity = make(chan map[string]interface{}, 0)
 		cache.m_removeEntity = make(chan map[string]interface{}, 0)
@@ -113,23 +111,14 @@ func newCache() *Cache {
 	// Cache processing loop...
 	go func(cache *Cache) {
 		// Keep information if an entity need to be saved.
-		needSaveEntity := make(map[string]bool, 0)
 		for {
 			select {
-			case operation := <-cache.m_needSaveEntity:
+			case operation := <-cache.m_getEntry:
 
+				getEntry := operation["getEntry"].(chan []interface{})
 				uuid := operation["uuid"].(string)
-				result := operation["needSaveEntity"].(chan bool)
-				if exist, ok := needSaveEntity[uuid]; ok {
-					result <- exist
-				} else {
-					result <- false
-				}
-
-			case operation := <-cache.m_resetNeedSaveEntity:
-
-				uuid := operation["uuid"].(string)
-				needSaveEntity[uuid] = false
+				entry, err := cache.getEntity(uuid)
+				getEntry <- []interface{}{entry, err}
 
 			case operation := <-cache.m_getEntity:
 
@@ -157,7 +146,6 @@ func newCache() *Cache {
 								}
 								// By uuid
 								cache.m_cache.Set(entity.GetUuid(), bytes)
-								needSaveEntity[entity.GetUuid()] = true
 							}
 						} else {
 							// By id
@@ -185,9 +173,6 @@ func newCache() *Cache {
 				// Remove from the cache.
 				cache.m_cache.Delete(entity.GetUuid())
 				log.Println("Entity was remove successfully from cache ", entity.GetUuid())
-
-				delete(needSaveEntity, entity.GetUuid())
-
 			case operation := <-cache.m_remove:
 
 				uuid := operation["uuid"].(string)
@@ -242,7 +227,6 @@ func newCache() *Cache {
 							}
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
-							needSaveEntity[values["UUID"].(string)] = true
 						}
 					} else {
 						if values["Ids"] != nil {
@@ -274,7 +258,6 @@ func newCache() *Cache {
 							}
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
-							needSaveEntity[values["UUID"].(string)] = true
 						}
 					}
 				}
@@ -297,7 +280,6 @@ func newCache() *Cache {
 							}
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
-							needSaveEntity[values["UUID"].(string)] = true
 						}
 					}
 				}

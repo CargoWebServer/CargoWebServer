@@ -157,7 +157,6 @@ func (this *OAuth2Manager) getId() string {
 func (this *OAuth2Manager) start() {
 	log.Println("--> Start OAuth2Manager")
 	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
-
 	cfg := activeConfigurations.GetOauth2Configuration()
 
 	var sconfig *osin.ServerConfig
@@ -178,6 +177,10 @@ func (this *OAuth2Manager) start() {
 		cfg.SetAccessExpiration(int64(sconfig.AccessExpiration))
 		cfg.SetAllowClientSecretInParams(sconfig.AllowClientSecretInParams)
 		cfg.SetAllowGetAccessRequest(sconfig.AllowGetAccessRequest)
+
+		cfg.SetUuidGenerator(generateUuidFct)
+		cfg.SetEntityGetter(getEntityFct)
+		cfg.SetEntitySetter(setEntityFct)
 
 		for i := 0; i < len(sconfig.AllowedAuthorizeTypes); i++ {
 			if sconfig.AllowedAuthorizeTypes[i] == osin.CODE {
@@ -308,6 +311,7 @@ func (this *OAuth2Manager) start() {
 	// Start the oauth service.
 	this.m_store = newOauth2Store()
 	this.m_server = osin.NewServer(sconfig, this.m_store)
+
 }
 
 func (this *OAuth2Manager) stop() {

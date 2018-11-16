@@ -18,6 +18,8 @@ type ScheduledTask struct {
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -69,6 +71,14 @@ func (this *ScheduledTask) GetUuid() string {
 }
 func (this *ScheduledTask) SetUuid(uuid string) {
 	this.UUID = uuid
+}
+
+/** Need save **/
+func (this *ScheduledTask) IsNeedSave() bool {
+	return this.needSave
+}
+func (this *ScheduledTask) SetNeedSave(needSave bool) {
+	this.needSave = needSave
 }
 
 func (this *ScheduledTask) GetReferenced() []string {
@@ -233,6 +243,7 @@ func (this *ScheduledTask) SetFrequencyType(val FrequencyType) {
 
 func (this *ScheduledTask) ResetFrequencyType() {
 	this.M_frequencyType = 0
+	this.setEntity(this)
 }
 
 func (this *ScheduledTask) GetOffsets() []int {
@@ -244,7 +255,13 @@ func (this *ScheduledTask) SetOffsets(val []int) {
 }
 
 func (this *ScheduledTask) AppendOffsets(val int) {
+	if this.M_offsets == nil {
+		this.M_offsets = make([]int, 0)
+	}
+
 	this.M_offsets = append(this.M_offsets, val)
+	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *ScheduledTask) GetParentPtr() *Configurations {
@@ -257,10 +274,11 @@ func (this *ScheduledTask) GetParentPtr() *Configurations {
 
 func (this *ScheduledTask) SetParentPtr(val *Configurations) {
 	this.M_parentPtr = val.GetUuid()
-	val.SetReferenced(this.UUID, "M_parentPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *ScheduledTask) ResetParentPtr() {
 	this.M_parentPtr = ""
+	this.setEntity(this)
 }

@@ -302,23 +302,6 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 	return entity
 }
 
-func (this *EntityManager) needSave(uuid string) bool {
-	infos := make(map[string]interface{})
-	infos["name"] = "needSaveEntity"
-	infos["uuid"] = uuid
-	infos["needSaveEntity"] = make(chan bool)
-	this.m_cache.m_needSaveEntity <- infos
-
-	return <-infos["needSaveEntity"].(chan bool)
-}
-
-func (this *EntityManager) resetNeedSave(uuid string) {
-	infos := make(map[string]interface{})
-	infos["name"] = "resetNeedSave"
-	infos["uuid"] = uuid
-	this.m_cache.m_resetNeedSaveEntity <- infos
-}
-
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
 
 	if len(uuid) == 0 {
@@ -479,54 +462,22 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 	// Get values as map[string]interface{} and also set the entity in it parent.
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		if strings.HasPrefix(fieldType, "[]") {
-			childs := parent.(*DynamicEntity).getValue(entity.GetParentLnk())
-			if childs != nil {
-				if reflect.TypeOf(childs).String() == "[]string" {
-					for i := 0; i < len(childs.([]string)); i++ {
-						if childs.([]string)[i] == entity.GetUuid() {
-							return nil
-						}
-					}
-				} else if reflect.TypeOf(childs).String() == "[]interface {}" {
-					for i := 0; i < len(childs.([]interface{})); i++ {
-						if childs.([]interface{})[i].(string) == entity.GetUuid() {
-							return nil
-						}
-					}
-				}
-			}
 			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		} else {
-			child := parent.(*DynamicEntity).getValue(entity.GetParentLnk())
-			if child != nil {
-				if child.(string) == entity.GetUuid() {
-					return nil
-				}
-			}
 			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).GetUuid())
 		}
 	} else {
 		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
 		if strings.HasPrefix(fieldType, "[]") {
-			r := reflect.ValueOf(parent)
-			f := reflect.Indirect(r).FieldByName(entity.GetParentLnk())
-			for i := 0; i < f.Len(); i++ {
-				if f.Index(i).String() == entity.GetUuid() {
-					return nil
-				}
-			}
 			setMethodName = "Append" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
 		} else {
-			r := reflect.ValueOf(parent)
-			f := reflect.Indirect(r).FieldByName(entity.GetParentLnk())
-			if f.String() == entity.GetUuid() {
-				return nil
-			}
 			setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
 		}
 		params := make([]interface{}, 1)
 		params[0] = entity
+
 		_, err_ := Utility.CallMethod(parent, setMethodName, params)
+		//log.Println("---> call method ", parent.GetUuid(), setMethodName, parent.IsNeedSave())
 		if err_ != nil {
 			log.Println("fail to call method ", setMethodName, " on ", parent)
 			cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
@@ -575,10 +526,14 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 		return nil, cargoError
 	}
 
+	//log.Println("---> create entity ", entity.GetUuid())
+	entity.SetNeedSave(false)
+
 	// also save it parent.
 	if parent != nil {
 		// Now I will save it in the datastore.
 		// I will set the entity parent.
+		//log.Println("----> set parent: ", parent.GetUuid(), entity.GetUuid())
 		cargoError := this.setParent(parent, entity)
 		if cargoError != nil {
 			return nil, cargoError
@@ -613,33 +568,42 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 	return entity, nil
 }
 
-func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
-
-	typeName := entity.GetTypeName() // Set the type name if not already set...
-
+func (this *EntityManager) entityExist(uuid string) bool {
+	typeName := strings.Split(uuid, "%")[0]
 	storeId := typeName[0:strings.Index(typeName, ".")]
 
-	// So now I will retreive the list of values associated with that uuid.
-	var q EntityQuery
-	q.TYPENAME = "Server.EntityQuery"
-	q.TypeName = entity.GetTypeName()
-	q.Fields = append(q.Fields, "UUID")
-	q.Query = entity.GetTypeName() + `.UUID=="` + entity.GetUuid() + `"`
-	query, _ := json.Marshal(q)
+	var query EntityQuery
+	query.TYPENAME = typeName
+	query.TypeName = typeName
+	query.Fields = []string{"UUID"}
+	query.Query = typeName + `.UUID=="` + uuid + `"`
 
-	// Test if the entity is in the database.
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	_, err := store.Read(string(query), []interface{}{}, []interface{}{})
+	queryStr, _ := json.Marshal(query)
+	_, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
+
+	// So now I will retreive the list of values associated with that uuid.
 	// If the to string are the same no save is needed.
-	if err == nil {
-		if !this.needSave(entity.GetUuid()) {
+	if this.entityExist(entity.GetUuid()) {
+		if !entity.IsNeedSave() {
+			//log.Println("--->not need save entity ", entity.GetUuid())
 			return nil
 		}
 	}
 
+	//log.Println("---> save entity ", entity.GetUuid())
 	// Here I will set the entity on the cache...
 	this.setEntity(entity)
 
+	typeName := entity.GetTypeName() // Set the type name if not already set...
+	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
 	eventData := make([]*MessageData, 2)
@@ -660,8 +624,10 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Send save event if something has change.
 	// I will get the existing value from the datastore is it exist.
 	var evt *Event
+	var err error
+	store := GetServer().GetDataManager().getDataStore(storeId)
 
-	if err == nil {
+	if this.entityExist(entity.GetUuid()) {
 		// I will create the entity.
 		err = store.Update("", []interface{}{entity}, []interface{}{})
 		if err != nil {
@@ -678,11 +644,11 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 	}
 
+	// Set need save to false.
+	entity.SetNeedSave(false)
+
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
-
-	// reset from need save.
-	this.resetNeedSave(entity.GetUuid())
 
 	// Set it childs...
 	this.saveChilds(entity, prototype)

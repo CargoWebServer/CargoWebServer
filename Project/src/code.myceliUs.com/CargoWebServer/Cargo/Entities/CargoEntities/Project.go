@@ -17,6 +17,8 @@ type Project struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -62,34 +64,42 @@ func (this *Project) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *Project) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *Project) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *Project) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *Project) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *Project) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *Project) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *Project) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *Project) SetFieldValue(field string, value interface{}) error{
@@ -198,10 +208,10 @@ func (this *Project) GetFilesRef()[]*File{
 func (this *Project) SetFilesRef(val []*File){
 	this.M_filesRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetReferenced(this.UUID,"M_filesRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -211,9 +221,13 @@ func (this *Project) AppendFilesRef(val *File){
 			return
 		}
 	}
+	if this.M_filesRef== nil {
+		this.M_filesRef = make([]string, 0)
+	}
+
 	this.M_filesRef = append(this.M_filesRef, val.GetUuid())
-	val.SetReferenced(this.UUID,"M_filesRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Project) RemoveFilesRef(val *File){
@@ -225,7 +239,6 @@ func (this *Project) RemoveFilesRef(val *File){
 	}
 	this.M_filesRef = values
 	this.setEntity(this)
-	val.RemoveReferenced(this.UUID,"M_filesRef")
 }
 
 
@@ -239,12 +252,13 @@ func (this *Project) GetEntitiesPtr()*Entities{
 
 func (this *Project) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *Project) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""
+	this.setEntity(this)
 }
 

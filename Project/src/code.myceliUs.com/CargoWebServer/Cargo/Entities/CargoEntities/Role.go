@@ -17,6 +17,8 @@ type Role struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -57,34 +59,42 @@ func (this *Role) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *Role) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *Role) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *Role) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *Role) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *Role) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *Role) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *Role) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *Role) SetFieldValue(field string, value interface{}) error{
@@ -182,10 +192,10 @@ func (this *Role) GetAccountsRef()[]*Account{
 func (this *Role) SetAccountsRef(val []*Account){
 	this.M_accountsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetReferenced(this.UUID,"M_accountsRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -195,9 +205,13 @@ func (this *Role) AppendAccountsRef(val *Account){
 			return
 		}
 	}
+	if this.M_accountsRef== nil {
+		this.M_accountsRef = make([]string, 0)
+	}
+
 	this.M_accountsRef = append(this.M_accountsRef, val.GetUuid())
-	val.SetReferenced(this.UUID,"M_accountsRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Role) RemoveAccountsRef(val *Account){
@@ -209,7 +223,6 @@ func (this *Role) RemoveAccountsRef(val *Account){
 	}
 	this.M_accountsRef = values
 	this.setEntity(this)
-	val.RemoveReferenced(this.UUID,"M_accountsRef")
 }
 
 
@@ -227,10 +240,10 @@ func (this *Role) GetActionsRef()[]*Action{
 func (this *Role) SetActionsRef(val []*Action){
 	this.M_actionsRef= make([]string,0)
 	for i:=0; i < len(val); i++{
-		val[i].SetReferenced(this.UUID,"M_actionsRef")
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -240,9 +253,13 @@ func (this *Role) AppendActionsRef(val *Action){
 			return
 		}
 	}
+	if this.M_actionsRef== nil {
+		this.M_actionsRef = make([]string, 0)
+	}
+
 	this.M_actionsRef = append(this.M_actionsRef, val.GetUuid())
-	val.SetReferenced(this.UUID,"M_actionsRef")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Role) RemoveActionsRef(val *Action){
@@ -254,7 +271,6 @@ func (this *Role) RemoveActionsRef(val *Action){
 	}
 	this.M_actionsRef = values
 	this.setEntity(this)
-	val.RemoveReferenced(this.UUID,"M_actionsRef")
 }
 
 
@@ -268,12 +284,13 @@ func (this *Role) GetEntitiesPtr()*Entities{
 
 func (this *Role) SetEntitiesPtr(val *Entities){
 	this.M_entitiesPtr= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_entitiesPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *Role) ResetEntitiesPtr(){
 	this.M_entitiesPtr= ""
+	this.setEntity(this)
 }
 

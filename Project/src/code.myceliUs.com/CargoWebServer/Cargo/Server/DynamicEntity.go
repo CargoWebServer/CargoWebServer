@@ -59,11 +59,26 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 
 	// set the values in the cache.
 	cache.m_setValue <- infos
+
+	this.SetNeedSave(true)
+
 	return nil
 }
 
 func (this *DynamicEntity) SetFieldValue(field string, value interface{}) error {
 	return this.setValue(field, value)
+}
+
+func (this *DynamicEntity) SetNeedSave(needSave bool) {
+	this.setValue("needSave", needSave)
+}
+
+func (this *DynamicEntity) IsNeedSave() bool {
+	if this.getValue("needSave") == nil {
+		return false
+	}
+
+	return this.getValue("needSave").(bool)
 }
 
 /**

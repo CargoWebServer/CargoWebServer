@@ -18,6 +18,8 @@ type Entities struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -71,34 +73,42 @@ func (this *Entities) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *Entities) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *Entities) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *Entities) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *Entities) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *Entities) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *Entities) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *Entities) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *Entities) SetFieldValue(field string, value interface{}) error{
@@ -265,6 +275,7 @@ func (this *Entities) SetEntities(val []Entity){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -274,6 +285,10 @@ func (this *Entities) AppendEntities(val Entity){
 			return
 		}
 	}
+	if this.M_entities== nil {
+		this.M_entities = make([]string, 0)
+	}
+
 	this.M_entities = append(this.M_entities, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -290,6 +305,7 @@ func (this *Entities) AppendEntities(val Entity){
 	val.SetParentLnk("M_entities")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Entities) RemoveEntities(val Entity){
@@ -335,6 +351,7 @@ func (this *Entities) SetRoles(val []*Role){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -344,6 +361,10 @@ func (this *Entities) AppendRoles(val *Role){
 			return
 		}
 	}
+	if this.M_roles== nil {
+		this.M_roles = make([]string, 0)
+	}
+
 	this.M_roles = append(this.M_roles, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -360,6 +381,7 @@ func (this *Entities) AppendRoles(val *Role){
 	val.SetParentLnk("M_roles")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Entities) RemoveRoles(val *Role){
@@ -405,6 +427,7 @@ func (this *Entities) SetPermissions(val []*Permission){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -414,6 +437,10 @@ func (this *Entities) AppendPermissions(val *Permission){
 			return
 		}
 	}
+	if this.M_permissions== nil {
+		this.M_permissions = make([]string, 0)
+	}
+
 	this.M_permissions = append(this.M_permissions, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -430,6 +457,7 @@ func (this *Entities) AppendPermissions(val *Permission){
 	val.SetParentLnk("M_permissions")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Entities) RemovePermissions(val *Permission){
@@ -475,6 +503,7 @@ func (this *Entities) SetActions(val []*Action){
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
@@ -484,6 +513,10 @@ func (this *Entities) AppendActions(val *Action){
 			return
 		}
 	}
+	if this.M_actions== nil {
+		this.M_actions = make([]string, 0)
+	}
+
 	this.M_actions = append(this.M_actions, val.GetUuid())
 	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
@@ -500,6 +533,7 @@ func (this *Entities) AppendActions(val *Action){
 	val.SetParentLnk("M_actions")
   this.setEntity(val)
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 func (this *Entities) RemoveActions(val *Action){

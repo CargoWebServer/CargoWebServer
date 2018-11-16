@@ -17,6 +17,8 @@ type OAuth2Client struct{
 	ParentUuid string
 	/** The relation name with the parent. **/
 	ParentLnk string
+	/** keep track if the entity has change over time. **/
+	needSave bool
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
@@ -61,34 +63,42 @@ func (this *OAuth2Client) SetUuid(uuid string){
 	this.UUID = uuid
 }
 
+/** Need save **/
+func (this *OAuth2Client) IsNeedSave() bool{
+	return this.needSave
+}
+func (this *OAuth2Client) SetNeedSave(needSave bool){
+	this.needSave=needSave
+}
+
 func (this *OAuth2Client) GetReferenced() []string {
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
 	// return the list of references
 	return this.Referenced
 }
 
-func (this *OAuth2Client) SetReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	this.Referenced = make([]string, 0)
- }
- if !Utility.Contains(this.Referenced, uuid+":"+field) {
- 	this.Referenced = append(this.Referenced, uuid+":"+field)
- }
+func (this *OAuth2Client) SetReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		this.Referenced = make([]string, 0)
+	}
+	if !Utility.Contains(this.Referenced, uuid+":"+field) {
+		this.Referenced = append(this.Referenced, uuid+":"+field)
+	}
 }
 
-func (this *OAuth2Client) RemoveReferenced(uuid string, field string){
- if this.Referenced == nil {
- 	return
- }
- referenced := make([]string,0)
- for i:=0; i < len(this.Referenced); i++ {
- 	if this.Referenced[i] != uuid+":"+field {
- 		referenced = append(referenced, uuid+":"+field)
- 	}
- }
- 	this.Referenced = referenced
+func (this *OAuth2Client) RemoveReferenced(uuid string, field string) {
+	if this.Referenced == nil {
+		return
+	}
+	referenced := make([]string, 0)
+	for i := 0; i < len(this.Referenced); i++ {
+		if this.Referenced[i] != uuid+":"+field {
+			referenced = append(referenced, uuid+":"+field)
+		}
+	}
+	this.Referenced = referenced
 }
 
 func (this *OAuth2Client) SetFieldValue(field string, value interface{}) error{
@@ -237,12 +247,13 @@ func (this *OAuth2Client) GetParentPtr()*OAuth2Configuration{
 
 func (this *OAuth2Client) SetParentPtr(val *OAuth2Configuration){
 	this.M_parentPtr= val.GetUuid()
-		val.SetReferenced(this.UUID,"M_parentPtr")
 	this.setEntity(this)
+	this.SetNeedSave(true)
 }
 
 
 func (this *OAuth2Client) ResetParentPtr(){
 	this.M_parentPtr= ""
+	this.setEntity(this)
 }
 
