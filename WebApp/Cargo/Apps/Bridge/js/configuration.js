@@ -71,7 +71,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.removeDataSchema(entity.M_id)
                         }
-                        if(view.deleteCallback!=undefined){
+                        if (view.deleteCallback != undefined) {
                             view.deleteCallback(entity)
                         }
                     }
@@ -171,7 +171,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 contentView.header.display()
 
                 // The data store configuration.
-               if (content.TYPENAME == "Config.DataStoreConfiguration") {
+                if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
                     // Here I have a service configuration.
                     if (content.UUID != undefined) {
@@ -180,7 +180,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             homePage.dataExplorer.initDataSchema(content)
                         }
                     }
-                    
+
                     // Here I will broadcast a local event, export data menue need that information.
                     var evt = {
                         "code": NewDataStoreEvent, "name": DataEvent,
@@ -385,7 +385,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 } else if (content.TYPENAME == "Config.ServiceConfiguration") {
                     // Here I have a service configuration.
                     homePage.serviceExplorer.initService(content)
-   
+
                 } else if (content.TYPENAME == "Config.ScheduledTask") {
                     // Here I will personalise input a little.
                     content.getPanel().fields["M_frequency"].panel.element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
@@ -415,23 +415,23 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 }, panel)
                         }
                     }(content.getPanel())
-                    
+
                     content.getPanel().deleteCallback = function (task) {
                         // If the task is delete I will delete it file.
                         server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [task.M_id], false,
-                            function(fileEntity, caller){
-                                server.entityManager.removeEntity(fileEntity.UUID, 
-                                    function(result, fileUUID){
+                            function (fileEntity, caller) {
+                                server.entityManager.removeEntity(fileEntity.UUID,
+                                    function (result, fileUUID) {
                                         // send close event to editor.
                                         var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
                                         server.eventHandler.broadcastLocalEvent(evt)
-                                    }, 
-                                    function(){
-                                        
+                                    },
+                                    function () {
+
                                     }, fileEntity)
                             },
-                            function(){
-                                
+                            function () {
+
                             }, {})
                     }
 
@@ -482,7 +482,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     }(content.getPanel().fields["M_script"].panel, content.getPanel())
 
 
-                    
+
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
                     contentView.refreshBtn = contentView.header.panel.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
@@ -648,11 +648,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-                        
+
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.ServiceConfiguration") {
                             homePage.serviceExplorer.setService(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-                        
+
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
                             configurationPanel.nextConfigBtn.element.className = "entity_panel_header_button"
                         } else {
@@ -684,11 +684,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-                        
+
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.ServiceConfiguration") {
                             homePage.serviceExplorer.setService(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
-                        
+
                         if (configurationPanel.currentIndex == 0) {
                             configurationPanel.previousConfigBtn.element.className = "entity_panel_header_button"
                         } else {
@@ -710,14 +710,16 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
         } else {
             if (content != undefined) {
-                if (this.contentViews[0] == null) {
-                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
-                    this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
+                if (isObject(content)) {
+                    if (this.contentViews[0] == null) {
+                        this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entity_panel_header_button" }).down()
+                        this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
 
-                    // Set the new configuration click handler.
-                    this.newConfigElementBtn.element.onclick = newConfiguration
+                        // Set the new configuration click handler.
+                        this.newConfigElementBtn.element.onclick = newConfiguration
+                    }
+                    this.setConfiguration(configurationContent, content)
                 }
-                this.setConfiguration(configurationContent, content)
             }
         }
     }

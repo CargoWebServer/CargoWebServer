@@ -16,223 +16,75 @@ function main() {
     // Append filter to receive all session event message
     // on the sessionEvent channel.
     //securityTests()
-    
-    /*102
-    server.eventHandler.appendEventFilter(
-         "CargoEntities.",
-         "EntityEvent",
-         function () {
-             entitiesDump("CargoEntities.User")
-         },
-         function () { },
-         undefined
-     )
- 
-*/
+
     server.sessionManager.login("admin", "adminadmin", "localhost",
         function () {
             // Create the dynamic entity here.
-            testDynamicEntity()
-            //testCreateDynamicEntity()
+            // testDynamicEntity()
+            // testCreateDynamicEntity()
+            testGetEntitiesByUuid()
+            
         },
         function () {
             // Nothing to do here.
         }, {})
-    /* server.eventHandler.appendEventFilter(
-          "CatalogSchema.",
-          "EntityEvent",
-          function () {
-              entitiesDump("CatalogSchema.FiltreRectangulaire")
-          },
-          function () { },
-          undefined
-     )*/
 
-    /*
+    // utilityTests()
+    //serverTests()
+    //sessionTests()
+    //languageManagerTests()
+    //elementTests()
+
+    //accountTests()
+    //fileTests()
+
+    //dataTests()
+
+    //entityTests()
     
-        // utilityTests()
-        //serverTests()
-        //sessionTests()
-        //languageManagerTests()
-        //elementTests()
-    
-        //accountTests()
-        //fileTests()
-    
-        //dataTests()
-    
-        //entityTests()
-
-    // entityDump("item_1", "Test.Item")
-    // entityDump("1", "dt_methode_development.dbo.DT_STATE")
-    //entityDump("1", "dt_methode_development.dbo.DT_DTS")
-    //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
-    // entityDump("1", "employees.employees")
-
-    entitiesDump("COLLADASchema.COLLADA")
-
-    // entitiesDump("DT3_informations.Department")
-    // testServiceContainer()
-    //entitiesDump("DT3_informations.Workpoint")
-    //entitiesDump("CargoEntities.Action")
-
-    //entitiesDump("XPDMXML.Product3DType")
-
-    //testSayHello("Dave")
-    // entityDump( "BPMN20", "BPMN20.Definitions")
-    /*server.entityManager.getEntityPrototypes("COLLADASchema", 
-    // success callback
-    function(prototypes, caller){
-        server.entityManager.getEntityByUuid("COLLADASchema.COLLADA%61933735-a65e-4f35-b8d6-920da06dee7e", false,
-        // The success callback
-        function(definitions, caller){
-            console.log(definitions)
-        },
-        // The error callback
-        function(error, caller){
-            console.log(error)
-        }, {})
-    }, 
-    // error callback.
-    function(){
-
-    })*/
-
-
-    // entitiesDump("XPDMXML.ProductionGeneralSystem")
-    // entitiesDump("CatalogSchema.CatalogType")
-
-    //testEntityQuery()
-
     //TestWebRtc2()
 
     // Test get media source...
     // TestUploadFile()
 
-    // Test get bmpn defintion instance...
-    /*server.runCmd("cmd", ["/K","dir /Q C:\\Temp\\Erreur.txt"],
-    // Success callback
-    function(results, caller){
-        console.log(results)
-    },
-    // Error callback.
-    function(){
+}
 
-    });
+function testGetEntitiesByUuid(){
+    console.log("---> test get entities by uuids")
+    // So first of all I will get the list of uuid's.
+     var query = {}
+     query.TypeName = "CargoEntities.File"
+     query.Fields = ["UUID"]
+     query.Query = ''
+ 
+     server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
+     function(results, caller){
+          var uuids = []
+          for(var i=0; i < results[0].length; i++){
+              uuids.push(results[0][i][0])
+          }
+          // Now That I go the list of all file uuids I will get it values.
+          server.entityManager.getEntitiesByUuid(uuids, 
+          function(index, total, caller){
+              console.log("---> transfert ", index, "/", total)
+          },
+          function(results, caller){
+              console.log("---> ", results)
+          },
+          function(){
+              
+          }, {})
+          
+     },
+     function (index, total, caller) {
+        
+     }, function (errMsg, caller) {
 
-
-    server.runCmd("cmd", ["/K","wmic datafile where name='c:\\\\windows\\\\system32\\\\notepad.exe' list full"],
-    // Success callback
-    function(results, caller){
-        console.log(results)
-    },
-    // Error callback.
-    function(){
-
-    });*/
-
-    /*
-        function getFileInfos(path, callback) {
-            server.runCmd("cmd", ["/K", "dir /Q " + path],
-                // Success callback
-                function (results, caller) {
-                    var values = results["result"].split(/\s+/);
-
-                    var author = ""
-                    for(var i=0; i < values.length; i++){
-                        if(values[i].startsWith("UD6")){
-                            author = values[i]
-                            break
-                        }
-                    }
-
-                    var path = caller.path.replaceAll("\\", "\\\\")
-                    server.runCmd("cmd", ["/K", "wmic datafile where name='" + path + "' list full"],
-                        // Success callback
-                        function (results, caller) {
-                            var values = results["result"].split(/\s+/);
-                            var fileInfos = {}
-                            for (var i = 0; i < values.length; i++) {
-                                if (values[i].indexOf("=") != -1) {
-                                    var infos = values[i].split("=")
-                                    var propertie = infos[0]
-                                    var value = infos[1]
-                                    if (propertie ==  "LastAccessed" || propertie == "LastModified" || propertie == "CreationDate" || propertie == "InstallDate") {
-                                        
-                                        value = moment(value, "YYYYMMDDHHmmSSSS").toDate();
-                                    }
-                                    fileInfos[propertie] = value
-                                }
-                            }
-                            fileInfos["Author"] = author
-                            caller.callback(fileInfos)
-                        },
-                        // Error callback.
-                        function () {
+     }, undefined)
     
-                        }, { "callback": caller.callback, "author": author });
-                },
-                // Error callback.
-                function () {
-    
-                }, { "path": path, "callback": callback });
-        }
-    
-        getFileInfos("\\\\mon-util-01\\Demande_Travail_2\\1\\toto.txt", function (fileInfos) {
-            console.log(fileInfos)
-    
-        })*/
+}
 
-    //LaunchImportNewSQLData_Process()
-
-    /*
-         server.entityManager.getEntityPrototypes("Test",
-             // Success callback.
-             function (result, caller) {
-                 server.entityManager.getEntityPrototypes("BPMN20",
-                     // Success callback.
-                     function (result, caller) {
-                         server.entityManager.getEntityPrototypes("BPMS",
-                             // Success callback.
-                             function (result, caller) {
-                                 server.entityManager.getEntityById("BPMN20.Definitions", ["_1484846640138"],
-                                     // success callbacak
-                                     function (result, caller) {
-                                         server.workflowManager.getDefinitionInstances(result,
-                                             // success callback
-                                             function (results, caller) {
-                                                 var result = results[0]
-                                                 var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
-                                                 new EntityPanel(parent, result.TYPENAME, function (entity) {
-                                                     return function (panel) {
-                                                         panel.setEntity(entity)
-                                                     }
-                                                 }(result), undefined, false, result, "")
-                                             },
-                                             // error callback 
-                                             function (errMsg, caller) {
-                                             },
-                                             {})
-                                     },
-                                     // Error callback 
-                                     function (errMsg, caller) {
-                                     }, {})
-                             },
-                             // Error callback.
-                             function () {
-                             }, {})
-                     },
-                     // Error callback.
-                     function () {
-     
-                     }, {})
-             },
-             // Error callback.
-             function () {
-     
-             }, {})
-     */
-
+function testGetRessource(){
     // Google OAuth
     /*server.oAuth2Manager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
     function(result, caller){
@@ -584,3 +436,4 @@ function TestWebRtc2() {
         alert("Sorry, your browser does not support getUserMedia.");
     }
 }
+

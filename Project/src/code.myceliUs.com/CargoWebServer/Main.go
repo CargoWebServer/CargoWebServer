@@ -43,6 +43,9 @@ func main() {
 	// The http query handler use by external http client or OAuth2
 	r.HandleFunc("/api/", Server.HttpQueryHandler)
 
+	// Handle temporary data file...
+	r.HandleFunc("/tmp/", Server.TempFileHandler)
+
 	// Test values...
 	//	ClientId:     "1234",
 	// 	ClientSecret: "aabbccdd",

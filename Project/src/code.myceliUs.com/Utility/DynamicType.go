@@ -291,6 +291,24 @@ func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType 
 			// the actual value to the field.
 			v.Elem().FieldByName(fieldName).Set(reflect.ValueOf(fieldValue))
 		}
+	case reflect.String:
+		if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
+			fv, err := InitializeStructure(fieldValue.(map[string]interface{}), setEntity)
+			if err == nil {
+				if fv.IsValid() {
+					v.Elem().FieldByName(fieldName).Set(fv.Elem().FieldByName("UUID"))
+				}
+			} else {
+				// In that case I dont have a map with a define type so i will simply set
+				// the actual value to the field.
+				v.Elem().FieldByName(fieldName).Set(reflect.ValueOf(fieldValue))
+			}
+		} else {
+			fv := InitializeBaseTypeValue(fieldType, fieldValue).Convert(fieldType)
+			if fv.IsValid() {
+				v.Elem().FieldByName(fieldName).Set(fv)
+			}
+		}
 	default:
 
 		// Convert is use to enumeration type who are int and must be convert to

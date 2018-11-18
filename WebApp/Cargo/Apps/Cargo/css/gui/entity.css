@@ -116,6 +116,8 @@
 	/* margin: 2px; */
     display: grid;
     padding: 2px;
+    padding-left: 5px;
+    text-align: left;
     
     /*Tow column*/
     grid-template-columns: 1fr 4fr;

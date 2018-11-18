@@ -12,15 +12,19 @@ var ProjectExplorer = function (parent) {
     // So here I will get the list of opened project.
     if(localStorage.getItem("projectsInfo") != undefined){
         var projectsInfo = JSON.parse(localStorage.getItem("projectsInfo"))
-        for(var i=0; i < projectsInfo.length; i++){
-            server.entityManager.getEntityByUuid(projectsInfo[i], false, 
-             function(projectInfo, caller){
-                 new ProjectView(caller.panel, projectInfo)
-             },
-             function(errObj, caller){
-                 
-             }, this)
-        }
+        server.entityManager.getEntitiesByUuid(projectsInfo, 
+            function(index, total, caller){
+            },
+            function(results, caller){
+                for(var i=0; i < results.length; i++){
+                    var project = new CargoEntities.Project()
+                    project.init(results[i], false)
+                    new ProjectView(caller, project)
+                }
+            },
+            function(){
+                
+            }, this.panel)
     }
     return this
 }

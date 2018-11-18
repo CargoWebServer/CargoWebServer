@@ -18,7 +18,6 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 		return "", errors.New("Nil pointer!")
 	}
 
-	//log.Println("Call method ", methodName, " with params ", params)
 	var ptr reflect.Value
 	var value reflect.Value
 	var finalMethod reflect.Value
@@ -83,10 +82,9 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 			var results_ []interface{}
 			// In case of error.
 			defer func(wait chan []interface{}, results *[]interface{}) { //catch or finally
-				/*if err := recover(); err != nil { //catch
+				if err := recover(); err != nil { //catch
 					*results = []interface{}{nil, err}
-					log.Panicln(err)
-				}*/
+				}
 				wait <- *results
 			}(wait, &results_)
 

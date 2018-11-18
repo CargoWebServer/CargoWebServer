@@ -2,6 +2,7 @@ package Server
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"log"
@@ -891,7 +892,8 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
-	if _, err := gz.Write([]byte(toJsonStr(infos))); err != nil {
+
+	if _, err := gz.Write([]byte(base64.StdEncoding.EncodeToString([]byte(toJsonStr(infos))))); err != nil {
 		panic(err)
 	}
 

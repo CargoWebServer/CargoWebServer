@@ -143,6 +143,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					doc.Add_boolean_term("Q" + formalize(uuid))
 					db.Replace_document("Q"+formalize(uuid), doc)
 				}
+
 				xapian.DeleteDocument(doc)
 				db.Close()
 				xapian.DeleteWritableDatabase(db)
@@ -201,7 +202,13 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					}
 
 					// Now i will add where I want to search...
-					query := parseXapianQuery(queryString)
+					var query xapian.Query
+					if len(queryString) == 0 {
+						typeNameIndex := generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+						query = xapian.NewQuery(typeNameIndex)
+					} else {
+						query = parseXapianQuery(queryString)
+					}
 					defer xapian.DeleteQuery(query)
 
 					enquire := xapian.NewEnquire(rstores[path])

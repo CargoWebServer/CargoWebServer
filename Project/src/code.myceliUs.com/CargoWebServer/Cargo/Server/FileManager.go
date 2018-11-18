@@ -17,7 +17,9 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"github.com/nfnt/resize"
@@ -498,23 +500,22 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	file.SetSize(int(info.Size()))
 	file.SetModeTime(info.ModTime().Unix())
 	file.SetIsDir(info.IsDir())
+	if strings.HasPrefix(file.GetMime(), "application/") || strings.HasPrefix(file.GetMime(), "text/") {
+		file.SetData(base64.StdEncoding.EncodeToString(filedata))
+	}
 
 	defer f.Close()
 
 	// Create the file if is new, genereate it uuid...
 	if isNew {
+
 		fileEntity, _ := GetServer().GetEntityManager().createEntity(parentDirEntity, "M_files", file)
 		file = fileEntity.(*CargoEntities.File) // cast...
-	}
 
-	if err == nil {
 		eventData := make([]*MessageData, 2)
 		fileInfo := new(MessageData)
 		fileInfo.TYPENAME = "Server.MessageData"
 		fileInfo.Name = "fileInfo"
-		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
-			file.SetData(base64.StdEncoding.EncodeToString(filedata))
-		}
 
 		fileInfo.Value = file
 		eventData[0] = fileInfo
@@ -593,28 +594,19 @@ func (this *FileManager) saveFile(fileId string, filedata []byte, sessionId stri
 				log.Println("---> fail to write file: ", this.root+"/"+filepath+"/"+filename, err)
 				return err
 			}
-		} else {
-			// Set the new data...
-			file.SetData(string(filedata))
 		}
 
 		file.SetChecksum(checksum)
-		log.Println("---> save ", file.GetPath()+"/"+file.GetName())
+		if strings.HasPrefix(file.GetMime(), "application/") || strings.HasPrefix(file.GetMime(), "text/") {
+			file.SetData(base64.StdEncoding.EncodeToString(filedata))
+		}
+
 		err := GetServer().GetEntityManager().saveEntity(file)
 		if err != nil {
 			log.Println("---> save file error ", err)
 		} else if file.GetMime() == "application/javascript" || file.GetMime() == "text/css" || file.GetMime() == "text/json" {
 			// Here I will remplace the old checksum with the new one.
 			this.updateHtmlChecksum(oldChecksum, checksum, file.GetPath()+"/"+file.GetName())
-		}
-
-	} /*else {
-		return nil
-	}*/
-
-	if err == nil {
-		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
-			file.SetData(base64.StdEncoding.EncodeToString(filedata))
 		}
 
 		eventData := make([]*MessageData, 2)
@@ -1817,6 +1809,42 @@ func (this FileManager) ReadDir(path string, messageId string, sessionId string)
 /////////////////////////////////////////////////////////////////////////////
 // Http handler
 /////////////////////////////////////////////////////////////////////////////
+func TempFileHandler(w http.ResponseWriter, r *http.Request) {
+	path := strings.Replace(GetServer().GetFileManager().root, "/Apps", r.URL.Path, -1)
+
+	downloadBytes, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	// set the default MIME type to send
+	mime := http.DetectContentType(downloadBytes)
+
+	fileSize := len(string(downloadBytes))
+
+	// Generate the server headers
+	w.Header().Set("Content-Type", mime)
+	w.Header().Set("Content-Disposition", "attachment; filename="+path+"")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+	if strings.HasSuffix(path, ".gz") {
+		// I will use RFC 1950 in encoding in that case.
+		w.Header().Set("Content-Encoding", "gzip")
+	}
+	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+	//b := bytes.NewBuffer(downloadBytes)
+	//if _, err := b.WriteTo(w); err != nil {
+	//              fmt.Fprintf(w, "%s", err)
+	//      }
+
+	// force it down the client's.....
+	http.ServeContent(w, r, path, time.Now(), bytes.NewReader(downloadBytes))
+	defer os.Remove(path)
+}
+
 /**
  * This code is use to upload a file into the tmp directory of the server
  * via http request.

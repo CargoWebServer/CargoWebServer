@@ -487,7 +487,7 @@ function setObjectValues(object, values, lazy) {
 
     // Set the initialisation state to false.
     object.IsInit = false;
-    
+
     ////////////////////////////////////////////////////////////////////////
     // Set back the reference...
     if (values == undefined) {
@@ -632,17 +632,17 @@ function setObjectValues(object, values, lazy) {
                     if (property.startsWith("[]M_") || property.startsWith("M_")) {
                         if (isArray_) {
                             if (lazy) {
-                               // object[property] = values[property]
-                               for(var i=0; i < values[property].length; i++){
+                                // object[property] = values[property]
+                                for (var i = 0; i < values[property].length; i++) {
                                     object[property][i] = values[property][i]
                                     // Set with local object if there is one available.
-                                    if(isObjectReference(values[property][i])){
+                                    if (isObjectReference(values[property][i])) {
                                         var uuid = values[property][i]
-                                        if(entities[uuid]!=undefined){
+                                        if (entities[uuid] != undefined) {
                                             object[property][i] = entities[uuid]
                                         }
                                     }
-                               }
+                                }
                             } else {
                                 object[property] = []
                                 for (var i = 0; i < values[property].length; i++) {
@@ -650,8 +650,16 @@ function setObjectValues(object, values, lazy) {
                                         setRef(object, property, values[property][i], isArray_)
                                     } else {
                                         if (!lazy) {
-                                            if(values[property][i].length > 0){
-                                                subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                            if (isString(values[property][i])) {
+                                                if (values[property][i].length > 0) {
+                                                    subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                                }
+                                            } else if (isObject(values[property][i])) {
+                                                if(values[property][i]["TYPENAME"] != undefined){
+                                                    subObjects.push({ "property": property, "uuid": values[property][i], "isArray": isArray_, "index": i })
+                                                }else{
+                                                    object[property].push(values[property][i])
+                                                }
                                             }
                                         }
                                     }
@@ -662,15 +670,23 @@ function setObjectValues(object, values, lazy) {
                                 setRef(object, property, values[property], isArray_)
                             } else {
                                 if (!lazy) {
-                                    if(values[property].length > 0){
-                                        subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                    if (isString(values[property])) {
+                                        if (values[property].length > 0) {
+                                            subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": undefined })
+                                        }
+                                    } else if (isObject(values[property])) {
+                                        if(values[property]["TYPENAME"] != undefined){
+                                            subObjects.push({ "property": property, "uuid": values[property], "isArray": isArray_, "index": i })
+                                        }else{
+                                            object[property].push(values[property])
+                                        }
                                     }
                                 } else {
                                     object[property] = values[property]
                                     // Try to set the entity if is an object.
-                                    if(isObjectReference(values[property])){
+                                    if (isObjectReference(values[property])) {
                                         var uuid = values[property]
-                                        if(entities[uuid]!=undefined){
+                                        if (entities[uuid] != undefined) {
                                             object[property] = entities[uuid]
                                         }
                                     }
@@ -688,54 +704,85 @@ function setObjectValues(object, values, lazy) {
         if (subObjects.length > 0) {
             var subObject = subObjects.shift()
             parent.IsInit = false;
-            
+
             if (isString(subObject.uuid)) {
                 if (subObject.uuid.length > 0) {
                     server.entityManager.getEntityByUuid(subObject.uuid, false,
                         function (entity, caller) {
                             // var parent = entities[caller.parent.UUID]
-                            entity.getParent = function(parent){
-                                return function(){
+                            entity.getParent = function (parent) {
+                                return function () {
                                     return parent;
                                 }
                             }(parent)
-                            
+
                             if (caller.subObject.isArray == true) {
                                 parent[caller.subObject.property][caller.subObject.index] = entity
                             } else {
                                 parent[caller.subObject.property] = entity
                             }
-                           
-                            if(caller.subObjects.length == 0){
+
+                            if (caller.subObjects.length == 0) {
                                 parent.IsInit = true
                                 initCallback(entity)
-                            }else{
+                            } else {
                                 setSubObject(parent, caller.subObjects)
                             }
                         },
                         function (err, caller) {
                             var parent = entities[caller.parent.UUID]
-                            if(caller.subObjects.length == 0){
+                            if (caller.subObjects.length == 0) {
                                 parent.IsInit = true
                                 initCallback(parent)
-                            }else{
+                            } else {
                                 setSubObject(parent, caller.subObjects)
                             }
                         },
-                        { "parent": parent, "subObjects": subObjects, "subObject": subObject})
+                        { "parent": parent, "subObjects": subObjects, "subObject": subObject })
                 } else {
                     setSubObject(parent, subObjects)
                 }
-            } else if (isObject(subObject)) {
-                // skip to the next object.
-                setSubObject(parent, subObjects)
+            } else if (isObject(subObject.uuid)) {
+                // Here I must initialyse the object...
+                // First of all I will get it entity prototype.
+                server.entityManager.getEntityPrototype(subObject.uuid.TYPENAME, subObject.uuid.TYPENAME.split(".")[0],
+                    function(entityPrototype, caller){
+                        var subObject = caller.subObject
+                        var subObjects = caller.subObjects
+                        var parent = caller.parent
+                        var initCallback = caller.initCallback
+                        
+                        var entity = eval("new " + entityPrototype.TypeName + "()")
+                        entity.init(caller.values, false)
+                        entity.getParent = function (parent) {
+                            return function () {
+                                return parent;
+                            }
+                        }(parent)
+        
+                        if (subObject.isArray == true) {
+                            parent[subObject.property][subObject.index] = entity
+                        } else {
+                            parent[subObject.property] = entity
+                        }
+        
+                        if (subObjects.length == 0) {
+                            parent.IsInit = true
+                            initCallback(entity)
+                        } else {
+                            setSubObject(parent, subObjects)
+                        }
+                    },
+                    function(errObj, caller){
+                        setSubObject(caller.parent, caller.subObjects)
+                    },{"parent":parent, "subObjects":subObjects, "subObject":subObject, "values":subObject.uuid, "initCallback":initCallback})
             }
         }
     }
-    
-    function initCallback(object){
-        if(object.IsInit == true){
-            if(object.initCallbacks != undefined){
+
+    function initCallback(object) {
+        if (object.IsInit == true) {
+            if (object.initCallbacks != undefined) {
                 var initCallbacks = object.initCallbacks
                 while (initCallbacks.length > 0) {
                     var initCallback_ = initCallbacks.pop();
@@ -744,12 +791,12 @@ function setObjectValues(object, values, lazy) {
                     server.entityManager.setEntity(object)
                 }
             }
-            if(object.getParent() != undefined){
+            if (object.getParent() != undefined) {
                 initCallback(object.getParent())
             }
         }
     }
-    
+
     // set the object in the map.
     if (lazy || subObjects.length == 0) {
         // simply call it callback function.
