@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 /**
@@ -21,11 +22,12 @@ type Referenceable interface {
 /**
  * That map will contain the list of all type to be created dynamicaly
  */
-var typeRegistry = make(map[string]reflect.Type)
+var typeRegistry = new(sync.Map) // make(map[string]reflect.Type)
 
 func GetTypeOf(typeName string) reflect.Type {
-	if t, ok := typeRegistry[typeName]; ok {
-		return reflect.New(t).Type()
+
+	if t, ok := typeRegistry.Load(typeName); ok {
+		return reflect.New(t.(reflect.Type)).Type()
 	}
 	return nil
 }
@@ -34,8 +36,8 @@ func GetTypeOf(typeName string) reflect.Type {
  * Return a new instance of a given typename
  */
 func GetInstanceOf(typeName string) interface{} {
-	if t, ok := typeRegistry[typeName]; ok {
-		instance := reflect.New(t).Interface()
+	if t, ok := typeRegistry.Load(typeName); ok {
+		instance := reflect.New(t.(reflect.Type)).Interface()
 		SetProperty(instance, "TYPENAME", typeName)
 		return instance
 	}
@@ -50,13 +52,13 @@ func RegisterType(typedNil interface{}) {
 	t := reflect.TypeOf(typedNil).Elem()
 	index := strings.LastIndex(t.PkgPath(), "/")
 	var typeName = t.Name()
-	if _, ok := typeRegistry[t.PkgPath()[index+1:]+"."+typeName]; !ok {
+	if _, ok := typeRegistry.Load(t.PkgPath()[index+1:] + "." + typeName); !ok {
 		if index > 0 {
-			typeRegistry[t.PkgPath()[index+1:]+"."+typeName] = t
+			typeRegistry.Store(t.PkgPath()[index+1:]+"."+typeName, t)
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
 			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
 		} else {
-			typeRegistry[t.PkgPath()+"."+typeName] = t
+			typeRegistry.Store(t.PkgPath()+"."+typeName, t)
 			gob.RegisterName(t.PkgPath()+"."+typeName, typedNil)
 			log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
 		}
@@ -167,13 +169,13 @@ func MakeInstance(typeName string, data map[string]interface{}, setEntity func(i
  */
 func initializeStructureValue(typeName string, data map[string]interface{}, setEntity func(interface{})) reflect.Value {
 	// Here I will create the value...
-	t := typeRegistry[typeName]
-	if t == nil {
+	t, ok := typeRegistry.Load(typeName)
+	if !ok {
 		return reflect.ValueOf(data)
 	}
-	v := reflect.New(t)
+	v := reflect.New(t.(reflect.Type))
 	for name, value := range data {
-		ft, exist := t.FieldByName(name)
+		ft, exist := t.(reflect.Type).FieldByName(name)
 		if exist && value != nil {
 			initializeStructureFieldValue(v, name, ft.Type, value, setEntity)
 		}
@@ -338,8 +340,8 @@ func InitializeStructures(data []interface{}, typeName string, setEntity func(in
 					if i == 0 {
 						if len(typeName) == 0 {
 							values = reflect.MakeSlice(reflect.SliceOf(obj.Type()), 0, 0)
-						} else if t, ok := typeRegistry[typeName]; ok {
-							values = reflect.MakeSlice(reflect.SliceOf(reflect.New(t).Type()), 0, 0)
+						} else if t, ok := typeRegistry.Load(typeName); ok {
+							values = reflect.MakeSlice(reflect.SliceOf(reflect.New(t.(reflect.Type)).Type()), 0, 0)
 						} else {
 							emptyInterfaceArray := make([]interface{}, 0, 0)
 							values = reflect.ValueOf(emptyInterfaceArray)
@@ -356,8 +358,8 @@ func InitializeStructures(data []interface{}, typeName string, setEntity func(in
 		}
 	} else {
 		// Here there is no value in the array.
-		if t, ok := typeRegistry[typeName]; ok {
-			values = reflect.MakeSlice(reflect.SliceOf(reflect.New(t).Type()), 0, 0)
+		if t, ok := typeRegistry.Load(typeName); ok {
+			values = reflect.MakeSlice(reflect.SliceOf(reflect.New(t.(reflect.Type)).Type()), 0, 0)
 		} else {
 			emptyInterfaceArray := make([]interface{}, 0, 0)
 			values = reflect.ValueOf(emptyInterfaceArray)
@@ -382,8 +384,8 @@ func ToBytes(val interface{}) ([]byte, error) {
 func FromBytes(data []byte, typeName string) (interface{}, error) {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
-	if t, ok := typeRegistry[typeName]; ok {
-		v := reflect.New(t).Interface()
+	if t, ok := typeRegistry.Load(typeName); ok {
+		v := reflect.New(t.(reflect.Type)).Interface()
 		err := dec.Decode(v)
 		return v, err
 	} else {
@@ -401,7 +403,7 @@ func InitializeStructure(data map[string]interface{}, setEntity func(interface{}
 	// Here I will get the type name, only dynamic type can be use here...
 	var value reflect.Value
 	if typeName, ok := data["TYPENAME"]; ok {
-		if _, ok := typeRegistry[typeName.(string)]; ok {
+		if _, ok := typeRegistry.Load(typeName.(string)); ok {
 			value = MakeInstance(typeName.(string), data, setEntity)
 			setEntity(value.Interface())
 			return value, nil
@@ -419,7 +421,6 @@ func InitializeStructure(data map[string]interface{}, setEntity func(interface{}
  */
 func InitializeArray(data []interface{}) (reflect.Value, error) {
 	var values reflect.Value
-
 	sameType := true
 	if len(data) > 1 {
 		for i := 1; i < len(data) && sameType; i++ {

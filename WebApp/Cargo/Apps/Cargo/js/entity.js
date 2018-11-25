@@ -707,38 +707,45 @@ function setObjectValues(object, values, lazy) {
 
             if (isString(subObject.uuid)) {
                 if (subObject.uuid.length > 0) {
-                    server.entityManager.getEntityByUuid(subObject.uuid, false,
-                        function (entity, caller) {
-                            // var parent = entities[caller.parent.UUID]
-                            entity.getParent = function (parent) {
-                                return function () {
-                                    return parent;
-                                }
-                            }(parent)
-
-                            if (caller.subObject.isArray == true) {
-                                parent[caller.subObject.property][caller.subObject.index] = entity
-                            } else {
-                                parent[caller.subObject.property] = entity
-                            }
-
-                            if (caller.subObjects.length == 0) {
-                                parent.IsInit = true
-                                initCallback(entity)
-                            } else {
-                                setSubObject(parent, caller.subObjects)
-                            }
+                    server.entityManager.getEntityPrototype(subObject.uuid.split("%")[0], subObject.uuid.split(".")[0],
+                        function(entityPrototype, caller){
+                            server.entityManager.getEntityByUuid(subObject.uuid, false,
+                                function (entity, caller) {
+                                    // var parent = entities[caller.parent.UUID]
+                                    entity.getParent = function (parent) {
+                                        return function () {
+                                            return parent;
+                                        }
+                                    }(parent)
+        
+                                    if (caller.subObject.isArray == true) {
+                                        parent[caller.subObject.property][caller.subObject.index] = entity
+                                    } else {
+                                        parent[caller.subObject.property] = entity
+                                    }
+        
+                                    if (caller.subObjects.length == 0) {
+                                        parent.IsInit = true
+                                        initCallback(entity)
+                                    } else {
+                                        setSubObject(parent, caller.subObjects)
+                                    }
+                                },
+                                function (err, caller) {
+                                    var parent = entities[caller.parent.UUID]
+                                    if (caller.subObjects.length == 0) {
+                                        parent.IsInit = true
+                                        initCallback(parent)
+                                    } else {
+                                        setSubObject(parent, caller.subObjects)
+                                    }
+                                },
+                                caller)
                         },
-                        function (err, caller) {
-                            var parent = entities[caller.parent.UUID]
-                            if (caller.subObjects.length == 0) {
-                                parent.IsInit = true
-                                initCallback(parent)
-                            } else {
-                                setSubObject(parent, caller.subObjects)
-                            }
-                        },
-                        { "parent": parent, "subObjects": subObjects, "subObject": subObject })
+                        function(){
+                            
+                        },{"parent": parent, "subObjects": subObjects, "subObject": subObject})
+                    
                 } else {
                     setSubObject(parent, subObjects)
                 }

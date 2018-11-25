@@ -84,7 +84,7 @@ func newCache() *Cache {
 			// cache will not allocate more memory than this limit, value in MB
 			// if value is reached then the oldest entries can be overridden for the new ones
 			// 0 value means no size limit
-			HardMaxCacheSize: 4000,
+			HardMaxCacheSize: 1000,
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.
@@ -172,7 +172,7 @@ func newCache() *Cache {
 				log.Println("--->cache delete entity: ", entity.GetUuid())
 				// Remove from the cache.
 				cache.m_cache.Delete(entity.GetUuid())
-				log.Println("Entity was remove successfully from cache ", entity.GetUuid())
+
 			case operation := <-cache.m_remove:
 
 				uuid := operation["uuid"].(string)
@@ -200,7 +200,6 @@ func newCache() *Cache {
 
 				uuid := operation["uuid"].(string)
 				getValues := operation["getValues"].(chan map[string]interface{})
-				//log.Println("--->cache getValues ", uuid)
 				var values map[string]interface{}
 				typeName := strings.Split(uuid, "%")[0]
 				if entry, err := cache.m_cache.Get(uuid); err == nil {
@@ -213,13 +212,15 @@ func newCache() *Cache {
 				getValues <- values
 
 			case operation := <-cache.m_setValues:
-
 				values := operation["values"].(map[string]interface{})
+
 				var bytes, err = Utility.ToBytes(values)
 				if err == nil {
 					bytes_, err := cache.m_cache.Get(values["UUID"].(string))
 					if err == nil {
-						if string(bytes) != string(bytes_) {
+						needSave := string(bytes) != string(bytes_)
+						if needSave {
+							//log.Println("---> setValues ", values)
 							// By id
 							if values["Ids"] != nil {
 								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
@@ -228,6 +229,9 @@ func newCache() *Cache {
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
 						}
+
+						// set if the entity need to be save.
+						operation["needSave"].(chan bool) <- needSave
 					} else {
 						if values["Ids"] != nil {
 							id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
@@ -235,31 +239,56 @@ func newCache() *Cache {
 						}
 						// By uuid
 						cache.m_cache.Set(values["UUID"].(string), bytes)
+						// true by default.
+						operation["needSave"].(chan bool) <- true
 					}
-
+				} else {
+					operation["needSave"].(chan bool) <- true
 				}
+
 			case operation := <-cache.m_setValue:
+
 				uuid := operation["uuid"].(string)
 				field := operation["field"].(string)
 				value := operation["value"].(interface{})
-				//log.Println("--->cache setValue: ", uuid)
+
 				typeName := strings.Split(uuid, "%")[0]
 				if entry, err := cache.m_cache.Get(uuid); err == nil {
 					val, err := Utility.FromBytes(entry, typeName)
 					if err == nil {
 						values := val.(map[string]interface{})
-						values[field] = value
-						var bytes, err = Utility.ToBytes(values)
-						if err == nil {
-							// By id
-							if values["ids"] != nil {
-								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
-								cache.m_cache.Set(id, []byte(values["UUID"].(string)))
-							}
-							// By uuid
-							cache.m_cache.Set(values["UUID"].(string), bytes)
+
+						// Test if the value has change.
+						needSave := false
+						if values[field] != nil {
+							needSave = Utility.GetChecksum(value) != Utility.GetChecksum(values[field])
+						} else {
+							needSave = true
 						}
+
+						if needSave {
+							//log.Println("---> setValue ", value)
+							// Set the field value...
+							values[field] = value
+							var bytes, err = Utility.ToBytes(values)
+							if err == nil {
+								// By id
+								if values["ids"] != nil {
+									id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))
+									cache.m_cache.Set(id, []byte(values["UUID"].(string)))
+								}
+								// By uuid
+								cache.m_cache.Set(values["UUID"].(string), bytes)
+							}
+						}
+
+						operation["needSave"].(chan bool) <- needSave
+
+					} else {
+						// new value here...
+						operation["needSave"].(chan bool) <- true
 					}
+
 				}
 			case operation := <-cache.m_deleteValue:
 				uuid := operation["uuid"].(string)

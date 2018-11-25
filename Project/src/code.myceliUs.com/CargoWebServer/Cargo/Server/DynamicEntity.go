@@ -6,8 +6,6 @@ import (
 
 	//	"log"
 
-	"github.com/robertkrimen/otto"
-
 	"code.myceliUs.com/Utility"
 )
 
@@ -37,6 +35,9 @@ type DynamicEntity struct {
 
 	/** Set the uuid function **/
 	generateUuid func(interface{}) string
+
+	/** keep save state **/
+	needSave bool
 }
 
 func NewDynamicEntity() *DynamicEntity {
@@ -56,11 +57,11 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	infos["uuid"] = this.uuid
 	infos["field"] = field
 	infos["value"] = value
-
+	infos["needSave"] = make(chan bool)
 	// set the values in the cache.
 	cache.m_setValue <- infos
 
-	this.SetNeedSave(true)
+	this.SetNeedSave(<-infos["needSave"].(chan bool))
 
 	return nil
 }
@@ -70,15 +71,11 @@ func (this *DynamicEntity) SetFieldValue(field string, value interface{}) error 
 }
 
 func (this *DynamicEntity) SetNeedSave(needSave bool) {
-	this.setValue("needSave", needSave)
+	this.needSave = needSave
 }
 
 func (this *DynamicEntity) IsNeedSave() bool {
-	if this.getValue("needSave") == nil {
-		return false
-	}
-
-	return this.getValue("needSave").(bool)
+	return this.needSave
 }
 
 /**
@@ -176,12 +173,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 		fieldType := prototype.FieldsType[i]
 
 		if val != nil {
-			if reflect.TypeOf(val).String() == "otto.Value" {
-				val, _ = val.(otto.Value).Export()
-				//log.Println("----> val otto: ", field, val)
-			}
 			if strings.HasPrefix(field, "M_") {
-				//log.Println("----> 169 field ", fieldType, reflect.TypeOf(val).String(), field, ":", val)
 				if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") {
 					if strings.HasPrefix(fieldType, "[]") {
 						if reflect.TypeOf(val).String() == "[]interface {}" {
@@ -296,43 +288,14 @@ func (this *DynamicEntity) setValues(values map[string]interface{}) {
 	infos := make(map[string]interface{})
 	infos["name"] = "setValues"
 	infos["values"] = values
+	infos["needSave"] = make(chan bool, 0)
 
 	// set the values in the cache.
-	cache.m_setValues <- infos
-}
 
-/**
- * Append a new value to array field
- */
-func (this *DynamicEntity) appendValue(field string, value interface{}) {
-	values := this.getValue(field)
-	if values == nil {
-		// Here no value aready exist.
-		if reflect.TypeOf(value).Kind() == reflect.String {
-			values = make([]string, 1)
-			values.([]string)[0] = value.(string)
-			this.setValue(field, values)
-		} else {
-			// Other types.
-			values = make([]interface{}, 1)
-			values.([]interface{})[0] = value
-			this.setValue(field, values)
-		}
-	} else {
-		// An array already exist in that case.
-		if reflect.TypeOf(value).Kind() == reflect.String {
-			if reflect.TypeOf(values).String() == "[]interface {}" {
-				values = append(values.([]interface{}), value.(string))
-			} else if reflect.TypeOf(values).String() == "[]string" {
-				values = append(values.([]string), value.(string))
-			}
-			this.setValue(field, values)
-		} else {
-			// Other types.
-			values = append(values.([]interface{}), value)
-			this.setValue(field, values)
-		}
-	}
+	cache.m_setValues <- infos
+
+	// wait to see if the entity has change...
+	this.needSave = <-infos["needSave"].(chan bool)
 }
 
 /**
@@ -421,8 +384,10 @@ func (this *DynamicEntity) Ids() []interface{} {
 }
 
 func (this *DynamicEntity) SetUuid(uuid string) {
-	this.setValue("UUID", uuid)
-	this.uuid = uuid // Keep local...
+	if this.uuid != uuid {
+		this.setValue("UUID", uuid)
+		this.uuid = uuid // Keep local...
+	}
 }
 
 func (this *DynamicEntity) GetParentUuid() string {
@@ -430,8 +395,10 @@ func (this *DynamicEntity) GetParentUuid() string {
 }
 
 func (this *DynamicEntity) SetParentUuid(parentUuid string) {
-	this.setValue("ParentUuid", parentUuid)
-	this.parentUuid = parentUuid
+	if this.parentUuid != parentUuid {
+		this.setValue("ParentUuid", parentUuid)
+		this.parentUuid = parentUuid
+	}
 }
 
 /**
@@ -442,8 +409,10 @@ func (this *DynamicEntity) GetParentLnk() string {
 }
 
 func (this *DynamicEntity) SetParentLnk(lnk string) {
-	this.setValue("ParentLnk", lnk)
-	this.parentLnk = lnk
+	if this.parentLnk != lnk {
+		this.setValue("ParentLnk", lnk)
+		this.parentLnk = lnk
+	}
 }
 
 func (this *DynamicEntity) GetParent() interface{} {

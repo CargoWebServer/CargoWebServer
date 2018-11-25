@@ -1,7 +1,7 @@
 package GoJavaScript
 
 import (
-	"log"
+	//	"log"
 	"reflect"
 	"time"
 )
@@ -10,12 +10,6 @@ import (
 type Cache struct {
 	// The map where object are store.
 	m_objects map[string]interface{}
-
-	// The js object references
-	m_jsObjects map[string]interface{}
-
-	// The object count.
-	m_objectsCount map[string]uint
 
 	// The channel to send cache operations.
 	m_operations chan map[string]interface{}
@@ -38,8 +32,6 @@ func newCache() {
 
 		// The map of objects.
 		cache.m_objects = make(map[string]interface{})
-		cache.m_jsObjects = make(map[string]interface{})
-		cache.m_objectsCount = make(map[string]uint)
 
 		// The operation channel.
 		cache.m_operations = make(chan map[string]interface{}, 0)
@@ -53,26 +45,15 @@ func newCache() {
 				if operation["name"] == "getObject" {
 					var object = cache.m_objects[operation["id"].(string)]
 					operation["result"].(chan interface{}) <- object
-				} else if operation["name"] == "getJsObject" {
-					var object = cache.m_jsObjects[operation["id"].(string)]
-					operation["result"].(chan interface{}) <- object
 				} else if operation["name"] == "setObject" {
 					// increment the reference count.
 					cache.m_objects[operation["id"].(string)] = operation["object"]
-				} else if operation["name"] == "setJsObject" {
-					// set the object in the map.
-					cache.m_jsObjects[operation["id"].(string)] = operation["jsObject"].(interface{})
-					log.Println("set object ----> ", operation["id"].(string))
+					//log.Println("set object ----> ", operation["id"].(string), len(cache.m_objects))
 				} else if operation["name"] == "removeObject" {
 					// The object will leave for more 30 second the time the
 					// script get object from it reference.
 					delete(cache.m_objects, operation["id"].(string))
-					obj := cache.m_jsObjects[operation["id"].(string)]
-					// remove it pointer from the interpreter.
-					if obj != nil {
-						log.Println("delete object ----> ", operation["id"].(string))
-						delete(cache.m_jsObjects, operation["id"].(string))
-					}
+					//log.Println("delete object ----> ", operation["id"].(string), len(cache.m_objects))
 				}
 			}
 		}

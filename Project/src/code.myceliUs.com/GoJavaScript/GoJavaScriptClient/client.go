@@ -259,69 +259,73 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 		}
 
 		// Method of JavaScript object are define in map.
-		if element.Type().String() != "GoJavaScript.Object" {
-			for i := 0; i < element.Addr().NumMethod(); i++ {
-				typeMethod := element.Addr().Type().Method(i)
-				infos["Methods"].(map[string]interface{})[typeMethod.Name] = ""
+		if element.IsValid() {
+			if element.Type().String() != "GoJavaScript.Object" {
+				for i := 0; i < element.Addr().NumMethod(); i++ {
+
+					typeMethod := element.Addr().Type().Method(i)
+					infos["Methods"].(map[string]interface{})[typeMethod.Name] = ""
+
+				}
 			}
-		}
 
-		// Now I will reflect other objects properties...
-		for i := 0; i < element.NumField(); i++ {
-			valueField := element.Field(i)
-			typeField := element.Type().Field(i)
+			// Now I will reflect other objects properties...
+			for i := 0; i < element.NumField(); i++ {
+				valueField := element.Field(i)
+				typeField := element.Type().Field(i)
 
-			// Here I will set the property
-			// Bust the number of field handler here.
-			if valueField.CanInterface() {
-				if valueField.IsValid() {
-					// So here is the field.
-					fieldValue := valueField.Interface()
-					fieldName := typeField.Name
-					// Dereference the pointer as needed.
-					for reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
-						// Here I will access the value and not the pointer...
-						fieldValue = valueField.Elem().Interface()
-					}
+				// Here I will set the property
+				// Bust the number of field handler here.
+				if valueField.CanInterface() {
+					if valueField.IsValid() {
+						// So here is the field.
+						fieldValue := valueField.Interface()
+						fieldName := typeField.Name
+						// Dereference the pointer as needed.
+						for reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
+							// Here I will access the value and not the pointer...
+							fieldValue = valueField.Elem().Interface()
+						}
 
-					if reflect.TypeOf(fieldValue).Kind() == reflect.Slice {
-						if valueField.Len() > 0 {
-							values := make([]interface{}, 0)
-							for i := 0; i < valueField.Len(); i++ {
-								fieldValue := valueField.Index(i).Interface()
-								// If the value is a struct I need to register it to JS
-								if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
-									// Here the element is a structure so I need to create it representation.
-									uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
-									values = append(values, GoJavaScript.NewObjectRef(uuid_))
-								} else {
-									values = append(values, fieldValue)
+						if reflect.TypeOf(fieldValue).Kind() == reflect.Slice {
+							if valueField.Len() > 0 {
+								values := make([]interface{}, 0)
+								for i := 0; i < valueField.Len(); i++ {
+									fieldValue := valueField.Index(i).Interface()
+									// If the value is a struct I need to register it to JS
+									if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
+										// Here the element is a structure so I need to create it representation.
+										uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
+										values = append(values, GoJavaScript.NewObjectRef(uuid_))
+									} else {
+										values = append(values, fieldValue)
+									}
+								}
+								// if the array dosent contain structure I will set it values...
+								infos[fieldName] = values
+
+							}
+						} else if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
+							// Set the struct...
+							uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
+							infos[fieldName] = GoJavaScript.NewObjectRef(uuid_)
+						} else if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
+							if fieldName == "Methods" {
+								methods := fieldValue.(map[string]interface{})
+								for name, src := range methods {
+									infos["Methods"].(map[string]interface{})[name] = src // src can by byte code.
+								}
+							} else if fieldName == "Properties" {
+								// can be recursive?
+								properties := fieldValue.(map[string]interface{})
+								for name, value := range properties {
+									infos[name] = value
 								}
 							}
-							// if the array dosent contain structure I will set it values...
-							infos[fieldName] = values
-
+						} else {
+							// basic type.
+							infos[fieldName] = fieldValue
 						}
-					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Struct || reflect.TypeOf(fieldValue).Kind() == reflect.Ptr {
-						// Set the struct...
-						uuid_ := GoJavaScript.RegisterGoObject(fieldValue, "")
-						infos[fieldName] = GoJavaScript.NewObjectRef(uuid_)
-					} else if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
-						if fieldName == "Methods" {
-							methods := fieldValue.(map[string]interface{})
-							for name, src := range methods {
-								infos["Methods"].(map[string]interface{})[name] = src // src can by byte code.
-							}
-						} else if fieldName == "Properties" {
-							// can be recursive?
-							properties := fieldValue.(map[string]interface{})
-							for name, value := range properties {
-								infos[name] = value
-							}
-						}
-					} else {
-						// basic type.
-						infos[fieldName] = fieldValue
 					}
 				}
 			}

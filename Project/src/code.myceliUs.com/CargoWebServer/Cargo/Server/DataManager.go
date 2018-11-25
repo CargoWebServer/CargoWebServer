@@ -512,6 +512,51 @@ func (this *DataManager) Close(storeName string, messageId string, sessionId str
 // @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
+// @src
+//DataManager.prototype.read = function(storeName, query, fieldsType, parameters, successCallback, progressCallback, errorCallback, caller){
+//	var params = [];
+//	params.push(createRpcData(storeName, "STRING", "storeName"));
+//	params.push(createRpcData(query, "STRING", "query"));
+//	params.push(createRpcData(fieldsType, "JSON_STR", "fieldsType", "[]interface {}"));
+//	params.push(createRpcData(parameters, "JSON_STR", "parameters", "[]interface {}"));
+//	server.executeJsFunction(
+//	"DataManagerRead",
+//	params,
+//	function (index, total, caller) { // Progress callback
+//		caller.progressCallback(index, total, caller.caller);
+//	},
+//	function (results, caller) { // Success callback
+//        var xhr = new XMLHttpRequest();
+//        xhr.open('GET', results[0][0], true);
+//        xhr.responseType = 'text';
+//        xhr.onload = function (caller) {
+//            return function (e) {
+//                if (this.status == 200) {
+//					  try{
+//                    	var jsonStr = this.responseText;
+//                    	caller.successCallback([JSON.parse(jsonStr)], caller.caller)
+//                    	caller.successCallback=undefined;
+//					  }catch(err){
+//               		caller.errorCallback(err, caller.caller);
+//					  }
+//                }
+//            }
+//        }(caller)
+//        xhr.onprogress = function (progressCallback, caller) {
+//            return function (e) {
+//               progressCallback(e.loaded, e.total, caller)
+//            }
+//        }(caller.progressCallback, caller.caller)
+//        xhr.send();
+//	},
+//	function (errMsg, caller) { // Error callback
+//		if(caller.errorCallback != undefined){
+//			caller.errorCallback(errMsg, caller.caller);
+//			caller.errorCallback = undefined;
+//		}
+//		server.errorManager.onError(errMsg);
+//	},{"progressCallback":progressCallback, "successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
+//}
 func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, parameters []interface{}, messageId string, sessionId string) [][]interface{} {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -519,16 +564,48 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
 	data, err := this.readData(storeName, query, fieldsType, parameters)
-
 	if err != nil {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
-	return data
+
+	// if the call is syncrone.
+	if len(messageId) == 0 {
+		return data
+	} else {
+
+		data_, _ := json.Marshal(data)
+		// Here I will create a file in the tmp directory and send back it path to the
+		// client.
+		var b bytes.Buffer
+		gz := gzip.NewWriter(&b)
+		if _, err := gz.Write(data_); err != nil {
+			panic(err)
+		}
+
+		if err := gz.Flush(); err != nil {
+			panic(err)
+		}
+
+		if err := gz.Close(); err != nil {
+			panic(err)
+		}
+
+		// So here I will create the response as a compress file.
+		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
+		err := ioutil.WriteFile(path, b.Bytes(), 0666)
+		if err != nil {
+			errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+
+		// Return a tow dimential array with the address of the tmporary file.
+		return [][]interface{}{[]interface{}{"/tmp/" + messageId + ".gz"}}
+	}
 }
 
 // @api 1.0

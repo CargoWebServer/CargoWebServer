@@ -436,8 +436,6 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 							}
 						}
 					}
-				} else {
-					return err
 				}
 
 			} else if attributes[j] == "name" {

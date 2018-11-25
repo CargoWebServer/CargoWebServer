@@ -2,13 +2,14 @@
 
 package CargoEntities
 
-import(
+import (
 	"encoding/xml"
-	"code.myceliUs.com/Utility"
 	"strings"
+
+	"code.myceliUs.com/Utility"
 )
 
-type Account struct{
+type Account struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -23,7 +24,7 @@ type Account struct{
 	/** Keep reference to entity that made use of thit entity **/
 	Referenced []string
 	/** Get entity by uuid function **/
-	getEntityByUuid func(string)(interface{}, error)
+	getEntityByUuid func(string) (interface{}, error)
 	/** Use to put the entity in the cache **/
 	setEntity func(interface{})
 	/** Generate the entity uuid **/
@@ -33,15 +34,14 @@ type Account struct{
 	M_id string
 
 	/** members of Account **/
-	M_name string
-	M_password string
-	M_email string
-	M_sessions []string
-	M_messages []string
-	M_userRef string
-	M_rolesRef []string
+	M_name           string
+	M_password       string
+	M_email          string
+	M_sessions       []string
+	M_messages       []string
+	M_userRef        string
+	M_rolesRef       []string
 	M_permissionsRef []string
-
 
 	/** Associations **/
 	M_entitiesPtr string
@@ -49,40 +49,39 @@ type Account struct{
 
 /** Xml parser for Account **/
 type XsdAccount struct {
-	XMLName xml.Name	`xml:"accountsRef"`
+	XMLName xml.Name `xml:"accountsRef"`
 	/** Entity **/
-	M_id	string	`xml:"id,attr"`
+	M_id string `xml:"id,attr"`
 
+	M_userRef        *string       `xml:"userRef"`
+	M_rolesRef       []string      `xml:"rolesRef"`
+	M_permissionsRef []string      `xml:"permissionsRef"`
+	M_sessions       []*XsdSession `xml:"sessions,omitempty"`
 
-	M_userRef	*string	`xml:"userRef"`
-	M_rolesRef	[]string	`xml:"rolesRef"`
-	M_permissionsRef	[]string	`xml:"permissionsRef"`
-	M_sessions	[]*XsdSession	`xml:"sessions,omitempty"`
-
-	M_name	string	`xml:"name,attr"`
-	M_password	string	`xml:"password,attr"`
-	M_email	string	`xml:"email,attr"`
-
+	M_name     string `xml:"name,attr"`
+	M_password string `xml:"password,attr"`
+	M_email    string `xml:"email,attr"`
 }
+
 /***************** Entity **************************/
 
 /** UUID **/
-func (this *Account) GetUuid() string{
+func (this *Account) GetUuid() string {
 	if len(this.UUID) == 0 {
 		this.SetUuid(this.generateUuid(this))
 	}
 	return this.UUID
 }
-func (this *Account) SetUuid(uuid string){
+func (this *Account) SetUuid(uuid string) {
 	this.UUID = uuid
 }
 
 /** Need save **/
-func (this *Account) IsNeedSave() bool{
+func (this *Account) IsNeedSave() bool {
 	return this.needSave
 }
-func (this *Account) SetNeedSave(needSave bool){
-	this.needSave=needSave
+func (this *Account) SetNeedSave(needSave bool) {
+	this.needSave = needSave
 }
 
 func (this *Account) GetReferenced() []string {
@@ -115,11 +114,11 @@ func (this *Account) RemoveReferenced(uuid string, field string) {
 	this.Referenced = referenced
 }
 
-func (this *Account) SetFieldValue(field string, value interface{}) error{
+func (this *Account) SetFieldValue(field string, value interface{}) error {
 	return Utility.SetProperty(this, field, value)
 }
 
-func (this *Account) GetFieldValue(field string) interface{}{
+func (this *Account) GetFieldValue(field string) interface{} {
 	return Utility.GetProperty(this, field)
 }
 
@@ -131,30 +130,30 @@ func (this *Account) Ids() []interface{} {
 }
 
 /** The type name **/
-func (this *Account) GetTypeName() string{
+func (this *Account) GetTypeName() string {
 	this.TYPENAME = "CargoEntities.Account"
 	return this.TYPENAME
 }
 
 /** Return the entity parent UUID **/
-func (this *Account) GetParentUuid() string{
+func (this *Account) GetParentUuid() string {
 	return this.ParentUuid
 }
 
 /** Set it parent UUID **/
-func (this *Account) SetParentUuid(parentUuid string){
+func (this *Account) SetParentUuid(parentUuid string) {
 	this.ParentUuid = parentUuid
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *Account) GetParentLnk() string{
+func (this *Account) GetParentLnk() string {
 	return this.ParentLnk
 }
-func (this *Account) SetParentLnk(parentLnk string){
+func (this *Account) SetParentLnk(parentLnk string) {
 	this.ParentLnk = parentLnk
 }
 
-func (this *Account) GetParent() interface{}{
+func (this *Account) GetParent() interface{} {
 	parent, err := this.getEntityByUuid(this.ParentUuid)
 	if err != nil {
 		return nil
@@ -163,104 +162,96 @@ func (this *Account) GetParent() interface{}{
 }
 
 /** Return it relation with it parent, only one parent is possible by entity. **/
-func (this *Account) GetChilds() []interface{}{
+func (this *Account) GetChilds() []interface{} {
 	var childs []interface{}
 	var child interface{}
 	var err error
-	for i:=0; i < len(this.M_sessions); i++ {
-		child, err = this.getEntityByUuid( this.M_sessions[i])
+	for i := 0; i < len(this.M_sessions); i++ {
+		child, err = this.getEntityByUuid(this.M_sessions[i])
 		if err == nil {
-			childs = append( childs, child)
+			childs = append(childs, child)
 		}
 	}
-	for i:=0; i < len(this.M_messages); i++ {
-		child, err = this.getEntityByUuid( this.M_messages[i])
+	for i := 0; i < len(this.M_messages); i++ {
+		child, err = this.getEntityByUuid(this.M_messages[i])
 		if err == nil {
-			childs = append( childs, child)
+			childs = append(childs, child)
 		}
 	}
 	return childs
 }
+
 /** Return the list of all childs uuid **/
-func (this *Account) GetChildsUuid() []string{
+func (this *Account) GetChildsUuid() []string {
 	var childs []string
-	childs = append( childs, this.M_sessions...)
-	childs = append( childs, this.M_messages...)
+	childs = append(childs, this.M_sessions...)
+	childs = append(childs, this.M_messages...)
 	return childs
 }
+
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
-func (this *Account) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+func (this *Account) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
 	this.getEntityByUuid = fct
 }
+
 /** Use it the set the entity on the cache. **/
-func (this *Account) SetEntitySetter(fct func(entity interface{})){
+func (this *Account) SetEntitySetter(fct func(entity interface{})) {
 	this.setEntity = fct
 }
+
 /** Set the uuid generator function **/
-func (this *Account) SetUuidGenerator(fct func(entity interface{}) string){
+func (this *Account) SetUuidGenerator(fct func(entity interface{}) string) {
 	this.generateUuid = fct
 }
 
-func (this *Account) GetId()string{
+func (this *Account) GetId() string {
 	return this.M_id
 }
 
-func (this *Account) SetId(val string){
-	this.M_id= val
+func (this *Account) SetId(val string) {
+	this.M_id = val
 }
 
-
-
-
-func (this *Account) GetName()string{
+func (this *Account) GetName() string {
 	return this.M_name
 }
 
-func (this *Account) SetName(val string){
-	this.M_name= val
+func (this *Account) SetName(val string) {
+	this.M_name = val
 }
 
-
-
-
-func (this *Account) GetPassword()string{
+func (this *Account) GetPassword() string {
 	return this.M_password
 }
 
-func (this *Account) SetPassword(val string){
-	this.M_password= val
+func (this *Account) SetPassword(val string) {
+	this.M_password = val
 }
 
-
-
-
-func (this *Account) GetEmail()string{
+func (this *Account) GetEmail() string {
 	return this.M_email
 }
 
-func (this *Account) SetEmail(val string){
-	this.M_email= val
+func (this *Account) SetEmail(val string) {
+	this.M_email = val
 }
 
-
-
-
-func (this *Account) GetSessions()[]*Session{
+func (this *Account) GetSessions() []*Session {
 	values := make([]*Session, 0)
 	for i := 0; i < len(this.M_sessions); i++ {
 		entity, err := this.getEntityByUuid(this.M_sessions[i])
 		if err == nil {
-			values = append( values, entity.(*Session))
+			values = append(values, entity.(*Session))
 		}
 	}
 	return values
 }
 
-func (this *Account) SetSessions(val []*Session){
-	this.M_sessions= make([]string,0)
-	for i:=0; i < len(val); i++{
-		this.M_sessions=append(this.M_sessions, val[i].GetUuid())
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
+func (this *Account) SetSessions(val []*Session) {
+	this.M_sessions = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_sessions = append(this.M_sessions, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0 && len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid() {
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -279,19 +270,18 @@ func (this *Account) SetSessions(val []*Session){
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) AppendSessions(val *Session){
-	for i:=0; i < len(this.M_sessions); i++{
+func (this *Account) AppendSessions(val *Session) {
+	for i := 0; i < len(this.M_sessions); i++ {
 		if this.M_sessions[i] == val.GetUuid() {
 			return
 		}
 	}
-	if this.M_sessions== nil {
+	if this.M_sessions == nil {
 		this.M_sessions = make([]string, 0)
 	}
 
 	this.M_sessions = append(this.M_sessions, val.GetUuid())
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
+	if len(val.GetParentUuid()) > 0 && len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -304,14 +294,14 @@ func (this *Account) AppendSessions(val *Session){
 	}
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_sessions")
-  this.setEntity(val)
+	this.setEntity(val)
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-func (this *Account) RemoveSessions(val *Session){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_sessions); i++{
+func (this *Account) RemoveSessions(val *Session) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_sessions); i++ {
 		if this.M_sessions[i] != val.GetUuid() {
 			values = append(values, this.M_sessions[i])
 		}
@@ -320,23 +310,22 @@ func (this *Account) RemoveSessions(val *Session){
 	this.setEntity(this)
 }
 
-
-func (this *Account) GetMessages()[]Message{
+func (this *Account) GetMessages() []Message {
 	values := make([]Message, 0)
 	for i := 0; i < len(this.M_messages); i++ {
 		entity, err := this.getEntityByUuid(this.M_messages[i])
 		if err == nil {
-			values = append( values, entity.(Message))
+			values = append(values, entity.(Message))
 		}
 	}
 	return values
 }
 
-func (this *Account) SetMessages(val []Message){
-	this.M_messages= make([]string,0)
-	for i:=0; i < len(val); i++{
-		this.M_messages=append(this.M_messages, val[i].GetUuid())
-		if len(val[i].GetParentUuid()) > 0  &&  len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid(){
+func (this *Account) SetMessages(val []Message) {
+	this.M_messages = make([]string, 0)
+	for i := 0; i < len(val); i++ {
+		this.M_messages = append(this.M_messages, val[i].GetUuid())
+		if len(val[i].GetParentUuid()) > 0 && len(val[i].GetParentLnk()) > 0 && this.GetUuid() != val[i].GetParentUuid() {
 			parent, _ := this.getEntityByUuid(val[i].GetParentUuid())
 			if parent != nil {
 				removeMethode := strings.Replace(val[i].GetParentLnk(), "M_", "", -1)
@@ -355,19 +344,18 @@ func (this *Account) SetMessages(val []Message){
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) AppendMessages(val Message){
-	for i:=0; i < len(this.M_messages); i++{
+func (this *Account) AppendMessages(val Message) {
+	for i := 0; i < len(this.M_messages); i++ {
 		if this.M_messages[i] == val.GetUuid() {
 			return
 		}
 	}
-	if this.M_messages== nil {
+	if this.M_messages == nil {
 		this.M_messages = make([]string, 0)
 	}
 
 	this.M_messages = append(this.M_messages, val.GetUuid())
-	if len(val.GetParentUuid()) > 0 &&  len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
+	if len(val.GetParentUuid()) > 0 && len(val.GetParentLnk()) > 0 && val.GetParentUuid() != this.GetUuid() {
 		parent, _ := this.getEntityByUuid(val.GetParentUuid())
 		if parent != nil {
 			removeMethode := strings.Replace(val.GetParentLnk(), "M_", "", -1)
@@ -380,14 +368,14 @@ func (this *Account) AppendMessages(val Message){
 	}
 	val.SetParentUuid(this.GetUuid())
 	val.SetParentLnk("M_messages")
-  this.setEntity(val)
+	this.setEntity(val)
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-func (this *Account) RemoveMessages(val Message){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_messages); i++{
+func (this *Account) RemoveMessages(val Message) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_messages); i++ {
 		if this.M_messages[i] != val.GetUuid() {
 			values = append(values, this.M_messages[i])
 		}
@@ -396,8 +384,7 @@ func (this *Account) RemoveMessages(val Message){
 	this.setEntity(this)
 }
 
-
-func (this *Account) GetUserRef()*User{
+func (this *Account) GetUserRef() *User {
 	entity, err := this.getEntityByUuid(this.M_userRef)
 	if err == nil {
 		return entity.(*User)
@@ -405,47 +392,44 @@ func (this *Account) GetUserRef()*User{
 	return nil
 }
 
-func (this *Account) SetUserRef(val *User){
-	this.M_userRef= val.GetUuid()
+func (this *Account) SetUserRef(val *User) {
+	this.M_userRef = val.GetUuid()
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) ResetUserRef(){
-	this.M_userRef= ""
+func (this *Account) ResetUserRef() {
+	this.M_userRef = ""
 	this.setEntity(this)
 }
 
-
-func (this *Account) GetRolesRef()[]*Role{
+func (this *Account) GetRolesRef() []*Role {
 	values := make([]*Role, 0)
 	for i := 0; i < len(this.M_rolesRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_rolesRef[i])
 		if err == nil {
-			values = append( values, entity.(*Role))
+			values = append(values, entity.(*Role))
 		}
 	}
 	return values
 }
 
-func (this *Account) SetRolesRef(val []*Role){
-	this.M_rolesRef= make([]string,0)
-	for i:=0; i < len(val); i++{
+func (this *Account) SetRolesRef(val []*Role) {
+	this.M_rolesRef = make([]string, 0)
+	for i := 0; i < len(val); i++ {
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) AppendRolesRef(val *Role){
-	for i:=0; i < len(this.M_rolesRef); i++{
+func (this *Account) AppendRolesRef(val *Role) {
+	for i := 0; i < len(this.M_rolesRef); i++ {
 		if this.M_rolesRef[i] == val.GetUuid() {
 			return
 		}
 	}
-	if this.M_rolesRef== nil {
+	if this.M_rolesRef == nil {
 		this.M_rolesRef = make([]string, 0)
 	}
 
@@ -454,9 +438,9 @@ func (this *Account) AppendRolesRef(val *Role){
 	this.SetNeedSave(true)
 }
 
-func (this *Account) RemoveRolesRef(val *Role){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_rolesRef); i++{
+func (this *Account) RemoveRolesRef(val *Role) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_rolesRef); i++ {
 		if this.M_rolesRef[i] != val.GetUuid() {
 			values = append(values, this.M_rolesRef[i])
 		}
@@ -465,35 +449,33 @@ func (this *Account) RemoveRolesRef(val *Role){
 	this.setEntity(this)
 }
 
-
-func (this *Account) GetPermissionsRef()[]*Permission{
+func (this *Account) GetPermissionsRef() []*Permission {
 	values := make([]*Permission, 0)
 	for i := 0; i < len(this.M_permissionsRef); i++ {
 		entity, err := this.getEntityByUuid(this.M_permissionsRef[i])
 		if err == nil {
-			values = append( values, entity.(*Permission))
+			values = append(values, entity.(*Permission))
 		}
 	}
 	return values
 }
 
-func (this *Account) SetPermissionsRef(val []*Permission){
-	this.M_permissionsRef= make([]string,0)
-	for i:=0; i < len(val); i++{
+func (this *Account) SetPermissionsRef(val []*Permission) {
+	this.M_permissionsRef = make([]string, 0)
+	for i := 0; i < len(val); i++ {
 		this.setEntity(val[i])
 	}
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) AppendPermissionsRef(val *Permission){
-	for i:=0; i < len(this.M_permissionsRef); i++{
+func (this *Account) AppendPermissionsRef(val *Permission) {
+	for i := 0; i < len(this.M_permissionsRef); i++ {
 		if this.M_permissionsRef[i] == val.GetUuid() {
 			return
 		}
 	}
-	if this.M_permissionsRef== nil {
+	if this.M_permissionsRef == nil {
 		this.M_permissionsRef = make([]string, 0)
 	}
 
@@ -502,9 +484,9 @@ func (this *Account) AppendPermissionsRef(val *Permission){
 	this.SetNeedSave(true)
 }
 
-func (this *Account) RemovePermissionsRef(val *Permission){
-	values := make([]string,0)
-	for i:=0; i < len(this.M_permissionsRef); i++{
+func (this *Account) RemovePermissionsRef(val *Permission) {
+	values := make([]string, 0)
+	for i := 0; i < len(this.M_permissionsRef); i++ {
 		if this.M_permissionsRef[i] != val.GetUuid() {
 			values = append(values, this.M_permissionsRef[i])
 		}
@@ -513,8 +495,7 @@ func (this *Account) RemovePermissionsRef(val *Permission){
 	this.setEntity(this)
 }
 
-
-func (this *Account) GetEntitiesPtr()*Entities{
+func (this *Account) GetEntitiesPtr() *Entities {
 	entity, err := this.getEntityByUuid(this.M_entitiesPtr)
 	if err == nil {
 		return entity.(*Entities)
@@ -522,15 +503,13 @@ func (this *Account) GetEntitiesPtr()*Entities{
 	return nil
 }
 
-func (this *Account) SetEntitiesPtr(val *Entities){
-	this.M_entitiesPtr= val.GetUuid()
+func (this *Account) SetEntitiesPtr(val *Entities) {
+	this.M_entitiesPtr = val.GetUuid()
 	this.setEntity(this)
 	this.SetNeedSave(true)
 }
 
-
-func (this *Account) ResetEntitiesPtr(){
-	this.M_entitiesPtr= ""
+func (this *Account) ResetEntitiesPtr() {
+	this.M_entitiesPtr = ""
 	this.setEntity(this)
 }
-

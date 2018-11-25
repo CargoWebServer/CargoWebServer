@@ -117,19 +117,23 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 
 		// The readable datastore.
 		rstores := make(map[string]xapian.Database)
+		wstores := make(map[string]xapian.WritableDatabase)
 
 		// Keep store in memory.
 		for {
 			select {
 			case op := <-store.m_set_entity_channel:
-
 				values, _ := op.(*sync.Map).Load("values")
-
 				typeName := values.(map[string]interface{})["TYPENAME"].(string)
 				uuid := values.(map[string]interface{})["UUID"].(string)
-
 				path := store.m_path + "/" + typeName + ".glass"
-				db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+
+				if wstores[path] == nil {
+					wstores[path] = xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+				} else {
+					wstores[path].Reopen()
+				}
+
 				// So here I will index the property found in the entity.
 				doc := xapian.NewDocument()
 
@@ -141,17 +145,12 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					store.indexEntity(doc, values.(map[string]interface{}))
 					doc.Set_data(data)
 					doc.Add_boolean_term("Q" + formalize(uuid))
-					db.Replace_document("Q"+formalize(uuid), doc)
+					wstores[path].Replace_document("Q"+formalize(uuid), doc)
 				}
 
+				// Release the document memory.
 				xapian.DeleteDocument(doc)
-				db.Close()
-				xapian.DeleteWritableDatabase(db)
-
-				// Reopen the datastore to reflect change.
-				if rstores[path] != nil {
-					rstores[path].Reopen()
-				}
+				wstores[path].Flush()
 
 				done, _ := op.(*sync.Map).Load("done")
 				done.(chan bool) <- true
@@ -160,30 +159,38 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 				uuid := op.(map[string]interface{})["uuid"].(string)
 				query := xapian.NewQuery("Q" + formalize(uuid))
 				path := store.m_path + "/" + uuid[0:strings.Index(uuid, "%")] + ".glass"
-				db := xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
 
-				enquire := xapian.NewEnquire(db)
-				defer xapian.DeleteEnquire(enquire)
+				if wstores[path] == nil {
+					wstores[path] = xapian.NewWritableDatabase(path, xapian.DB_CREATE_OR_OPEN)
+				} else {
+					wstores[path].Reopen()
+				}
+
+				enquire := xapian.NewEnquire(wstores[path])
 				enquire.Set_query(query)
+
 				mset := enquire.Get_mset(uint(0), uint(10000))
-				defer xapian.DeleteMSet(mset)
+
 				// Now I will process the results.
 				for i := 0; i < mset.Size(); i++ {
-					doc := mset.Get_hit(uint(i)).Get_document()
+					it := mset.Get_hit(uint(i))
+					doc := it.Get_document()
 					// Remove the document
-					db.Delete_document(doc.Get_docid())
+					wstores[path].Delete_document(doc.Get_docid())
 					xapian.DeleteDocument(doc)
+					xapian.DeleteMSetIterator(it)
 				}
+
 				xapian.DeleteQuery(query)
-				db.Close()
-				xapian.DeleteWritableDatabase(db)
-				// Reopen the datastore to reflect change.
-				if rstores[path] != nil {
-					rstores[path].Reopen()
-				}
+				xapian.DeleteMSet(mset)
+				xapian.DeleteEnquire(enquire)
+
+				wstores[path].Flush()
+
 				op.(map[string]interface{})["done"].(chan bool) <- true
 
 			case op := <-store.m_get_entity_channel:
+
 				queryString := op.(map[string]interface{})["queryString"].(string)
 				typeName := op.(map[string]interface{})["typeName"].(string)
 				fields := op.(map[string]interface{})["fields"].([]string)
@@ -199,6 +206,9 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					if rstores[path] == nil {
 						rstores[path] = xapian.NewDatabase()
 						rstores[path].Add_database(xapian.NewDatabase(path))
+					} else {
+						// refresh it information.
+						rstores[path].Reopen()
 					}
 
 					// Now i will add where I want to search...
@@ -209,20 +219,15 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					} else {
 						query = parseXapianQuery(queryString)
 					}
-					defer xapian.DeleteQuery(query)
 
 					enquire := xapian.NewEnquire(rstores[path])
-					defer xapian.DeleteEnquire(enquire)
-
 					enquire.Set_query(query)
-
 					mset := enquire.Get_mset(uint(0), uint(10000))
-					defer xapian.DeleteMSet(mset)
 
 					// Now I will process the results.
 					for i := 0; i < mset.Size(); i++ {
-						doc := mset.Get_hit(uint(i)).Get_document()
-						defer xapian.DeleteDocument(doc)
+						it := mset.Get_hit(uint(i))
+						doc := it.Get_document()
 						if len(fields) > 0 {
 							var prototype *EntityPrototype
 							prototype, err = store.GetEntityPrototype(typeName)
@@ -241,11 +246,16 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 									} else if XML_Schemas.IsXsDate(prototype.FieldsType[fieldIndex]) {
 										values = append(values, xapian.Sortable_unserialise(value))
 									} else {
-										log.Println("----> typeName not supported! ", prototype.FieldsType[fieldIndex])
+										var v map[string]interface{}
+										err := json.Unmarshal([]byte(doc.Get_data()), &v)
+										if err == nil {
+											values = append(values, v[fields[j]])
+										}
 									}
 								}
 								results = append(results, values)
 							}
+
 						} else {
 							// In that case the data contain in the document are return.
 							var v map[string]interface{}
@@ -254,15 +264,20 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 								results = append(results, []interface{}{v})
 							}
 						}
+						xapian.DeleteMSetIterator(it)
+						xapian.DeleteDocument(doc)
 					}
 
 					if len(results) == 0 {
 						err = errors.New("No results found!")
 					}
+
+					xapian.DeleteMSet(mset)
+					xapian.DeleteEnquire(enquire)
+					xapian.DeleteQuery(query)
 				}
 				op.(map[string]interface{})["results"].(chan []interface{}) <- []interface{}{results, err}
 			}
-
 		}
 
 	}(store)
@@ -288,11 +303,10 @@ func (this *GraphStore) setEntity(entity Entity) {
 
 	op := new(sync.Map)
 	op.Store("values", values)
-
-	this.m_set_entity_channel <- op
-
 	done := make(chan bool)
 	op.Store("done", done)
+
+	this.m_set_entity_channel <- op
 
 	<-done
 }
@@ -303,8 +317,10 @@ func (this *GraphStore) setEntity(entity Entity) {
 func (this *GraphStore) deleteEntity(uuid string) {
 	op := make(map[string]interface{})
 	op["uuid"] = uuid
-	this.m_delete_entity_channel <- op
 	op["done"] = make(chan bool)
+
+	this.m_delete_entity_channel <- op
+
 	<-op["done"].(chan bool)
 }
 
@@ -319,7 +335,9 @@ func (this *GraphStore) getValues(queryString string, typeName string, fields []
 	op["results"] = make(chan []interface{})
 
 	this.m_get_entity_channel <- op
+
 	results := <-op["results"].(chan []interface{})
+
 	if results[1] != nil {
 		return nil, results[1].(error)
 	}
@@ -1701,10 +1719,8 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 					if item.IsValid() {
 						zeroValue := reflect.Zero(item.Type())
 						if zeroValue != item {
-							//log.Println("---> index field ", field, fieldType, data)
 							this.indexField(s.Index(i).Interface(), field, fieldType, typeName, termGenerator, doc, -1)
 						} else {
-							log.Println("---> index nil field ", field, fieldType, data)
 							this.indexField(nil, field, fieldType, typeName, termGenerator, doc, -1)
 						}
 
@@ -1742,11 +1758,9 @@ func (this *GraphStore) indexEntity(doc xapian.Document, values map[string]inter
 
 	// The term generator
 	termGenerator := xapian.NewTermGenerator()
-	defer xapian.DeleteTermGenerator(termGenerator)
 
 	// set english by default.
 	stemmer := xapian.NewStem("en")
-	defer xapian.DeleteStem(stemmer)
 
 	termGenerator.Set_stemmer(stemmer)
 	termGenerator.Set_document(doc)
@@ -1781,6 +1795,9 @@ func (this *GraphStore) indexEntity(doc xapian.Document, values map[string]inter
 		}
 		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, i)
 	}
+
+	xapian.DeleteStem(stemmer)
+	xapian.DeleteTermGenerator(termGenerator)
 }
 
 /**
@@ -1825,10 +1842,7 @@ func (l *XapianQueryListener) EnterQuery(ctx *parser.QueryContext) {
 // Finish parsing a query
 func (l *XapianQueryListener) ExitQuery(ctx *parser.QueryContext) {
 
-	defer xapian.DeleteQueryParser(l.p)
-
 	stemmer := xapian.NewStem("en")
-	defer xapian.DeleteStem(stemmer)
 
 	l.p.Set_stemmer(stemmer)
 	l.p.Set_stemming_strategy(xapian.XapianQueryParserStem_strategy(xapian.QueryParserSTEM_SOME))
@@ -1840,6 +1854,9 @@ func (l *XapianQueryListener) ExitQuery(ctx *parser.QueryContext) {
 	}
 
 	l.q <- query
+
+	xapian.DeleteQueryParser(l.p)
+	xapian.DeleteStem(stemmer)
 }
 
 func (l *XapianQueryListener) ExitReference(ctx *parser.ReferenceContext) {

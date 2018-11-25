@@ -179,18 +179,16 @@ func (this *SessionManager) closeSession(session *CargoEntities.Session) *CargoE
 	err := <-sessionToClose.err
 
 	return err
-
 }
 
 func (this *SessionManager) getActiveSessions() []*CargoEntities.Session {
-
 	var sessions []*CargoEntities.Session
 	entities, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Account", "CargoEntities", nil)
 	for i := 0; i < len(entities); i++ {
 		account := entities[i].(*CargoEntities.Account)
 		sessions = append(sessions, account.GetSessions()...)
 	}
-
+	log.Println("193 ----> active session: ", sessions)
 	return sessions
 
 }

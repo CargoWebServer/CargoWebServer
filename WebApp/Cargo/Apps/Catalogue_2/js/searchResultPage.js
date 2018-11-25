@@ -133,98 +133,29 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
     
         // So here I will regroup results by type...
         var results_ = [];
-    
-        // Properties are asynchrone...
-        var getItem = function (uuid, itemSearchResultPage, results, properties, query, getItem, callback) {
-            // In that case I will get the entity from the server...
-            server.entityManager.getEntityByUuid(uuid, false,
-                // success callback
-                function (entity, caller) {
-                    caller.results.push(entity)
-                    var next = caller.uuids.pop()
-                    if (caller.uuids.length == 0) {
-                        caller.callback(caller.results, caller.query, caller.itemSearchResultPage)
-                    } else {
-                        caller.getItem(next, caller.itemSearchResultPage, caller.results, caller.uuids, caller.query, caller.getItem, caller.callback)
-                    }
-                },
-                // error callback
-                function (errObj, caller) {
-                    var next = caller.uuids.pop()
-                    if (caller.uuids.length == 0) {
-                        caller.callback(caller.results, caller.query, caller.itemSearchResultPage)
-                    } else {
-                        caller.getItem(next, caller.itemSearchResultPage, caller.results, caller.uuids, caller.query, caller.getItem, caller.callback)
-                    }
-                }, { "itemSearchResultPage": itemSearchResultPage, "results": results, "uuids": uuids, "query": queryTxt, "getItem": getItem, "callback": callback })
-        }
-    
-        // Get the properties items if any's
-        if (uuids.length > 0) {
-            getItem(uuids[0], this, results_, uuids, query, getItem,
-                // The callback...
-                function (packages) {
-                    return function (results, query, itemSearchResultPage) {
-                        if (packages.length == 0) {
-                            // simply display the results.
-                            itemSearchResultPage.displayTabResults(results, query)
-                        } else {
-                            // In that case I will also append items from the packages...
-                            var getPackageItems = function (pacakageUuid, packages, itemSearchResultPage, results, query, getPackageItems, callback) {
-                                server.entityManager.getEntityByUuid(pacakageUuid, false,
-                                    // success callback 
-                                    function (results, caller) {
-                                        caller.getPacakageItem = function (items, caller) {
-                                            var item = items.pop()
-                                            caller.items = items;
-                                            // Here I will get the item reference value.
-                                            server.entityManager.getEntityByUuid(item, false,
-                                                // success callback 
-                                                function (results, caller) {
-                                                    if (!objectPropInArray(caller.results, "UUID", results.UUID)) {
-                                                        caller.results.push(results)
-                                                    }
-                                                    // Here I will get the item reference value.
-                                                    if (caller.items.length == 0) {
-                                                        if (caller.packages.length == 0) {
-                                                            // end of process
-                                                            caller.callback(caller.results, caller.query, caller.itemSearchResultPage)
-                                                        } else {
-                                                            // call another time.
-                                                            caller.getPackageItems(caller.packages.pop(0), caller.packages, caller.itemSearchResultPage, caller.results, caller.query, caller.getPackageItems, caller.callback)
-                                                        }
-                                                    } else {
-                                                        caller.getPacakageItem(caller.items, caller)
-                                                    }
-                                                },
-                                                // error callback
-                                                function (errObj, caller) {
-                                                    console.log("---> searchResultPage ln 202")
-                                                }, caller)
-                                        }
-                                        
-                                        caller.getPacakageItem(JSON.parse(JSON.stringify(results.M_items)), caller)
-    
-                                    },
-                                    // error callback
-                                    function (errObj, caller) {
-                                        console.log("---> searchResultPage ln 211")
-                                    }, { "itemSearchResultPage": itemSearchResultPage, "packages": packages, "results": results, "query": query, "getPackageItems": getPackageItems, "callback": callback })
-                            }
-                            // process the first item.
-                            getPackageItems(packages.pop(0), packages, itemSearchResultPage, results, query, getPackageItems, function (results, query, itemSearchResultPage) {
-                                itemSearchResultPage.displayTabResults(results, query)
-                            })
-                        }
-                    }
-                }(packages)
-            )
-        }
+        server.entityManager.getEntitiesByUuid(uuids, 
+          function(index, total, caller){
+              console.log("---> transfert ", index, "/", total)
+          },
+          function(results, caller){
+              var items = []
+              for(i=0; i < results.length; i++){
+                  var item = new CatalogSchema.ItemType()
+                  item.init(results[i], false)
+                  items.push(item)
+              }
+              caller.itemSearchResultPage.displayTabResults(items, caller.query)
+              
+          },
+          function(){
+              
+          }, {"query":query, "itemSearchResultPage":this})
+          
     }else if(context == "supplierSearchLnk"){
         // The seach result must be about supplier and supplied items and
         // not the items itself...
         var uuids = []
-        var itemSupplier = [] // contain the supplier/itemsSupplier values, that's what we want to display.
+        var itemSuppliers = [] // contain the supplier/itemsSupplier values, that's what we want to display.
         if (results.estimate > 0) {
             for (var i = 0; i < results.results.length; i++) {
                 var result = results.results[i];
@@ -241,93 +172,71 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
                         }
                     }
                 }else if (result.data.TYPENAME == "CatalogSchema.ItemSupplierType") {
-                    itemSupplier.push(results.results[i].data)
+                    itemSuppliers.push(results.results[i].data)
                 }
             }
             headerText = "About " + (uuids.length) + " results " + " (" + results.elapsedTime / 1000 + "seconds)"
         }
-        
-        var initItemSuppliers = function(uuids, itemSuppliers, q, itemSearchResultPage, callback){
-            // The query.
-            var uuid = uuids.pop()
+
+        var getItemSuppliers = function(packages, itemSuppliers, q, itemSearchResultPage){
             
-            // In case of undefined values.
-            if(uuid == undefined){
-                initItemSuppliers(uuids, itemSuppliers, q, itemSearchResultPage, callback)
-                if(uuids.length == 0){
-                    callback(uuids, itemSuppliers, query, itemSearchResultPage, callback)
-                }
-                return
-            }
-           
-        	server.entityManager.getEntityByUuid(uuid, false,
-        		// success callback
-        		function (itemSupplier, caller) {
-        			// return the results.
-        			caller.itemSuppliers.push(itemSupplier)
-        			if(caller.uuids.length > 0){
-        			    caller.callback(caller.uuids, caller.itemSuppliers, caller.query, caller.itemSearchResultPage, caller.callback)
-        			}else{
-        			    caller.itemSearchResultPage.displayTabResults(caller.itemSuppliers, caller.query)
-        			}
-        		},
-        		// error callback
-        		function (errObj, caller) {
-                    if(caller.uuids.length > 0){
-        			    caller.callback(caller.uuids, caller.itemSuppliers, caller.query, caller.itemSearchResultPage, caller.callback)
-        			}else{
-        			    caller.itemSearchResultPage.displayTabResults(caller.itemSuppliers, caller.query)
-        			}
-        		}, {"uuids":uuids, "itemSuppliers":itemSuppliers, "query": query, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
-        }
-        
-        var getItemSuppliers = function(uuids, itemSuppliers, q, itemSearchResultPage, callback){
-            // The query.
-            var uuid = uuids.pop()
-        	var query = {}
-        	query.TypeName = "CatalogSchema.PackageType"
-        	query.Fields = ["M_supplied"]
-        	query.Query = 'CatalogSchema.PackageType.UUID == "' + uuid + '"'
-        	server.dataManager.read('CatalogSchema', JSON.stringify(query), query.Fields, [],
-        		// success callback
-        		function (results, caller) {
-        			// return the results.
-        			caller.itemSuppliers = caller.itemSuppliers.concat(results[0][0])
-        			if(caller.uuids.length > 0){
-        			    caller.callback(caller.uuids, caller.itemSuppliers, caller.query, caller.itemSearchResultPage, caller.callback)
-        			}else{
-        			    initItemSuppliers(caller.itemSuppliers, [], caller.query, caller.itemSearchResultPage, initItemSuppliers)
-        			}
-        		},
-        		// progress callback
-        		function (index, total, caller) {
-        
-        		},
-        		// error callback
-        		function (errObj, caller) {
-        
-        		}, {"uuids":uuids, "itemSuppliers":itemSuppliers, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
+            server.entityManager.getEntitiesByUuid(packages, 
+              function(index, total, caller){
+                  console.log("---> transfert ", index, "/", total)
+              },
+              function(results, caller){
+                  var itemSuppliers = caller.itemSuppliers
+                  for(var i=0; i < results.length; i++){
+                      for(var j=0; j < results[i].M_supplied.length; j++){
+                          if(results[i].M_supplied[j] != null){
+                              if(itemSuppliers.indexOf(results[i].M_supplied[j]) == -1){
+                                itemSuppliers.push(results[i].M_supplied[j])
+                              }
+                          }
+                      }
+                  }
+                  
+                  server.entityManager.getEntitiesByUuid(itemSuppliers, 
+                    function(index, total, caller){
+                        console.log("---> transfert ", index, "/", total)
+                    },
+                    function(results, caller){
+                        var itemSuppliers = []
+                        for(var i=0; i < results.length; i++){
+                            var itemSupplier = new CatalogSchema.ItemSupplierType();
+                            itemSupplier.init(results[i], false);
+                            itemSuppliers.push(itemSupplier);
+                        }
+                        caller.itemSearchResultPage.displayTabResults(itemSuppliers, caller.query)
+                    },
+                    function(err, caller){},
+                    caller)
+      
+              },
+              function(){
+                  
+              },  {"query":q, "itemSuppliers":itemSuppliers, "itemSearchResultPage":itemSearchResultPage})
         }
         
         // I will use the data manager to get the basic information.
-        var getPackages = function(uuids, pacakages, q, itemSearchResultPage, callback){
+        var getPackages = function(uuids, pacakages, itemSuppliers, q, itemSearchResultPage, callback){
             // The query.
             var uuid = uuids.pop()
         	var query = {}
         	query.TypeName = "CatalogSchema.ItemType"
         	query.Fields = ["M_packaged"]
-        	query.Query = 'CatalogSchema.ItemType.UUID == "' + uuid + '"'
+        	query.Query = 'CatalogSchema.ItemType.UUID=="' + uuid + '"'
         	server.dataManager.read('CatalogSchema', JSON.stringify(query), query.Fields, [],
         		// success callback
         		function (results, caller) {
         			// return the results.
-        			if(results[0][0] != undefined){
-        			    caller.pacakages = results[0][0].concat(caller.pacakages)
+        			if(results[0][0][0] != undefined){
+        			    caller.pacakages = results[0][0][0].concat(caller.pacakages)
         			}
         			if(caller.uuids.length > 0){
-        			    caller.callback(caller.uuids, caller.pacakages, caller.query, caller.itemSearchResultPage, caller.callback)
+        			    caller.callback(caller.uuids, caller.pacakages, caller.itemSuppliers, caller.query, caller.itemSearchResultPage, caller.callback)
         			}else{
-        			    getItemSuppliers(caller.pacakages, [], caller.query, caller.itemSearchResultPage, getItemSuppliers)
+        			    getItemSuppliers(caller.pacakages, caller.itemSuppliers, caller.query, caller.itemSearchResultPage)
         			}
         		},
         		// progress callback
@@ -337,14 +246,18 @@ SearchResultPage.prototype.displayResults = function (results, query, context) {
         		// error callback
         		function (errObj, caller) {
                 
-        		}, {"uuids":uuids, "pacakages":pacakages, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
+        		}, {"uuids":uuids, "pacakages":pacakages, "itemSuppliers":itemSuppliers, "query": q, "itemSearchResultPage":itemSearchResultPage, "callback":callback})
         }
-        if(uuids.length > 0 && itemSupplier == 0){
-            getPackages(uuids, [], query, this, getPackages);
-        }else{
-             this.displayTabResults(itemSupplier, query)
+        if(uuids.length > 0){
+            var uuids_ = []
+            for(var i=0; i < itemSuppliers.length; i++){
+                uuids_.push(itemSuppliers[i].UUID)
+            }
+            getPackages(uuids, [], uuids_, query, this, getPackages);
+        }else if(itemSuppliers.length > 0){
+            this.displayTabResults(itemSuppliers, query)
         }
-        // this.displayTabResults(results, query)
+        
     }else if(context == "localisationSearchLnk"){
         
         // In that case localisation is the the main think to look for...
