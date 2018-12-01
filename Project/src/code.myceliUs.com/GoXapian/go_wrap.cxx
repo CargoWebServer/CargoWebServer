@@ -2343,12 +2343,11 @@ Xapian::TermIterator *_wrap_Document_termlist_end_xapian_245a1afe1629f0b1(Xapian
 
 
 intgo _wrap_Document_values_count_xapian_245a1afe1629f0b1(Xapian::Document *_swig_go_0) {
+	
   Xapian::Document *arg1 = (Xapian::Document *) 0 ;
   Xapian::termcount result;
   intgo _swig_go_result;
-  
-  arg1 = *(Xapian::Document **)&_swig_go_0; 
-  
+  arg1 = *(Xapian::Document **)&_swig_go_0;
   result = (Xapian::termcount)((Xapian::Document const *)arg1)->values_count();
   _swig_go_result = result; 
   return _swig_go_result;

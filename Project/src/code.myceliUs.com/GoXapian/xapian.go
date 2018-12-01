@@ -13,6 +13,7 @@
 package xapian
 
 //#cgo LDFLAGS:  -L/usr/local/lib -lxapian
+//#cgo CFLAGS: -g -O3 -fno-stack-protector
 /*
 #define intgo swig_intgo
 typedef void *swig_voidp;

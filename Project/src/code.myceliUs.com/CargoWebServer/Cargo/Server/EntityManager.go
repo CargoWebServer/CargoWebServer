@@ -312,7 +312,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No uuid given!"))
 		return nil, errObj
 	}
-
 	// Get it from cache if is there.
 	entity := this.getEntity(uuid)
 	if entity != nil {
@@ -356,7 +355,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 				entity.SetNeedSave(false)
 				// Set the entity in the cache
 				this.setEntity(entity)
-			} else {
+			} else if obj.Type().String() == "map[string]interface {}" {
 				// Dynamic entity here.
 				entity = NewDynamicEntity()
 				entity.(*DynamicEntity).setObject(results[0][0].(map[string]interface{}))
@@ -2066,6 +2065,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, lazy bool, messageId str
 		if !lazy {
 			entity = initChilds(entity)
 		}
+
 		// Here I will create a file in the tmp directory and send back it path to the
 		// client.
 		var values []byte
@@ -2075,7 +2075,6 @@ func (this *EntityManager) GetEntityByUuid(uuid string, lazy bool, messageId str
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
 		}
-
 		var b bytes.Buffer
 		gz := gzip.NewWriter(&b)
 		if _, err := gz.Write(values); err != nil {
@@ -2089,7 +2088,6 @@ func (this *EntityManager) GetEntityByUuid(uuid string, lazy bool, messageId str
 		if err := gz.Close(); err != nil {
 			panic(err)
 		}
-
 		// So here I will create the response as a compress file.
 		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
 		err = ioutil.WriteFile(path, b.Bytes(), 0666)

@@ -1616,13 +1616,13 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-	log.Println("---> 1619")
+
 	file, errObj := this.openFile(fileId, sessionId)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-	log.Println("---> 1625")
+
 	// I will also get the data from the disk...
 	if !file.IsDir() && file.GetFileType() == CargoEntities.FileType_DiskFile {
 		filedata, err := ioutil.ReadFile(this.root + file.GetPath() + "/" + file.GetName())

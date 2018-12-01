@@ -188,7 +188,6 @@ func (this *SessionManager) getActiveSessions() []*CargoEntities.Session {
 		account := entities[i].(*CargoEntities.Account)
 		sessions = append(sessions, account.GetSessions()...)
 	}
-	log.Println("193 ----> active session: ", sessions)
 	return sessions
 
 }

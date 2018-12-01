@@ -72,32 +72,12 @@ func (cache *Cache) GetObject(id string) interface{} {
 	return <-values["result"].(chan interface{})
 }
 
-func (cache *Cache) GetJsObject(id string) interface{} {
-	// Here I will get object from the cache.
-	values := make(map[string]interface{})
-	values["name"] = "getJsObject"
-	values["id"] = id
-	values["result"] = make(chan interface{})
-	cache.m_operations <- values
-	// wait to the result to be found.
-	return <-values["result"].(chan interface{})
-}
-
 func (cache *Cache) SetObject(id string, object interface{}) {
 	// Here I will set object in the cache
 	values := make(map[string]interface{})
 	values["name"] = "setObject"
 	values["id"] = id
 	values["object"] = object
-	cache.m_operations <- values
-}
-
-func (cache *Cache) SetJsObject(id string, jsObject interface{}) {
-	// Here I will set object in the cache
-	values := make(map[string]interface{})
-	values["name"] = "setJsObject"
-	values["id"] = id
-	values["jsObject"] = jsObject
 	cache.m_operations <- values
 }
 

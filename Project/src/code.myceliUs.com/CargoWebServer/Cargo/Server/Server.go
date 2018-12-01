@@ -914,9 +914,11 @@ func (this *Server) Start() {
 			successCallback := func(connectionId string, conn GoJavaScript.Object, service GoJavaScript.Object, caller interface{}) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
-					JS.GetJsRuntimeManager().RunScript(connectionId, src)
-					// Call on open...
-					conn.Call("onopen", service, caller)
+					_, err := JS.GetJsRuntimeManager().RunScript(connectionId, src)
+					if err == nil {
+						// Call on open...
+						conn.Call("onopen", service, caller)
+					}
 				}
 			}(sessionId, conn, service, caller)
 

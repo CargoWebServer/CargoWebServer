@@ -3,8 +3,6 @@ package GoJavaScript
 import "code.myceliUs.com/Utility"
 import "reflect"
 
-//import "log"
-
 // The object must be contain entirely in the client a get by the server when he's
 // ready to use it with getObjectByUuid... so no channel will dead lock.
 /**
@@ -142,13 +140,14 @@ func (self *Object) Call(name string, params ...interface{}) (interface{}, error
 
 	var err error
 	var result interface{}
-
 	if action.Results[0] != nil {
 		result = RefToObject(action.Results[0])
 	}
 
 	if action.Results[1] != nil {
-		err = action.Results[1].(error)
+		if reflect.TypeOf(action.Results[1]).String() == "error" {
+			err = action.Results[1].(error)
+		}
 	}
 
 	return result, err

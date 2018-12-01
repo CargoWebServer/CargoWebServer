@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"strings"
 
-	//	"log"
-
 	"code.myceliUs.com/Utility"
 )
 
@@ -171,7 +169,6 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 		field := prototype.Fields[i]
 		val := obj[field]
 		fieldType := prototype.FieldsType[i]
-
 		if val != nil {
 			if strings.HasPrefix(field, "M_") {
 				if !strings.HasPrefix(fieldType, "[]xs.") && !strings.HasPrefix(fieldType, "xs.") {
@@ -274,7 +271,6 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 	object["ParentUuid"] = this.parentUuid
 	object["ParentLnk"] = this.parentLnk
 	object["Ids"] = ids
-
 	// save it to the cache
 	this.setValues(object)
 }
@@ -291,7 +287,6 @@ func (this *DynamicEntity) setValues(values map[string]interface{}) {
 	infos["needSave"] = make(chan bool, 0)
 
 	// set the values in the cache.
-
 	cache.m_setValues <- infos
 
 	// wait to see if the entity has change...
