@@ -159,8 +159,9 @@ Table.prototype.setModel = function (model, initCallback) {
 
 	// Link both side of the relation.
 	this.modelId = model.id
-
+	
 	model.table = this
+	this.model = model;
 
 	// Initialyse the table model.
 	this.getModel().init(

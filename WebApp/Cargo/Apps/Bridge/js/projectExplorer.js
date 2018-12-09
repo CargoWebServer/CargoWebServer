@@ -8,7 +8,6 @@ var ProjectExplorer = function (parent) {
     this.parent = parent
 
     this.panel = parent.appendElement({ "tag": "div", "class": "project_explorer" }).down()
-
     // So here I will get the list of opened project.
     if(localStorage.getItem("projectsInfo") != undefined){
         var projectsInfo = JSON.parse(localStorage.getItem("projectsInfo"))
@@ -357,7 +356,7 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                 }(dir), "fa fa-trash-o")
 
                 // Close a project
-                var closeMenuItem = new MenuItem("rename_menu", "Close", {}, 0, function (dir, folderDiv) {
+                var closeMenuItem = new MenuItem("close_menu", "Close", {}, 0, function (dir, folderDiv) {
                     return function () {
                         // Here I will close the project view.
                         folderDiv.element.parentNode.removeChild(folderDiv.element)
@@ -377,9 +376,37 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                     }
                 }(dir, folderDiv), "fa fa-times")
                 
+
                 // The main menu will be display in the body element, so nothing will be over it.
                 if(dir.M_path == ""){
-                    new PopUpMenu(folderDiv, [closeMenuItem, "|", newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+                    
+                    // display it as needed.
+                    var canCompile = false
+                    for(var i=0; i < dir.M_files.length; i++){
+                        if(dir.M_files[i] != undefined){
+                            if(dir.M_files[i].M_name == "tsconfig.json"){
+                                canCompile = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if(canCompile){
+                        // Now the compile menu.
+                        var compileMenuItem = new MenuItem("compile_menu", "Compile", {}, 0, function (dir, folderDiv) {
+                            return function () {
+                               console.log("compile project", dir)
+                               server.projectManager.compile(dir.UUID, 
+                                function(){},
+                                function(){}, {})
+                                
+                            }
+                        }(dir, folderDiv), "fa fa-hashtag")
+                        new PopUpMenu(folderDiv, [closeMenuItem,"|", compileMenuItem, "|", newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+                    }else{
+                        new PopUpMenu(folderDiv, [closeMenuItem, "|", newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+                    }
+                    
                 }else{
                     new PopUpMenu(folderDiv, [newFolderMenuItem, newFileMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
                 }
@@ -538,7 +565,6 @@ ProjectView.prototype.createFileView = function (parent, file) {
                 return false
             }
         }(fileDiv, file), false)
-
     return fileDiv
 }
 

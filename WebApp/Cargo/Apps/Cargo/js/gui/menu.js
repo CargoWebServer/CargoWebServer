@@ -85,7 +85,7 @@ var Menu = function (parent, items) {
     }
 
     this.parent = parent
-    this.panel = this.parent.appendElement({ "tag": "div", "style": "position: relative; display: none;" }).down()
+    this.panel = this.parent.appendElement({ "tag": "div", "style": "position: relative; display: none;"}).down()
     this.subItemPanel = null
     this.currentItem = null
     this.subMenus = {}

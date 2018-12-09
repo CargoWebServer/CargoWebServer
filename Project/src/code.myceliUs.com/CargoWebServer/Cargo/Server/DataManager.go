@@ -544,7 +544,10 @@ func (this *DataManager) Close(storeName string, messageId string, sessionId str
 //        }(caller)
 //        xhr.onprogress = function (progressCallback, caller) {
 //            return function (e) {
-//               progressCallback(e.loaded, e.total, caller)
+//					if (!e.lengthComputable) {
+//					  e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
+//					}
+//					progressCallback(e.loaded, e.total, caller)
 //            }
 //        }(caller.progressCallback, caller.caller)
 //        xhr.send();

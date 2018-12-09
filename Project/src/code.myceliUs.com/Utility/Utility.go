@@ -446,25 +446,6 @@ func copyFileContents(src, dst string) (err error) {
 	return
 }
 
-func RemoveContents(dir string) error {
-	d, err := os.Open(dir)
-	if err != nil {
-		return err
-	}
-	defer d.Close()
-	names, err := d.Readdirnames(-1)
-	if err != nil {
-		return err
-	}
-	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(dir, name))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func FileLine() string {
 	_, fileName, fileLine, ok := runtime.Caller(1)
 	var s string
@@ -1163,4 +1144,79 @@ func Less(val0 interface{}, val1 interface{}) bool {
 		log.Println("Value with type:", reflect.TypeOf(val0).String(), "cannot be compare!")
 	}
 	return false
+}
+
+/**
+ * Keep the parent node
+ */
+func GetFilePathsByExtension(path string, extension string) []string {
+	files, err := ioutil.ReadDir(path)
+	results := make([]string, 0)
+	if err == nil {
+		for i := 0; i < len(files); i++ {
+			if files[i].IsDir() {
+				results = append(results, GetFilePathsByExtension(path+"/"+files[i].Name(), extension)...)
+			} else if strings.HasSuffix(files[i].Name(), extension) {
+				results = append(results, path+"/"+files[i].Name())
+			}
+		}
+	}
+	return results
+}
+
+// Copy the src file to dst. Any existing file will be overwritten and will not
+// copy file attributes.
+func Copy(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
+
+// Write a string to a given file.
+func WriteStringToFile(filepath, s string) error {
+	fo, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fo.Close()
+
+	_, err = io.Copy(fo, strings.NewReader(s))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveContents(dir string) error {
+	d, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(dir, name))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

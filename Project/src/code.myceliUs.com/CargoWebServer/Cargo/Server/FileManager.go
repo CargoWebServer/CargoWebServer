@@ -114,7 +114,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 	// Keep only the part past the root...
 	filePath_ := strings.Replace(filePath, this.root, "", -1)
 
-	if filePath_ == "/lib" {
+	if filePath_ == "/lib" || strings.HasSuffix(filePath, "node_modules") {
 		return nil
 	}
 
@@ -1172,7 +1172,10 @@ func (this *FileManager) CreateDir(dirName string, dirPath string, messageId str
 //    } (successCallback, caller)
 //    xhr.onprogress = function (progressCallback, caller) {
 //        return function (e) {
-//            progressCallback(e.loaded, e.total, caller)
+//			if (!e.lengthComputable) {
+//				e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
+//			}
+//          progressCallback(e.loaded, e.total, caller)
 //        }
 //    } (progressCallback, caller)
 //    xhr.send();

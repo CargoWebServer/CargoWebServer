@@ -1801,7 +1801,10 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                    }(caller)
 //                    xhr.onprogress = function (progressCallback, caller) {
 //                        return function (e) {
-//                            progressCallback(e.loaded, e.total, caller)
+//							if (!e.lengthComputable) {
+//					  			e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
+//							}
+//                          progressCallback(e.loaded, e.total, caller)
 //                        }
 //                    }(caller.progressCallback, caller.caller)
 //                    xhr.send();
@@ -2214,6 +2217,9 @@ func getEntityByUuid(uuid string) (map[string]interface{}, error) {
 //           }(caller)
 //           xhr.onprogress = function (progressCallback, caller) {
 //               return function (e) {
+//					if (!e.lengthComputable) {
+//					  e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
+//					}
 //                  progressCallback(e.loaded, e.total, caller)
 //               }
 //           }(caller.progressCallback, caller.caller)
