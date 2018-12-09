@@ -350,6 +350,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 			errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with uuid "+uuid))
 			return nil, errObj
 		} else {
+
 			if obj.Type().String() != "map[string]interface {}" {
 				entity = obj.Interface().(Entity)
 				entity.SetNeedSave(false)
@@ -2383,9 +2384,7 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
 	entity, errObj := this.getEntityById(typeName, storeId, ids)
-
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

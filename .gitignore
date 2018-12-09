@@ -49,6 +49,9 @@
 !/WebApp/Cargo/Apps/Bridge/
 
 /CargoServiceContainer/plugins
+!/CargoServiceContainer/plugins/SayHelloPlugin/
+!/CargoServiceContainer/plugins/XapianPlugin/
+
 /CargoServiceContainer/lib
 /CargoServiceContainer/include
 /CargoServiceContainer/*.user

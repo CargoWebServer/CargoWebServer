@@ -2,9 +2,19 @@ var SearchResultPage = function (parent) {
     this.parent = parent;
     this.panel = new Element(null, {"tag":"div","id" : "item_search_result_page", "class" : "container-fluid", "style" :"margin-top : 15px; width 100%;"})
     this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs d-none d-sm-flex querynav"}).down()
-    this.toggle = this.navbar.appendElement({"tag" : "button","class" :"btn btn-dark toggleBtn", "onclick" : "goToItem()", "innerHtml":"Voir les items trouvés",})
-    .appendElement({"tag" : "button","class" :"btn btn-dark", "onclick" : "goToPackage()", "innerHtml":"Voir les paquets trouvés",})
-    
+    this.getItemBtn = this.navbar.appendElement({"tag" : "button","class" :"btn btn-dark toggleBtn", "innerHtml":"Voir les items trouvés",}).down()
+    this.getItemBtn.element.onclick = function(){
+        document.getElementById("item_display_page_panel").style.display = ""
+        document.getElementById("item_search_result_page").style.display = "none"
+        fireResize()
+    }
+    this.getPackageBtn = this.navbar.appendElement({"tag" : "button","class" :"btn btn-dark", "innerHtml":"Voir les paquets trouvés",}).down()
+    this.getPackageBtn.element.onclick = function(){
+        document.getElementById("package_display_page_panel").style.display = ""
+        document.getElementById("item_search_result_page").style.display = "none"
+        fireResize()
+    }
+
     this.mobileContent =  this.panel.appendElement({"tag" : "div", "class" : "container-fluid d-block d-sm-none"}).down()
     this.resultsContent = this.panel.appendElement({"tag" : "div", "class" : "tab-content  d-none d-sm-flex"}).down()
   
@@ -47,15 +57,6 @@ var SearchResultPage = function (parent) {
     return this
 }
 
-function goToItem(){
-    document.getElementById("item_display_page_panel").style.display = ""
-    document.getElementById("item_search_result_page").style.display = "none"
-}
-
-function goToPackage(){
-    document.getElementById("package_display_page_panel").style.display = ""
-    document.getElementById("item_search_result_page").style.display = "none"
-}
 
 SearchResultPage.prototype.displayResults = function (results, query, context) {
     mainPage.itemDisplayPage.panel.element.style.display = "none"

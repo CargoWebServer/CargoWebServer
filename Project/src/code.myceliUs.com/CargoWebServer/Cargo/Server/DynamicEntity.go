@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 
+	// "log"
+
 	"code.myceliUs.com/Utility"
 )
 
@@ -271,6 +273,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 	object["ParentUuid"] = this.parentUuid
 	object["ParentLnk"] = this.parentLnk
 	object["Ids"] = ids
+
 	// save it to the cache
 	this.setValues(object)
 }

@@ -216,6 +216,10 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					enquire := xapian.NewEnquire(db)
 					enquire.Set_query(query)
 					mset := enquire.Get_mset(uint(0), uint(10000))
+					if strings.HasPrefix(queryString, "CatalogSchema.LocalisationType.ParentUuid") {
+						log.Println("------> 220 ", mset.Size())
+					}
+
 					// Now I will process the results.
 					for i := 0; i < mset.Size(); i++ {
 						it := mset.Get_hit(uint(i))
@@ -1914,7 +1918,12 @@ func (l *XapianQueryListener) ExitPredicate(ctx *parser.PredicateContext) {
 	} else if field == "UUID" || field == "TYPENAME" || field == "ParentUuid" || field == "ParentLnk" {
 		// Search for a unique value.
 		v := strings.Replace(l.value, `"`, "", -1)
-		l.query = generatePrefix(storeId+"."+typeName, field) + formalize(v)
+		if len(v) > 0 {
+			l.query = generatePrefix(storeId+"."+typeName, field) + formalize(v)
+		} else {
+			// here we search for an empty value over values for that type name.
+			l.query = generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+		}
 	}
 }
 

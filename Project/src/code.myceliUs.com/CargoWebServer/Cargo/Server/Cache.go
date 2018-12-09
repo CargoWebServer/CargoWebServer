@@ -1,12 +1,12 @@
 package Server
 
 import (
+	//	"errors"
 	"log"
 	"reflect"
+	"runtime/debug"
 	"strings"
 	"time"
-
-	"runtime/debug"
 
 	"code.myceliUs.com/Utility"
 	"github.com/allegro/bigcache"
@@ -59,7 +59,35 @@ func (cache *Cache) getEntity(uuid string) (Entity, error) {
 			log.Panicln("--> go error ", uuid, err)
 			return nil, err
 		}
-	}
+	} /*else {
+		// Try to get values from the datastore...
+		values, err := getEntityByUuid(uuid)
+		if err != nil {
+			return nil, err
+		}
+
+		obj, _ := Utility.InitializeStructure(values, setEntityFct)
+
+		// So here I will retreive the entity uuid from the entity id.
+		if obj.IsValid() {
+			if obj.IsNil() {
+				return nil, errors.New("Fail to retreive entity with uuid " + uuid)
+			} else {
+				if obj.Type().String() != "map[string]interface {}" {
+					entity = obj.Interface().(Entity)
+					entity.SetNeedSave(false)
+				} else if obj.Type().String() == "map[string]interface {}" {
+					// Dynamic entity here.
+					entity = NewDynamicEntity()
+					// set the entity in the cache.
+					entity.SetNeedSave(false)
+				}
+				return entity, nil
+			}
+		}
+		return nil, err
+
+	}*/
 	return entity, nil
 }
 
@@ -84,7 +112,7 @@ func newCache() *Cache {
 			// cache will not allocate more memory than this limit, value in MB
 			// if value is reached then the oldest entries can be overridden for the new ones
 			// 0 value means no size limit
-			HardMaxCacheSize: 1000,
+			HardMaxCacheSize: 4000,
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.
@@ -207,6 +235,10 @@ func newCache() *Cache {
 					if err == nil {
 						values = val.(map[string]interface{})
 					}
+				} else {
+					// get values from the db instead.
+					values, _ = getEntityByUuid(uuid)
+					log.Println("---> no values found in the cache for uuid ", uuid, err.Error())
 				}
 				// Return the found values.
 				getValues <- values
@@ -229,7 +261,6 @@ func newCache() *Cache {
 							// By uuid
 							cache.m_cache.Set(values["UUID"].(string), bytes)
 						}
-
 						// set if the entity need to be save.
 						operation["needSave"].(chan bool) <- needSave
 					} else {

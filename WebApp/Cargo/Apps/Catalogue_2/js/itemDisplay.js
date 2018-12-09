@@ -10,23 +10,23 @@ var ItemDisplayPage = function (parent) {
 
     this.navbar = this.panel.appendElement({"tag" : "ul", "class" : "nav nav-tabs querynav printHide","id" : "itemqueries"}).down()
     // Now I will display the list of results...
-    this.navbar.appendElement({"tag":"button","class":"btn btn-dark toggleBtn", "onclick" : "itemSwitchContext()","innerHtml" :"Voir les recherches"})
+    this.itemSwitchContextBtn = this.navbar.appendElement({"tag":"button","class":"btn btn-dark toggleBtn", "innerHtml" :"Voir les recherches"}).down()
+    this.itemSwitchContextBtn.element.onclick = function(){
+        if(document.getElementById("item_display_page_panel") !== null){
+            document.getElementById("item_display_page_panel").style.display = "none"
+        }
+        if(document.getElementById("item_search_result_page") !== null){
+            document.getElementById("item_search_result_page").style.display = ""
+        }
+        fireResize()
+    }
     
     this.itemResultPanel = this.panel.appendElement({ "tag": "div", "class": "search_results_content tab-content" }).down()
     this.currentItem = null
     
     return this
 }
-  
-function itemSwitchContext(){
-    if(document.getElementById("item_display_page_panel") !== null){
-        document.getElementById("item_display_page_panel").style.display = "none"
-    }
-    if(document.getElementById("item_search_result_page") !== null){
-        document.getElementById("item_search_result_page").style.display = ""
-    }
-    fireResize()
-}
+
 
 function showPackage(itemID){
     packageElement = document.getElementById(itemID+"-packagesContent")
