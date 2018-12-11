@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	// "log"
+	"log"
 
 	"code.myceliUs.com/Utility"
 )
@@ -35,10 +35,12 @@ type DynamicEntity struct {
 
 	/** Set the uuid function **/
 	generateUuid func(interface{}) string
-
-	/** keep save state **/
-	needSave bool
 }
+
+// Contain entity that need to be save.
+var (
+	needSave_ = make(map[string]bool)
+)
 
 func NewDynamicEntity() *DynamicEntity {
 	entity := new(DynamicEntity)
@@ -58,24 +60,36 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	infos["field"] = field
 	infos["value"] = value
 	infos["needSave"] = make(chan bool)
+
 	// set the values in the cache.
 	cache.m_setValue <- infos
 
-	this.SetNeedSave(<-infos["needSave"].(chan bool))
+	needSave := <-infos["needSave"].(chan bool)
+	if needSave {
+		needSave_[this.uuid] = true
+	}
 
 	return nil
 }
 
 func (this *DynamicEntity) SetFieldValue(field string, value interface{}) error {
+	needSave_[this.uuid] = true
 	return this.setValue(field, value)
 }
 
-func (this *DynamicEntity) SetNeedSave(needSave bool) {
-	this.needSave = needSave
+func (this *DynamicEntity) SetNeedSave(val bool) {
+	if val {
+		needSave_[this.uuid] = true
+	} else {
+		delete(needSave_, this.uuid)
+	}
 }
 
 func (this *DynamicEntity) IsNeedSave() bool {
-	return this.needSave
+	if _, ok := needSave_[this.uuid]; ok {
+		return true
+	}
+	return false
 }
 
 /**
@@ -274,7 +288,6 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 	object["ParentLnk"] = this.parentLnk
 	object["Ids"] = ids
 
-	// save it to the cache
 	this.setValues(object)
 }
 
@@ -293,7 +306,8 @@ func (this *DynamicEntity) setValues(values map[string]interface{}) {
 	cache.m_setValues <- infos
 
 	// wait to see if the entity has change...
-	this.needSave = <-infos["needSave"].(chan bool)
+	this.SetNeedSave(<-infos["needSave"].(chan bool))
+	log.Println("---> entity ", this.uuid, "needSave", this.IsNeedSave())
 }
 
 /**
@@ -475,6 +489,7 @@ func (this *DynamicEntity) GetChildsUuid() []string {
 			}
 		}
 	}
+
 	return childs
 }
 

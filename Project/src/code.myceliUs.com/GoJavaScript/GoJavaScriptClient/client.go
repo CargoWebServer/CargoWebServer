@@ -204,6 +204,7 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 		if data["TYPENAME"] != nil {
 			relfectValue := Utility.MakeInstance(data["TYPENAME"].(string), data, SetEntity)
 			value = relfectValue.Interface()
+
 		} else {
 			// Here map[string]interface{} will be use.
 			err = errors.New("No object are registered in go to back the js object!")
@@ -228,7 +229,6 @@ func (self *Client) SetObjectValues(uuid string, jsonStr string) {
 // method names
 func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error) {
 	obj := GoJavaScript.GetCache().GetObject(uuid)
-
 	var err error
 	var infos map[string]interface{}
 
@@ -262,10 +262,8 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 		if element.IsValid() {
 			if element.Type().String() != "GoJavaScript.Object" {
 				for i := 0; i < element.Addr().NumMethod(); i++ {
-
 					typeMethod := element.Addr().Type().Method(i)
 					infos["Methods"].(map[string]interface{})[typeMethod.Name] = ""
-
 				}
 			}
 
@@ -277,6 +275,7 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 				// Here I will set the property
 				// Bust the number of field handler here.
 				if valueField.CanInterface() {
+
 					if valueField.IsValid() {
 						// So here is the field.
 						fieldValue := valueField.Interface()
@@ -301,6 +300,7 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 										values = append(values, fieldValue)
 									}
 								}
+
 								// if the array dosent contain structure I will set it values...
 								infos[fieldName] = values
 
@@ -327,9 +327,12 @@ func (self *Client) GetGoObjectInfos(uuid string) (map[string]interface{}, error
 							infos[fieldName] = fieldValue
 						}
 					}
+				} else {
+					//log.Println("---> field cant interface ", typeField.Name)
 				}
 			}
 		}
+
 		// Return the list of infos.
 		return infos, nil
 	}

@@ -17,9 +17,7 @@ var AdminSupplierPage = function(panel){
         .appendElement({"tag" : "div", "class" : "col-md-9 bg-light"}).down()
          .appendElement({"tag" : "div", "class" : "tab-content", "id" : "suppliersAdminControl"}).up().up().up()
         
-
-
-     this.currencies = []
+    this.currencies = []
     
     this.modifiedItems = {}
   

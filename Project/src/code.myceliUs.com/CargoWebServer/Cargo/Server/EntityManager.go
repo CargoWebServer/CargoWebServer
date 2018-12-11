@@ -525,9 +525,12 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 	// The list of childs.
 	childs := entity.GetChilds()
 	// Save the childs...
+	log.Println("---> save child: ", entity.GetUuid())
 	for i := 0; i < len(childs); i++ {
 		childs[i].(Entity).SetParentUuid(entity.GetUuid())
+		log.Println("-----> save child: ", childs[i].(Entity).GetUuid(), childs[i].(Entity).IsNeedSave())
 		this.saveEntity(childs[i].(Entity))
+		childs[i].(Entity).SetNeedSave(false)
 	}
 }
 
@@ -620,10 +623,9 @@ func (this *EntityManager) entityExist(uuid string) bool {
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// So now I will retreive the list of values associated with that uuid.
 	// If the to string are the same no save is needed.
-	// log.Println("---> save entity: ", entity.GetUuid())
+
 	if this.entityExist(entity.GetUuid()) {
 		if !entity.IsNeedSave() {
-			// log.Println("--->not need save entity ", entity.GetUuid())
 			return nil
 		}
 	}
@@ -639,7 +641,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	msgData0.Name = "entity"
 	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		msgData0.Value = entity.(*DynamicEntity).getValues()
-		//log.Println("---> save entity ", toJsonStr(entity.(*DynamicEntity).getValues()))
 	} else {
 		msgData0.Value = entity
 	}
@@ -1620,6 +1621,7 @@ func (this *EntityManager) SaveEntity(values interface{}, messageId string, sess
 				return obj.Interface().(Entity)
 			} else {
 				entity := NewDynamicEntity()
+				entity.SetNeedSave(true)
 				entity.setObject(values.(map[string]interface{}))
 				errObj = this.saveEntity(entity)
 				if errObj != nil {

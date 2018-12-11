@@ -290,6 +290,18 @@ Element.prototype.prependElement = function (e) {
 };
 
 /**
+ *  Insert a child inside a div a given position.
+ */
+Element.prototype.insertChildAtIndex = function(child, index) {
+  if (!index) index = 0
+  if (index >= this.element.children.length) {
+    this.element.appendChild(child.element)
+  } else {
+    this.insertBefore(child.element, this.element.children[index])
+  }
+}
+
+/**
 * Remove a child element.
 * @param {Element} e The child element to remove.
 * @stability 1

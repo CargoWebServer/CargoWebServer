@@ -225,7 +225,6 @@ func newCache() *Cache {
 				getValue <- value
 
 			case operation := <-cache.m_getValues:
-
 				uuid := operation["uuid"].(string)
 				getValues := operation["getValues"].(chan map[string]interface{})
 				var values map[string]interface{}
@@ -252,7 +251,6 @@ func newCache() *Cache {
 					if err == nil {
 						needSave := string(bytes) != string(bytes_)
 						if needSave {
-							//log.Println("---> setValues ", values)
 							// By id
 							if values["Ids"] != nil {
 								id := generateEntityUuid(values["TYPENAME"].(string), "", values["Ids"].([]interface{}))

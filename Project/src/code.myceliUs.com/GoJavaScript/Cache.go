@@ -48,6 +48,7 @@ func newCache() {
 				} else if operation["name"] == "setObject" {
 					// increment the reference count.
 					cache.m_objects[operation["id"].(string)] = operation["object"]
+
 					//log.Println("set object ----> ", operation["id"].(string), len(cache.m_objects))
 				} else if operation["name"] == "removeObject" {
 					// The object will leave for more 30 second the time the

@@ -124,6 +124,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 			case op := <-store.m_set_entity_channel:
 				values, _ := op.(*sync.Map).Load("values")
 				if values.(map[string]interface{})["TYPENAME"] != nil {
+					//log.Println("---> save values ", toJsonStr(values))
 					typeName := values.(map[string]interface{})["TYPENAME"].(string)
 					uuid := values.(map[string]interface{})["UUID"].(string)
 					path := store.m_path + "/" + typeName + ".glass"
@@ -216,9 +217,6 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 					enquire := xapian.NewEnquire(db)
 					enquire.Set_query(query)
 					mset := enquire.Get_mset(uint(0), uint(10000))
-					if strings.HasPrefix(queryString, "CatalogSchema.LocalisationType.ParentUuid") {
-						log.Println("------> 220 ", mset.Size())
-					}
 
 					// Now I will process the results.
 					for i := 0; i < mset.Size(); i++ {
@@ -1533,7 +1531,7 @@ func (this *GraphStore) Update(queryStr string, values []interface{}, params []i
 	for i := 0; i < len(values); i++ {
 		v := values[i]
 		// If the value is an entity...
-		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct {
+		if reflect.TypeOf(v).Kind() == reflect.Ptr || reflect.TypeOf(v).Kind() == reflect.Struct || reflect.TypeOf(v).Kind() == reflect.Map {
 			this.setEntity(v.(Entity))
 		}
 	}

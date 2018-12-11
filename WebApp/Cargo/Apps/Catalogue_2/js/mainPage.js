@@ -684,7 +684,6 @@ function loadQuickSearchData(panel) {
 
     server.dataManager.read("CatalogSchema", JSON.stringify(q), [], [],
         function (results, caller) {
-            console.log(results[0].length)
             var uuids = []
             for (var i = 0; i < results[0].length; i++) {
                 if (results[0][i][0]==null) {

@@ -217,7 +217,9 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) error {
 												C.duk_put_prop_index(ctx, values, C.uint(i))
 											}
 										} else {
-											log.Println("214 GoDukTape.go ---> unhandle case!!!!")
+											//log.Panicln("214 GoDukTape.go ---> unhandle case!!!!")
+											setValue(ctx, e)
+											C.duk_put_prop_index(ctx, values, C.uint(i))
 										}
 									} else {
 										setValue(ctx, e)

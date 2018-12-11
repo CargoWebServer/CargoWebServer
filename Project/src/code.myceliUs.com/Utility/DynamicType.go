@@ -163,11 +163,13 @@ func MakeInstance(typeName string, data map[string]interface{}, setEntity func(i
  */
 func initializeStructureValue(typeName string, data map[string]interface{}, setEntity func(interface{})) reflect.Value {
 	// Here I will create the value...
+
 	t, ok := getTypeManager().getType(typeName)
 	if !ok {
 		return reflect.ValueOf(data)
 	}
 	v := reflect.New(t.(reflect.Type))
+
 	for name, value := range data {
 		ft, exist := t.(reflect.Type).FieldByName(name)
 		if exist && value != nil {
@@ -189,7 +191,7 @@ func InitializeStructureFieldArrayValue(slice reflect.Value, fieldName string, f
 
 		// If the type is register as dynamic type.
 		if v_ != nil {
-
+			// log.Println("---> ", reflect.TypeOf(v_).String(), v_)
 			if reflect.TypeOf(v_).String() == "map[string]interface {}" {
 				// The value is a dynamic value.
 				v_ := v_.(map[string]interface{})
@@ -240,6 +242,7 @@ func InitializeStructureFieldArrayValue(slice reflect.Value, fieldName string, f
 }
 
 func initializeStructureFieldValue(v reflect.Value, fieldName string, fieldType reflect.Type, fieldValue interface{}, setEntity func(interface{})) {
+
 	switch fieldType.Kind() {
 	case reflect.Slice:
 		// That's mean the value contain an array...
