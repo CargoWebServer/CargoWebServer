@@ -5,8 +5,8 @@ var bodyElement = new Element(document.body, { "tag": "div", "id": "body-element
 // Here I will display the spinner.
 var spinner = new Spinner(bodyElement, 30);
     
-//var service = new Server("localhost", "127.0.0.1", 9494)
-var service = new Server("mon176", "10.67.44.52", 9494)
+var service = new Server("localhost", "127.0.0.1", 9494)
+//var service = new Server("mon176", "10.67.44.52", 9494)
 var xapian = null
 
 // The list of datastore to looking in.
@@ -69,8 +69,7 @@ function main() {
                 console.log("Service is close!")
             })
     }
-    // the main page.
-    main_()
+
 
     // Initialisation of the catalogue data here.
     server.entityManager.getEntityPrototypes("xs",
@@ -100,6 +99,8 @@ function main() {
                                 // display the interface.
                                 spinner.panel.element.style.display = "none";
                                 catalog = results
+                                // the main page.
+                                main_()
                             },
                             function (err) {
                                 var errObj = err.dataMap["errorObj"]
@@ -112,6 +113,8 @@ function main() {
                                     server.entityManager.saveEntity(catalog, function (result, caller) {
                                         catalog.init(result)
                                         spinner.panel.element.style.display = "none";
+                                        // the main page.
+                                        main_()
                                     })
                                 }
                             },

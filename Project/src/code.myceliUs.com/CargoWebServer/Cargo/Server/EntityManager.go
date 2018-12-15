@@ -498,7 +498,6 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 		params[0] = entity
 
 		_, err_ := Utility.CallMethod(parent, setMethodName, params)
-		//log.Println("---> call method ", parent.GetUuid(), setMethodName, parent.IsNeedSave())
 		if err_ != nil {
 			log.Println("fail to call method ", setMethodName, " on ", parent)
 			cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
@@ -517,6 +516,26 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
 		}
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+		eventData := make([]*MessageData, 2)
+		msgData0 := new(MessageData)
+		msgData0.Name = "entity"
+		if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
+			msgData0.Value = parent.(*DynamicEntity).getValues()
+		} else {
+			msgData0.Value = parent
+		}
+		eventData[0] = msgData0
+		msgData1 := new(MessageData)
+		msgData1.Name = "prototype"
+		msgData1.Value = prototype
+		eventData[1] = msgData1
+		// Send save event if something has change.
+		// I will get the existing value from the datastore is it exist.
+		var evt *Event
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+
 	}
 	return nil
 }
@@ -1311,6 +1330,7 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 
 	proto, err := this.getEntityPrototype(typeName, storeId)
 	if err != nil {
+		log.Panicln("------> error ", err)
 		cargoError := NewError(Utility.FileLine(), ENTITY_PROTOTYPE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
@@ -1756,47 +1776,51 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                                    }
 //                                } else {
 //                                    // Now I will initialyse entities from json objects.
-//                                    var values = JSON.parse(jsonStr)
-//                                    if (values.length > 0) {
-//                                        var initEntitiesFct = function (values, caller, entities) {
-//                                            var value = values.pop();
-//                                            var entity = eval("new " + caller.prototype.TypeName + "()")
-//                                            entities.push(entity);
-//                                            if (values.length == 0) {
-//                                                var initCallback = function (caller, entities) {
-//                                                    return function (entity) {
-//                                                        server.entityManager.setEntity(entity);
-//                                                        if (caller.successCallback != undefined) {
-//                                                            caller.successCallback(entities, caller.caller);
-//                                                            caller.successCallback = undefined;
+//                                    try {
+//                                        var values = JSON.parse(jsonStr)
+//                                        if (values.length > 0) {
+//                                            var initEntitiesFct = function (values, caller, entities) {
+//                                                var value = values.pop();
+//                                                var entity = eval("new " + caller.prototype.TypeName + "()")
+//                                                entities.push(entity);
+//                                                if (values.length == 0) {
+//                                                    var initCallback = function (caller, entities) {
+//                                                        return function (entity) {
+//                                                            server.entityManager.setEntity(entity);
+//                                                            if (caller.successCallback != undefined) {
+//                                                                caller.successCallback(entities, caller.caller);
+//                                                                caller.successCallback = undefined;
+//                                                            }
 //                                                        }
+//                                                    }(caller, entities)
+//                                                    if (entity.initCallbacks == undefined) {
+//                                                        entity.initCallbacks = [];
 //                                                    }
-//                                                }(caller, entities)
-//                                                if (entity.initCallbacks == undefined) {
-//                                                    entity.initCallbacks = [];
-//                                                }
-//                                                entity.initCallbacks.push(initCallback);
-//                                                entity.init(value, lazy);
-//                                            } else {
-//                                                var initCallback = function (values, caller, entities, initEntitiesFct) {
-//                                                    return function (entity) {
-//                                                        server.entityManager.setEntity(entity);
-//                                                        initEntitiesFct(values, caller, entities);
+//                                                    entity.initCallbacks.push(initCallback);
+//                                                    entity.init(value, lazy);
+//                                                } else {
+//                                                    var initCallback = function (values, caller, entities, initEntitiesFct) {
+//                                                        return function (entity) {
+//                                                            server.entityManager.setEntity(entity);
+//                                                            initEntitiesFct(values, caller, entities);
+//                                                        }
+//                                                    }(values, caller, entities, initEntitiesFct)
+//                                                    if (entity.initCallbacks == undefined) {
+//                                                        entity.initCallbacks = [];
 //                                                    }
-//                                                }(values, caller, entities, initEntitiesFct)
-//                                                if (entity.initCallbacks == undefined) {
-//                                                    entity.initCallbacks = [];
+//                                                    entity.initCallbacks.push(initCallback);
+//                                                    entity.init(value, lazy);
 //                                                }
-//                                                entity.initCallbacks.push(initCallback);
-//                                                entity.init(value, lazy);
+//                                            }
+//                                            initEntitiesFct(values, caller, entities);
+//                                        } else {
+//                                            if (caller.successCallback != undefined) {
+//                                                caller.successCallback(entities, caller.caller);
+//                                                caller.successCallback = undefined;
 //                                            }
 //                                        }
-//                                        initEntitiesFct(values, caller, entities);
-//                                    } else {
-//                                        if (caller.successCallback != undefined) {
-//                                            caller.successCallback(entities, caller.caller);
-//                                            caller.successCallback = undefined;
-//                                        }
+//                                    } catch (err) {
+//                                        caller.errorCallback(err, caller.caller);
 //                                    }
 //                                }
 //                            }
@@ -1804,10 +1828,10 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                    }(caller)
 //                    xhr.onprogress = function (progressCallback, caller) {
 //                        return function (e) {
-//							if (!e.lengthComputable) {
-//					  			e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
-//							}
-//                          progressCallback(e.loaded, e.total, caller)
+//                            if (!e.lengthComputable) {
+//                                e.total = parseInt(e.target.getResponseHeader('x-decompressed-content-length'), 10);
+//                            }
+//                            progressCallback(e.loaded, e.total, caller)
 //                        }
 //                    }(caller.progressCallback, caller.caller)
 //                    xhr.send();
@@ -1937,17 +1961,19 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 //    }
 //    var typeName = uuid.substring(0, uuid.indexOf("%"));
 //    var storeId = typeName.substring(0, typeName.indexOf("."));
-//    // Create the entity prototype here.
-//    var entity = eval("new " + typeName + "()");
-//    entity.UUID = uuid;
-//    entity.TYPENAME = typeName;
-//    server.entityManager.setEntity(entity);
 //    // First of all i will get the entity prototype.
 //    server.entityManager.getEntityPrototype(typeName, storeId,
 //        // The success callback.
 //        function (result, caller) {
 //            // Set the parameters.
 //            var uuid = caller.uuid;
+//        	  var typeName = uuid.substring(0, uuid.indexOf("%"));
+//        	  var storeId = typeName.substring(0, typeName.indexOf("."));
+//        	  // Create the entity prototype here.
+//        	  var entity = eval("new " + typeName + "()");
+//        	  entity.UUID = uuid;
+//        	  entity.TYPENAME = typeName;
+//        	  server.entityManager.setEntity(entity);
 //            var successCallback = caller.successCallback;
 //            var progressCallback = caller.progressCallback;
 //            var errorCallback = caller.errorCallback;
@@ -2007,9 +2033,9 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 //                        xhr.onload = function (caller) {
 //                            return function (e) {
 //                                if (this.status == 200) {
-//                                    var jsonStr = this.responseText;
-//                                    var values = JSON.parse(jsonStr)
 //									  try{
+//	                                   	var jsonStr = this.responseText;
+//                                    	var values = JSON.parse(jsonStr)
 //										initEntitiy(values, caller)
 //									  }catch(err){
 //			               				caller.errorCallback(err, caller.caller);

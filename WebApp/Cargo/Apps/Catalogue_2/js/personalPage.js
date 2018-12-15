@@ -113,7 +113,6 @@
  
 PersonalPage.prototype.displayOrders = function(orders){
    
-    
     orders.sort(function(a,b){
         
         return new Date(b.M_completionDate) - new Date(a.M_completionDate)
@@ -149,7 +148,6 @@ PersonalPage.prototype.displayOrders = function(orders){
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap.entity;
             if(file.TYPENAME == "CatalogSchema.OrderType"){
-   
                 server.entityManager.getEntityByUuid(file.UUID, false, 
                     function(order, caller){
                         caller.orders.push(order)

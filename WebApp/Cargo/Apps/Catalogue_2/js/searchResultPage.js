@@ -595,6 +595,14 @@ SearchResultPage.prototype.displayTabResults = function (results, query, tabCont
         }
     }(closeBtn, query, this)
     
+    closeBtn.element.onmouseover = function(){
+        this.style.cursor = "pointer"
+    }
+
+    closeBtn.element.onmouseleave = function(){
+        this.style.cursor = "default"
+    }
+
     tab.element.onmouseover =  function(closeBtn){
         return function(){
             try{

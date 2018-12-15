@@ -403,6 +403,14 @@ PackageDisplayPage.prototype.displayTabItem = function (pkg) {
         }
     }(this.navbar.getChildById(packageID + "-li"),  this.packageResultPanel.getChildById(packageID+"-query") )
     
+    this.navbar.getChildById(packageID+"-closebtn").element.onmouseover = function(){
+        this.style.cursor = "pointer"
+    }
+
+    this.navbar.getChildById(packageID+"-closebtn").element.onmouseleave = function(){
+        this.style.cursor = "default"
+    }
+
     var tab = document.getElementById(packageID + "-tab")
             tab.classList.remove("active")
             tab.click()

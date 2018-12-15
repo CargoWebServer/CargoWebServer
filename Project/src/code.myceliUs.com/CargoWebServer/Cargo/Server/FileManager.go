@@ -1829,6 +1829,8 @@ func TempFileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", mime)
 	w.Header().Set("Content-Disposition", "attachment; filename="+path+"")
 	w.Header().Set("Expires", "0")
+	w.Header().Set("X-UA-Compatible", "IE=Edge")
+	w.Header().Set("Content-language", "en")
 	w.Header().Set("Content-Transfer-Encoding", "binary")
 	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
 	if strings.HasSuffix(path, ".gz") {
