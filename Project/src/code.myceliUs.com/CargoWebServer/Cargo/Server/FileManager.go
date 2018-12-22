@@ -1676,7 +1676,8 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *FileManager) WriteExcelFile(filePath string, sheetName string, values [][]interface{}, messageId string, sessionId string) {
+func (this *FileManager) WriteExcelFile(filePath string, sheetName string, values []interface{}, messageId string, sessionId string) {
+
 	// In case of temp dir...
 	if strings.HasPrefix(filePath, "/tmp/") {
 		// Here the file must be create in the temp path.
@@ -1703,11 +1704,11 @@ func (this *FileManager) WriteExcelFile(filePath string, sheetName string, value
 	// So here I got the xl file open and sheet ready to write into.
 	for i := 0; i < len(values); i++ {
 		row := xlSheet.AddRow()
-		for j := 0; j < len(values[i]); j++ {
-			if values[i][j] != nil {
+		for j := 0; j < len(values[i].([]interface{})); j++ {
+			if values[i].([]interface{})[j] != nil {
 				cell := row.AddCell()
-				if reflect.TypeOf(values[i][j]).String() == "string" {
-					str := values[i][j].(string)
+				if reflect.TypeOf(values[i].([]interface{})[j]).String() == "string" {
+					str := values[i].([]interface{})[j].(string)
 					// here I will try to format the date time if it can be...
 					dateTime, err := Utility.DateTimeFromString(str, "2006-01-02 15:04:05")
 					if err != nil {
@@ -1716,8 +1717,8 @@ func (this *FileManager) WriteExcelFile(filePath string, sheetName string, value
 						cell.SetDateTime(dateTime)
 					}
 				} else {
-					if values[i][j] != nil {
-						cell.SetValue(values[i][j])
+					if values[i].([]interface{})[j] != nil {
+						cell.SetValue(values[i].([]interface{})[j])
 					}
 				}
 			}

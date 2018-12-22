@@ -268,16 +268,17 @@ func (this *ProjectManager) Compile(uuid string, sessionId string, messageId str
 			jsFile += "function display(){\n"
 
 			jsFile += "	var div = new Element(document.body, {\"tag\":\"div\", \"class\":\"pbi-container visual-" + pbiviz["visual"].(map[string]interface{})["guid"].(string) + "\"}); \n"
-			jsFile += "	var host = new VisualHost();\n"
-			jsFile += "	var options = new VisualConstructorOptions(div.element, host);\n"
-			jsFile += "	var visual = new powerbi.extensibility.visual." + pbiviz["visual"].(map[string]interface{})["visualClassName"].(string) + "(options);\n\n"
+			jsFile += "	var host = new pbi.VisualHost();\n"
+			jsFile += "	var options = new pbi.VisualConstructorOptions(div.element, host);\n"
+			jsFile += "	var visual = new powerbi.extensibility.visual." + pbiviz["visual"].(map[string]interface{})["guid"].(string) + "." + pbiviz["visual"].(map[string]interface{})["visualClassName"].(string) + "(options);\n\n"
 			jsFile += "	// Init the container.\n"
 			jsFile += "	initContainer(div);\n\n"
 
 			// The update event.
 			jsFile += "	window.onresize = function(visual, div){\n"
 			jsFile += "		return function(){\n"
-			jsFile += "			visual.update({\"viewport\":{\"width\":div.offsetWidth, \"height\":div.offsetHeight}})\n"
+			jsFile += "			var updateOptions = new pbi.VisualUpdateOptions(new pbi.Viewport(div.offsetHeight, div.offsetWidth), [])\n"
+			jsFile += "			visual.update(updateOptions)\n"
 			jsFile += "		}\n"
 			jsFile += "	}(visual, div.element)\n"
 

@@ -505,7 +505,6 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 		}
 	}
 
-	//this.saveEntity(parent)
 	if parent.IsNeedSave() {
 		this.setEntity(parent)
 		typeName := parent.GetTypeName()
@@ -544,10 +543,8 @@ func (this *EntityManager) saveChilds(entity Entity, prototype *EntityPrototype)
 	// The list of childs.
 	childs := entity.GetChilds()
 	// Save the childs...
-	log.Println("---> save child: ", entity.GetUuid())
 	for i := 0; i < len(childs); i++ {
 		childs[i].(Entity).SetParentUuid(entity.GetUuid())
-		log.Println("-----> save child: ", childs[i].(Entity).GetUuid(), childs[i].(Entity).IsNeedSave())
 		this.saveEntity(childs[i].(Entity))
 		childs[i].(Entity).SetNeedSave(false)
 	}
