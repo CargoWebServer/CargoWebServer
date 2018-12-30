@@ -25,6 +25,7 @@
  * This global object represent a reference to the distant server.
  * @see Server
  */
+//var server = new Server("localhost", "192.168.1.109", 9393)
 var server = new Server("localhost", "127.0.0.1", 9393)
 //var server = new Server("mon-util-01", "10.2.128.70", 9393)
 //var server = new Server("mon176", "10.67.44.52", 9393)

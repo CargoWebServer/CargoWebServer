@@ -1887,7 +1887,7 @@ func (this *GraphStore) evaluate(typeName string, fieldName string, comparator s
 			return value.(float64) >= expected.(float64), nil
 		}
 	}
-	
+
 	return isMatch, nil
 }
 
@@ -2335,7 +2335,7 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 			}
 		}
 	}
-	//log.Println("----> 2341 ", results)
+
 	return results, nil
 }
 

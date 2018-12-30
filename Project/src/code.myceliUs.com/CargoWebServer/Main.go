@@ -19,7 +19,7 @@ import (
 func main() {
 
 	// Handle application path...
-	root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
+	//root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
 	port := Server.GetServer().GetConfigurationManager().GetServerPort()
 
 	r := http.NewServeMux()
@@ -35,7 +35,10 @@ func main() {
 	r.Handle("/ws", websocket.Handler(Server.HttpHandler))
 
 	// The http handler
-	r.Handle("/", http.FileServer(http.Dir(root)))
+
+	//r.Handle("/", http.FileServer(http.Dir(root)))
+	//r.HandleFunc("/", Server.WrapHandler(http.FileServer(http.Dir(root))))
+	r.HandleFunc("/", Server.ServeFileHandler)
 
 	// The file upload handler.
 	r.HandleFunc("/uploads", Server.FileUploadHandler)

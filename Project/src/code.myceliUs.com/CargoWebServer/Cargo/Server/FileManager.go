@@ -16,6 +16,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -1898,5 +1900,118 @@ func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+}
 
+// That function resolve import path.
+func resolveImportPath(path string, importPath string) (string, error) {
+
+	// firt of all i will keep only the path part of the import...
+	startIndex := strings.Index(importPath, `'@`) + 1
+	endIndex := strings.LastIndex(importPath, `'`)
+	importPath_ := importPath[startIndex:endIndex]
+	root := GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
+
+	filepath.Walk(root+path[0:strings.Index(path, "/")],
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if strings.HasSuffix(path, importPath_) {
+				importPath_ = path
+				return io.EOF
+			}
+
+			return nil
+		})
+
+	importPath_ = strings.Replace(importPath_, root, "", -1)
+
+	// Now i will make the path relative.
+	importPath__ := strings.Split(importPath_, "/")
+	path__ := strings.Split(path, "/")
+
+	var index int
+	for ; importPath__[index] == path__[index]; index++ {
+	}
+
+	importPath_ = ""
+
+	// move up part..
+	for i := index; i < len(path__)-1; i++ {
+		importPath_ += "../"
+	}
+
+	// go down to the file.
+	for i := index; i < len(importPath__); i++ {
+		importPath_ += importPath__[i]
+		if i < len(importPath__)-1 {
+			importPath_ += "/"
+		}
+	}
+
+	// remove the root path part and the leading / caracter.
+	return importPath_, nil
+}
+
+func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
+
+	//if empty, set current directory
+	root := GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
+	dir := string(root)
+	if dir == "" {
+		dir = "."
+	}
+
+	//add prefix and clean
+	upath := r.URL.Path
+	if !strings.HasPrefix(upath, "/") {
+		upath = "/" + upath
+		r.URL.Path = upath
+	}
+
+	upath = path.Clean(upath)
+
+	//path to file
+	name := path.Join(dir, filepath.FromSlash(upath))
+
+	//check if file exists
+	f, err := os.Open(name)
+	if err != nil {
+		if os.IsNotExist(err) {
+			http.Error(w, "File "+upath+" not found!", http.StatusBadRequest)
+			return
+		}
+	}
+
+	defer f.Close()
+
+	// If the file is a javascript file...
+	var code string
+	hasChange := false
+	if strings.HasSuffix(name, ".js") {
+		if err == nil {
+			scanner := bufio.NewScanner(f)
+			for scanner.Scan() {
+				line := scanner.Text()
+				if strings.HasPrefix(line, "import") {
+					if strings.Index(line, `'@`) > -1 {
+						path_, err := resolveImportPath(upath, line)
+						if err == nil {
+							line = line[0:strings.Index(line, `'@`)] + `'` + path_ + `'`
+							hasChange = true
+						}
+					}
+				}
+				code += line + "\n"
+			}
+		}
+	}
+
+	// if the file has change...
+	if !hasChange {
+		http.ServeFile(w, r, name)
+	} else {
+		http.ServeContent(w, r, name, time.Now(), strings.NewReader(code))
+	}
 }

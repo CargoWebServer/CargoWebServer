@@ -1879,9 +1879,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 	// I will execute the query and get it results.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	queryStr, _ := json.Marshal(query)
-	log.Println("---> 1882")
 	values, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
-	log.Println("---> 1884", values)
 	results := make([]interface{}, 0)
 	if err == nil {
 		// Sort the entities
