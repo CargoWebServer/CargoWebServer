@@ -1,5 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-// Fichier contenant les différents test..
+// Fichier contenant les différents test...
 var languageInfo = {
     "en": {
         "test":"test",
@@ -22,7 +22,8 @@ function main() {
             // Create the dynamic entity here.
             // testDynamicEntity()
             // testCreateDynamicEntity()
-            testGetEntitiesByUuid()
+            // testGetEntitiesByUuid()
+            testEntityQuery() 
             
         },
         function () {
@@ -50,8 +51,7 @@ function main() {
 }
 
 function testGetEntitiesByUuid(){
-    console.log("---> test get entities by uuids")
-    // So first of all I will get the list of uuid's.
+     // So first of all I will get the list of uuid's.
      var query = {}
      query.TypeName = "CargoEntities.File"
      query.Fields = ["UUID"]

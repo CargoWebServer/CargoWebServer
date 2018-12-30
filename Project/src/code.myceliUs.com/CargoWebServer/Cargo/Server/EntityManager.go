@@ -307,6 +307,7 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+	// log.Println("-----> 339 ", uuid)
 
 	if len(uuid) == 0 {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No uuid given!"))
@@ -1878,7 +1879,9 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 	// I will execute the query and get it results.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	queryStr, _ := json.Marshal(query)
+	log.Println("---> 1882")
 	values, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+	log.Println("---> 1884", values)
 	results := make([]interface{}, 0)
 	if err == nil {
 		// Sort the entities
@@ -1891,7 +1894,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 			// all results are require.
 			limit = float64(len(values))
 		}
-
 		for i := int(offset); i < int(limit); i++ {
 			if !lazy {
 				results = append(results, initChilds(values[i][0].(map[string]interface{})))

@@ -11,12 +11,18 @@ import (
 	"reflect"
 	"strings"
 
+	"regexp"
+	"strconv"
+	"time"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser"
-	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/Parser"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
+	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
 	"code.myceliUs.com/Utility"
+	"github.com/xrash/smetrics"
 
 	// Xapian datastore.
 	base64 "encoding/base64"
@@ -197,83 +203,20 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 
 				// The results.
 				results := make([][]interface{}, 0)
-				var err error
 				if !Utility.Exists(path) {
 					// Here no database was found.
 					err = errors.New("Datastore " + path + " dosent exit!")
 				} else {
-
-					db := xapian.NewDatabase(path)
-
-					// Now i will add where I want to search...
-					var query xapian.Query
-					if len(queryString) == 0 {
-						typeNameIndex := generatePrefix(typeName, "TYPENAME") + formalize(typeName)
-						query = xapian.NewQuery(typeNameIndex)
+					if len(queryString) > 0 {
+						results, err = store.executeSearchQuery(queryString, fields)
 					} else {
-						query = parseXapianQuery(queryString)
+						typeNameIndex := generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+						query := xapian.NewQuery(typeNameIndex)
+						results, err = store.runXapianQuery(typeName, query, fields)
 					}
-
-					enquire := xapian.NewEnquire(db)
-					enquire.Set_query(query)
-					mset := enquire.Get_mset(uint(0), uint(10000))
-
-					// Now I will process the results.
-					for i := 0; i < mset.Size(); i++ {
-						it := mset.Get_hit(uint(i))
-						doc := it.Get_document()
-						if len(fields) > 0 {
-							var prototype *EntityPrototype
-							prototype, err = store.GetEntityPrototype(typeName)
-							if err == nil {
-								values := make([]interface{}, 0)
-								for j := 0; j < len(fields); j++ {
-									// Get the field index.
-									fieldIndex := prototype.getFieldIndex(fields[j])
-									if uint(fieldIndex) < doc.Values_count() {
-										value := doc.Get_value(uint(fieldIndex))
-										if XML_Schemas.IsXsNumeric(prototype.FieldsType[fieldIndex]) {
-											values = append(values, xapian.Sortable_unserialise(value))
-										} else if XML_Schemas.IsXsString(prototype.FieldsType[fieldIndex]) {
-											values = append(values, value)
-										} else if XML_Schemas.IsXsId(prototype.FieldsType[fieldIndex]) {
-											values = append(values, value)
-										} else if XML_Schemas.IsXsDate(prototype.FieldsType[fieldIndex]) {
-											values = append(values, xapian.Sortable_unserialise(value))
-										} else {
-											var v map[string]interface{}
-											err := json.Unmarshal([]byte(doc.Get_data()), &v)
-											if err == nil {
-												values = append(values, v[fields[j]])
-											}
-										}
-									}
-								}
-								results = append(results, values)
-							}
-
-						} else {
-							// In that case the data contain in the document are return.
-							var v map[string]interface{}
-							err := json.Unmarshal([]byte(doc.Get_data()), &v)
-							if err == nil {
-								results = append(results, []interface{}{v})
-							}
-						}
-						xapian.DeleteDocument(doc)
-						xapian.DeleteMSetIterator(it)
-					}
-
 					if len(results) == 0 {
 						err = errors.New("No results found!")
 					}
-
-					db.Close()
-
-					xapian.DeleteMSet(mset)
-					xapian.DeleteEnquire(enquire)
-					xapian.DeleteQuery(query)
-					xapian.DeleteDatabase(db)
 				}
 				op.(map[string]interface{})["results"].(chan []interface{}) <- []interface{}{results, err}
 			}
@@ -1625,7 +1568,6 @@ func (this *GraphStore) Delete(queryStr string, values []interface{}) (err error
 	}
 
 	// Remove the list of obsolete triples from the datastore.
-	log.Println("---> remove entity ", values)
 	for i := 0; i < len(values); i++ {
 		toDelete := values[i]
 		if reflect.TypeOf(toDelete).Kind() == reflect.String {
@@ -1726,6 +1668,8 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 					}
 				}
 				doc.Add_value(uint(index), Utility.ToString(str_))
+			} else {
+				doc.Add_value(uint(index), "null")
 			}
 		} else {
 			if index != -1 {
@@ -1743,8 +1687,6 @@ func (this *GraphStore) indexField(data interface{}, field string, fieldType str
 				} else {
 					this.indexStringField(str, field, typeName, termGenerator)
 				}
-			} else if index != -1 {
-				doc.Add_value(uint(index), Utility.ToString(data))
 			}
 		}
 	} else {
@@ -1792,145 +1734,645 @@ func (this *GraphStore) indexEntity(doc xapian.Document, values map[string]inter
 				doc.Add_boolean_term(term)
 			}
 		}
-		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, i)
+		index := prototype.getFieldIndex(prototype.Fields[i])
+		this.indexField(value, prototype.Fields[i], prototype.FieldsType[i], prototype.TypeName, termGenerator, doc, index)
 	}
 
 	xapian.DeleteStem(stemmer)
 	xapian.DeleteTermGenerator(termGenerator)
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Search functionality.
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Generate a xapian query from the minimalist query string.
+ * Merge tow results in one...
  */
-func parseXapianQuery(str string) xapian.Query {
-	// Parse the query
-	l := new(XapianQueryListener)
-	l.q = make(chan xapian.Query)
+func (this *GraphStore) merge(r1 map[string]map[string]interface{}, r2 map[string]map[string]interface{}) map[string]map[string]interface{} {
 
-	go func() {
-		QueryParser.Parse(str, l)
-	}()
-
-	return <-l.q
+	for k, v := range r1 {
+		r2[k] = v
+	}
+	return r2
 }
 
-type XapianQueryListener struct {
-	*parser.BaseQueryListener
-
-	reference string
-	operator  string
-	value     string
-	valueType string
-
-	// That will contain the xapian query.
-	query string
-
-	// The channel to set back string to the query parser
-	// when parsing is done.
-	q chan xapian.Query
-	p xapian.QueryParser
-}
-
-func (l *XapianQueryListener) EnterQuery(ctx *parser.QueryContext) {
-
-	// initialyse the query parser.
-	l.p = xapian.NewQueryParser()
-
-}
-
-// Finish parsing a query
-func (l *XapianQueryListener) ExitQuery(ctx *parser.QueryContext) {
-
-	stemmer := xapian.NewStem("en")
-
-	l.p.Set_stemmer(stemmer)
-	l.p.Set_stemming_strategy(xapian.XapianQueryParserStem_strategy(xapian.QueryParserSTEM_SOME))
-
-	query := l.p.Parse_query(l.query)
-
-	if strings.HasPrefix(l.query, "X") {
-		query = xapian.NewQuery(l.query)
+/**
+ * Evaluate an expression.
+ */
+func (this *GraphStore) evaluate(typeName string, fieldName string, comparator string, expected interface{}, value interface{}) (bool, error) {
+	isMatch := false
+	// if the value is nil i will automatically return
+	if value == nil {
+		return isMatch, nil
 	}
 
-	l.q <- query
+	prototype, err := this.GetEntityPrototype(typeName)
+	if err != nil {
+		return false, err
+	}
 
-	xapian.DeleteQueryParser(l.p)
-	xapian.DeleteStem(stemmer)
-}
+	// The type name.
+	fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
+	fieldType = strings.Replace(fieldType, "[]", "", -1)
 
-func (l *XapianQueryListener) ExitReference(ctx *parser.ReferenceContext) {
-	l.reference = ctx.GetText()
-}
-
-// ExitOperator is called when production operator is exited.
-func (l *XapianQueryListener) ExitOperator(ctx *parser.OperatorContext) {
-	l.operator = ctx.GetText()
-}
-
-// ExitIntegerValue is called when production IntegerValue is exited.
-func (l *XapianQueryListener) ExitIntegerValue(ctx *parser.IntegerValueContext) {
-	l.valueType = "int"
-	l.value = ctx.GetText()
-}
-
-// ExitDoubleValue is called when production DoubleValue is exited.
-func (l *XapianQueryListener) ExitDoubleValue(ctx *parser.DoubleValueContext) {
-	l.valueType = "double"
-	l.value = ctx.GetText()
-}
-
-// ExitBooleanValue is called when production BooleanValue is exited.
-func (l *XapianQueryListener) ExitBooleanValue(ctx *parser.BooleanValueContext) {
-	l.valueType = "bool"
-	l.value = ctx.GetText()
-}
-
-// ExitStringValue is called when production StringValue is exited.
-func (l *XapianQueryListener) ExitStringValue(ctx *parser.StringValueContext) {
-	l.valueType = "string"
-	l.value = strings.ToLower(ctx.GetText())
-}
-
-// ExitPredicate is called when production predicate is exited.
-func (l *XapianQueryListener) ExitPredicate(ctx *parser.PredicateContext) {
-	// Here I must call create the predicate expression.
-	v_ := strings.Split(l.reference, ".")
-
-	// The first value is the store id BPMN, Config, CargoEntities etc
-	storeId := v_[0]
-
-	// the second is the TYPENAME User Task Computer...
-	typeName := v_[1]
-
-	// the third one is the field M_id UUID TYPENAME etc...
-	field := v_[2]
-
-	if strings.HasPrefix(field, "M_") {
-		// String values query
-		if l.valueType == "string" {
-			// I ill add the prefix to the query parser.
-			l.p.Add_prefix(field[2:], strings.ToUpper(field))
-			// Now I will set the query.
-			l.query = field[2:] + ":" + l.value
-		}
-	} else if field == "UUID" || field == "TYPENAME" || field == "ParentUuid" || field == "ParentLnk" {
-		// Search for a unique value.
-		v := strings.Replace(l.value, `"`, "", -1)
-		if len(v) > 0 {
-			l.query = generatePrefix(storeId+"."+typeName, field) + formalize(v)
+	// here for the date I will get it unix time value...
+	if fieldType == "xs.date" || fieldType == "xs.dateTime" {
+		expectedDateValue, err := Utility.MatchISO8601_Date(expected.(string))
+		if err == nil {
+			dateValue, _ := Utility.MatchISO8601_Date(value.(string))
+			if fieldType == "xs.dateTime" {
+				expected = expectedDateValue.Unix() // get the unix resultstime for calcul
+				value = dateValue.Unix()            // get the unix time for calcul
+			} else {
+				expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+				value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+			}
 		} else {
-			// here we search for an empty value over values for that type name.
-			l.query = generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+			// I will try with data time instead.
+			expectedDateValue, err := Utility.MatchISO8601_DateTime(expected.(string))
+			if err == nil {
+				dateValue, _ := Utility.MatchISO8601_DateTime(value.(string))
+				if fieldType == "xs.dateTime" {
+					expected = expectedDateValue.Unix() // get the unix time for calcul
+					value = dateValue.Unix()            // get the unix time for calcul
+				} else {
+					expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+					value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+				}
+			} else {
+				return false, err
+			}
 		}
 	}
+
+	if comparator == "==" {
+		// Equality comparator.
+		// Case of string type.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			isRegex := strings.HasPrefix(expected.(string), "/") && strings.HasSuffix(expected.(string), "/")
+			if isRegex {
+				// here I will try to match the regular expression.
+				var err error
+				isMatch, err = regexp.MatchString(expected.(string)[1:len(expected.(string))-1], value.(string))
+				if err != nil {
+					return false, err
+				}
+			} else {
+				isMatch = Utility.RemoveAccent(expected.(string)) == Utility.RemoveAccent(value.(string))
+			}
+		} else if reflect.TypeOf(expected).Kind() == reflect.Bool && reflect.TypeOf(value).Kind() == reflect.Bool {
+			return expected.(bool) == value.(bool), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return expected.(int64) == value.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return expected.(float64) == value.(float64), nil
+		}
+	} else if comparator == "~=" {
+		// Approximation comparator, string only...
+		// Case of string types.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			distance := smetrics.JaroWinkler(Utility.RemoveAccent(expected.(string)), Utility.RemoveAccent(value.(string)), 0.7, 4)
+			isMatch = distance >= .85
+		} else {
+			return false, errors.New("Operator ~= can be only used with strings.")
+		}
+	} else if comparator == "!=" {
+		// Equality comparator.
+		// Case of string type.
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			isMatch = Utility.RemoveAccent(expected.(string)) != Utility.RemoveAccent(value.(string))
+		} else if reflect.TypeOf(expected).Kind() == reflect.Bool && reflect.TypeOf(value).Kind() == reflect.Bool {
+			return expected.(bool) != value.(bool), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return expected.(int64) != value.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return expected.(float64) != value.(float64), nil
+		}
+	} else if comparator == "^=" {
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			return strings.HasPrefix(value.(string), expected.(string)), nil
+		} else {
+			return false, nil
+		}
+	} else if comparator == "$=" {
+		if reflect.TypeOf(expected).Kind() == reflect.String && reflect.TypeOf(value).Kind() == reflect.String {
+			return strings.HasSuffix(value.(string), expected.(string)), nil
+		} else {
+			return false, nil
+		}
+	} else if comparator == "<" {
+		// Number operator only...
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) < expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) < expected.(float64), nil
+		}
+	} else if comparator == "<=" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) <= expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) <= expected.(float64), nil
+		}
+	} else if comparator == ">" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) > expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) > expected.(float64), nil
+		}
+	} else if comparator == ">=" {
+		if reflect.TypeOf(expected).Kind() == reflect.Int64 && reflect.TypeOf(value).Kind() == reflect.Int64 {
+			return value.(int64) >= expected.(int64), nil
+		} else if reflect.TypeOf(expected).Kind() == reflect.Float64 && reflect.TypeOf(value).Kind() == reflect.Float64 {
+			return value.(float64) >= expected.(float64), nil
+		}
+	}
+	
+	return isMatch, nil
 }
 
-// EnterBracketExpression is called when production BracketExpression is entered.
-func (l *XapianQueryListener) EnterBracketExpression(ctx *parser.BracketExpressionContext) {
-	l.query += "("
+/**
+ * That function test if a given value match all expressions of a given ast...
+ */
+func (this *GraphStore) match(ast *ast.QueryAst, values map[string]interface{}) (bool, error) {
+
+	// test if the value is composite.
+	if ast.IsComposite() {
+		ast1, _, ast2 := ast.GetSubQueries()
+		// both side of the tree must match.
+		isMatch, err := this.match(ast1, values)
+		if err != nil {
+			return false, err
+		}
+		if isMatch == false {
+			return false, nil
+		}
+
+		isMatch, err = this.match(ast2, values)
+		if err != nil {
+			return false, err
+		}
+
+		if isMatch == false {
+			return false, nil
+		}
+	} else {
+		// I will evaluate the expression...
+		typeName, fieldName, comparator, expected := ast.GetExpression()
+		return this.evaluate(typeName, fieldName, comparator, expected, values[fieldName])
+	}
+
+	return true, nil
 }
 
-// ExitBracketExpression is called when production BracketExpression is exited.
-func (l *XapianQueryListener) ExitBracketExpression(ctx *parser.BracketExpressionContext) {
-	l.query += ")"
+func (this *GraphStore) getIndexationValues(uuid string, fields []string) (map[string]interface{}, error) {
+	object := make(map[string]interface{}, 0)
+
+	// So here I will retreive values for given object fields...
+	typeName := strings.Split(uuid, "%")[0]
+
+	prefix := generatePrefix(typeName, "UUID") + formalize(uuid)
+	query := xapian.NewQuery(prefix)
+
+	results, err := this.runXapianQuery(typeName, query, fields)
+	object["TYPENAME"] = typeName
+
+	if len(fields) > 0 {
+		for i := 0; i < len(fields); i++ {
+			object[fields[i]] = results[0][i]
+		}
+	} else {
+		object = results[0][0].(map[string]interface{})
+	}
+	return object, err
+}
+
+/**
+ * Run a query and return it result.
+ */
+func (this *GraphStore) runXapianQuery(typeName string, query xapian.Query, fields []string) ([][]interface{}, error) {
+	var err error
+	var results [][]interface{}
+	var prototype *EntityPrototype
+	prototype, err = this.GetEntityPrototype(typeName)
+	if err != nil {
+		return results, err
+	}
+
+	path := this.m_path + "/" + typeName + ".glass"
+	db := xapian.NewDatabase(path)
+
+	enquire := xapian.NewEnquire(db)
+	enquire.Set_query(query)
+	mset := enquire.Get_mset(uint(0), uint(10000))
+
+	// Now I will process the results.
+	for i := 0; i < mset.Size(); i++ {
+		it := mset.Get_hit(uint(i))
+		doc := it.Get_document()
+		if len(fields) > 0 {
+			values := make([]interface{}, 0)
+			for j := 0; j < len(fields); j++ {
+				// Get the field index.
+				fieldIndex := prototype.getFieldIndex(fields[j])
+				fieldType := prototype.FieldsType[fieldIndex]
+				value := doc.Get_value(uint(fieldIndex))
+				if XML_Schemas.IsXsNumeric(fieldType) {
+					values = append(values, xapian.Sortable_unserialise(value))
+				} else if XML_Schemas.IsXsString(fieldType) {
+					values = append(values, value)
+				} else if XML_Schemas.IsXsId(fieldType) {
+					values = append(values, value)
+				} else if XML_Schemas.IsXsDate(fieldType) {
+					values = append(values, xapian.Sortable_unserialise(value))
+				} else {
+					var v map[string]interface{}
+					err := json.Unmarshal([]byte(doc.Get_data()), &v)
+					if err == nil {
+						values = append(values, v[fields[j]])
+					} else {
+						values = append(values, nil)
+					}
+				}
+			}
+			results = append(results, values)
+
+		} else {
+			// In that case the data contain in the document are return.
+			var v map[string]interface{}
+			err := json.Unmarshal([]byte(doc.Get_data()), &v)
+			if err == nil {
+				results = append(results, []interface{}{v})
+			}
+		}
+		xapian.DeleteDocument(doc)
+		xapian.DeleteMSetIterator(it)
+	}
+
+	if len(results) == 0 {
+		err = errors.New("No results found!")
+	}
+
+	db.Close()
+	xapian.DeleteMSet(mset)
+	xapian.DeleteEnquire(enquire)
+	xapian.DeleteQuery(query)
+	xapian.DeleteDatabase(db)
+
+	return results, err
+}
+
+// Return the UUID for a given
+func (this *GraphStore) getIndexation(typeName string, fieldName string, expected interface{}) ([]interface{}, error) {
+
+	// Indexations contain array of string
+	var ids []interface{}
+	var prototype, err = this.GetEntityPrototype(typeName)
+	if err != nil {
+		return ids, err
+	}
+	// I will retreive the value...
+	if len(fieldName) == 0 {
+		// Indexation by typeName...
+		typeNameIndex := generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+		query := xapian.NewQuery(typeNameIndex)
+		results, err := this.runXapianQuery(typeName, query, []string{"UUID"})
+		if err != nil {
+			return ids, err
+		}
+		for i := 0; i < len(results); i++ {
+			ids = append(ids, results[i][0].(string))
+		}
+	} else {
+		fieldIndex := prototype.getFieldIndex(fieldName)
+		if fieldIndex != -1 {
+			fieldType := prototype.FieldsType[fieldIndex]
+			fieldType_ := strings.Replace(fieldType, "[]", "", -1)
+			fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
+			var query xapian.Query
+			if fieldName == "UUID" || fieldName == "TYPENAME" || fieldName == "ParentUuid" || fieldName == "ParentLnk" {
+				prefix := generatePrefix(typeName, fieldName) + formalize(Utility.ToString(expected))
+				query = xapian.NewQuery(prefix)
+			} else if strings.HasPrefix(fieldName, "M_") {
+				if XML_Schemas.IsXsString(fieldType) || XML_Schemas.IsXsId(fieldType) {
+					p := xapian.NewQueryParser()
+					// I ill add the prefix to the query parser.
+					p.Add_prefix(fieldName[2:], strings.ToUpper(fieldName))
+					query = p.Parse_query(fieldName[2:] + ":" + expected.(string))
+					xapian.DeleteQueryParser(p)
+				}
+			}
+
+			results, err := this.runXapianQuery(typeName, query, []string{"UUID"})
+			if err != nil {
+				return ids, err
+			}
+			// Now I will get the results...
+			for i := 0; i < len(results); i++ {
+				ids = append(ids, results[i][0].(string))
+			}
+
+		}
+	}
+	return ids, nil
+}
+
+/**
+ * Here i will walk the tree and generate the query.
+ */
+func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string]map[string]interface{}, error) {
+	// I will create the array if it dosent exist.
+	results := make(map[string]map[string]interface{}, 0)
+
+	if ast.IsComposite() {
+		// Get the sub-queries
+		ast1, operator, ast2 := ast.GetSubQueries()
+
+		r1, err := this.runQuery(ast1, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		r2, err := this.runQuery(ast2, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		if operator == "&&" { // conjonction
+			for k, v := range r2 {
+				isMatch, err := this.match(ast1, v)
+				if err != nil {
+					return nil, err
+				}
+				if isMatch {
+					results[k] = v
+				}
+			}
+			for k, v := range r1 {
+				isMatch, err := this.match(ast2, v)
+				if err != nil {
+					return nil, err
+				}
+				if isMatch {
+					results[k] = v
+				}
+			}
+		} else if operator == "||" { // disjonction
+			results = this.merge(r1, r2)
+		}
+
+	} else {
+
+		typeName, fieldName, comparator, expected := ast.GetExpression()
+		values := make(map[string]map[string]interface{}, 0)
+		// Need the prototype here.
+		prototype, err := this.GetEntityPrototype(typeName)
+		if err != nil {
+			return nil, err
+		}
+
+		if fieldName == "TYPENAME" {
+			indexations, err := this.getIndexation(typeName, "", "")
+			if err != nil {
+				return nil, err
+			}
+			for i := 0; i < len(indexations); i++ {
+				values_, err := this.getIndexationValues(indexations[i].(string), fields)
+				if err == nil {
+					results[indexations[i].(string)] = values_
+				}
+			}
+
+		} else {
+			fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
+			isArray := strings.HasPrefix(fieldType, "[]")
+			isRef := strings.HasSuffix(fieldType, ":Ref")
+			fieldType = strings.Replace(fieldType, "[]", "", -1)
+			isString := fieldType == "xs.string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.NCName" || fieldType == "xs.ID" || fieldType == "xs.language"
+
+			// Integers types.
+			isInt := fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong"
+
+			// decimal value
+			isDecimal := fieldType == "xs.float" || fieldType == "xs.decimal" || fieldType == "xs.double"
+
+			// Date time
+			isDate := fieldType == "xs.date" || fieldType == "xs.dateTime"
+
+			fields = prototype.Fields // all field must be search...
+
+			// Strings or references...
+			if isString || isRef {
+				// The string expected value...
+				if expected != nil {
+					expectedStr := expected.(string)
+					isRegex := strings.HasPrefix(expectedStr, "/") && strings.HasSuffix(expectedStr, "/")
+					if comparator == "==" && !isRegex {
+						// Now i will get the value from the indexation.
+						if len(expectedStr) > 0 {
+							indexations, err := this.getIndexation(typeName, fieldName, expectedStr)
+							if err == nil {
+								for i := 0; i < len(indexations); i++ {
+									values[indexations[i].(string)], err = this.getIndexationValues(indexations[i].(string), []string{})
+									if err != nil {
+										return nil, err
+									}
+									var isMatch bool
+									if isArray {
+										// Here I have an array of values to test.
+										var strValues []string
+										err = json.Unmarshal([]byte(values[indexations[i].(string)][fieldName].(string)), &strValues)
+										if err != nil {
+											return nil, err
+										}
+										for j := 0; j < len(strValues); j++ {
+											isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, strValues[j])
+										}
+									} else {
+										isMatch, err = this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+									}
+
+									if err != nil {
+										return nil, err
+									}
+									if isMatch {
+										// if the result match I put it inside the map result.
+										results[indexations[i].(string)] = values[indexations[i].(string)]
+									}
+								}
+							}
+						}
+					} else if comparator == "~=" || comparator == "!=" || comparator == "^=" || comparator == "$=" || (isRegex && comparator == "==") {
+						// Here I will use the typename as indexation key...
+						indexations, err := this.getIndexation(typeName, "", "")
+						if err == nil {
+							for i := 0; i < len(indexations); i++ {
+								values[indexations[i].(string)], err = this.getIndexationValues(indexations[i].(string), fields)
+								if err != nil {
+									return nil, err
+								}
+								isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+								if err != nil {
+									return nil, err
+								}
+								if isMatch {
+									// if the result match I put it inside the map result.
+									results[indexations[i].(string)] = values[indexations[i].(string)]
+								}
+							}
+						} else {
+							log.Println("---> 2230 ", err)
+						}
+					} else {
+						if !isRegex {
+							return nil, errors.New("Unexpexted comparator " + comparator + " for type \"string\".")
+						} else {
+							return nil, errors.New("Unexpexted comparator " + comparator + " for regex, use \"==\" insted")
+						}
+					}
+				} else if isRef {
+					// In that case the only the operato == and != are define.
+					if comparator == "==" || comparator == "!=" {
+
+						typeNameIndex := generatePrefix(typeName, "TYPENAME") + formalize(typeName)
+						query := xapian.NewQuery(typeNameIndex)
+						uuids, err := this.runXapianQuery(typeName, query, []string{"UUID"})
+
+						if err != nil {
+							return nil, err
+						}
+
+						if comparator == "==" {
+							for i := 0; i < len(uuids); i++ {
+								values, err := this.getIndexationValues(uuids[i][0].(string), fields)
+								if err == nil {
+									results[uuids[i][0].(string)] = values
+								}
+							}
+						} else if comparator == "!=" {
+							for i := 0; i < len(uuids); i++ {
+								values, err := this.getIndexationValues(uuids[i][0].(string), fields)
+								if err == nil {
+									results[uuids[i][0].(string)] = values
+								}
+							}
+						}
+
+					} else {
+						return nil, errors.New("Unexpexted comparator " + comparator + " for regex, use \"==\" insted")
+					}
+				}
+
+			} else if fieldType == "xs.boolean" {
+				if !(comparator == "==" || comparator == "!=") {
+					return nil, errors.New("Unexpexted comparator " + comparator + " for bool values, use \"==\" or  \"!=\"")
+				}
+
+				// Get the boolean value.
+				indexations, err := this.getIndexation(typeName, fieldName, strconv.FormatBool(expected.(bool)))
+				if err == nil {
+					for i := 0; i < len(indexations); i++ {
+						values[indexations[i].(string)], err = this.getIndexationValues(indexations[i].(string), fields)
+						if err != nil {
+							return nil, err
+						}
+
+						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+						if err != nil {
+							return nil, err
+						}
+						if isMatch {
+							// if the result match I put it inside the map result.
+							results[indexations[i].(string)] = values[indexations[i].(string)]
+						}
+					}
+				}
+			} else if isInt || isDecimal || isDate { // Numeric values or date that are covert at evaluation time as integer.
+				if comparator == "~=" {
+					return nil, errors.New("Unexpexted comparator " + comparator + " for type numeric value.")
+				}
+				// Get the boolean value.
+				if comparator == "==" {
+					indexations, err := this.getIndexation(typeName, fieldName, expected)
+					if err == nil {
+						for i := 0; i < len(indexations); i++ {
+							values[indexations[i].(string)], err = this.getIndexationValues(indexations[i].(string), fields)
+							if err != nil {
+								return nil, err
+							}
+
+							isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+							if err != nil {
+								return nil, err
+							}
+							if isMatch {
+								// if the result match I put it inside the map result.
+								results[indexations[i].(string)] = values[indexations[i].(string)]
+							}
+						}
+					}
+				} else {
+					// for the other comparator I will get all the entities of the given type and test each of those.
+					indexations, err := this.getIndexation(typeName, "", "")
+					if err == nil {
+						for i := 0; i < len(indexations); i++ {
+							values[indexations[i].(string)], err = this.getIndexationValues(indexations[i].(string), fields)
+							if err != nil {
+								return nil, err
+							}
+
+							isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
+							if err != nil {
+								return nil, err
+							}
+							if isMatch {
+								// if the result match I put it inside the map result.
+								results[indexations[i].(string)] = values[indexations[i].(string)]
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//log.Println("----> 2341 ", results)
+	return results, nil
+}
+
+/**
+ * Execute a search query.
+ */
+func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]interface{}, error) {
+	s := lexer.NewLexer([]byte(query))
+	p := parser.NewParser()
+	a, err := p.Parse(s)
+
+	if err == nil {
+		astree := a.(*ast.QueryAst)
+		fieldLength := len(fields)
+		r, err := this.runQuery(astree, fields)
+		if err != nil {
+			return nil, err
+		}
+
+		// Here I will keep the result part...
+		results := make([][]interface{}, 0)
+		for _, object := range r {
+			if fieldLength == 0 {
+				// In that case the whole object will be set in the result.
+				results = append(results, []interface{}{object})
+			} else {
+				results_ := make([]interface{}, 0)
+				for i := 0; i < fieldLength; i++ {
+					results_ = append(results_, object[fields[i]])
+				}
+				results = append(results, results_)
+			}
+		}
+		return results, err
+	} else {
+		log.Println("-------> query: ", query, fields)
+		log.Println("--> search error ", err)
+	}
+	return nil, err
 }

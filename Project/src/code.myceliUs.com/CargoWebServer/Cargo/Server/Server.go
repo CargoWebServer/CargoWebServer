@@ -1170,7 +1170,6 @@ func (server *Server) RunCmd(name string, args []string, sessionId string) inter
 	}
 
 	// Set the command
-	log.Println("1173 ---> cmd call ", path)
 	cmd := exec.Command(path)
 	cmd.Args = append(cmd.Args, args...)
 
