@@ -1916,7 +1916,7 @@ func resolveImportPath(path string, importPath string) (string, error) {
 			if err != nil {
 				return err
 			}
-
+			path = strings.Replace(path, "\\", "/", -1) // Windows back slash replacement here...
 			if strings.HasSuffix(path, importPath_) {
 				importPath_ = path
 				return io.EOF
@@ -1973,7 +1973,7 @@ func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
 	upath = path.Clean(upath)
 
 	//path to file
-	name := path.Join(dir, filepath.FromSlash(upath))
+	name := path.Join(dir, upath)
 
 	//check if file exists
 	f, err := os.Open(name)
@@ -1983,7 +1983,6 @@ func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 	defer f.Close()
 
 	// If the file is a javascript file...
@@ -2012,6 +2011,7 @@ func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
 	if !hasChange {
 		http.ServeFile(w, r, name)
 	} else {
+		log.Println(code)
 		http.ServeContent(w, r, name, time.Now(), strings.NewReader(code))
 	}
 }
