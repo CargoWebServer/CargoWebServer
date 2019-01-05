@@ -15,7 +15,6 @@ var homePage = null;
 var bodyElement = null;
 
 function init() {
-    // console.log("welcome to bridge!")
     // Set style informations.
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"));
     if (cargoThemeInfos !== undefined) {

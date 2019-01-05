@@ -688,17 +688,29 @@ func (this *FileManager) setHtmlIncludes(path string, filedata []byte) []byte {
 
 	f_ := func(basePath string, path string, a *html.Attribute) {
 		// Retreive the existing file...
-		fileId := Utility.CreateSha1Key([]byte(path))
+		var fileId string
+		if strings.Index(path, "?") != -1 {
+			fileId = Utility.CreateSha1Key([]byte(path[0:strings.Index(path, "?")]))
+		} else {
+			fileId = Utility.CreateSha1Key([]byte(path))
+		}
+
 		checksum_, err := this.getFileChecksum(fileId)
 		var checksum string
-		if len(strings.Split(path, "?")) > 1 {
-			checksum = strings.Split(path, "?")[1]
-			path = strings.Split(path, "?")[0]
+		if strings.Index(path, "?") != -1 {
+			checksum = path[strings.Index(path, "?")+1:]
 		}
+
 		if err == nil {
 			if checksum != checksum_ {
 				// Change the actual value with the new checksum
-				a.Val = path + "?" + checksum_
+				if strings.Index(path, "?") != -1 {
+					a.Val = path[0:strings.Index(path, "?")] + "?" + checksum_
+				} else {
+					a.Val = path + "?" + checksum_
+				}
+			} else {
+				a.Val = path[0:strings.Index(path, "?")] + "?" + checksum
 			}
 		} else {
 			fileId := Utility.CreateSha1Key([]byte(basePath + "/" + path))
@@ -706,7 +718,13 @@ func (this *FileManager) setHtmlIncludes(path string, filedata []byte) []byte {
 			if err == nil {
 				if checksum != checksum_ {
 					// Change the actual value with the new checksum
-					a.Val = path + "?" + checksum_
+					if strings.Index(path, "?") != -1 {
+						a.Val = path[0:strings.Index(path, "?")] + "?" + checksum_
+					} else {
+						a.Val = path + "?" + checksum_
+					}
+				} else {
+					a.Val = path[0:strings.Index(path, "?")] + "?" + checksum
 				}
 			}
 		}
