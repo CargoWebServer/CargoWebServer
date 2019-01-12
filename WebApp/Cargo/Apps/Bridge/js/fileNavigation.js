@@ -454,7 +454,7 @@ FileNavigator.prototype.saveFile = function (fileId) {
         } catch (error) {
             f = new Blob(data, { type: f.M_mime });
             f.name = f.M_name
-            f.lastModifiedDate = new Date(0);
+            f.File_ModifiedDateTime = new Date(0);
         }
         if (file.UUID.length == 0) {
             file.M_data = ""

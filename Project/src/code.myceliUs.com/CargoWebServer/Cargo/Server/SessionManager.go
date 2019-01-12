@@ -251,12 +251,18 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 	accountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountName})
 	if errObj != nil {
 		store := GetServer().GetDataManager().getDataStore("CargoEntities")
-		query := "(?, CargoEntities.Account:xs.string:M_name," + accountName + ")"
-		results, err := store.Read(query, []interface{}{}, []interface{}{})
+		var q EntityQuery
+		q.TYPENAME = "Server.EntityQuery"
+		q.Fields = []string{"UUID"}
+		q.Query = `CargoEntities.Account.M_name=="` + accountName + `"`
+		q.TypeName = "CargoEntities.Account"
+
+		results, err := store.Read(toJsonStr(q), []interface{}{}, []interface{}{})
 		if err == nil {
 			uuid := results[0][0].(string)
 			accountEntity, _ = GetServer().GetEntityManager().getEntityByUuid(uuid)
 		} else {
+			log.Println("----> ", err)
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
 		}
