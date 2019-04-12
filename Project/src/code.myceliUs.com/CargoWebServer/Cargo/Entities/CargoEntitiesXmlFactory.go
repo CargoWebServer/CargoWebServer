@@ -1235,10 +1235,10 @@ func (this *CargoEntitiesXmlFactory) SerialyzeAccount(xmlElement *CargoEntities.
 	/** Serialyze Message **/
 
 	/** Now I will save the value of messages **/
-	for i := 0; i < len(object.M_messages); i++ {
+	/*for i := 0; i < len(object.M_messages); i++ {
 		switch v := object.GetMessages()[i].(type) {
 		}
-	}
+	}*/
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object.GetUuid()
 	}

@@ -92,7 +92,7 @@ func newSchemaManager() *SchemaManager {
 
 func (this *SchemaManager) initialize() {
 
-	log.Println("--> Initialize SchemaManager")
+	LogInfo("--> Initialize SchemaManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Here I will initialyse the schema found in the schema directory.
@@ -111,7 +111,7 @@ func (this *SchemaManager) initialize() {
 				// if the schema does not exist I will get the existing schema...
 				if len(schema.TargetNamespace) != 0 {
 					schema.Id = schema.TargetNamespace[strings.LastIndex(schema.TargetNamespace, "/")+1:]
-					//log.Println("--> Load file: ", schemasXsdPath)
+					//LogInfo("--> Load file: ", schemasXsdPath)
 					this.schemas[schema.Id] = schema
 
 					// Read and populate maps of element, complex type etc...
@@ -164,7 +164,7 @@ func (this *SchemaManager) initialize() {
 	// Now I will import the xml file from the schema directory...
 	for _, f := range schemasDir {
 		if strings.HasSuffix(strings.ToUpper(f.Name()), ".XSD") == false && strings.HasSuffix(strings.ToLower(f.Name()), ".gitignore") == false {
-			log.Println("--> import xml data: ", GetServer().GetConfigurationManager().GetSchemasPath()+"/"+f.Name())
+			LogInfo("--> import xml data: ", GetServer().GetConfigurationManager().GetSchemasPath()+"/"+f.Name())
 			this.importXmlFile(GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name())
 		}
 	}
@@ -220,11 +220,11 @@ func (this *SchemaManager) getId() string {
 }
 
 func (this *SchemaManager) start() {
-	log.Println("--> Start SchemaManager")
+	LogInfo("--> Start SchemaManager")
 }
 
 func (this *SchemaManager) stop() {
-	log.Println("--> Stop SchemaManager")
+	LogInfo("--> Stop SchemaManager")
 }
 
 func removeNs(id string) string {
@@ -250,7 +250,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 		// if the schema does not exist I will get the existing schema...
 		if len(schema.TargetNamespace) != 0 {
 			schema.Id = schema.TargetNamespace[strings.LastIndex(schema.TargetNamespace, "/")+1:]
-			//log.Println("--> Load file: ", schemasXsdPath)
+			//LogInfo("--> Load file: ", schemasXsdPath)
 			this.schemas[schema.Id] = schema
 
 			// Read and populate maps of element, complex type etc...
@@ -969,12 +969,12 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 						this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 					}
 				} else {
-					log.Println("-------> prototype: ", element.Name, " Not found!!!")
+					LogInfo("-------> prototype: ", element.Name, " Not found!!!")
 				}
 				return
 			}
 		} else {
-			log.Println("-------> element: ", element.Ref, " Not found!!!")
+			LogInfo("-------> element: ", element.Ref, " Not found!!!")
 			return
 		}
 	}

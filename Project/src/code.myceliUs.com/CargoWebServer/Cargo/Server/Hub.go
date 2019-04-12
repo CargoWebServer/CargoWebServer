@@ -123,5 +123,5 @@ func (h *Hub) run() {
 			}
 		}
 	}
-	log.Println("---> server web socket stop listen!")
+	LogInfo("---> server web socket stop listen!")
 }

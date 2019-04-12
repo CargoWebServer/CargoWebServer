@@ -6,7 +6,6 @@ package Server
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -94,7 +93,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 }
 
 func (this *SqlDataStore) Connect() error {
-	//log.Println("-----> connect: ", this.GetId())
+	//LogInfo("-----> connect: ", this.GetId())
 	// The error message.
 	var err error
 	var connectionString string
@@ -359,12 +358,12 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 						lastId = int64(results[0][0].(int))
 					}
 				} else {
-					log.Println("-------> fail to execute query ", lastIndexQuery, err)
+					LogInfo("-------> fail to execute query ", lastIndexQuery, err)
 				}
 			}
 		}
 	} else {
-		log.Println("-------> fail to execute query ", colKeyQuery, " table Name ", tableName, err)
+		LogInfo("-------> fail to execute query ", colKeyQuery, " table Name ", tableName, err)
 	}
 
 	if err == nil {
@@ -396,7 +395,7 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
  * Cast sql type into it go equivalent type.
  */
 func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) interface{} {
-	// log.Println("---> convert typename ", sqlTypeName, Utility.ToString(value))
+	// LogInfo("---> convert typename ", sqlTypeName, Utility.ToString(value))
 	/////////////////////////// Integer ////////////////////////////////
 	if strings.HasSuffix(sqlTypeName, "tinyint") || strings.HasSuffix(sqlTypeName, "smallint") || strings.HasSuffix(sqlTypeName, "int") || strings.HasSuffix(sqlTypeName, "bigint") || strings.HasSuffix(sqlTypeName, "timestampNumeric") {
 		var val int
@@ -439,7 +438,7 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 				return false
 			}
 		} else {
-			log.Println("-----------> bit cast fail! ", reflect.TypeOf(value).String())
+			LogInfo("-----------> bit cast fail! ", reflect.TypeOf(value).String())
 		}
 	}
 
@@ -613,7 +612,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 	}
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
-		log.Println("---> sql read query error:", err)
+		LogInfo("---> sql read query error:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -647,7 +646,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Println("---> sql error:", err)
+		LogInfo("---> sql error:", err)
 		return nil, err
 	}
 	return results, nil
@@ -1050,7 +1049,7 @@ func (this *SqlDataStore) isAssociative(prototype *EntityPrototype) bool {
 				refInfos, _ := this.getRefInfos(prototype.Fields[j][2:])
 				if len(refInfos) == 0 {
 					if !Utility.Contains(prototype.Ids, prototype.Fields[j]) {
-						//log.Println("-----> ", prototype.TypeName, " is not associative")
+						//LogInfo("-----> ", prototype.TypeName, " is not associative")
 						this.m_associations[prototype.TypeName] = false
 						return false
 					}
@@ -1060,7 +1059,7 @@ func (this *SqlDataStore) isAssociative(prototype *EntityPrototype) bool {
 	}
 
 	this.m_associations[prototype.TypeName] = true
-	//log.Println("-----> ", prototype.TypeName, " is associative")
+	//LogInfo("-----> ", prototype.TypeName, " is associative")
 	return true
 }
 
@@ -1206,7 +1205,7 @@ func (this *SqlDataStore) setRefs() error {
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
-		log.Println("------> error ", err)
+		LogInfo("------> error ", err)
 		return err
 	}
 
@@ -1231,13 +1230,13 @@ func (this *SqlDataStore) setRefs() error {
 
 			src, err := GetServer().GetEntityManager().getEntityPrototype(sourceTableName, this.m_name)
 			if err != nil {
-				log.Println("----------------> src not found: ", err)
+				LogInfo("----------------> src not found: ", err)
 				return err
 			}
 
 			trg, err := GetServer().GetEntityManager().getEntityPrototype(targetTableName, this.m_name)
 			if err != nil {
-				log.Println("----------------> trg not found: ", err)
+				LogInfo("----------------> trg not found: ", err)
 				return err
 			}
 

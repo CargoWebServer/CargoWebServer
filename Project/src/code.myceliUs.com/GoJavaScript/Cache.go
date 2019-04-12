@@ -1,7 +1,6 @@
 package GoJavaScript
 
 import (
-	//	"log"
 	"reflect"
 	"time"
 )
@@ -69,8 +68,11 @@ func (cache *Cache) GetObject(id string) interface{} {
 	values["id"] = id
 	values["result"] = make(chan interface{})
 	cache.m_operations <- values
+
 	// wait to the result to be found.
-	return <-values["result"].(chan interface{})
+	result := <-values["result"].(chan interface{})
+
+	return result
 }
 
 func (cache *Cache) SetObject(id string, object interface{}) {
@@ -102,6 +104,7 @@ func GetObject(val interface{}) interface{} {
 	if val == nil {
 		return nil
 	}
+
 	if reflect.TypeOf(val).String() == "GoJavaScript.ObjectRef" {
 		ref := val.(ObjectRef)
 		if GetCache().GetObject(ref.UUID) != nil {

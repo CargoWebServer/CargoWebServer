@@ -150,6 +150,7 @@ func (self *Engine) Clear() {
  * value The value of the variable, can be a string, a number, an object.
  */
 func (self *Engine) SetGlobalVariable(name string, value interface{}) {
+
 	// Set the propertie in the global context..
 	setValue(self.context, value)
 

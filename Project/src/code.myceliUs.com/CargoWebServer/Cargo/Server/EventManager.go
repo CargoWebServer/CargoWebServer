@@ -2,7 +2,6 @@ package Server
 
 import (
 	"encoding/json"
-	"log"
 	"regexp"
 
 	"math/rand"
@@ -281,7 +280,7 @@ func newEventManager() *EventManager {
  * Do intialysation stuff here.
  */
 func (this *EventManager) initialize() {
-	log.Println("--> Initialize EventManager")
+	LogInfo("--> Initialize EventManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.m_eventDataMap = make(map[*Event]string, 0)
@@ -292,11 +291,11 @@ func (this *EventManager) getId() string {
 }
 
 func (this *EventManager) start() {
-	log.Println("--> Start EventManager")
+	LogInfo("--> Start EventManager")
 }
 
 func (this *EventManager) stop() {
-	log.Println("--> Stop EventManager")
+	LogInfo("--> Stop EventManager")
 }
 
 /**
@@ -478,7 +477,7 @@ func (this *EventListener) onEvent(evt *Event) {
 
 		// I will sent the event message to the listener...
 		// Never send the message directly use the message processor for it.
-		//log.Println("--> broadcast evt ", *m.msg.Id, " to ", this.m_addr.GetPort())
+		//LogInfo("--> broadcast evt ", *m.msg.Id, " to ", this.m_addr.GetPort())
 		GetServer().messageProcessor.m_outgoingChannel <- m
 	}
 }

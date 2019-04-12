@@ -130,7 +130,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 			case op := <-store.m_set_entity_channel:
 				values, _ := op.(*sync.Map).Load("values")
 				if values.(map[string]interface{})["TYPENAME"] != nil {
-					//log.Println("---> save values ", toJsonStr(values))
+					//LogInfo("---> save values ", toJsonStr(values))
 					typeName := values.(map[string]interface{})["TYPENAME"].(string)
 					uuid := values.(map[string]interface{})["UUID"].(string)
 					path := store.m_path + "/" + typeName + ".glass"
@@ -605,7 +605,7 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
 		// The success callback.
 		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
 			return func(rspMsg *message, caller interface{}) {
-				log.Println("---> entity protoype deleted!")
+				LogInfo("---> entity protoype deleted!")
 				// update success
 				resultsChan <- nil
 			}
@@ -2221,7 +2221,7 @@ func (this *GraphStore) runQuery(ast *ast.QueryAst, fields []string) (map[string
 								}
 							}
 						} else {
-							log.Println("---> 2230 ", err)
+							LogInfo("---> 2230 ", err)
 						}
 					} else {
 						if !isRegex {
@@ -2371,8 +2371,8 @@ func (this *GraphStore) executeSearchQuery(query string, fields []string) ([][]i
 		}
 		return results, err
 	} else {
-		log.Println("-------> query: ", query, fields)
-		log.Println("--> search error ", err)
+		LogInfo("-------> query: ", query, fields)
+		LogInfo("--> search error ", err)
 	}
 	return nil, err
 }

@@ -2,9 +2,7 @@ package main
 
 import (
 	"code.myceliUs.com/GoJavaScript"
-	//"code.myceliUs.com/GoJavaScript/GoChakra"
 	"code.myceliUs.com/GoJavaScript/GoDuktape"
-	//"code.myceliUs.com/GoJavaScript/GoJerryScript"
 )
 
 // The server will redirect client command to JavaScript.
@@ -81,7 +79,6 @@ func (self *Server) processRemoteActions() {
 
 // Run requested actions.
 func (self *Server) processActions() {
-
 	// Process remote action in it own goroutine.
 	go self.processRemoteActions()
 	for self.isRunning {

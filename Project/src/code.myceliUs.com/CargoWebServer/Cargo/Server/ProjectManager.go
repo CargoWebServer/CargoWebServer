@@ -6,7 +6,6 @@ package Server
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"strings"
 
@@ -46,7 +45,7 @@ func newProjectManager() *ProjectManager {
  */
 func (this *ProjectManager) initialize() {
 	// register service avalaible action here.
-	log.Println("--> Initialize ProjectManager")
+	LogInfo("--> Initialize ProjectManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 }
@@ -56,23 +55,23 @@ func (this *ProjectManager) getId() string {
 }
 
 func (this *ProjectManager) start() {
-	log.Println("--> Start ProjectManager")
+	LogInfo("--> Start ProjectManager")
 }
 
 func (this *ProjectManager) stop() {
-	log.Println("--> Stop ProjectManager")
+	LogInfo("--> Stop ProjectManager")
 }
 
 /**
  * Synchronize all the project from application root directory.
  */
 func (this *ProjectManager) synchronize() {
-	log.Println("---> synchronize projects")
+	LogInfo("---> synchronize projects")
 	// Each directory contain an application...
 	files, _ := ioutil.ReadDir(this.root)
 	for _, f := range files {
 		if f.IsDir() {
-			log.Println("--> Synchronize project ", f.Name())
+			LogInfo("--> Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) && f.Name() != "lib" && f.Name() != "queries" {
 				projectEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Project", "CargoEntities", []interface{}{f.Name()})
 				if err != nil {

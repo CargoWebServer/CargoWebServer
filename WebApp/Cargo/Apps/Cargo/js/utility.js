@@ -1353,6 +1353,16 @@ function getCurrentDateStr() {
     return today;
 }
 
+Date.prototype.yyyymmdd = function() {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+  
+    return [this.getFullYear(),
+            (mm>9 ? '' : '0') + mm,
+            (dd>9 ? '' : '0') + dd
+           ].join('-');
+  };
+  
 /**
  * Resize an image to a maximum with or height, and keep the same ratio.
  * @param {string} The base 64 representation of the image.
@@ -1804,3 +1814,16 @@ function formatValue(value, typeName, callback) {
 
     return formatedValue
 }
+
+
+function getChildIndex(child){
+    var parent = child.parentNode;
+    var children = parent.children;
+    var i = children.length - 1;
+    for (; i >= 0; i--){
+        if (child == children[i]){
+            break;
+        }
+    }
+    return i;
+};

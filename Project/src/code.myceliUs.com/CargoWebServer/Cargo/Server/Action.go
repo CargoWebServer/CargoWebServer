@@ -74,7 +74,7 @@ func (action *Action) execute() {
 	messageID := action.msg.GetId()
 
 	if errMsg != nil {
-		log.Println("---> 77 ", action.Name, errMsg)
+		LogInfo("---> 77 ", action.Name, errMsg)
 		err := errMsg.(error)
 
 		// Create the error object.
@@ -115,7 +115,6 @@ func (action *Action) execute() {
  * Register a new listener with a given name.
  */
 func (self *Action) RegisterListener(name string) {
-	log.Println("---> RegisterListener ", name)
 	if self.msg.from.IsOpen() {
 		listener := NewEventListener(name, self.msg.from)
 		GetServer().GetEventManager().AddEventListener(listener)
@@ -142,7 +141,9 @@ func (self *Action) BroadcastNetworkEvent(eventNumber int64, channelId string, e
  * The client must know it session id, it simply return it...
  */
 func (self *Action) GetSessionId() string {
+	LogInfo("--> get session id called")
 	if self.msg.from.IsOpen() {
+		LogInfo("--> session id is ", self.msg.from.GetUuid())
 		return self.msg.from.GetUuid()
 	}
 	return ""
@@ -183,7 +184,7 @@ func runVbs(scriptName string, args []string) ([]string, error) {
 	args_ = append(args_, path)
 	args_ = append(args_, args...)
 
-	log.Println("---> run vb script: ", scriptName)
+	LogInfo("---> run vb script: ", scriptName)
 
 	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", args_...).Output()
 	results := strings.Split(string(out), "\n")
@@ -227,6 +228,7 @@ func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interf
 	}
 
 	// Call the function on the Js runtime.
+	LogInfo("Action 231 execute js function ", funtionStr)
 	results, jsError = JS.GetJsRuntimeManager().ExecuteJsFunction(self.msg.GetId(), sessionId, funtionStr, funtionParams)
 
 	if jsError != nil {

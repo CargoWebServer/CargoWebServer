@@ -101,7 +101,7 @@ func (this *DataManager) initialize() {
 
 	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations().GetDataStoreConfigs()
 
-	log.Println("--> initialyze DataManager")
+	LogInfo("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
 		if this.getDataStore(storeConfigurations[i].GetId()) == nil {
 			store, err := NewDataStore(storeConfigurations[i])
@@ -119,11 +119,11 @@ func (this *DataManager) getId() string {
 }
 
 func (this *DataManager) start() {
-	log.Println("--> Start DataManager")
+	LogInfo("--> Start DataManager")
 }
 
 func (this *DataManager) stop() {
-	log.Println("--> Stop DataManager")
+	LogInfo("--> Stop DataManager")
 	this.close()
 }
 
@@ -135,9 +135,9 @@ func (this *DataManager) openConnections() {
 	for i := 0; i < len(this.getDataStores()); i++ {
 		err := this.getDataStores()[i].Connect()
 		if err == nil {
-			log.Println("--> connection ", this.getDataStores()[i].GetId(), " is opened!")
+			LogInfo("--> connection ", this.getDataStores()[i].GetId(), " is opened!")
 		} else {
-			log.Println("--> fail to open connection ", this.getDataStores()[i].GetId())
+			LogInfo("--> fail to open connection ", this.getDataStores()[i].GetId())
 		}
 	}
 }
@@ -145,7 +145,7 @@ func (this *DataManager) openConnections() {
 func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfiguration) {
 	store, err := NewDataStore(config)
 	if err != nil {
-		log.Println(err)
+		LogInfo(err)
 	}
 
 	this.setDataStore(store)
@@ -337,7 +337,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 	store := this.getDataStore(storeId)
 	if this.getDataStore(storeId) == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' doesn't exist."))
-		log.Println("---> Store with id", storeId, "dosen't exist!")
+		LogInfo("---> Store with id", storeId, "dosen't exist!")
 		return cargoError
 	}
 
@@ -370,7 +370,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to delete directory '"+filePath+"' with error '"+err.Error()+"'."))
-		log.Println("---> Fail to remove ", storeId, err)
+		LogInfo("---> Fail to remove ", storeId, err)
 		return cargoError
 	}
 	return nil
@@ -598,7 +598,7 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
 		}
 
 		// So here I will create the response as a compress file.
-		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
+		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz.json"
 		err := ioutil.WriteFile(path, b.Bytes(), 0666)
 		if err != nil {
 			errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
@@ -607,7 +607,7 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
 		}
 
 		// Return a tow dimential array with the address of the tmporary file.
-		return [][]interface{}{[]interface{}{"/tmp/" + messageId + ".gz"}}
+		return [][]interface{}{[]interface{}{"/tmp/" + messageId + ".gz.json"}}
 	}
 }
 
@@ -985,7 +985,7 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 		panic(err)
 	}
 
-	var path = GetServer().GetConfigurationManager().GetApplicationDirectoryPath() + "/" + storeId + ".gz"
+	var path = GetServer().GetConfigurationManager().GetApplicationDirectoryPath() + "/" + storeId + ".gz.json"
 	err := ioutil.WriteFile(path, b.Bytes(), 0666)
 
 	if err != nil {
@@ -994,7 +994,7 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 		return ""
 	}
 
-	return storeId + ".gz"
+	return storeId + ".gz.json"
 }
 
 // @api 1.0
@@ -1086,7 +1086,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	data, err := ioutil.ReadAll(gr)
 	if err != nil {
-		//log.Println(err)
+		//LogInfo(err)
 		return
 	}
 
@@ -1099,7 +1099,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	err = json.Unmarshal(data, &infos)
 	if err != nil {
-		//log.Println(err)
+		//LogInfo(err)
 		return
 	}
 
@@ -1137,7 +1137,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		}
 	}
 	if err != nil {
-		//log.Println(err)
+		//LogInfo(err)
 		return
 	}
 	// Now I will save the data...
@@ -1161,7 +1161,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	// Now I can save it.
 	for i := 0; i < len(entities); i++ {
-		//log.Println("---> create: ", entities[i])
+		//LogInfo("---> create: ", entities[i])
 		GetServer().GetEntityManager().saveEntity(entities[i])
 	}
 	// remove the tmp file if it file path is not empty... otherwise the

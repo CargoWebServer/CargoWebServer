@@ -81,7 +81,7 @@ func newFileManager() *FileManager {
 
 func (this *FileManager) initialize() {
 	// register service avalaible action here.
-	log.Println("--> initialyze ConfigurationManager")
+	LogInfo("--> initialyze ConfigurationManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 }
@@ -91,12 +91,12 @@ func (this *FileManager) getId() string {
 }
 
 func (this *FileManager) start() {
-	log.Println("--> Start FileManager")
+	LogInfo("--> Start FileManager")
 
 }
 
 func (this *FileManager) stop() {
-	log.Println("--> Stop FileManager")
+	LogInfo("--> Stop FileManager")
 }
 
 func (this *FileManager) synchronizeAll() {
@@ -130,7 +130,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 	dirEntity, err := this.getFileById(dirId)
 
 	if err != nil {
-		log.Println("Dir ", filePath_, "not found!")
+		LogInfo("Dir ", filePath_, "not found!")
 
 		if isRoot {
 			dirEntity, _ = this.createDir("", "", "")
@@ -180,7 +180,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		delete(toDelete, fileId)
 
 		if !fileExist {
-			log.Println("---> create file ", this.root+filePath__)
+			LogInfo("---> create file ", this.root+filePath__)
 			// here I will create the new entity...
 			if !f.IsDir() {
 				// Now I will open the file and create the entry in the DB.
@@ -206,10 +206,9 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 			}
 		} else {
 
-			log.Println("---> synchronize file ", this.root+filePath__)
+			LogInfo("---> synchronize file ", this.root+filePath__)
 			// I will test the checksum to see if the file has change...
 			if !f.IsDir() {
-				// Update the file checksum and save it if the file has change...
 				if !strings.HasPrefix(f.Name(), ".") {
 					filedata, _ := ioutil.ReadFile(this.root + filePath__)
 					this.saveFile(fileId, filedata, "", 128, 128, false)
@@ -232,9 +231,9 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		// Delete the associated entity...
 		err := this.deleteFile(fileToDelete.GetUuid())
 		if err == nil {
-			log.Println("--> Delete file: ", fileToDelete.GetPath()+"/"+fileToDelete.GetName())
+			LogInfo("--> Delete file: ", fileToDelete.GetPath()+"/"+fileToDelete.GetName())
 		} else {
-			log.Println("---> ", err)
+			LogInfo("---> ", err)
 		}
 	}
 
@@ -333,7 +332,7 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	}
 
 	// Save the dir.
-	log.Println("---> save dir ", dirPath)
+	LogInfo("---> save dir ", dirPath)
 	GetServer().GetEntityManager().saveEntity(dir)
 
 	return dir, nil
@@ -398,18 +397,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		}
 
 		file.SetFileType(CargoEntities.FileType_DiskFile)
-		f_, err := ioutil.TempFile("", "_create_file_")
-		if err != nil {
-			// Create the error message
-			cargoError := NewError(Utility.FileLine(), FILE_OPEN_ERROR, SERVER_ERROR_CODE, errors.New("Failed to open tmp file for '"+filepath+"/"+filename+"'. "))
-			return nil, cargoError
-		}
-
-		f_.Write(filedata)
-		checksum_ := Utility.CreateFileChecksum(f_)
-
-		f_.Close()
-		os.Remove(f_.Name())
+		checksum = Utility.CreateFileChecksum(this.root + filepath + "/" + filename)
 
 		// Open it
 		f, err = os.Open(this.root + filepath + "/" + filename)
@@ -418,43 +406,25 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 			cargoError := NewError(Utility.FileLine(), FILE_OPEN_ERROR, SERVER_ERROR_CODE, errors.New("Failed to open '"+this.root+filepath+"/"+filename+"'. "))
 			return nil, cargoError
 		}
-		checksum = Utility.CreateFileChecksum(f)
 
-		// Update the file content.
-		if checksum != checksum_ {
-			err = ioutil.WriteFile(this.root+filepath+"/"+filename, filedata, 0644)
-			if err != nil {
-				// Create the error message
-				cargoError := NewError(Utility.FileLine(), FILE_MANAGER_ERROR, SERVER_ERROR_CODE, err)
-				return nil, cargoError
-			}
-			// Reload the file
-			f.Close()
-			f, _ = os.Open(this.root + filepath + "/" + filename)
+		err = ioutil.WriteFile(this.root+filepath+"/"+filename, filedata, 0644)
+		if err != nil {
+			// Create the error message
+			cargoError := NewError(Utility.FileLine(), FILE_MANAGER_ERROR, SERVER_ERROR_CODE, err)
+			return nil, cargoError
 		}
-	} else {
+		// Reload the file
+		f.Close()
+		f, _ = os.Open(this.root + filepath + "/" + filename)
 
+	} else {
+		checksum = Utility.CreateDataChecksum(filedata)
 		// The file data will be saved in the database without physical file.
 		// The id will be a uuid.
 		file.SetFileType(CargoEntities.FileType_DbFile)
-		f_, err := ioutil.TempFile("", "_cargo_tmp_file_")
-		if err != nil {
-			// Create the error message
-			cargoError := NewError(Utility.FileLine(), FILE_OPEN_ERROR, SERVER_ERROR_CODE, errors.New("Failed to open _cargo_tmp_file_ for file '"+filename+"'. "))
-			return nil, cargoError
-
-		}
-		f_.Write(filedata)
-
-		// Create the checksum
-		checksum = Utility.CreateFileChecksum(f_)
 
 		// Keep the data into the data base as a base 64 string
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
-
-		// delete temporary file now.
-		f_.Close()
-		os.Remove(f_.Name())
 	}
 
 	// Set general information.
@@ -553,16 +523,8 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
  */
 func (this *FileManager) saveFile(fileId string, filedata []byte, sessionId string, thumbnailMaxHeight int, thumbnailMaxWidth int, dbFile bool) error {
 
-	// Create a temporary file object from the data...
-	f_, err := ioutil.TempFile(os.TempDir(), fileId)
-	if err != nil {
-		log.Println("Fail to open _cargo_tmp_file_ for file ", fileId, " ", err)
-		return err
-	}
-
-	f_.Write(filedata)
-
-	checksum := Utility.CreateFileChecksum(f_)
+	// Create the data checksum.
+	checksum := Utility.CreateDataChecksum(filedata)
 
 	// Nothing todo if the file has not change.
 	checksum_, err := this.getFileChecksum(fileId)
@@ -572,60 +534,53 @@ func (this *FileManager) saveFile(fileId string, filedata []byte, sessionId stri
 		}
 	}
 
-	// close the file and remove it.
-	f_.Close()
-	os.Remove(f_.Name())
-
 	// I will retreive the file, the uuid must exist in that case.
 	fileEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
 	file := fileEntity.(*CargoEntities.File)
 
-	if file.GetChecksum() != checksum {
-		// append the ?checksum in includes path.
-		var oldChecksum = file.GetChecksum()
-		if file.GetMime() == "text/html" {
-			filedata = this.setHtmlIncludes(file.GetPath(), filedata)
-		}
-
-		if !dbFile {
-			// Save the data to the disck...
-			filename := file.GetName()
-			filepath := file.GetPath()
-			err = ioutil.WriteFile(this.root+"/"+filepath+"/"+filename, filedata, 0644)
-			if err != nil {
-				log.Println("---> fail to write file: ", this.root+"/"+filepath+"/"+filename, err)
-				return err
-			}
-		}
-
-		file.SetChecksum(checksum)
-		if strings.HasPrefix(file.GetMime(), "application/") || strings.HasPrefix(file.GetMime(), "text/") {
-			file.SetData(base64.StdEncoding.EncodeToString(filedata))
-		}
-
-		err := GetServer().GetEntityManager().saveEntity(file)
-		if err != nil {
-			log.Println("---> save file error ", err)
-		} else if file.GetMime() == "application/javascript" || file.GetMime() == "text/css" || file.GetMime() == "text/json" {
-			// Here I will remplace the old checksum with the new one.
-			this.updateHtmlChecksum(oldChecksum, checksum, file.GetPath()+"/"+file.GetName())
-		}
-
-		eventData := make([]*MessageData, 2)
-		fileInfo := new(MessageData)
-		fileInfo.TYPENAME = "Server.MessageData"
-		fileInfo.Name = "fileInfo"
-		fileInfo.Value = file
-		eventData[0] = fileInfo
-
-		prototypeInfo := new(MessageData)
-		prototypeInfo.TYPENAME = "Server.MessageData"
-		prototypeInfo.Name = "prototype"
-		prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
-		eventData[1] = prototypeInfo
-		evt, _ := NewEvent(UpdateFileEvent, FileEvent, eventData)
-		GetServer().GetEventManager().BroadcastEvent(evt)
+	// append the ?checksum in includes path.
+	if file.GetMime() == "text/html" {
+		filedata = this.setHtmlIncludes(file.GetPath(), filedata)
 	}
+
+	if !dbFile {
+		// Save the data to the disk...
+		filename := file.GetName()
+		filepath := file.GetPath()
+		err = ioutil.WriteFile(this.root+"/"+filepath+"/"+filename, filedata, 0644)
+		if err != nil {
+			LogInfo("---> fail to write file: ", this.root+"/"+filepath+"/"+filename, err)
+			return err
+		}
+	}
+
+	file.SetChecksum(checksum)
+	if strings.HasPrefix(file.GetMime(), "application/") || strings.HasPrefix(file.GetMime(), "text/") {
+		file.SetData(base64.StdEncoding.EncodeToString(filedata))
+	}
+
+	errObj := GetServer().GetEntityManager().saveEntity(file)
+	if errObj != nil {
+		LogInfo("---> save file error ", errObj)
+	} else if file.GetMime() == "application/javascript" || file.GetMime() == "text/css" || file.GetMime() == "text/json" {
+		// Here I will remplace the old checksum with the new one.
+		this.updateHtmlChecksum(checksum_, checksum, file.GetPath()+"/"+file.GetName())
+	}
+
+	eventData := make([]*MessageData, 2)
+	fileInfo := new(MessageData)
+	fileInfo.TYPENAME = "Server.MessageData"
+	fileInfo.Name = "fileInfo"
+	fileInfo.Value = file
+	eventData[0] = fileInfo
+
+	prototypeInfo := new(MessageData)
+	prototypeInfo.TYPENAME = "Server.MessageData"
+	prototypeInfo.Name = "prototype"
+	prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
+	eventData[1] = prototypeInfo
+	evt, _ := NewEvent(UpdateFileEvent, FileEvent, eventData)
+	GetServer().GetEventManager().BroadcastEvent(evt)
 
 	return nil
 }
@@ -1051,7 +1006,7 @@ func (this *FileManager) ReadTextFile(filePath string, messageId string, session
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		log.Println("---> ", errObj.GetBody())
+		LogInfo("---> ", errObj.GetBody())
 		return ""
 	}
 
@@ -1409,9 +1364,6 @@ func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight f
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
-
-	// Now I will change file checksum in the all index.html files...
-
 }
 
 // @api 1.0
@@ -1848,16 +1800,20 @@ func TempFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Generate the server headers
 	w.Header().Set("Content-Type", mime)
-	w.Header().Set("Content-Disposition", "attachment; filename="+path+"")
+
 	w.Header().Set("Expires", "0")
 	w.Header().Set("X-UA-Compatible", "IE=Edge")
 	w.Header().Set("Content-language", "en")
 	w.Header().Set("Content-Transfer-Encoding", "binary")
 	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
-	if strings.HasSuffix(path, ".gz") {
+
+	if strings.HasSuffix(path, ".gz.json") {
 		// I will use RFC 1950 in encoding in that case.
+		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Content-Encoding", "gzip")
 	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename="+path+"")
 	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
 
 	//b := bytes.NewBuffer(downloadBytes)
@@ -2007,7 +1963,9 @@ func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
 	var code string
 	hasChange := false
 	if strings.HasSuffix(name, ".js") {
+		w.Header().Add("Content-Type", "application/javascript")
 		if err == nil {
+			//hasChange = true
 			scanner := bufio.NewScanner(f)
 			for scanner.Scan() {
 				line := scanner.Text()
@@ -2023,6 +1981,10 @@ func ServeFileHandler(w http.ResponseWriter, r *http.Request) {
 				code += line + "\n"
 			}
 		}
+	} else if strings.HasSuffix(name, ".css") {
+		w.Header().Add("Content-Type", "text/css")
+	} else if strings.HasSuffix(name, ".html") || strings.HasSuffix(name, ".htm") {
+		w.Header().Add("Content-Type", "text/html")
 	}
 
 	// if the file has change...

@@ -67,7 +67,7 @@ func newServiceManager() *ServiceManager {
  */
 func (this *ServiceManager) initialize() {
 	// Here I will start the c++ service container...
-	log.Println("--> Initialize ServiceManager")
+	LogInfo("--> Initialize ServiceManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	for i := 0; i < len(this.m_servicesLst); i++ {
@@ -82,7 +82,7 @@ func (this *ServiceManager) getId() string {
 }
 
 func (this *ServiceManager) start() {
-	log.Println("--> Start ServiceManager")
+	LogInfo("--> Start ServiceManager")
 
 	// I will create new action if there one's...
 	for i := 0; i < len(this.m_servicesLst); i++ {
@@ -118,7 +118,7 @@ func (this *ServiceManager) start() {
 }
 
 func (this *ServiceManager) stop() {
-	log.Println("--> Stop ServiceManager")
+	LogInfo("--> Stop ServiceManager")
 	for _, service := range this.m_services {
 		service.stop()
 	}
@@ -151,7 +151,7 @@ func (this *ServiceManager) registerServiceListeners(conn *WebSocketConnection) 
 	wait := make(chan interface{})
 
 	// Register the listener
-	log.Println("--> register listener: ", conn.GetHostname(), conn.GetPort())
+	LogInfo("--> register listener: ", conn.GetHostname(), conn.GetPort())
 
 	// The success callback.
 	successCallback := func(rspMsg *message, caller interface{}) {
@@ -267,7 +267,7 @@ func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConne
 
 						} else {
 							action = entity.(*CargoEntities.Action)
-							log.Println("-->Load service container action ", action.GetName(), " informations.")
+							LogInfo("-->Load service container action ", action.GetName(), " informations.")
 						}
 						this.m_serviceAction[id] = append(this.m_serviceAction[id], action)
 					}
@@ -323,7 +323,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		for i := 0; i < len(actions); i++ {
 			action := actions[i].(*CargoEntities.Action)
 			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
-			log.Println("-->Load service ", service.getId(), " action ", action.GetName(), " informations.")
+			LogInfo("-->Load service ", service.getId(), " action ", action.GetName(), " informations.")
 		}
 		return // Nothing todo in that case.
 	}
@@ -460,7 +460,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		// Export only action with api...
 		if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
-			log.Println("-->Load service action ", action.GetName(), " informations.")
+			LogInfo("-->Load service action ", action.GetName(), " informations.")
 		}
 	}
 }
@@ -920,6 +920,6 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 		}
 
 	} else {
-		log.Println("---> service not found: ", name)
+		LogInfo("---> service not found: ", name)
 	}
 }

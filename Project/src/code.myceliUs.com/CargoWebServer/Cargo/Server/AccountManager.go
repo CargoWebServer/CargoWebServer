@@ -82,11 +82,11 @@ func (this *AccountManager) getId() string {
 }
 
 func (this *AccountManager) start() {
-	log.Println("--> Start AccountManager")
+	LogInfo("--> Start AccountManager")
 }
 
 func (this *AccountManager) stop() {
-	log.Println("--> Stop AccountManager")
+	LogInfo("--> Stop AccountManager")
 }
 
 ////////////////////////////////////////////////////////////////////////////////

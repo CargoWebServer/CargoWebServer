@@ -1,7 +1,7 @@
 /**
  * Created by Dave Courtois on 2/14/2015.
  */
- 
+
 var applicationName = document.getElementsByTagName("title")[0].text;
 
 // Local event.
@@ -29,7 +29,7 @@ function init() {
             }
         }
     }
-    
+
     bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
     // The body element....
@@ -53,9 +53,9 @@ function init() {
 /**
  * That is a connection with the service container.
  */
-var service = new Server("localhost", "127.0.0.1", 9494)
+//var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon-util-01", "10.2.128.70", 9494)
-//var service = new Server("mon176", "10.67.46.210", 9494)
+var service = new Server("mon176", "10.67.44.52", 9494)
 
 var xapian = null
 

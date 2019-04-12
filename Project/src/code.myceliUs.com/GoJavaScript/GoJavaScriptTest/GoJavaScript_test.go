@@ -33,7 +33,7 @@ func GetPerson() *Person {
 
 	var p *Person
 	p = new(Person)
-	p.TYPENAME = "GoJavaScript.Person"
+	p.TYPENAME = "GoJavaScriptTest.Person"
 	p.Age = 42
 	p.FirstName = "Dave"
 	p.LastName = "Courtois"
@@ -45,7 +45,7 @@ func GetPerson() *Person {
 
 	// Append a contact.
 	c0 := new(Person)
-	c0.TYPENAME = "GoJavaScript.Person"
+	c0.TYPENAME = "GoJavaScriptTest.Person"
 	c0.Age = 21
 	c0.FirstName = "Emmanuel"
 	c0.LastName = "Proulx"
@@ -53,7 +53,7 @@ func GetPerson() *Person {
 	p.Contacts = append(p.Contacts, c0)
 
 	c1 := new(Person)
-	c1.TYPENAME = "GoJavaScript.Person"
+	c1.TYPENAME = "GoJavaScriptTest.Person"
 	c1.Age = 42
 	c1.FirstName = "Eric"
 	c1.LastName = "Boucher"
@@ -103,7 +103,7 @@ func AddNumber(a float64, b float64) float64 {
 	return a + b
 }
 
-// one of jerryscript, chakracore, duktape
+// only ducktape is avalaible a this time.
 var engine = GoJavaScriptClient.NewClient("127.0.0.1", 8081, "duktape")
 
 /**
@@ -245,6 +245,7 @@ func TestRegisterGoObject(t *testing.T) {
 
 	// Eval single return type (not array)
 	engine.RegisterGoFunction("GetPerson", GetPerson)
+
 	engine.EvalScript("console.log('Hello: ' + GetPerson().Name() + ' Your age are ' + GetPerson().Age + ' ' + GetPerson().SayHelloTo(Dave))", []interface{}{})
 
 	// Eval array...

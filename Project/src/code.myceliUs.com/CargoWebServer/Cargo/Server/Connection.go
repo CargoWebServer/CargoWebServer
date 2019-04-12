@@ -2,7 +2,6 @@ package Server
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -156,7 +155,7 @@ func HttpHandler(ws *websocket.Conn) {
 		//  I will remove all sub-connection associated with the connection
 		GetServer().removeAllOpenSubConnections(c.GetUuid())
 		c.Close()
-		log.Println("--> connection ", c.GetUuid(), "is close!")
+		LogInfo("--> connection ", c.GetUuid(), "is close!")
 	}(c)
 
 	// Start the writing loop...

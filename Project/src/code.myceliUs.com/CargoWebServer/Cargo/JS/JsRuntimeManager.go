@@ -89,6 +89,7 @@ type FunctionInfos struct {
 
 var (
 	jsRuntimeManager *JsRuntimeManager
+	LogInfo          func(...interface{})
 )
 
 /**
@@ -180,11 +181,11 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						<-intervalInfo.timer.C
 						_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].CallFunction(intervalInfo.callback, []interface{}{})
 						if err != nil {
-							log.Println("---> Run timeout callback error: ", err)
+							LogInfo("---> Run timeout callback error: ", err)
 						}
 					}
 				} else {
-					log.Println("---> Run interval callback error: ", err)
+					LogInfo("---> Run interval callback error: ", err)
 				}
 
 			}(intervalInfo)
@@ -218,26 +219,30 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 			sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
 		case operationInfos := <-jsRuntimeManager.m_appendScript:
 			callback := operationInfos.m_returns
+
 			path := operationInfos.m_params["path"].(string)
 			script := operationInfos.m_params["script"].(string)
 			jsRuntimeManager.appendScript(path, script)
+
 			// In case the script must be run...
 			if operationInfos.m_params["run"].(bool) {
 				for _, session := range jsRuntimeManager.m_sessions {
 					session.EvalScript(script, []interface{}{})
 				}
 			}
+
 			callback <- []interface{}{true} // unblock the channel...
+
 		case operationInfos := <-jsRuntimeManager.m_execVmOperation:
+			LogInfo(237, "execVmOperation")
 			// Set the function on the JS runtime...
 			go func() {
 				defer func() {
 					if recover() != nil {
 					}
 				}()
-
+				LogInfo(244, "execVmOperation", operationInfos.m_name)
 				var sessionId = operationInfos.m_params["sessionId"].(string)
-
 				if jsRuntimeManager.m_sessions[sessionId] != nil {
 					// Here I will execute various session action.
 					if operationInfos.m_name == "GetVar" {
@@ -252,14 +257,18 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						jsRuntimeManager.m_runScript[operationInfos.m_params["sessionId"].(string)] <- operationInfos
 					}
 				} else {
-					log.Println("---> try to execute function on close channel whit id: ", sessionId)
+					LogInfo("---> try to execute function on close channel whit id: ", sessionId)
 					// return nil, errors.New("Session " + sessionId + " is closed!")
 				}
 			}()
 
 		case operationInfos := <-jsRuntimeManager.m_createVm:
+
 			callback := operationInfos.m_returns
 			sessionId := operationInfos.m_params["sessionId"].(string)
+			LogInfo(269, "createVm", sessionId)
+
+			// Create the session if is not already exist.
 			if jsRuntimeManager.m_sessions[sessionId] == nil {
 				// Create one JS engine by session, or task...
 				jsRuntimeManager.createVm(sessionId)
@@ -281,7 +290,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 						if caught := recover(); caught != nil {
 							if caught.(error).Error() == "Stahp" {
 								// Here the task was cancel.
-								log.Println("---> session: ", sessionId, " is now closed")
+								LogInfo("---> session: ", sessionId, " is now closed")
 								return
 							} else {
 								panic(caught) // Something else happened, repanic!
@@ -293,6 +302,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					for {
 						select {
 						case operationInfos := <-setVariable:
+							LogInfo(305, "setVariable")
 							callback := operationInfos.m_returns
 							if operationInfos.m_params["varInfos"] != nil {
 								varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
@@ -300,6 +310,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							}
 							callback <- []interface{}{true} // unblock the channel...
 						case operationInfos := <-getVariable:
+							LogInfo(313, "getVariable")
 							callback := operationInfos.m_returns
 							var varInfos JsVarInfos
 							if operationInfos.m_params["varInfos"] != nil {
@@ -311,6 +322,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							}
 							callback <- []interface{}{varInfos} // unblock the channel...
 						case operationInfos := <-createObject:
+							LogInfo(325, "createObject")
 							callback := operationInfos.m_returns
 							var varInfos JsVarInfos
 							if operationInfos.m_params["varInfos"] != nil {
@@ -320,6 +332,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							}
 							callback <- []interface{}{varInfos} // unblock the channel...
 						case operationInfos := <-executeJsFunction:
+							LogInfo(335, "executeJsFunction")
 							callback := operationInfos.m_returns
 							var jsFunctionInfos JsFunctionInfos
 							if operationInfos.m_params["jsFunctionInfos"] != nil {
@@ -327,17 +340,21 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								vm.SetGlobalVariable("messageId", jsFunctionInfos.m_messageId)
 								vm.SetGlobalVariable("sessionId", jsFunctionInfos.m_sessionId)
 								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+
 							}
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case operationInfos := <-runScript:
+							LogInfo(347, "runScript")
 							callback := operationInfos.m_returns
 							var results interface{}
 							var err error
 							if operationInfos.m_params["script"] != nil {
+								// Here I will set a maximum delay to be sure the processor will not block indefinitly.
 								results, err = vm.EvalScript(operationInfos.m_params["script"].(string), []interface{}{})
 							}
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
+							LogInfo(357, "stopVm")
 							if stop {
 								vm.Stop()
 								break process // exit the processing loop.
@@ -346,24 +363,26 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					}
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_createObject[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 			}
+
 			// Close vm callback...
 			callback <- []interface{}{true} // unblock the channel...
 
 		case operationInfos := <-jsRuntimeManager.m_closeVm:
+			LogInfo(371, "closeVm")
 			sessionId := operationInfos.m_params["sessionId"].(string)
 			callback := operationInfos.m_returns
+
 			if jsRuntimeManager.m_sessions[sessionId] != nil {
-				callback <- []interface{}{true} // unblock the channel...
 				// here I will not wait for the session to clean before retrun.
 				go func() {
 					// Wait until the vm is stop
 					jsRuntimeManager.m_stopVm[sessionId] <- true // stop processing loop
 					jsRuntimeManager.removeVm(sessionId)
 				}()
-			} else {
-				// simply call the callback if the sesion is already close.
-				callback <- []interface{}{true} // unblock the channel...
 			}
+
+			callback <- []interface{}{true} // unblock the channel...
+
 		}
 	}
 }
@@ -538,7 +557,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// Bypass error here and try to loop again...
 	defer func(jsRuntimeManager *JsRuntimeManager) {
 		if caught := recover(); caught != nil {
-			log.Println("----> error caught at line 539 of JsRuntimeManager. ", caught.(error).Error())
+			LogInfo("----> error caught at line 539 of JsRuntimeManager. ", caught.(error).Error())
 			go run(jsRuntimeManager)
 		}
 	}(jsRuntimeManager)
@@ -582,7 +601,7 @@ func (this *JsRuntimeManager) appendScriptFiles() error {
  * Compile and run a given script...
  */
 func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
-	log.Println("--> Load script file ", filePath)
+	LogInfo("--> Load script file ", filePath)
 	srcFile, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal("Read JS src file:", err)
@@ -803,7 +822,7 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJavaSc
 			// script.
 			src = strings.Replace(src, "exports.", "exports_"+uuid+".", -1)
 			_, err := vm.EvalScript(src, []interface{}{})
-			//log.Println(src)
+			//LogInfo(src)
 			if err != nil {
 				log.Panicln("---> script running error:  ", path, src, err)
 			}
@@ -821,13 +840,16 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJavaSc
  */
 func (this *JsRuntimeManager) createVm(sessionId string) {
 	if this.m_sessions[sessionId] != nil {
-		return // Nothing to do if the session already exist.
+		//this.m_sessions[sessionId]
+		this.m_sessions[sessionId].Stop()
+		delete(this.m_sessions, sessionId)
+		LogInfo("-------> remove existion session and recreating a new one.")
 	}
 
-	log.Println("---> create a new vm for session: ", sessionId)
+	LogInfo("---> create a new vm for session: ", sessionId)
 
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1", this.m_startPort, "duktape" /*"jerryscript"*/ /*"chakracore"*/)
+	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1", this.m_startPort, "duktape")
 
 	this.m_startPort += 1
 
@@ -844,7 +866,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 		return // never delete the general session
 	}
 
-	log.Println("---> remove ressource for session: ", sessionId)
+	LogInfo("---> remove ressource for session: ", sessionId)
 
 	// I will also clear intervals for the
 	// the session.
@@ -929,7 +951,7 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJavaScriptClient.Client, f
 
 		_, err = vm.EvalScript(functionStr, []interface{}{})
 		if err != nil {
-			log.Println("fail to run ", functionStr)
+			LogInfo("fail to run ", functionStr)
 			return nil, err
 		}
 
@@ -939,8 +961,8 @@ func (this *JsRuntimeManager) executeJsFunction(vm *GoJavaScriptClient.Client, f
 	result, err_ := vm.CallFunction(functionName, functionParams...)
 
 	if err_ != nil {
-		log.Println("Error found with function ", functionName, err_.(error), "params: ", functionParams)
-		log.Println("Src ", functionStr)
+		LogInfo("Error found with function ", functionName, err_.(error), "params: ", functionParams)
+		LogInfo("Src ", functionStr)
 		return nil, err_.(error)
 	}
 	// Append val to results...
@@ -1005,8 +1027,8 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (interf
 
 	if results[1] != nil {
 		err = results[1].(error)
-		log.Println("--> 914 err: ", err)
-		log.Println("--> 915 script: ", script)
+		LogInfo("--> 914 err: ", err)
+		LogInfo("--> 915 script: ", script)
 	}
 
 	return value, err
@@ -1055,10 +1077,11 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
+	LogInfo("1072 call: ", functionStr)
 	this.m_execVmOperation <- op
-
 	// wait for completion
 	results := <-op.m_returns
+	LogInfo("1077 received: ", functionStr)
 	return results[0].(JsFunctionInfos).m_results, results[0].(JsFunctionInfos).m_err
 
 }
@@ -1143,7 +1166,7 @@ func (this *JsRuntimeManager) OpenSession(sessionId string) {
 	defer close(op.m_returns)
 	// wait for completion
 	<-op.m_returns
-	log.Println("--> vm with id", sessionId, "is now open!")
+	LogInfo("--> vm with id", sessionId, "is now open!")
 }
 
 /**

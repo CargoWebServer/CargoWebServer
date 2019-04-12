@@ -26,6 +26,7 @@ import (
 	"unicode"
 	"unsafe"
 
+	"github.com/kalafut/imohash"
 	"github.com/pborman/uuid"
 	"github.com/robertkrimen/otto"
 	"golang.org/x/text/encoding/charmap"
@@ -341,7 +342,6 @@ func GetChecksum(values interface{}) string {
 		checksum += ToString(values)
 	}
 
-	//log.Println(checksum)
 	return GetMD5Hash(checksum)
 }
 
@@ -357,23 +357,14 @@ func ToMap(in interface{}) (map[string]interface{}, error) {
 }
 
 const filechunk = 8192 // we settle for 8KB
-func CreateFileChecksum(file *os.File) string {
-	file.Seek(0, 0) // Set the reader back to the begenin of the file...
-	// calculate the file size
-	info, _ := file.Stat()
-	filesize := info.Size()
-	blocks := uint64(math.Ceil(float64(filesize) / float64(filechunk)))
-	hash := md5.New()
+func CreateFileChecksum(path string) string {
+	checksum, _ := imohash.SumFile(path)
+	return GetMD5Hash(string(checksum[:]))
+}
 
-	for i := uint64(0); i < blocks; i++ {
-		blocksize := int(math.Min(filechunk, float64(filesize-int64(i*filechunk))))
-		buf := make([]byte, blocksize)
-		file.Read(buf)
-		io.WriteString(hash, string(buf)) // append into the hash
-	}
-	checksum := hex.EncodeToString(hash.Sum(nil))
-	file.Seek(0, 0) // Set the reader back to the begenin of the file...
-	return checksum
+func CreateDataChecksum(data []byte) string {
+	checksum := imohash.Sum(data)
+	return GetMD5Hash(string(checksum[:]))
 }
 
 // Exists reports whether the named file or directory exists.
@@ -1019,6 +1010,16 @@ func ToString(value interface{}) string {
 		str += strconv.FormatBool(value.(bool))
 	} else if reflect.TypeOf(value).String() == "[]uint8" {
 		str += string(value.([]uint8))
+	} else if reflect.TypeOf(value).String() == "*errors.errorString" || reflect.TypeOf(value).String() == "*errors.Error" {
+		errStr := value.(error).Error()
+		str += errStr
+	} else if reflect.TypeOf(value).String() == "[]string" {
+		for i := 0; i < len(value.([]string)); i++ {
+			str += value.([]string)[i]
+			if i < len(value.([]string))-1 {
+				str += " "
+			}
+		}
 	} else {
 		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to string")
 	}

@@ -87,7 +87,6 @@ func main() {
 	// Start the server...
 	Server.GetServer().Start()
 
-	//open.Run("http://127.0.0.1:9393/Bridge")
 	log.Println("--> server is ready and listen at port ", port)
 	err := http.ListenAndServe(":"+strconv.Itoa(port), r)
 

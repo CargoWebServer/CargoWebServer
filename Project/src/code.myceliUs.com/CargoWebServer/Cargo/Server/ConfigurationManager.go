@@ -1,7 +1,6 @@
 package Server
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -73,7 +72,7 @@ func newConfigurationManager() *ConfigurationManager {
 
 	dir = strings.Replace(dir, "\\", "/", -1)
 	if err != nil {
-		log.Println(err)
+		LogError(err)
 	}
 
 	if strings.HasSuffix(dir, "/") == false {
@@ -82,7 +81,7 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// Here I will set the root...
 	configurationManager.m_filePath = dir + "WebApp/Cargo"
-	log.Println("--> server file path is " + configurationManager.m_filePath)
+	LogInfo("--> server file path is " + configurationManager.m_filePath)
 	JS.NewJsRuntimeManager(configurationManager.m_filePath + "/Script")
 
 	// The list of registered services config
@@ -150,7 +149,7 @@ func (this *ConfigurationManager) getActiveConfigurations() *Config.Configuratio
  * Do intialysation stuff here.
  */
 func (this *ConfigurationManager) initialize() {
-	log.Println("--> initialyze ConfigurationManager")
+	LogInfo("--> initialyze ConfigurationManager")
 	// So here if there is no configuration...
 	entity, cargoError := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
 	if cargoError == nil {
@@ -213,7 +212,7 @@ func (this *ConfigurationManager) getId() string {
 }
 
 func (this *ConfigurationManager) start() {
-	log.Println("--> Start ConfigurationManager")
+	LogInfo("--> Start ConfigurationManager")
 	// Set services configurations...
 	for i := 0; i < len(this.m_servicesConfiguration); i++ {
 		_, err := GetServer().GetEntityManager().getEntityById("Config.ServiceConfiguration", "Config", []interface{}{this.m_servicesConfiguration[i].GetId()})
@@ -234,7 +233,7 @@ func (this *ConfigurationManager) start() {
 }
 
 func (this *ConfigurationManager) stop() {
-	log.Println("--> Stop ConfigurationManager")
+	LogInfo("--> Stop ConfigurationManager")
 }
 
 /**

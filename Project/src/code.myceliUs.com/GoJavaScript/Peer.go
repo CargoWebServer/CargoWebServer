@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"sync"
 
 	"code.myceliUs.com/Utility"
 )
@@ -45,7 +46,7 @@ type Peer struct {
 	// Actions related channel.
 
 	// Action asked by the peer.
-	pending_actions_chan map[string]chan *Action
+	pending_actions_chan *sync.Map // map[string]chan *Action
 
 	// The channel where the action are executed.
 	exec_action_chan chan *Action
@@ -70,7 +71,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	p.receive_chan = make(chan *Message)
 
 	// pending action.
-	p.pending_actions_chan = make(map[string]chan *Action, 0)
+	p.pending_actions_chan = new(sync.Map) // make(map[string]chan *Action, 0)
 
 	// action exec channel, this is given by the channel owner.return
 	p.exec_action_chan = exec_action_chan
@@ -136,13 +137,14 @@ func (self *Peer) run() {
 				go func(self *Peer, msg *Message) {
 					// Here I receive a response.
 					// I will get the action...
-					action := <-self.pending_actions_chan[msg.UUID]
+					channel, _ := self.pending_actions_chan.Load(msg.UUID)
+					action := <-channel.(chan *Action)
 
 					// The response result in the action.
 					action.Results = msg.Remote.Results
 
 					// unblock the function call.
-					self.pending_actions_chan[msg.UUID] <- action
+					channel.(chan *Action) <- action
 
 				}(self, msg)
 			}
@@ -201,21 +203,29 @@ func (self *Peer) CallRemoteAction(action *Action) *Action {
 
 	// So here I will create a pending action channel a wait for the completion
 	// of the function before return it.
-	self.pending_actions_chan[action.UUID] = make(chan *Action)
+	channel := make(chan *Action)
+	self.pending_actions_chan.Store(action.UUID, channel)
 
 	// Create the action request.
 	msg := NewMessage(Request, action)
 
 	// Send the request and wait for it answer.
-	self.SendMessage(msg)
+	//
+	go func() {
+		// ** The message is sent in it own goroutine so the action is
+		// append faster in the pending action map and chance of response arrive
+		// before the action is waiting are null.
+		self.SendMessage(msg)
+	}()
 
 	// Put the action in the channel and wait for the response...
-	self.pending_actions_chan[action.UUID] <- action
+	channel <- action
 
 	// Call remote action and wait for it result and set it back in the action.
-	action = <-self.pending_actions_chan[action.UUID]
+	action = <-channel
+
 	// Remove it from the map.
-	delete(self.pending_actions_chan, action.UUID)
+	self.pending_actions_chan.Delete(action.UUID)
 
 	return action
 }

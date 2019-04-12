@@ -141,7 +141,7 @@ func savePEMKey(fileName string, key *rsa.PrivateKey) error {
  */
 func (this *OAuth2Manager) initialize() {
 	// register service avalaible action here.
-	log.Println("--> initialyze OAuth2Manager")
+	LogInfo("--> initialyze OAuth2Manager")
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
@@ -155,7 +155,7 @@ func (this *OAuth2Manager) getId() string {
 }
 
 func (this *OAuth2Manager) start() {
-	log.Println("--> Start OAuth2Manager")
+	LogInfo("--> Start OAuth2Manager")
 	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurations()
 	cfg := activeConfigurations.GetOauth2Configuration()
 
@@ -315,7 +315,7 @@ func (this *OAuth2Manager) start() {
 }
 
 func (this *OAuth2Manager) stop() {
-	log.Println("--> Stop OAuth2Manager")
+	LogInfo("--> Stop OAuth2Manager")
 }
 
 /**
@@ -538,10 +538,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 	// If the ressource is found all we have to do is to get the actual resource.
 	if access != nil {
 		// Here I will made the API call.
-		log.Println("-------------> dowload the ressource")
+		LogInfo("-------------> dowload the ressource")
 		result, err := DownloadRessource(query, access.GetId(), "Bearer")
 		if err == nil {
-			log.Println("-------------> result found ", result)
+			LogInfo("-------------> result found ", result)
 			return result
 		} else {
 			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
@@ -550,7 +550,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		}
 
 	} else {
-		log.Println("-----------> ask for authorization")
+		LogInfo("-----------> ask for authorization")
 		// No access was found so here I will initiated the authorization process...
 		// To do so I will create the href where the user will be ask to
 		// authorize the client application to access ressources.
@@ -648,13 +648,13 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		if <-done {
 			closeAuthorizeDialog()
 			if len(accessUuid) == 0 {
-				log.Println("-----------> authorization accept")
-				log.Println("-----------> Ask for access")
+				LogInfo("-----------> authorization accept")
+				LogInfo("-----------> Ask for access")
 
 				// That channel will contain the accessUuid
 				channels[msgId] = make(chan []string)
 
-				log.Println("------> wait for channel ", msgId)
+				LogInfo("------> wait for channel ", msgId)
 
 				// Wait for the response from AppAuthCodeHandler.
 				values := <-channels[msgId]
@@ -682,7 +682,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		} else {
 			// Here I will report the error to the user.
-			log.Println("-----------> authorization refuse")
+			LogInfo("-----------> authorization refuse")
 			closeAuthorizeDialog()
 			errObj := NewError(Utility.FileLine(), AUTHORIZATION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Authorization denied to get resource with scope "+scope+" for client with id "+clientId))
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1504,7 +1504,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
 
-	log.Println("-----> request ", r)
+	LogInfo("-----> request ", r)
 	// Send authentication end message...
 	var clientId string
 	var sessionId string
@@ -1518,7 +1518,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		scope = strings.Split(state, ":")[3]
 	}
 
-	log.Println("------> 1452 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
+	LogInfo("------> 1452 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
 
 	// I will get a reference to the client who generate the request.
 	ids := []interface{}{clientId}
@@ -1531,7 +1531,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(errorCode) != 0 {
 		// The authorization fail!
-		log.Println("--------> create access error.")
+		LogInfo("--------> create access error.")
 		errorDescription := r.Form.Get("error_description")
 		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
@@ -1539,11 +1539,11 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().getProcessor().m_incomingChannel <- accessDenied
 	} else {
-		log.Println("--------> try to create access grant response whit id: ", messageId)
+		LogInfo("--------> try to create access grant response whit id: ", messageId)
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "", scope)
 
 		if err == nil {
-			log.Println("--------> create access grant response.", messageId)
+			LogInfo("--------> create access grant response.", messageId)
 			var idTokenUuid string
 			if access.GetUserData() != nil {
 				idTokenUuid = access.GetUserData().GetUuid()
@@ -1579,7 +1579,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 		} else {
 			// send error
-			log.Println("--------> access error: ", err)
+			LogInfo("--------> access error: ", err)
 			to := make([]*WebSocketConnection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
 			var errData []byte
@@ -1840,7 +1840,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 
 	// Initialyse getUuid, setEntity etc...
 	GetServer().GetEntityManager().setEntity(a)
-	log.Println("---> expire In ", data.ExpiresIn)
+	LogInfo("---> expire In ", data.ExpiresIn)
 	a.SetExpiresIn(int64(data.ExpiresIn))
 	a.SetScope(data.Scope)
 	a.SetRedirectUri(data.RedirectUri)

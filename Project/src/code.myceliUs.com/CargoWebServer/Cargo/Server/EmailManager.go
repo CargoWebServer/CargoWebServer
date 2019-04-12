@@ -67,7 +67,7 @@ func newEmailManager() *EmailManager {
  */
 func (this *EmailManager) initialize() {
 
-	log.Println("--> Initialize EmailManager")
+	LogInfo("--> Initialize EmailManager")
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
@@ -89,11 +89,11 @@ func (this *EmailManager) getId() string {
 }
 
 func (this *EmailManager) start() {
-	log.Println("--> Start EmailManager")
+	LogInfo("--> Start EmailManager")
 }
 
 func (this *EmailManager) stop() {
-	log.Println("--> Stop EmailManager")
+	LogInfo("--> Stop EmailManager")
 }
 
 /**
@@ -103,6 +103,7 @@ func (this *EmailManager) sendEmail(id string, from string, to []string, cc []*C
 
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", from)
+
 	msg.SetHeader("To", to...)
 
 	// Attach the multiple carbon copy...
@@ -147,26 +148,26 @@ func (this *EmailManager) receiveMailFunc(address string, user string, pass stri
 	client, err := pop3.DialTLS(address)
 
 	if err != nil {
-		log.Println("Error: %v\n", err)
+		LogError("Error: %v\n", err)
 	} else {
 		err = client.Auth(user, pass)
 		if err != nil {
-			log.Println("Error: %v\n", err)
+			LogError("Error: %v\n", err)
 		} else {
 			msgs, sizes, err := client.ListAll()
 			if err != nil {
-				log.Println("Error: %v\n", err)
+				LogError("Error: %v\n", err)
 			} else {
 				for i := 0; i < len(msgs); i++ {
 					if err != nil {
-						log.Println("Error: %v\n", err)
+						LogError("Error: %v\n", err)
 					} else {
 						log.Println("msg:", msgs[i], "size:", sizes[i])
 						msgStr, err := client.Retr(msgs[i])
 						if err != nil {
-							log.Println("Error: %v\n", err)
+							LogError("Error: %v\n", err)
 						} else {
-							log.Println(msgStr)
+							LogInfo(msgStr)
 						}
 
 					}
@@ -201,7 +202,7 @@ func (this *EmailManager) OnEvent(evt interface{}) {
 // This function is use to send a email message to a given addresse.
 // @param {string} id The server connection id
 // @param {string} from The email of the sender
-// @param {string} to The destination email's list
+// @param {[]string} to The destination email's list
 // @param {[]*server.CarbonCopy} cc The carbon copy's.
 // @param {string} title The email title.
 // @param {string} msg The message to send must be html format.
@@ -213,7 +214,17 @@ func (this *EmailManager) OnEvent(evt interface{}) {
 // @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*CarbonCopy, subject string, body string, attachs []*Attachment, bodyType string, messageId string, sessionId string) {
+func (this *EmailManager) SendEmail(id string, from string, to []interface{}, cc []interface{}, subject string, body string, attachs []interface{}, bodyType string, messageId string, sessionId string) {
+	cc_ := make([]*CarbonCopy, 0)
+	attachs_ := make([]*Attachment, 0)
+
+	for i := 0; i < len(cc); i++ {
+		cc_ = append(cc_, cc[i].(*CarbonCopy))
+	}
+
+	for i := 0; i < len(attachs); i++ {
+		attachs_ = append(attachs_, attachs[i].(*Attachment))
+	}
 
 	// Initialyse the parameters object of not already intialyse.
 	var errObj *CargoEntities.Error
@@ -223,16 +234,22 @@ func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*C
 		return
 	}
 
-	errObj = this.sendEmail(id, from, to, cc, subject, body, attachs, bodyType)
+	// convert various
+	to_ := make([]string, len(to))
+	for i := 0; i < len(to); i++ {
+		to_[i] = to[i].(string)
+	}
+
+	errObj = this.sendEmail(id, from, to_, cc_, subject, body, attachs_, bodyType)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
 
 	// Wrote message success here.
-	log.Println("Message was send to ", to, " by ", from)
+	LogInfo("Message was send to ", to, " by ", from)
 	for i := 0; i < len(cc); i++ {
-		log.Println("--> cc :", cc[i].Mail)
+		LogInfo("--> cc :", cc_[i].Mail)
 	}
 
 	return

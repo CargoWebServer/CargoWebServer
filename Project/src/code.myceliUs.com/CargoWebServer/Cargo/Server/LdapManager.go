@@ -44,7 +44,7 @@ func newLdapManager() *LdapManager {
  */
 func (this *LdapManager) initialize() {
 	// register service avalaible action here.
-	log.Println("--> initialyze LdapManager")
+	LogInfo("--> initialyze LdapManager")
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 }
@@ -66,7 +66,7 @@ func (this *LdapManager) getConfigsInfo() map[string]*Config.LdapConfiguration {
 }
 
 func (this *LdapManager) start() {
-	log.Println("--> Start LdapManager")
+	LogInfo("--> Start LdapManager")
 }
 
 func (this *LdapManager) synchronizeAll() {
@@ -94,7 +94,7 @@ func (this *LdapManager) synchronizeAll() {
 }
 
 func (this *LdapManager) stop() {
-	log.Println("--> Stop LdapManager")
+	LogInfo("--> Stop LdapManager")
 }
 
 /**
@@ -171,7 +171,7 @@ func (this *LdapManager) connect(id string, userId string, psswd string) (*LDAP.
 
 	if err != nil {
 		// handle error
-		log.Println("---> Cannot open the connection: ", ldapConfigInfo.M_hostName, err)
+		LogInfo("---> Cannot open the connection: ", ldapConfigInfo.M_hostName, err)
 		return nil, err
 	}
 
@@ -257,7 +257,7 @@ func (this *LdapManager) authenticate(id string, login string, psswd string) boo
 	var attributes []string = []string{"sAMAccountName"}
 	_, err := this.search(id, login, psswd, base_dn, filter, attributes)
 	if err != nil {
-		log.Println("---> ldap authenticate fail: ", login, err)
+		LogInfo("---> ldap authenticate fail: ", login, err)
 		return false
 	}
 
@@ -351,7 +351,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 								userEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
 								user = userEntity.(*CargoEntities.User)
 								if err == nil {
-									log.Println("--> Create user: ", user.GetId())
+									LogInfo("--> Create user: ", user.GetId())
 									account.SetUserRef(user)
 									user.AppendAccounts(account)
 									// Save both entity...
@@ -364,7 +364,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 						} else {
 							// save only the user here.
 							GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", user)
-							log.Println("--> User ", user.GetFirstName()+" "+user.GetLastName(), " is not active")
+							LogInfo("--> User ", user.GetFirstName()+" "+user.GetLastName(), " is not active")
 						}
 					}
 				}
@@ -385,7 +385,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
  * This Get the LDAP groups from the DB...
  */
 func (this *LdapManager) synchronizeGroups(id string) error {
-	// log.Println("--> Synchronize Groups")
+	// LogInfo("--> Synchronize Groups")
 	var base_dn string = "OU=Groups," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=group)"
 	var attributes []string = []string{"name", "distinguishedName"}
@@ -420,7 +420,7 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 							groupEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities(), "M_entities", group)
 							if err == nil {
 								group = groupEntity.(*CargoEntities.Group)
-								log.Println("--> create group ", group.GetId())
+								LogInfo("--> create group ", group.GetId())
 							}
 						} else {
 							group = groupEntity.(*CargoEntities.Group)
@@ -444,7 +444,7 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 				group.SetName(row[j].(string))
 			}
 		}
-		// log.Println("---> group ", group)
+		// LogInfo("---> group ", group)
 		GetServer().GetEntityManager().saveEntity(group)
 	}
 
@@ -630,7 +630,7 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 				if computerEntity != nil {
 					computer = computerEntity.(*CargoEntities.Computer)
 				}
-				log.Println("----> create computer ", computer.GetId())
+				LogInfo("----> create computer ", computer.GetId())
 			} /*else {
 				addrs, err := net.LookupIP(computer.GetName())
 				if err == nil {
@@ -645,7 +645,7 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 				computer.ParentUuid = computerEntity.GetParentUuid()
 				computer.ParentLnk = computerEntity.GetParentLnk()
 				GetServer().GetEntityManager().saveEntity(computer)
-				log.Println("----> save computer ", computer.GetName(), computer.GetIpv4())
+				LogInfo("----> save computer ", computer.GetName(), computer.GetIpv4())
 			}*/
 		}
 	}

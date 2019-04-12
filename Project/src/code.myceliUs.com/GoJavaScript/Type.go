@@ -134,6 +134,7 @@ func RegisterGoType(value interface{}) {
  * Localy register a go object.
  */
 func RegisterGoObject(obj interface{}, name string) string {
+
 	// Here I will dynamicaly register objet type in the utility cache...
 	empty := reflect.New(reflect.TypeOf(obj))
 	RegisterGoType(empty.Elem().Interface())
@@ -237,6 +238,7 @@ func ObjectToRef(objects interface{}) interface{} {
 						if reflect.TypeOf(e.Interface()).Kind() == reflect.Struct {
 							// results will be register.
 							uuid := RegisterGoObject(objects, "")
+
 							// I will set the results a object reference.
 							objects = NewObjectRef(uuid)
 						}

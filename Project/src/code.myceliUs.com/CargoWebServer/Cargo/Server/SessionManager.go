@@ -63,7 +63,7 @@ func newSessionManager() *SessionManager {
  */
 func (this *SessionManager) initialize() {
 
-	log.Println("--> Initialize SessionManager")
+	LogInfo("--> Initialize SessionManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.sessionToCloseChannel = make(chan struct {
@@ -82,12 +82,12 @@ func (this *SessionManager) getId() string {
 }
 
 func (this *SessionManager) start() {
-	log.Println("--> Start SessionManager")
+	LogInfo("--> Start SessionManager")
 	this.removeClosedSession()
 }
 
 func (this *SessionManager) stop() {
-	log.Println("--> Stop SessionManager")
+	LogInfo("--> Stop SessionManager")
 }
 
 /**
@@ -108,7 +108,7 @@ func (this *SessionManager) run() {
  */
 func (this *SessionManager) removeClosedSession() {
 	sessions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Session", "CargoEntities", nil)
-	log.Println("---> there is ", len(sessions), " session to close.")
+	LogInfo("---> there is ", len(sessions), " session to close.")
 	for i := 0; i < len(sessions); i++ {
 		sessionId := sessions[i].(*CargoEntities.Session).GetId()
 		if GetServer().getConnectionById(sessionId) == nil {
@@ -145,7 +145,7 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 
 	// Delete the session.
 	GetServer().GetEntityManager().deleteEntity(session)
-	log.Println("---> session ", session.GetId(), " is now close.")
+	LogInfo("---> session ", session.GetId(), " is now close.")
 
 	// Send the event
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -262,7 +262,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			uuid := results[0][0].(string)
 			accountEntity, _ = GetServer().GetEntityManager().getEntityByUuid(uuid)
 		} else {
-			log.Println("----> ", err)
+			LogInfo("----> ", err)
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
 		}
@@ -285,7 +285,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 				}
 			}
 		} else {
-			log.Println("--> ldap ", serverId, " not found!")
+			LogInfo("--> ldap ", serverId, " not found!")
 			if account.M_password != psswd {
 				// Create the error message
 				cargoError := NewError(Utility.FileLine(), PASSWORD_MISMATCH_ERROR, SERVER_ERROR_CODE, errors.New("The password '"+psswd+"' does not match the account name '"+accountName+"'. "))

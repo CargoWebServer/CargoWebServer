@@ -11,8 +11,11 @@ import (
 	"errors"
 
 	//"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 
 	"code.myceliUs.com/GoJavaScript"
@@ -50,12 +53,27 @@ func NewClient(address string, port int, name string) *Client {
 	var err error
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
+	// Make sure the command exist in the os path...
 	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 	err = client.srv.Start()
 
 	if err != nil {
-		log.Println("Fail to start GoJavaScriptServer", err)
-		return nil
+		// In that case I will try to start the GoJavaScriptServer at the save level of the client application.
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err == nil {
+			if runtime.GOOS == "windows" {
+				client.srv = exec.Command(dir+"\\GoJavaScriptServer.exe", strconv.Itoa(port), name)
+			} else {
+				client.srv = exec.Command(dir+"/GoJavaScriptServer", strconv.Itoa(port), name)
+			}
+
+			err = client.srv.Start()
+			if err != nil {
+				log.Println("Fail to start GoJavaScriptServer", err)
+				return nil
+			}
+		}
+
 	}
 
 	// Create the client connection, try 5 time and wait 200 millisecond each try.
@@ -204,7 +222,6 @@ func (self *Client) CreateGoObject(jsonStr string) (interface{}, error) {
 		if data["TYPENAME"] != nil {
 			relfectValue := Utility.MakeInstance(data["TYPENAME"].(string), data, SetEntity)
 			value = relfectValue.Interface()
-
 		} else {
 			// Here map[string]interface{} will be use.
 			err = errors.New("No object are registered in go to back the js object!")
@@ -413,12 +430,6 @@ func (self *Client) SetObjectJsMethod(uuid string, name string, value interface{
 	obj.Methods[name] = value
 }
 
-func (self *Client) SetObjectGoMethod(uuid string, name string) {
-	//obj := GoJavaScript.GetCache().GetObject(uuid).(GoJavaScript.Object)
-	// set the object property.
-	log.Println("---> set go function ", uuid, name)
-}
-
 /**
  * Evaluate sript.
  * The list of global variables to be set before executing the script.
@@ -432,6 +443,7 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
 	action.AppendParam("variables", variables)
 
 	// Call the remote action
+
 	action = self.peer.CallRemoteAction(action)
 
 	var err error
@@ -465,8 +477,7 @@ func (self *Client) CallFunction(name string, params ...interface{}) (interface{
 	if action.Results[1] != nil {
 		err = action.Results[1].(error)
 	}
-	//r, _ := Utility.ToJson(action.Results[0])
-	//log.Println("---> result ", r)
+
 	value := GoJavaScript.RefToObject(action.Results[0])
 
 	return value, err

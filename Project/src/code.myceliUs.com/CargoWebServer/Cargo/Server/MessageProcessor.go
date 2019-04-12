@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"code.myceliUs.com/Utility"
@@ -16,6 +15,7 @@ import (
  * The message processor processes the incomming message received.
  */
 type MessageProcessor struct {
+
 	// Run until abortedByEnvironment is false
 	abortedByEnvironment chan bool
 
@@ -25,22 +25,10 @@ type MessageProcessor struct {
 	// The message to be sent..
 	m_outgoingChannel chan *message
 
-	// This map will contain chunk of message larger
-	// than the allow transfert size.
-	m_pendingMsgChunk map[string][][]byte
-
-	// The message(s) that waiting for response.
-	m_pendingMsg map[string][]*message
-
 	// serialyse request sending...
 	m_sendRequest            chan *message
 	m_receiveRequestResponse chan *message
 	m_receiveRequestError    chan *message
-
-	/**
-	 * Use to protected the entitiesMap access.
-	 */
-	sync.RWMutex
 }
 
 /**
@@ -60,13 +48,9 @@ func newMessageProcessor() *MessageProcessor {
 	p.m_receiveRequestResponse = make(chan *message)
 	p.m_receiveRequestError = make(chan *message)
 
-	// Pending message.
-	p.m_pendingMsg = make(map[string][]*message)
-	p.m_pendingMsgChunk = make(map[string][][]byte)
-
 	// Channel to stop the message proecessing.
 	p.abortedByEnvironment = make(chan bool)
-	
+
 	return p
 }
 
@@ -105,7 +89,6 @@ func (this *MessageProcessor) run() {
 					delete(pendingRequest, m.GetId())
 					m.tryNb = 0 // No more necessary...
 
-					//log.Println("---> pendingRequest", len(pendingRequest))
 					if rqst.successCallback != nil {
 						// Call the success callback.
 						rqst.successCallback(m, rqst.caller)
@@ -116,7 +99,6 @@ func (this *MessageProcessor) run() {
 				rqst := pendingRequest[m.GetId()]
 				if rqst != nil {
 					delete(pendingRequest, m.GetId())
-					//log.Println("---> pendingRequest", len(pendingRequest))
 					if rqst.errorCallback != nil {
 						// Call the error callback.
 						rqst.errorCallback(m, rqst.caller)
@@ -127,15 +109,21 @@ func (this *MessageProcessor) run() {
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
 
+	// keep the list of pending message.
+
+	// Those collection are access by help of channel.
+	pendingMsg := make(map[string][]*message)
+	pendingMsgChunk := make(map[string][][]byte)
+
 	// Main message processing loop...
 	for {
 		select {
 		case m := <-this.m_incomingChannel:
 			// Process the incomming message.
-			go this.processIncomming(m)
+			go this.processIncomming(m, pendingMsg, pendingMsgChunk)
 		case m := <-this.m_outgoingChannel:
 			// Process the outgoing message.
-			go this.processOutgoing(m)
+			go this.processOutgoing(m, pendingMsg)
 		case done := <-this.abortedByEnvironment:
 			if done {
 				return
@@ -167,8 +155,7 @@ func (this *MessageProcessor) appendResponse(m *message) {
 }
 
 ////////////////////////////// Pending message ///////////////////////////////////z
-func (this *MessageProcessor) createPendingMessages(m *message) {
-	this.Lock()
+func (this *MessageProcessor) createPendingMessages(m *message, pendingMsg map[string][]*message) {
 
 	//Get the max size.
 	maxSize := getMaxMessageSize()
@@ -185,7 +172,8 @@ func (this *MessageProcessor) createPendingMessages(m *message) {
 	id := m.GetId()
 
 	// Create the message array
-	this.m_pendingMsg[id] = make([]*message, count)
+	pendingMsg[id] = make([]*message, count)
+
 	for i := 0; i < count; i++ {
 		// So here I w ill create the slice.
 		var bytesSlice []byte
@@ -213,94 +201,10 @@ func (this *MessageProcessor) createPendingMessages(m *message) {
 		transferMsg.msg.Data = make([]byte, len(bytesSlice))
 		copy(transferMsg.msg.Data, bytesSlice)
 
-		this.m_pendingMsg[id][i] = transferMsg
+		pendingMsg[id][i] = transferMsg
 	}
 	// So here I will start the pending message processing.
-	this.Unlock()
-	this.processPendingMessage(id)
-}
-
-/**
- * Determine if a message is pending or not.
- */
-func (this *MessageProcessor) isPending(id string) bool {
-	this.Lock()
-	defer this.Unlock()
-	if _, ok := this.m_pendingMsg[id]; ok {
-		return true
-	}
-	return false
-}
-
-/**
- * Get the pending request with is id.
- */
-func (this *MessageProcessor) getPendingMessagesById(id string) []*message {
-	this.Lock()
-	defer this.Unlock()
-	return this.m_pendingMsg[id]
-}
-
-/**
- * Remove the first messages from the pending list and retrun it
- */
-func (this *MessageProcessor) popPendingMessages(id string) *message {
-	this.Lock()
-	defer this.Unlock()
-
-	messages := this.m_pendingMsg[id]
-	if len(messages) > 0 {
-		msg := messages[0]
-		if *msg.msg.Type == Message_TRANSFER {
-			// I will now remove the first item from the array.
-			this.m_pendingMsg[id] = make([]*message, 0)
-			for i := 1; i < len(messages); i++ {
-				this.m_pendingMsg[id] = append(this.m_pendingMsg[id], messages[i])
-			}
-			return msg
-		}
-	} else {
-		// Remove the pendeing message from the list.
-		delete(this.m_pendingMsg, id)
-	}
-	return nil
-}
-
-////////////////////////////// chunk message /////////////////////////////////
-
-/**
- * Create an empty array of bytes.
- */
-func (this *MessageProcessor) createChunkMessages(messageId string, container [][]byte) {
-	this.Lock()
-	defer this.Unlock()
-	this.m_pendingMsgChunk[messageId] = container
-}
-
-/**
- * Get the chunked message.
- */
-func (this *MessageProcessor) getChunkMessagesById(id string) [][]byte {
-	this.Lock()
-	defer this.Unlock()
-
-	return this.m_pendingMsgChunk[id]
-}
-
-/**
- * Determine if the chunck message exist or not.
- */
-func (this *MessageProcessor) isChunkMessagesExist(m *message) bool {
-	if this.getChunkMessagesById(m.GetId()) != nil {
-		return true
-	}
-	return false
-}
-
-func (this *MessageProcessor) removeChunkMessages(messageId string) {
-	this.Lock()
-	defer this.Unlock()
-	delete(this.m_pendingMsgChunk, messageId)
+	this.processPendingMessage(id, pendingMsg)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +214,7 @@ func (this *MessageProcessor) removeChunkMessages(messageId string) {
 /**
  * Process Is use to execute the action associated whit the request.
  */
-func (this *MessageProcessor) processIncomming(m *message) {
+func (this *MessageProcessor) processIncomming(m *message, pendingMsg map[string][]*message, pendingMsgChunk map[string][][]byte) {
 	msg := m.msg
 
 	if *msg.Type == Message_REQUEST {
@@ -418,9 +322,9 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 	} else if *msg.Type == Message_RESPONSE {
 		// If the response is in the pending message I will process the next message.
-		if this.isPending(msg.Rsp.GetId()) {
+		if _, ok := pendingMsg[msg.Rsp.GetId()]; ok { // if this.isPending(msg.Rsp.GetId()) {
 			//do something here
-			this.processPendingMessage(msg.Rsp.GetId())
+			this.processPendingMessage(msg.Rsp.GetId(), pendingMsg)
 		} else {
 			// Here I received a response from the client so I will process it.
 			this.m_receiveRequestResponse <- m
@@ -442,8 +346,9 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		total := int(msg.GetTotal())
 		messageId := msg.GetId()
 		index := int(msg.GetIndex())
-		chunk := this.getChunkMessagesById(messageId)
-		//log.Println("---> Transfert message: ", messageId, ":", index, "/", total)
+		chunk := pendingMsgChunk[messageId]
+
+		//LogInfo("---> Transfert message: ", messageId, ":", index, "/", total)
 		if chunk != nil {
 			// So here it's not the first message receive for the file.
 			chunk[index] = msg.GetData()
@@ -455,7 +360,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 				}
 
 				// Release the memory for that message.
-				this.removeChunkMessages(messageId)
+				delete(pendingMsgChunk, messageId)
 
 				// and process the action...
 				originMsg, err := NewMessageFromData(data, m.from)
@@ -471,7 +376,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			// -- firt i will create a new array whit the necessary space.
 			container := make([][]byte, total, total)
 			container[0] = msg.GetData()
-			this.createChunkMessages(messageId, container)
+			pendingMsgChunk[messageId] = container
 
 		}
 
@@ -488,7 +393,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 /**
  * Process outgoing message to be sent to the client.
  */
-func (this *MessageProcessor) processOutgoing(m *message) {
+func (this *MessageProcessor) processOutgoing(m *message, pendingMsg map[string][]*message) {
 	// Get the max message size.
 	maxSize := getMaxMessageSize()
 
@@ -509,7 +414,7 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 				} else {
 					// so here I will split the message in multiple part
 					// and send it.
-					this.createPendingMessages(m)
+					this.createPendingMessages(m, pendingMsg)
 				}
 			}
 		}
@@ -526,7 +431,7 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 				} else {
 					// so here I will split the message in multiple part
 					// and send it.
-					this.createPendingMessages(m)
+					this.createPendingMessages(m, pendingMsg)
 				}
 			}
 		}
@@ -545,9 +450,20 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 /**
  * Process pending message one by one.
  */
-func (this *MessageProcessor) processPendingMessage(id string) {
-	msg := this.popPendingMessages(id)
-	if msg != nil {
-		this.m_outgoingChannel <- msg
+func (this *MessageProcessor) processPendingMessage(id string, pendingMsg map[string][]*message) {
+	messages := pendingMsg[id]
+	if len(messages) > 0 {
+		msg := messages[0]
+		if *msg.msg.Type == Message_TRANSFER {
+			// I will now remove the first item from the array.
+			pendingMsg[id] = make([]*message, 0)
+			for i := 1; i < len(messages); i++ {
+				pendingMsg[id] = append(pendingMsg[id], messages[i])
+			}
+			this.m_outgoingChannel <- msg
+		}
+	} else {
+		// Remove the pendeing message from the list.
+		delete(pendingMsg, id)
 	}
 }

@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"strings"
 
-	"log"
-
 	"code.myceliUs.com/Utility"
 )
 
@@ -307,7 +305,7 @@ func (this *DynamicEntity) setValues(values map[string]interface{}) {
 
 	// wait to see if the entity has change...
 	this.SetNeedSave(<-infos["needSave"].(chan bool))
-	log.Println("---> entity ", this.uuid, "needSave", this.IsNeedSave())
+	LogInfo("---> entity ", this.uuid, "needSave", this.IsNeedSave())
 }
 
 /**

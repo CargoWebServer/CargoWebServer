@@ -50,7 +50,7 @@ MenuItem.prototype.appendItem = function (item) {
 }
 
 /**
- * Append a sub menu item to an existing menu item.
+ * Delete a sub menu item to an existing menu item.
  */
 MenuItem.prototype.deleteItem = function () {
     // remove it from it parent,
@@ -62,7 +62,7 @@ MenuItem.prototype.deleteItem = function () {
 }
 
 /**
- * Append a sub menu item to an existing menu item.
+ * Rename a sub menu item to an existing menu item.
  */
 MenuItem.prototype.renameItem = function (name, id) {
     delete this.parent.subItems[this.id]

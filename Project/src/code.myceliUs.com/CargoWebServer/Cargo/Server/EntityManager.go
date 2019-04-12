@@ -77,6 +77,80 @@ func generateEntityUuid(typeName string, parentUuid string, ids []interface{}) s
 	return uuid
 }
 
+// Recursively replace child reference by theire actual values.
+func initChilds(values map[string]interface{}) map[string]interface{} {
+	typeName := values["TYPENAME"].(string)
+	storeId := typeName[0:strings.Index(typeName, ".")]
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+	for i := 0; i < len(prototype.Fields); i++ {
+		if strings.HasPrefix(prototype.Fields[i], "M_") {
+			isBaseType := strings.HasPrefix(prototype.FieldsType[i], "xs.") || strings.HasPrefix(prototype.FieldsType[i], "[]xs.") || strings.HasPrefix(prototype.FieldsType[i], "enum:")
+			if !isBaseType {
+				isRef := strings.HasSuffix(prototype.FieldsType[i], ":Ref") || strings.HasSuffix(prototype.Fields[i], "Ptr")
+				if !isRef {
+					v := reflect.ValueOf(values[prototype.Fields[i]])
+					// In case of an array of references.
+					if v.IsValid() {
+						if v.Type().Kind() == reflect.Slice {
+							for j := 0; j < v.Len(); j++ {
+								if v.Index(j).Type().Kind() == reflect.Interface {
+									if reflect.TypeOf(v.Index(j).Interface()).Kind() == reflect.String {
+										if Utility.IsValidEntityReferenceName(v.Index(j).Interface().(string)) {
+											v_, err := getEntityByUuid(v.Index(j).Interface().(string))
+											if err == nil {
+												values[prototype.Fields[i]].([]interface{})[j] = v_
+
+											}
+										}
+									}
+								}
+							}
+						} else {
+							// In case of a reference.
+							if v.Type().Kind() == reflect.String {
+								// Here I will test if the value is a valid reference.
+								if Utility.IsValidEntityReferenceName(v.String()) {
+									v_, err := getEntityByUuid(v.String())
+									if err == nil {
+										values[prototype.Fields[i]] = v_
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return values
+}
+
+// Simple function that return an entity from it uuid if the entity exist.
+func getEntityByUuid(uuid string) (map[string]interface{}, error) {
+
+	typeName := strings.Split(uuid, "%")[0]
+	storeId := typeName[0:strings.Index(typeName, ".")]
+
+	var query EntityQuery
+	query.TYPENAME = typeName
+	query.TypeName = typeName
+	query.Fields = []string{}
+	query.Query = typeName + `.UUID=="` + uuid + `"`
+
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	queryStr, _ := json.Marshal(query)
+	values, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
+
+	if err == nil {
+		// init it child values.
+		initChilds(values[0][0].(map[string]interface{}))
+		// return the resulting map.
+		return values[0][0].(map[string]interface{}), nil
+	}
+
+	return nil, err
+}
+
 func (this *Server) GetEntityManager() *EntityManager {
 	if entityManager == nil {
 		entityManager = newEntityManager()
@@ -134,7 +208,7 @@ func newEntityManager() *EntityManager {
  * Initialization.
  */
 func (this *EntityManager) initialize() {
-	log.Println("--> Initialize EntityManager")
+	LogInfo("--> Initialize EntityManager")
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
@@ -151,11 +225,11 @@ func (this *EntityManager) getId() string {
 }
 
 func (this *EntityManager) start() {
-	log.Println("--> Start EntityManager")
+	LogInfo("--> Start EntityManager")
 }
 
 func (this *EntityManager) stop() {
-	log.Println("--> Stop EntityManager")
+	LogInfo("--> Stop EntityManager")
 }
 
 // Return the default Cargo Entities, create it if is not already exist.
@@ -193,12 +267,10 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 }
 
 func (this *EntityManager) getEntityOwner(entity Entity) Entity {
-	log.Println("getEntityOwner")
 	return nil
 }
 
 func (this *EntityManager) isEntityExist(uuid string) bool {
-	log.Println("isEntityExist")
 	return false
 }
 
@@ -251,7 +323,7 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 					entities = append(entities, entity)
 				}
 			} else {
-				log.Println("----> results not an entity: ", results[i])
+				LogInfo("----> results not an entity: ", results[i])
 			}
 		}
 	}
@@ -307,7 +379,6 @@ func (this *EntityManager) getEntity(uuid string) Entity {
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
-	// log.Println("-----> 339 ", uuid)
 
 	if len(uuid) == 0 {
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No uuid given!"))
@@ -506,16 +577,28 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 		}
 	}
 
+	// I will not save the parent directly...
+	// TODO
 	if parent.IsNeedSave() {
+
+		// update the parent in the cache.
 		this.setEntity(parent)
+
+		// Update the value in the datastore.
 		typeName := parent.GetTypeName()
 		storeId := typeName[0:strings.Index(typeName, ".")]
 		store := GetServer().GetDataManager().getDataStore(storeId)
+
 		err := store.Update("", []interface{}{parent}, []interface{}{})
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
 		}
+
+		// The parent dosent need save.
+		parent.SetNeedSave(false)
+
+		// Send update event to clients...
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 		eventData := make([]*MessageData, 2)
 		msgData0 := new(MessageData)
@@ -525,18 +608,20 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 		} else {
 			msgData0.Value = parent
 		}
+
 		eventData[0] = msgData0
 		msgData1 := new(MessageData)
 		msgData1.Name = "prototype"
 		msgData1.Value = prototype
 		eventData[1] = msgData1
+
 		// Send save event if something has change.
 		// I will get the existing value from the datastore is it exist.
 		var evt *Event
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
-
 	}
+
 	return nil
 }
 
@@ -577,7 +662,7 @@ func (this *EntityManager) createEntity(parent Entity, attributeName string, ent
 		return nil, cargoError
 	}
 
-	//log.Println("---> create entity ", entity.GetUuid())
+	//LogInfo("---> create entity ", entity.GetUuid())
 	entity.SetNeedSave(false)
 
 	// also save it parent.
@@ -1922,7 +2007,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 	}
 
 	// So here I will create the response as a compress file.
-	var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
+	var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz.json"
 	err = ioutil.WriteFile(path, b.Bytes(), 0666)
 
 	if err != nil {
@@ -1931,7 +2016,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, q interf
 		return nil
 	}
 
-	return "/tmp/" + messageId + ".gz"
+	return "/tmp/" + messageId + ".gz.json"
 }
 
 // @api 1.0
@@ -2118,7 +2203,7 @@ func (this *EntityManager) GetEntityByUuid(uuid string, lazy bool, messageId str
 			panic(err)
 		}
 		// So here I will create the response as a compress file.
-		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
+		var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz.json"
 		err = ioutil.WriteFile(path, b.Bytes(), 0666)
 		if err != nil {
 			errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
@@ -2126,83 +2211,9 @@ func (this *EntityManager) GetEntityByUuid(uuid string, lazy bool, messageId str
 			return nil
 		}
 
-		return "/tmp/" + messageId + ".gz"
+		return "/tmp/" + messageId + ".gz.json"
 	}
 
-}
-
-// Recursively replace child reference by theire actual values.
-func initChilds(values map[string]interface{}) map[string]interface{} {
-	typeName := values["TYPENAME"].(string)
-	storeId := typeName[0:strings.Index(typeName, ".")]
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-	for i := 0; i < len(prototype.Fields); i++ {
-		if strings.HasPrefix(prototype.Fields[i], "M_") {
-			isBaseType := strings.HasPrefix(prototype.FieldsType[i], "xs.") || strings.HasPrefix(prototype.FieldsType[i], "[]xs.") || strings.HasPrefix(prototype.FieldsType[i], "enum:")
-			if !isBaseType {
-				isRef := strings.HasSuffix(prototype.FieldsType[i], ":Ref") || strings.HasSuffix(prototype.Fields[i], "Ptr")
-				if !isRef {
-					v := reflect.ValueOf(values[prototype.Fields[i]])
-					// In case of an array of references.
-					if v.IsValid() {
-						if v.Type().Kind() == reflect.Slice {
-							for j := 0; j < v.Len(); j++ {
-								if v.Index(j).Type().Kind() == reflect.Interface {
-									if reflect.TypeOf(v.Index(j).Interface()).Kind() == reflect.String {
-										if Utility.IsValidEntityReferenceName(v.Index(j).Interface().(string)) {
-											v_, err := getEntityByUuid(v.Index(j).Interface().(string))
-											if err == nil {
-												values[prototype.Fields[i]].([]interface{})[j] = v_
-
-											}
-										}
-									}
-								}
-							}
-						} else {
-							// In case of a reference.
-							if v.Type().Kind() == reflect.String {
-								// Here I will test if the value is a valid reference.
-								if Utility.IsValidEntityReferenceName(v.String()) {
-									v_, err := getEntityByUuid(v.String())
-									if err == nil {
-										values[prototype.Fields[i]] = v_
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return values
-}
-
-// Simple function that return an entity from it uuid if the entity exist.
-func getEntityByUuid(uuid string) (map[string]interface{}, error) {
-
-	typeName := strings.Split(uuid, "%")[0]
-	storeId := typeName[0:strings.Index(typeName, ".")]
-
-	var query EntityQuery
-	query.TYPENAME = typeName
-	query.TypeName = typeName
-	query.Fields = []string{}
-	query.Query = typeName + `.UUID=="` + uuid + `"`
-
-	store := GetServer().GetDataManager().getDataStore(storeId)
-	queryStr, _ := json.Marshal(query)
-	values, err := store.Read(string(queryStr), []interface{}{}, []interface{}{})
-
-	if err == nil {
-		// init it child values.
-		initChilds(values[0][0].(map[string]interface{}))
-		// return the resulting map.
-		return values[0][0].(map[string]interface{}), nil
-	}
-
-	return nil, err
 }
 
 // @api 1.0
@@ -2299,7 +2310,7 @@ func (this *EntityManager) GetEntitiesByUuid(uuids []interface{}, messageId stri
 	}
 
 	// So here I will create the response as a compress file.
-	var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz"
+	var path = GetServer().GetConfigurationManager().GetTmpPath() + "/" + messageId + ".gz.json"
 	err := ioutil.WriteFile(path, b.Bytes(), 0666)
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
@@ -2307,7 +2318,7 @@ func (this *EntityManager) GetEntitiesByUuid(uuids []interface{}, messageId stri
 		return nil
 	}
 
-	return "/tmp/" + messageId + ".gz"
+	return "/tmp/" + messageId + ".gz.json"
 }
 
 // @api 1.0

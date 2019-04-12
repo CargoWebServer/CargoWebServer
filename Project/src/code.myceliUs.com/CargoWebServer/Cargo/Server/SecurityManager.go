@@ -88,7 +88,7 @@ func (this *SecurityManager) createGuestRole() {
  */
 func (this *SecurityManager) initialize() {
 
-	log.Println("--> Initialize Security manager")
+	LogInfo("--> Initialize Security manager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.createAdminRole()
@@ -101,11 +101,11 @@ func (this *SecurityManager) getId() string {
 }
 
 func (this *SecurityManager) start() {
-	log.Println("--> Start SecurityManager")
+	LogInfo("--> Start SecurityManager")
 }
 
 func (this *SecurityManager) stop() {
-	log.Println("--> Stop SecurityManager")
+	LogInfo("--> Stop SecurityManager")
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -474,7 +474,7 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType int,
 		permissions := account.GetPermissionsRef()
 		for i := 0; i < len(permissions); i++ {
 			// Here I will evaluate the pattern that is a regular expression.
-			log.Println("--------> evaluate ", permissions[i].GetId())
+			LogInfo("--------> evaluate ", permissions[i].GetId())
 			// If the regex is a success then i will return nil here.
 
 		}

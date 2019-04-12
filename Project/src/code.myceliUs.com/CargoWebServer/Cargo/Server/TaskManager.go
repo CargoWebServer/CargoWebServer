@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"errors"
-	"log"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -188,11 +187,11 @@ func (this *TaskManager) start() {
 						tasks[instancesInfos[i].TaskId].Stop()
 						delete(tasks, instancesInfos[i].TaskId)
 						// I will stop the vm that run that task.
-						log.Println("--> Suspend the task: ", instancesInfos[i].TaskId)
+						LogInfo("--> Suspend the task: ", instancesInfos[i].TaskId)
 						JS.GetJsRuntimeManager().CloseSession(instancesInfos[i].TaskId,
 							func(taskId string) func() {
 								return func() {
-									log.Println("--> task with id " + taskId + " is now stop!")
+									LogInfo("--> task with id " + taskId + " is now stop!")
 									// Now I will kill it commands.
 									cmds := GetServer().sessionCmds[taskId]
 									for i := 0; i < len(cmds); i++ {
@@ -255,13 +254,13 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 			JS.GetJsRuntimeManager().OpenSession(task.GetId())
 			_, err := JS.GetJsRuntimeManager().RunScript(task.GetId(), string(script))
 			if err != nil {
-				log.Println("--> script error: ", err)
+				LogInfo("--> script error: ", err)
 				JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 				return err
 			}
 
 		} else {
-			log.Println("--> script error: ", err)
+			LogInfo("--> script error: ", err)
 			JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 			return err
 		}
@@ -275,12 +274,12 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 			}
 		}
 	} else {
-		log.Println("--> script error: ", err.GetBody())
+		LogInfo("--> script error: ", err.GetBody())
 		JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 		return errors.New(err.GetBody())
 	}
 
-	log.Println("--> task ", task.GetId(), "run successfully!")
+	LogInfo("--> task ", task.GetId(), "run successfully!")
 	//JS.GetJsRuntimeManager().CloseSession(task.GetId(), func() {})
 	return nil
 }

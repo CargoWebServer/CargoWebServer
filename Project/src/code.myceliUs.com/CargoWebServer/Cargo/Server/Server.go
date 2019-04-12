@@ -95,6 +95,17 @@ func newServer() *Server {
  * Do intialysation stuff here.
  */
 func (this *Server) initialize() {
+	// The map of loggers.
+	this.loggers = make(map[string]*Logger)
+
+	// The default error logger...
+	this.loggers["defaultErrorLogger"] = NewLogger("defaultErrorLogger")
+
+	// The default info logger
+	this.loggers["defaultInfoLogger"] = NewLogger("defaultInfoLogger")
+
+	// Set the log info function in The js module.
+	JS.LogInfo = LogInfo
 
 	// Must be call first.
 	this.GetConfigurationManager()
@@ -126,11 +137,6 @@ func (this *Server) initialize() {
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
 
-	// The map of loggers.
-	this.loggers = make(map[string]*Logger)
-	// The default error logger...
-	logger := NewLogger("defaultErrorLogger")
-	this.loggers["defaultErrorLogger"] = logger
 }
 
 /**
@@ -215,7 +221,7 @@ func (this *Server) onClose(subConnectionId string) {
 	// Remove ressource use by scripts.
 	callback := func(sessionId string) func() {
 		return func() {
-			log.Println("--> session " + sessionId + " is now close!")
+			LogInfo("--> session " + sessionId + " is now close!")
 			// Now I will kill it commands.
 			cmds := GetServer().sessionCmds[sessionId]
 			for i := 0; i < len(cmds); i++ {
@@ -885,11 +891,11 @@ func (this *Server) Start() {
 			// Get the new connection id.
 			subConnection, err := GetServer().connect(host, port)
 			if err != nil {
-				log.Println("---> err ", err)
+				LogInfo("---> err ", err)
 			}
 
 			if err != nil {
-				log.Println("---> 914 ", err)
+				LogInfo("---> 914 ", err)
 				return
 			}
 
@@ -973,14 +979,17 @@ func (this *Server) Start() {
 			GetTaskManager().scheduleTask(task)
 		}
 
+		// TODO set as schedule task to save processing time.
+		// Sync files
+
 		// Sync files
 		this.GetFileManager().synchronizeAll()
 
-		// Sync users, computers and groups.
-		this.GetLdapManager().synchronizeAll()
-
 		// Sync projects.
 		this.GetProjectManager().synchronize()
+
+		// Sync users, computers and groups.
+		this.GetLdapManager().synchronizeAll()
 
 	}()
 }
@@ -1070,7 +1079,7 @@ func (this *Server) connect(host string, port int) (*WebSocketConnection, error)
 		return nil, errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
-	log.Println("--> connection whit ", host, " at port ", port, " is now open!")
+	LogInfo("--> connection whit ", host, " at port ", port, " is now open!")
 
 	return conn, nil
 }
@@ -1097,6 +1106,10 @@ func (this *Server) getLoggerById(id string) *Logger {
 
 func (this *Server) getDefaultErrorLogger() *Logger {
 	return this.loggers["defaultErrorLogger"]
+}
+
+func (this *Server) getDefaultInfoLogger() *Logger {
+	return this.loggers["defaultInfoLogger"]
 }
 
 /////////////////////////////////////////////////////////

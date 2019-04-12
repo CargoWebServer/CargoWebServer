@@ -59,35 +59,8 @@ func (cache *Cache) getEntity(uuid string) (Entity, error) {
 			log.Panicln("--> go error ", uuid, err)
 			return nil, err
 		}
-	} /*else {
-		// Try to get values from the datastore...
-		values, err := getEntityByUuid(uuid)
-		if err != nil {
-			return nil, err
-		}
+	}
 
-		obj, _ := Utility.InitializeStructure(values, setEntityFct)
-
-		// So here I will retreive the entity uuid from the entity id.
-		if obj.IsValid() {
-			if obj.IsNil() {
-				return nil, errors.New("Fail to retreive entity with uuid " + uuid)
-			} else {
-				if obj.Type().String() != "map[string]interface {}" {
-					entity = obj.Interface().(Entity)
-					entity.SetNeedSave(false)
-				} else if obj.Type().String() == "map[string]interface {}" {
-					// Dynamic entity here.
-					entity = NewDynamicEntity()
-					// set the entity in the cache.
-					entity.SetNeedSave(false)
-				}
-				return entity, nil
-			}
-		}
-		return nil, err
-
-	}*/
 	return entity, nil
 }
 
@@ -116,7 +89,9 @@ func newCache() *Cache {
 			// callback fired when the oldest entry is removed because of its
 			// expiration time or no space left for the new entry. Default value is nil which
 			// means no callback and it prevents from unwrapping the oldest entry.
-			OnRemove: func(key string, data []byte) { debug.FreeOSMemory() },
+			OnRemove: func(key string, data []byte) {
+				debug.FreeOSMemory()
+			},
 		}
 
 		// The Cache...
@@ -186,7 +161,7 @@ func newCache() *Cache {
 						}
 
 					} else {
-						log.Println("---> fail to serialyse entity!")
+						LogInfo("---> fail to serialyse entity!")
 					}
 				}
 			case operation := <-cache.m_removeEntity:
@@ -197,7 +172,7 @@ func newCache() *Cache {
 					id := generateEntityUuid(entity.GetTypeName(), "", entity.Ids())
 					cache.m_cache.Delete(id)
 				}
-				log.Println("--->cache delete entity: ", entity.GetUuid())
+				LogInfo("--->cache delete entity: ", entity.GetUuid())
 				// Remove from the cache.
 				cache.m_cache.Delete(entity.GetUuid())
 
@@ -211,7 +186,7 @@ func newCache() *Cache {
 
 				uuid := operation["uuid"].(string)
 				field := operation["field"].(string)
-				//log.Println("--->cache getValue ", uuid)
+				//LogInfo("--->cache getValue ", uuid)
 				getValue := operation["getValue"].(chan interface{})
 				var value interface{}
 				typeName := strings.Split(uuid, "%")[0]
@@ -237,7 +212,7 @@ func newCache() *Cache {
 				} else {
 					// get values from the db instead.
 					values, _ = getEntityByUuid(uuid)
-					log.Println("---> no values found in the cache for uuid ", uuid, err.Error())
+					LogInfo("---> no values found in the cache for uuid ", uuid, err.Error())
 				}
 				// Return the found values.
 				getValues <- values
@@ -296,7 +271,7 @@ func newCache() *Cache {
 						}
 
 						if needSave {
-							//log.Println("---> setValue ", value)
+							//LogInfo("---> setValue ", value)
 							// Set the field value...
 							values[field] = value
 							var bytes, err = Utility.ToBytes(values)
@@ -322,7 +297,7 @@ func newCache() *Cache {
 			case operation := <-cache.m_deleteValue:
 				uuid := operation["uuid"].(string)
 				field := operation["field"].(string)
-				// log.Println("--->cache deleteValue: ", uuid)
+				// LogInfo("--->cache deleteValue: ", uuid)
 				typeName := strings.Split(uuid, "%")[0]
 				if entry, err := cache.m_cache.Get(uuid); err == nil {
 					val, err := Utility.FromBytes(entry, typeName)

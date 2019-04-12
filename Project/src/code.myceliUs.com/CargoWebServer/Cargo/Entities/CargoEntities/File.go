@@ -1,4 +1,4 @@
-// +build CargoEntities
+          // +build CargoEntities
 
 package CargoEntities
 
