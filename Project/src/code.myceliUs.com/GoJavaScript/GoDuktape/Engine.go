@@ -318,7 +318,7 @@ func (self *Engine) CallFunction(name string, params []interface{}) (interface{}
 	if ret == 0 {
 		byteCode, err := b64.StdEncoding.DecodeString(name)
 		if err == nil {
-			byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
+			byteCode_ := (*C.char)(C.CBytes(byteCode))
 			C.load_byte_code(self.context, byteCode_, C.int(len(byteCode)))
 			C.free(unsafe.Pointer(byteCode_))
 

@@ -164,7 +164,7 @@ func getJsObjectByUuid(uuid string, ctx C.duk_context_ptr) error {
 				} else {
 					byteCode, err := b64.StdEncoding.DecodeString(src.(string))
 					if err == nil {
-						byteCode_ := (*_Ctype_char)(C.CBytes(byteCode))
+						byteCode_ := (*C.char)(C.CBytes(byteCode))
 						C.load_byte_code(ctx, byteCode_, C.int(len(byteCode)))
 						C.free(unsafe.Pointer(byteCode_))
 
