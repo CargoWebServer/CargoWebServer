@@ -2,8 +2,6 @@
 package GoJavaScriptClient
 
 import (
-	"log"
-
 	"strconv"
 	"time"
 
@@ -54,7 +52,6 @@ func NewClient(address string, port int, name string) *Client {
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
 	// Make sure the command exist in the os path...
-	log.Println("--> start new GoJavaScriptServer", port, name)
 	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
 
 	err = client.srv.Start()
@@ -71,7 +68,7 @@ func NewClient(address string, port int, name string) *Client {
 
 			err = client.srv.Start()
 			if err != nil {
-				log.Println("Fail to start GoJavaScriptServer", err)
+				GoJavaScript.Log("Fail to start GoJavaScriptServer", err)
 				return nil
 			}
 		}
@@ -88,7 +85,7 @@ func NewClient(address string, port int, name string) *Client {
 	}
 
 	if err != nil {
-		log.Println("Fail to connect with server ", address, ":", port, err)
+		GoJavaScript.Log("Fail to connect with server ", address, ":", port, err)
 		return nil
 	}
 
@@ -121,7 +118,7 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params).([]interface{})...)
 
 	if err != nil {
-		log.Println("---> call go function ", name, " fail with error: ", err)
+		GoJavaScript.Log("---> call go function ", name, " fail with error: ", err)
 		return nil, err
 	}
 
@@ -168,7 +165,7 @@ func (self *Client) processActions() {
 						isJsObject = reflect.TypeOf(target).String() == "GoJavaScript.Object" ||
 							reflect.TypeOf(target).String() == "*GoJavaScript.Object"
 						if target == nil {
-							log.Println("---> fail to retreive target ", a.Target)
+							GoJavaScript.Log("---> fail to retreive target ", a.Target)
 						}
 					}
 				}
@@ -189,13 +186,13 @@ func (self *Client) processActions() {
 					// Now I will call the method on the object.
 					results, err = Utility.CallMethod(target, a.Name, params)
 					if err != nil {
-						log.Println("---> call Method: ", a.Name)
+						GoJavaScript.Log("---> call Method: ", a.Name)
 						for i := 0; i < len(params); i++ {
-							log.Println("param ", i, params[i], reflect.TypeOf(params[i]).String())
+							GoJavaScript.Log("param ", i, params[i], reflect.TypeOf(params[i]).String())
 						}
 						str, _ := Utility.ToJson(target)
-						log.Println("---> target: ", str)
-						log.Println("---> error: ", err)
+						GoJavaScript.Log("---> target: ", str)
+						GoJavaScript.Log("---> error: ", err)
 					}
 				}
 				// Keep go object in client and transfert only reference.

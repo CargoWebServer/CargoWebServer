@@ -1,7 +1,6 @@
 package GoJavaScript
 
 import "strconv"
-import "log"
 
 // Global variable.
 var (
@@ -32,8 +31,8 @@ func CallGoFunction(target string, name string, params ...interface{}) (interfac
 
 	var err error
 	if action.Results[1] != nil {
-		log.Println("action  ", name, action.Results[0])
-		log.Println("action error ", name, action.Results[1])
+		Log("action  ", name, action.Results[0])
+		Log("action error ", name, action.Results[1])
 		err = action.Results[1].(error)
 	}
 

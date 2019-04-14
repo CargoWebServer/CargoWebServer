@@ -2,7 +2,6 @@ package GoJavaScript
 
 import "reflect"
 import "code.myceliUs.com/Utility"
-import "log"
 
 /**
  * Variable with name and value.
@@ -201,7 +200,6 @@ func ObjectToRef(objects interface{}) interface{} {
 									objects_ = append(objects_, NewObjectRef(uuid))
 								} else {
 									// The map will be transfert.
-									log.Println("172 ---> Dynamic object found: ", obj)
 									objects_ = append(objects_, obj)
 								}
 							} else {
@@ -256,8 +254,6 @@ func ObjectToRef(objects interface{}) interface{} {
 							GetCache().SetObject(uuid, obj.Interface())
 							// I will set the results a object reference.
 							objects = NewObjectRef(uuid)
-						} else {
-							log.Println("229 ---> Dynamic object found: ", obj)
 						}
 					}
 

@@ -1,50 +1,56 @@
-2019/04/14 16:04:56 [---> marshaling error:  write tcp 127.0.0.1:9696->127.0.0.1:54296: wsasend: An existing connection was forcibly closed by the remote host.]
+2019/04/14 17:44:16 [---> ping call]
 
-2019/04/14 16:07:55 [---> ping call]
+2019/04/14 17:44:16 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:07:55 [---> pong  0xc000174000]
+2019/04/14 17:44:21 [---> ping call]
 
-2019/04/14 16:08:00 [---> ping call]
+2019/04/14 17:44:21 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:08:00 [---> pong  0xc00035bb80]
+2019/04/14 17:44:26 [---> ping call]
 
-2019/04/14 16:08:05 [---> ping call]
+2019/04/14 17:44:26 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:08:05 [---> pong  0xc00039b780]
+2019/04/14 17:44:31 [---> ping call]
 
-2019/04/14 16:08:10 [---> ping call]
+2019/04/14 17:44:31 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:08:10 [---> pong  0xc000090280]
+2019/04/14 17:44:36 [---> ping call]
 
-2019/04/14 16:08:15 [---> ping call]
+2019/04/14 17:44:36 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:08:15 [---> pong  0xc00039b880]
+2019/04/14 17:44:41 [---> ping call]
 
-2019/04/14 16:08:20 [---> ping call]
+2019/04/14 17:44:41 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:08:20 [---> marshaling error:  write tcp 127.0.0.1:9696->127.0.0.1:54483: wsasend: An existing connection was forcibly closed by the remote host.]
+2019/04/14 17:44:46 [---> ping call]
 
-2019/04/14 16:13:57 [---> ping call]
+2019/04/14 17:44:46 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:13:57 [---> pong  0xc000172000]
+2019/04/14 17:44:51 [---> ping call]
 
-2019/04/14 16:14:02 [---> ping call]
+2019/04/14 17:44:51 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:14:02 [---> pong  0xc000368c80]
+2019/04/14 17:44:56 [---> ping call]
 
-2019/04/14 16:14:07 [---> ping call]
+2019/04/14 17:44:56 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:14:07 [---> pong  0xc0005c3100]
+2019/04/14 17:45:01 [---> ping call]
 
-2019/04/14 16:14:12 [---> ping call]
+2019/04/14 17:45:01 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:14:12 [---> pong  0xc000028d00]
+2019/04/14 17:45:06 [---> ping call]
 
-2019/04/14 16:14:17 [---> ping call]
+2019/04/14 17:45:06 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:14:17 [---> pong  0xc000028d80]
+2019/04/14 17:45:11 [---> ping call]
 
-2019/04/14 16:14:22 [---> ping call]
+2019/04/14 17:45:11 [---> pong  [Pong <nil>]]
 
-2019/04/14 16:14:22 [---> marshaling error:  write tcp 127.0.0.1:9696->127.0.0.1:54827: wsasend: An existing connection was forcibly closed by the remote host.]
+2019/04/14 17:45:16 [---> ping call]
+
+2019/04/14 17:45:16 [---> pong  [Pong <nil>]]
+
+2019/04/14 17:45:21 [---> ping call]
+
+2019/04/14 17:45:21 [---> marshaling error:  write tcp 127.0.0.1:9696->127.0.0.1:60189: wsasend: An existing connection was forcibly closed by the remote host. [GoJavaScriptServer 9696 duktape]]
 

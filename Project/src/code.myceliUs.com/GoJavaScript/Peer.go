@@ -93,12 +93,12 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	p.stop_chan = make(chan bool)
 
 	// The log processing information.
-	go func() {
+	go func(port int) {
 		for {
 			select {
 			case msg := <-logChannel:
 				// Open the log file.
-				f, err := os.OpenFile("./GoJavaScript_"+os.Args[1]+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+				f, err := os.OpenFile("./GoJavaScript_"+strconv.Itoa(port)+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 				if err != nil {
 					log.Println(err)
 				}
@@ -109,7 +109,7 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 				f.Close()
 			}
 		}
-	}()
+	}(port)
 
 	return p
 }
@@ -191,27 +191,28 @@ func (self *Peer) run() {
 				encoder := json.NewEncoder(self.conn)
 				err := encoder.Encode(msg)
 				if err != nil {
-					Log("---> marshaling error: ", err)
+					Log("---> marshaling error: ", err, os.Args)
 					os.Exit(0)
 				}
 			}(self, msg)
 		case <-self.stop_chan:
-			os.Exit(0)
+			self.conn.Close()
+			self.isRunning = false
+			break
 		}
-
 	}
 }
 
-func (self *Peer) Ping() string {
+func (self *Peer) Ping() {
 	// Create the action.
 	ping := NewAction("Ping", "")
 	ping.Target = "Client"
 
 	// Append the name parameter.
-	//Log("---> ping call")
+	Log("---> ping call")
 	ping = self.CallRemoteAction(ping)
-	//Log("---> pong ", ping)
-	return ping.Results[0].(string)
+	Log("---> pong ", ping.Results)
+	// return "Pong" // ping.Results[0].(string)
 }
 
 // Send a message over the network
