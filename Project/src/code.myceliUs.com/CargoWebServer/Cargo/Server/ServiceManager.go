@@ -110,6 +110,7 @@ func (this *ServiceManager) start() {
 	services := GetServer().GetConfigurationManager().getActiveConfigurations().GetServiceConfigs()
 	for i := 0; i < len(services); i++ {
 		config := services[i]
+		log.Println("----> config: ", config)
 		if config.GetHostName() != "localhost" || config.GetPort() == GetServer().GetConfigurationManager().GetConfigurationServicePort() {
 			this.m_remoteServicesLst[config.M_id] = config
 			config.M_start = false // In that case start means ready to listen.
@@ -891,6 +892,7 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 	// First of all I will get it configuration information.
 	config := GetServer().GetConfigurationManager().getServiceConfigurationById(name)
 	if config != nil {
+
 		// External server.
 		if config.GetPort() != GetServer().GetConfigurationManager().GetServerPort() {
 			// I will test if a process exist for with that name.

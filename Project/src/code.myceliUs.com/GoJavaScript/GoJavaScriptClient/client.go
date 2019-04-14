@@ -54,7 +54,9 @@ func NewClient(address string, port int, name string) *Client {
 	// Here I will start the external server process.
 	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
 	// Make sure the command exist in the os path...
+	log.Println("--> start new GoJavaScriptServer", port, name)
 	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+
 	err = client.srv.Start()
 
 	if err != nil {
@@ -152,6 +154,7 @@ func (self *Client) processActions() {
 	for self.isRunning {
 		select {
 		case action := <-self.exec_action_chan:
+			//log.Println("---> action receive: ", action.Name, action.Target)
 			go func(a *GoJavaScript.Action) {
 				var target interface{}
 				isJsObject := true
@@ -520,6 +523,13 @@ func (self *Client) GetGlobalVariable(name string) (interface{}, error) {
 	value := GoJavaScript.RefToObject(action.Results[0])
 
 	return value, err
+}
+
+/**
+ * Use by the server to test if the client is alive.
+ */
+func (self *Client) Ping() string {
+	return "Pong"
 }
 
 /**

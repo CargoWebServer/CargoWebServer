@@ -13,7 +13,7 @@ import (
 func LogInfo(infos ...interface{}) {
 
 	// also display in the command prompt.
-	log.Println(infos...)
+	//log.Println(infos...)
 	GetServer().getDefaultInfoLogger().LogInfo(fmt.Sprintln(infos))
 }
 
@@ -27,7 +27,7 @@ func LogError(infos ...interface{}) {
 	}
 
 	// also display in the command prompt.
-	log.Println(info)
+	//log.Println(info)
 	GetServer().getDefaultErrorLogger().LogInfo(info)
 }
 
@@ -46,7 +46,7 @@ func NewLogger(id string) *Logger {
 			case msg := <-logger.logChannel:
 				// Open the log file.
 				f, err := os.OpenFile("text.log",
-					os.O_APPEND|os.O_CREATE|os.O_WRONLY, 777)
+					os.O_APPEND|os.O_CREATE|os.O_WRONLY, 664)
 				if err != nil {
 					log.Println(err)
 				}

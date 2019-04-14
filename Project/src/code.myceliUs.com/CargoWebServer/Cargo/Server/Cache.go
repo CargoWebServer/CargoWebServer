@@ -164,6 +164,7 @@ func newCache() *Cache {
 						LogInfo("---> fail to serialyse entity!")
 					}
 				}
+
 			case operation := <-cache.m_removeEntity:
 
 				entity := operation["entity"].(Entity)

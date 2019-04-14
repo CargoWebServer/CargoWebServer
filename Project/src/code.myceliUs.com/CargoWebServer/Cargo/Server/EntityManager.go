@@ -578,12 +578,12 @@ func (this *EntityManager) setParent(parent Entity, entity Entity) *CargoEntitie
 	}
 
 	// I will not save the parent directly...
-	// TODO
 	if parent.IsNeedSave() {
 
 		// update the parent in the cache.
 		this.setEntity(parent)
 
+		// In case of mu
 		// Update the value in the datastore.
 		typeName := parent.GetTypeName()
 		storeId := typeName[0:strings.Index(typeName, ".")]

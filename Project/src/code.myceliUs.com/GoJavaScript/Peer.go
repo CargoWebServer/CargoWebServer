@@ -2,10 +2,13 @@ package GoJavaScript
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
+	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -52,6 +55,16 @@ type Peer struct {
 	exec_action_chan chan *Action
 }
 
+var (
+	logChannel = make(chan string)
+)
+
+func Log(infos ...interface{}) {
+
+	// also display in the command prompt.
+	logChannel <- fmt.Sprintln(infos)
+}
+
 func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	// Transferable objects types over the client/server.
 	Utility.RegisterType((*Message)(nil))
@@ -79,6 +92,25 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	// Stop the process.
 	p.stop_chan = make(chan bool)
 
+	// The log processing information.
+	go func() {
+		for {
+			select {
+			case msg := <-logChannel:
+				// Open the log file.
+				f, err := os.OpenFile("./GoJavaScript_"+os.Args[1]+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+				if err != nil {
+					log.Println(err)
+				}
+				logger := log.New(f, "", log.LstdFlags)
+				logger.Println(msg)
+
+				// set the message.
+				f.Close()
+			}
+		}
+	}()
+
 	return p
 }
 
@@ -90,15 +122,20 @@ func (self *Peer) run() {
 		for self.isRunning {
 			data := make(map[string]interface{})
 			decoder := json.NewDecoder(self.conn)
-			err := decoder.Decode(&data)
-			if err == nil {
-				// Here I will create a message from the generic map of interface
-				msg, err := Utility.InitializeStructure(data, SetEntity)
-				if err != nil {
+			if decoder != nil {
+				err := decoder.Decode(&data)
+				if err == nil {
+					// Here I will create a message from the generic map of interface
+					msg, err := Utility.InitializeStructure(data, SetEntity)
+					if err != nil {
+						return
+					}
+					self.receive_chan <- msg.Interface().(*Message)
+				} else {
 					return
 				}
-				self.receive_chan <- msg.Interface().(*Message)
 			} else {
+				Log("Peer.go line 107 fail to create decoder tcp connection!")
 				return
 			}
 		}
@@ -151,18 +188,30 @@ func (self *Peer) run() {
 		case msg := <-self.send_chan:
 			go func(self *Peer, msg *Message) {
 				// Send the message over the network.
-
 				encoder := json.NewEncoder(self.conn)
 				err := encoder.Encode(msg)
 				if err != nil {
-					log.Println("---> marshaling error: ", err)
+					Log("---> marshaling error: ", err)
+					os.Exit(0)
 				}
 			}(self, msg)
 		case <-self.stop_chan:
-			self.isRunning = false
-			break // stop the processin loop.
+			os.Exit(0)
 		}
+
 	}
+}
+
+func (self *Peer) Ping() string {
+	// Create the action.
+	ping := NewAction("Ping", "")
+	ping.Target = "Client"
+
+	// Append the name parameter.
+	//Log("---> ping call")
+	ping = self.CallRemoteAction(ping)
+	//Log("---> pong ", ping)
+	return ping.Results[0].(string)
 }
 
 // Send a message over the network
@@ -174,10 +223,19 @@ func (self *Peer) SendMessage(msg *Message) {
 // If the peer act as server you must use that function
 func (self *Peer) Listen() {
 	ln, _ := net.Listen("tcp", ":"+strconv.Itoa(self.port))
-	self.conn, _ = ln.Accept()
+	self.conn, _ = ln.Accept() // only one connection per server here...
 
 	// Process message (incoming and outgoing)
 	go self.run()
+
+	// test if the connection is alive.
+	go func(self *Peer) {
+		// Call ping a interval of 5 second...
+		for ; true; <-time.Tick(5 * time.Second) {
+			self.Ping()
+		}
+
+	}(self)
 }
 
 func (self *Peer) Close() {
@@ -192,10 +250,18 @@ func (self *Peer) Connect(address string, port int) error {
 	ipv4 := address + ":" + strconv.Itoa(port)
 	self.conn, err = net.Dial("tcp", ipv4)
 
+	if err != nil {
+		Log("--> connection error: ", err)
+		return err
+	}
+
+	// set the deadline to 30 second.
+	//self.conn.SetDeadline(time.Now().Add(deadLine * time.Second))
+
 	// Start runing.
 	go self.run()
 
-	return err
+	return nil
 }
 
 // Run a remote action.

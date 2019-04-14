@@ -26,6 +26,7 @@ func NewServer(address string, port int, name string) *Server {
 	// I will create a new server and start listen for incomming request.
 	server := new(Server)
 	server.isRunning = true
+
 	// open the action channel.
 	server.exec_action_chan = make(chan *GoJavaScript.Action)
 
@@ -114,12 +115,10 @@ func (self *Server) processActions() {
 				} else if action.Name == "GetGlobalVariable" {
 					action.AppendResults(self.engine.GetGlobalVariable(action.Params[0].Value.(string)))
 				} else if action.Name == "Stop" {
-					// Send back the result to client.
 					self.isRunning = false
 				}
 				action.GetDone() <- action
 			}()
-
 		}
 	}
 	self.peer.Close()

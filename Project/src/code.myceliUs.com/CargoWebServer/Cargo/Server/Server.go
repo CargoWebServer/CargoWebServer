@@ -745,6 +745,7 @@ func (this *Server) Start() {
 	 * @param {object} caller A place to store object from the request context and get it back from the response context.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.getServicesClientCode", func(successCallback string, errorCallback string, caller interface{}, subConnectionId string) {
+		log.Println("------> 748")
 		id := Utility.RandomUUID()
 
 		params := make([]*MessageData, 0)
@@ -958,6 +959,7 @@ func (this *Server) Start() {
 
 		// Set service in the server object.
 		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
+
 			// I will register the script to be run be sub-sessions.
 			JS.GetJsRuntimeManager().AppendScript("Cargo/"+serviceName, "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();", false)
 		}
