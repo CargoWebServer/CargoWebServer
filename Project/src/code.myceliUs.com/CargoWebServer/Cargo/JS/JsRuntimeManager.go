@@ -145,9 +145,6 @@ type JsRuntimeManager struct {
 	m_executeJsFunction map[string]OperationChannel
 	m_runScript         map[string]OperationChannel
 	m_stopVm            map[string]chan (bool)
-
-	// The starting port number for session VM.
-	m_startPort int
 }
 
 // The main processing loop...
@@ -332,7 +329,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 							}
 							callback <- []interface{}{varInfos} // unblock the channel...
 						case operationInfos := <-executeJsFunction:
-							LogInfo(335, "executeJsFunction")
+							LogInfo(335, "start executeJsFunction")
 							callback := operationInfos.m_returns
 							var jsFunctionInfos JsFunctionInfos
 							if operationInfos.m_params["jsFunctionInfos"] != nil {
@@ -342,9 +339,10 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 
 							}
+							LogInfo(345, "end executeJsFunction")
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case operationInfos := <-runScript:
-							LogInfo(347, "runScript")
+							LogInfo(347, "start runScript")
 							callback := operationInfos.m_returns
 							var results interface{}
 							var err error
@@ -352,6 +350,7 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 								// Here I will set a maximum delay to be sure the processor will not block indefinitly.
 								results, err = vm.EvalScript(operationInfos.m_params["script"].(string), []interface{}{})
 							}
+							LogInfo(355, "end runScript")
 							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
 							LogInfo(357, "stopVm")
@@ -370,8 +369,6 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 		case operationInfos := <-jsRuntimeManager.m_closeVm:
 			LogInfo(371, "closeVm")
 			sessionId := operationInfos.m_params["sessionId"].(string)
-			callback := operationInfos.m_returns
-
 			if jsRuntimeManager.m_sessions[sessionId] != nil {
 				// here I will not wait for the session to clean before retrun.
 				go func() {
@@ -380,9 +377,6 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 					jsRuntimeManager.removeVm(sessionId)
 				}()
 			}
-
-			callback <- []interface{}{true} // unblock the channel...
-
 		}
 	}
 }
@@ -390,8 +384,6 @@ func run(jsRuntimeManager *JsRuntimeManager) {
 func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// The singleton.
 	jsRuntimeManager = new(JsRuntimeManager)
-
-	jsRuntimeManager.m_startPort = 9696
 
 	// The dir where the js file are store on the server side.
 	jsRuntimeManager.m_searchDir = filepath.ToSlash(searchDir)
@@ -824,7 +816,7 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) GoJavaSc
 			_, err := vm.EvalScript(src, []interface{}{})
 			//LogInfo(src)
 			if err != nil {
-				log.Panicln("---> script running error:  ", path, src, err)
+				LogInfo("---> script running error:  ", path, src, err)
 			}
 		}
 		return export
@@ -849,9 +841,8 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	LogInfo("---> create a new vm for session: ", sessionId)
 
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1", this.m_startPort, "duktape")
-
-	this.m_startPort += 1
+	// * Here I will use the port 0 meaning I use available port.
+	this.m_sessions[sessionId] = GoJavaScriptClient.NewClient("127.0.0.1" /*this.m_startPort*/, 0, "duktape")
 
 	if sessionId != "" {
 		this.initScripts(sessionId)
@@ -872,7 +863,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	// the session.
 	this.m_clearInterval <- sessionId
 
-	// Execute channel id
+	// Close and remove channel.
 	if this.m_executeJsFunction[sessionId] != nil {
 		close(this.m_executeJsFunction[sessionId])
 		delete(this.m_executeJsFunction, sessionId)
@@ -903,11 +894,6 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 		delete(this.m_getVariable, sessionId)
 	}
 
-	if this.m_getVariable[sessionId] != nil {
-		close(this.m_getVariable[sessionId])
-		delete(this.m_getVariable, sessionId)
-	}
-
 	if this.m_exports[sessionId] != nil {
 		delete(this.m_exports, sessionId)
 	}
@@ -915,6 +901,8 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	if this.m_sessions[sessionId] != nil {
 		delete(this.m_sessions, sessionId)
 	}
+
+	LogInfo("---> ressource for session: ", sessionId, " are removed!")
 
 }
 
@@ -1179,11 +1167,8 @@ func (this *JsRuntimeManager) CloseSession(sessionId string, callback func()) {
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["sessionId"] = sessionId
-	op.m_returns = make(chan ([]interface{}))
+
 	this.m_closeVm <- op
-	defer close(op.m_returns)
-	// wait for completion
-	<-op.m_returns
 
 	// Call the close callback
 	callback()

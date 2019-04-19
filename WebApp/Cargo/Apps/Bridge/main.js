@@ -32,7 +32,7 @@ function init() {
 
     bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
-    // The body element....
+    // The body element.
     var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
 
     // The page to display when the user is logged in.

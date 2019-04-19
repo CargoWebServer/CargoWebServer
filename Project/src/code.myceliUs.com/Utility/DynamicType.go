@@ -5,6 +5,7 @@ import (
 	b64 "encoding/base64"
 	"encoding/gob"
 	"errors"
+
 	"log"
 	"reflect"
 	"strconv"
@@ -50,11 +51,11 @@ func RegisterType(typedNil interface{}) {
 		if index > 0 {
 			getTypeManager().setType(t.PkgPath()[index+1:]+"."+typeName, t)
 			gob.RegisterName(t.PkgPath()[index+1:]+"."+typeName, typedNil)
-			log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
+			//log.Println("------> type: ", t.PkgPath()[index+1:]+"."+typeName, " was register as dynamic type.")
 		} else {
 			getTypeManager().setType(t.PkgPath()+"."+typeName, t)
 			gob.RegisterName(t.PkgPath()+"."+typeName, typedNil)
-			log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
+			//log.Println("------> type: ", t.PkgPath()+"."+typeName, " was register as dynamic type.")
 		}
 	}
 }

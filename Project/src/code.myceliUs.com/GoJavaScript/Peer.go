@@ -2,6 +2,7 @@ package GoJavaScript
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -93,23 +94,21 @@ func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
 	p.stop_chan = make(chan bool)
 
 	// The log processing information.
-	go func(port int) {
+	go func(p *Peer) {
 		for {
 			select {
 			case msg := <-logChannel:
 				// Open the log file.
-				f, err := os.OpenFile("./GoJavaScript_"+strconv.Itoa(port)+"_log.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-				if err != nil {
-					log.Println(err)
+				f, err := os.OpenFile("./GoJavaScript_"+strconv.Itoa(p.port)+".log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+				if err == nil {
+					logger := log.New(f, "", log.LstdFlags)
+					logger.Println(msg)
+					// set the message.
+					f.Close()
 				}
-				logger := log.New(f, "", log.LstdFlags)
-				logger.Println(msg)
-
-				// set the message.
-				f.Close()
 			}
 		}
-	}(port)
+	}(p)
 
 	return p
 }
@@ -132,6 +131,9 @@ func (self *Peer) run() {
 					}
 					self.receive_chan <- msg.Interface().(*Message)
 				} else {
+					if err.Error() == "EOF" {
+						Log("136 Peer.go --> Connection close normaly for peer ", self.address, self.port)
+					}
 					return
 				}
 			} else {
@@ -196,11 +198,32 @@ func (self *Peer) run() {
 				}
 			}(self, msg)
 		case <-self.stop_chan:
+			Log("---> close peer ", self.address, self.port)
 			self.conn.Close()
 			self.isRunning = false
+
+			//erase map
+			self.pending_actions_chan.Range(func(key interface{}, value interface{}) bool {
+				// clear the map.
+				action := value.(*Action)
+				action.AppendResults(errors.New("Action cancel by peer " + self.address))
+				action.GetDone() <- action
+				self.pending_actions_chan.Delete(key)
+				return true
+			})
+
+			// Close the channels
+			close(self.send_chan)
+			close(self.receive_chan)
+			close(self.exec_action_chan)
+
 			break
 		}
 	}
+}
+
+func (self *Peer) SetPort(port int) {
+	self.port = port
 }
 
 func (self *Peer) Ping() {
@@ -209,10 +232,7 @@ func (self *Peer) Ping() {
 	ping.Target = "Client"
 
 	// Append the name parameter.
-	Log("---> ping call")
-	ping = self.CallRemoteAction(ping)
-	Log("---> pong ", ping.Results)
-	// return "Pong" // ping.Results[0].(string)
+	self.CallRemoteAction(ping)
 }
 
 // Send a message over the network
@@ -224,6 +244,14 @@ func (self *Peer) SendMessage(msg *Message) {
 // If the peer act as server you must use that function
 func (self *Peer) Listen() {
 	ln, _ := net.Listen("tcp", ":"+strconv.Itoa(self.port))
+
+	// Set the port from the actual connection.
+	self.port = ln.Addr().(*net.TCPAddr).Port
+	Log("248 connection open from server at port ---> ", self.port)
+
+	// print the value to the console.
+	fmt.Println(self.port)
+
 	self.conn, _ = ln.Accept() // only one connection per server here...
 
 	// Process message (incoming and outgoing)
@@ -232,7 +260,7 @@ func (self *Peer) Listen() {
 	// test if the connection is alive.
 	go func(self *Peer) {
 		// Call ping a interval of 5 second...
-		for ; true; <-time.Tick(5 * time.Second) {
+		for ; true; <-time.Tick(2 * time.Second) {
 			self.Ping()
 		}
 
@@ -255,9 +283,6 @@ func (self *Peer) Connect(address string, port int) error {
 		Log("--> connection error: ", err)
 		return err
 	}
-
-	// set the deadline to 30 second.
-	//self.conn.SetDeadline(time.Now().Add(deadLine * time.Second))
 
 	// Start runing.
 	go self.run()

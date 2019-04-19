@@ -116,10 +116,12 @@ func (self *Server) processActions() {
 					action.AppendResults(self.engine.GetGlobalVariable(action.Params[0].Value.(string)))
 				} else if action.Name == "Stop" {
 					self.isRunning = false
+					action.GetDone() <- action
+					self.peer.Close()
+					return
 				}
 				action.GetDone() <- action
 			}()
 		}
 	}
-	self.peer.Close()
 }

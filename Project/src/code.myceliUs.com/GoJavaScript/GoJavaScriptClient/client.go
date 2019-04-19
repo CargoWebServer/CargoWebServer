@@ -5,10 +5,12 @@ import (
 	"strconv"
 	"time"
 
+	"bufio"
 	"encoding/json"
 	"errors"
 
-	//"fmt"
+	//	"log"
+
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -48,41 +50,7 @@ func NewClient(address string, port int, name string) *Client {
 	// Create the peer.
 	client.peer = GoJavaScript.NewPeer(address, port, client.exec_action_chan)
 
-	var err error
-	// Here I will start the external server process.
-	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
-	// Make sure the command exist in the os path...
-	client.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
-
-	err = client.srv.Start()
-
-	if err != nil {
-		// In that case I will try to start the GoJavaScriptServer at the save level of the client application.
-		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err == nil {
-			if runtime.GOOS == "windows" {
-				client.srv = exec.Command(dir+"\\GoJavaScriptServer.exe", strconv.Itoa(port), name)
-			} else {
-				client.srv = exec.Command(dir+"/GoJavaScriptServer", strconv.Itoa(port), name)
-			}
-
-			err = client.srv.Start()
-			if err != nil {
-				GoJavaScript.Log("Fail to start GoJavaScriptServer", err)
-				return nil
-			}
-		}
-
-	}
-
-	// Create the client connection, try 5 time and wait 200 millisecond each try.
-	for i := 0; i < 100; i++ {
-		time.Sleep(50 * time.Millisecond)
-		err = client.peer.Connect(address, port)
-		if err == nil {
-			break
-		}
-	}
+	err := client.startServerProcess(name, address, port)
 
 	if err != nil {
 		GoJavaScript.Log("Fail to connect with server ", address, ":", port, err)
@@ -96,6 +64,73 @@ func NewClient(address string, port int, name string) *Client {
 	client.SetGlobalVariable("console", getConsole())
 
 	return client
+}
+
+func (self *Client) startServerProcess(name string, address string, port int) error {
+	var err error
+
+	// Here I will start the external server process.
+	// Make Go intall for the GoJerryScriptServer to be in the /bin of go.
+	// Make sure the command exist in the os path...
+	self.srv = exec.Command("GoJavaScriptServer", strconv.Itoa(port), name)
+	stdout, _ := self.srv.StdoutPipe()
+
+	err = self.srv.Start()
+	if err != nil {
+
+		// In that case I will try to start the GoJavaScriptServer at the save level of the client application.
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err == nil {
+			if runtime.GOOS == "windows" {
+				self.srv = exec.Command(dir+"\\GoJavaScriptServer.exe", strconv.Itoa(port), name)
+			} else {
+				self.srv = exec.Command(dir+"/GoJavaScriptServer", strconv.Itoa(port), name)
+			}
+
+			err = self.srv.Start()
+			if err != nil {
+				GoJavaScript.Log("Fail to start GoJavaScriptServer", err)
+				return nil
+			}
+		}
+		return err
+	}
+
+	if port == 0 {
+		// if the port is 0 It means the process will generate it and it
+		// outpout will contain it.
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			m := scanner.Text()
+			port, _ := strconv.Atoi(m)
+
+			// set the client port to port
+			self.peer.SetPort(port)
+
+			for i := 0; i < 500; i++ {
+				time.Sleep(50 * time.Millisecond)
+				err = self.peer.Connect(address, port)
+				if err == nil {
+					GoJavaScript.Log("---> Peer connected at ", address, ":", port)
+					return nil
+				}
+			}
+		}
+
+		// Here I will wait to input...
+		self.srv.Wait()
+	}
+
+	// Create the client connection, try 5 time and wait 200 millisecond each try.
+	for i := 0; i < 500; i++ {
+		time.Sleep(50 * time.Millisecond)
+		err = self.peer.Connect(address, port)
+		if err == nil {
+			break
+		}
+	}
+
+	return nil
 }
 
 // Call a go function and return it result.
@@ -114,11 +149,9 @@ func (self *Client) callGoFunction(name string, params []interface{}) (interface
 		}
 	}
 
-	//log.Println("----> call go function ", name, params)
 	results, err := Utility.CallFunction(name, GoJavaScript.RefToObject(params).([]interface{})...)
 
 	if err != nil {
-		GoJavaScript.Log("---> call go function ", name, " fail with error: ", err)
 		return nil, err
 	}
 
@@ -153,6 +186,10 @@ func (self *Client) processActions() {
 		case action := <-self.exec_action_chan:
 			//log.Println("---> action receive: ", action.Name, action.Target)
 			go func(a *GoJavaScript.Action) {
+				if a == nil {
+					return
+				}
+
 				var target interface{}
 				isJsObject := true
 				if len(a.Target) > 0 {
@@ -200,13 +237,12 @@ func (self *Client) processActions() {
 
 				// set the action result.
 				a.AppendResults(results, err)
+
 				// Here I will create the response and send it back to the client.
 				a.GetDone() <- a
 			}(action)
 		}
 	}
-	// No more action to process.
-	self.peer.Close()
 }
 
 ////////////////////////////-- Api --////////////////////////////
@@ -443,7 +479,6 @@ func (self *Client) EvalScript(script string, variables []interface{}) (interfac
 	action.AppendParam("variables", variables)
 
 	// Call the remote action
-
 	action = self.peer.CallRemoteAction(action)
 
 	var err error
@@ -487,7 +522,6 @@ func (self *Client) CallFunction(name string, params ...interface{}) (interface{
  * Set the global variable name.
  */
 func (self *Client) SetGlobalVariable(name string, value interface{}) {
-
 	// Replace objects by their reference as needed.
 	value = GoJavaScript.ObjectToRef(value)
 
@@ -504,6 +538,7 @@ func (self *Client) SetGlobalVariable(name string, value interface{}) {
  * Get the global variable name.
  */
 func (self *Client) GetGlobalVariable(name string) (interface{}, error) {
+
 	action := GoJavaScript.NewAction("GetGlobalVariable", "")
 
 	action.AppendParam("name", name)
@@ -541,9 +576,6 @@ func (self *Client) Stop() bool {
 
 	// Stop action proecessing
 	self.isRunning = false
-
-	// stop it server.
-	self.srv.Process.Kill()
 
 	// Close the peers.
 	self.peer.Close()
