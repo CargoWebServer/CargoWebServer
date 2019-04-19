@@ -1,8 +1,0 @@
-2019/04/18 20:31:01 [248 connection open from server at port --->  49875]
-
-2019/04/18 20:31:01 [---> Peer connected at  127.0.0.1 : 49875]
-
-2019/04/18 20:31:02 [---> Peer connected at  127.0.0.1 : 49881]
-
-2019/04/18 20:40:37 [136 Peer.go --> Connection close normaly for peer  127.0.0.1 50773]
-

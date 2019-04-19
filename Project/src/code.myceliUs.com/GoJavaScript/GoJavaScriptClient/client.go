@@ -39,7 +39,7 @@ type Client struct {
 }
 
 // Create a new client session with jerry script server.
-func NewClient(address string, port int, name string) *Client {
+func NewClient(address string, port int, name string) (*Client, error) {
 
 	client := new(Client)
 	client.isRunning = true
@@ -54,7 +54,7 @@ func NewClient(address string, port int, name string) *Client {
 
 	if err != nil {
 		GoJavaScript.Log("Fail to connect with server ", address, ":", port, err)
-		return nil
+		return nil, err
 	}
 
 	// process actions.
@@ -63,7 +63,7 @@ func NewClient(address string, port int, name string) *Client {
 	// Set the console.
 	client.SetGlobalVariable("console", getConsole())
 
-	return client
+	return client, nil
 }
 
 func (self *Client) startServerProcess(name string, address string, port int) error {

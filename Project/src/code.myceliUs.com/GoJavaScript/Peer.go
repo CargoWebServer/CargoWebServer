@@ -63,7 +63,7 @@ var (
 func Log(infos ...interface{}) {
 
 	// also display in the command prompt.
-	logChannel <- fmt.Sprintln(infos)
+	//logChannel <- fmt.Sprintln(infos)
 }
 
 func NewPeer(address string, port int, exec_action_chan chan *Action) *Peer {
